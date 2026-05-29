@@ -292,7 +292,16 @@ function DietBuilder() {
       </div>
 
       {openMeal && <SubstitutionModal meal={openMeal} onClose={() => setOpenMeal(null)} />}
+      <SendShareDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title={`Enviar plano para ${p.name}`}
+        defaultMessage={whatsText}
+        printHtml={printHtml}
+        printTitle={`Plano — ${p.name}`}
+      />
     </AppShell>
+
   );
 }
 
