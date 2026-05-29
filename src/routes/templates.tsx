@@ -620,7 +620,7 @@ function MealEditor({
                 Alimentos da refeição ({meal.main.items.length})
               </p>
               <button
-                onClick={addMainItem}
+                onClick={() => setPickerOpen(true)}
                 className="text-[10px] text-primary hover:underline"
               >
                 + alimento
