@@ -107,6 +107,9 @@ function DietBuilder() {
             <ClipboardList className="size-3.5" />
             Orientações Nutricionais
           </button>
+        </div>
+
+
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
           <div className="space-y-6">
