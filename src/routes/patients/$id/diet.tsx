@@ -27,6 +27,9 @@ function DietBuilder() {
   const [variationId, setVariationId] = useState(template.variations[0].id);
   const variation = template.variations.find((v) => v.id === variationId) ?? template.variations[0];
   const [openMeal, setOpenMeal] = useState<Meal | null>(null);
+  const [tab, setTab] = useState<"refeicoes" | "orientacoes">("refeicoes");
+  const [orientacoes, setOrientacoes] = useState<string>(() => defaultOrientacoes("Esportivo"));
+  const [shareOpen, setShareOpen] = useState(false);
 
   const totals = variation.meals.reduce(
     (acc, m) => ({
@@ -38,18 +41,33 @@ function DietBuilder() {
     { kcal: 0, p: 0, c: 0, f: 0 },
   );
 
+  const printHtml = dietToPrintHtml(p, variation, template.name, orientacoes);
+  const whatsText = dietToWhatsText(p, variation, template.name, orientacoes);
+
   return (
     <AppShell
       header={
         <div className="flex gap-2">
-          <button className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground border border-border rounded-md px-3 py-2 flex items-center gap-2">
-            <Download className="size-3.5" />
-            Exportar PDF
-          </button>
-          <button className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => printHTML({ title: `Plano — ${p.name}`, html: printHtml })}
+          >
+            <Printer className="size-3.5" />
+            Imprimir / PDF
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => setShareOpen(true)}
+            className="bg-[#25D366] hover:bg-[#1ebe57] text-white"
+          >
+            <MessageCircle className="size-3.5" />
+            WhatsApp
+          </Button>
+          <Button size="sm">
             <Save className="size-3.5" />
             Salvar Dieta
-          </button>
+          </Button>
         </div>
       }
     >
