@@ -1,10 +1,11 @@
 // Hook + store p/ "Meus Templates" (persistência local — futuro: Supabase)
 import { useEffect, useState, useCallback } from "react";
-import type { DietTemplate } from "./template-data";
+import type { PlannerTemplate } from "./meal-planner";
+import { normalizeStoredPlannerTemplate } from "./meal-planner";
 
 const KEY = "fitjourney.myTemplates.v1";
 
-export type MyTemplate = DietTemplate & {
+export type MyTemplate = PlannerTemplate & {
   basedOn: string;        // id do template do sistema
   savedAt: string;        // ISO
   finalidade?: string;    // ex: "Atleta hipertrofia 80kg"
@@ -14,7 +15,20 @@ export type MyTemplate = DietTemplate & {
 function read(): MyTemplate[] {
   if (typeof window === "undefined") return [];
   try {
-    return JSON.parse(localStorage.getItem(KEY) || "[]") as MyTemplate[];
+    const raw = JSON.parse(localStorage.getItem(KEY) || "[]") as Array<MyTemplate | Record<string, unknown>>;
+    return raw
+      .map((entry) => {
+        const normalized = normalizeStoredPlannerTemplate(entry);
+        if (!normalized) return null;
+        return {
+          ...normalized,
+          basedOn: typeof (entry as MyTemplate).basedOn === "string" ? (entry as MyTemplate).basedOn : normalized.id,
+          savedAt: typeof (entry as MyTemplate).savedAt === "string" ? (entry as MyTemplate).savedAt : new Date().toISOString(),
+          finalidade: typeof (entry as MyTemplate).finalidade === "string" ? (entry as MyTemplate).finalidade : undefined,
+          observacoes: typeof (entry as MyTemplate).observacoes === "string" ? (entry as MyTemplate).observacoes : undefined,
+        } satisfies MyTemplate;
+      })
+      .filter((entry): entry is MyTemplate => Boolean(entry));
   } catch {
     return [];
   }
