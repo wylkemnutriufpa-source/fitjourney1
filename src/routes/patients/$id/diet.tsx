@@ -245,7 +245,15 @@ function DietBuilder() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setOrientacoes(defaultOrientacoes("Esportivo"))}
+                    onClick={() =>
+                      setOrientacoes(
+                        orientacoesFor({
+                          id: MOCK_TO_SYSTEM_ID[templateId] ?? templateId,
+                          category: "Esportivo",
+                        }),
+                      )
+                    }
+
                   >
                     Restaurar padrão
                   </Button>
