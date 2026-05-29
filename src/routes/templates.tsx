@@ -17,9 +17,10 @@ import { Badge } from "@/components/ui/badge";
 import {
   templates as systemTemplates,
   categories,
-  defaultOrientacoes,
+  orientacoesFor,
   type DietTemplate,
 } from "@/lib/template-data";
+
 import { imgFor } from "@/lib/food-images";
 import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
 import { SendShareDialog } from "@/components/SendShareDialog";
@@ -304,8 +305,9 @@ function TemplateEditor({
   const [finalidade, setFinalidade] = useState(existingMine?.finalidade ?? "");
   const [observacoes, setObservacoes] = useState(existingMine?.observacoes ?? "");
   const [orientacoes, setOrientacoes] = useState<string>(
-    draft.orientacoes ?? defaultOrientacoes(draft.category),
+    draft.orientacoes ?? orientacoesFor(draft),
   );
+
   const [editorTab, setEditorTab] = useState<"refeicoes" | "orientacoes">("refeicoes");
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -437,7 +439,7 @@ function TemplateEditor({
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setOrientacoes(defaultOrientacoes(draft.category))}
+                    onClick={() => setOrientacoes(orientacoesFor(draft))}
                   >
                     Restaurar padrão
                   </Button>
