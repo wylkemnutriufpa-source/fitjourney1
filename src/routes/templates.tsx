@@ -677,6 +677,22 @@ function MealEditor({
           </div>
         </div>
       </div>
+      <FoodPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onPick={(f) =>
+          addMainItemFromCatalog(
+            createEmptyFoodItem({
+              foodKey: f.foodKey,
+              name: f.name,
+              qty: f.qty,
+              unit: f.unit,
+              kcal: f.kcal,
+              scaleGroup: f.scaleGroup,
+            }),
+          )
+        }
+      />
     </div>
   );
 }
