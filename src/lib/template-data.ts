@@ -37,7 +37,53 @@ export type DietTemplate = {
   tags: string[];
   kcal: number;
   meals: MealSlot[];
+  /** Orientações nutricionais editáveis — vão junto no PDF/WhatsApp. */
+  orientacoes?: string;
 };
+
+/** Texto padrão de Orientações Nutricionais por categoria — base editável. */
+export function defaultOrientacoes(category: DietTemplate["category"]): string {
+  const base = [
+    "• Beba pelo menos 35 ml de água por kg de peso por dia.",
+    "• Mastigue bem os alimentos — coma com calma, sem distrações.",
+    "• Respeite os horários das refeições; evite pular qualquer uma.",
+    "• Priorize alimentos in natura; evite ultraprocessados e refrigerantes.",
+    "• As substituições equivalentes mantêm a mesma calorias/macros — escolha conforme disponibilidade.",
+  ];
+  const extras: Record<DietTemplate["category"], string[]> = {
+    Esportivo: [
+      "• Faça a refeição pré-treino 60–90 min antes do treino.",
+      "• Consuma a refeição pós-treino em até 60 min após o estímulo.",
+      "• Em treinos longos (>90 min) considere reposição de carbo e eletrólitos.",
+    ],
+    Clínico: [
+      "• Reduza sal e açúcar adicionados ao mínimo.",
+      "• Evite frituras e gorduras hidrogenadas.",
+      "• Acompanhe os marcadores laboratoriais nas consultas de retorno.",
+    ],
+    Regional: [
+      "• Priorize peixes e frutas regionais da estação.",
+      "• Use açaí puro ou com aveia/tapioca — evite xaropes açucarados.",
+    ],
+    Gestante: [
+      "• Não pule a ceia para evitar hipoglicemia noturna.",
+      "• Evite peixes crus, embutidos e laticínios não pasteurizados.",
+      "• Mantenha a suplementação prescrita (ácido fólico, ferro).",
+    ],
+    "Pré/Pós-operatório": [
+      "• Siga rigorosamente o jejum prescrito pelo cirurgião.",
+      "• Evite frituras e fibras em excesso nas 48h pré-cirurgia.",
+      "• No pós, evolua a consistência apenas com liberação da equipe.",
+    ],
+    Bariátrica: [
+      "• Pare ao primeiro sinal de saciedade — volumes pequenos.",
+      "• NÃO tome líquidos durante a refeição (aguarde 30 min antes/depois).",
+      "• Mastigue cada porção 20–30 vezes.",
+      "• Mantenha suplementação prescrita (multivit, B12, ferro, cálcio).",
+    ],
+  };
+  return [...base, "", ...extras[category]].join("\n");
+}
 
 // ---- Catálogo enxuto de alimentos (apenas o que existe no banco de imagens) ----
 // Reaproveitamos para montar refeições. Cada chave corresponde a um arquivo .jpg
