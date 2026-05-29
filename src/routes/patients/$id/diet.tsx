@@ -8,7 +8,15 @@ import { Button } from "@/components/ui/button";
 import { SendShareDialog } from "@/components/SendShareDialog";
 import { dietToPrintHtml, dietToWhatsText } from "@/lib/diet-serializers";
 import { printHTML } from "@/lib/share-utils";
-import { defaultOrientacoes } from "@/lib/template-data";
+import { orientacoesFor } from "@/lib/template-data";
+
+/** Mapa mock-templates → ids do sistema, para puxar orientações específicas. */
+const MOCK_TO_SYSTEM_ID: Record<string, string> = {
+  "t-end-hc": "esp-endurance",
+  "t-hyp-2": "esp-hipertrofia",
+  "t-cut": "esp-cutting",
+};
+
 
 export const Route = createFileRoute("/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Dieta — FitJourney" }] }),
@@ -28,7 +36,10 @@ function DietBuilder() {
   const variation = template.variations.find((v) => v.id === variationId) ?? template.variations[0];
   const [openMeal, setOpenMeal] = useState<Meal | null>(null);
   const [tab, setTab] = useState<"refeicoes" | "orientacoes">("refeicoes");
-  const [orientacoes, setOrientacoes] = useState<string>(() => defaultOrientacoes("Esportivo"));
+  const [orientacoes, setOrientacoes] = useState<string>(() =>
+    orientacoesFor({ id: MOCK_TO_SYSTEM_ID[templateId] ?? templateId, category: "Esportivo" }),
+  );
+
   const [shareOpen, setShareOpen] = useState(false);
 
   const totals = variation.meals.reduce(
