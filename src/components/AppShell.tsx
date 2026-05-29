@@ -1,4 +1,4 @@
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Users,
@@ -6,8 +6,11 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  Loader2,
+  ShieldCheck,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { useAuth } from "@/lib/auth-context";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
