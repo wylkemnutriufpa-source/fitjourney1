@@ -292,6 +292,11 @@ function TemplateEditor({
   );
   const [finalidade, setFinalidade] = useState(existingMine?.finalidade ?? "");
   const [observacoes, setObservacoes] = useState(existingMine?.observacoes ?? "");
+  const [orientacoes, setOrientacoes] = useState<string>(
+    draft.orientacoes ?? defaultOrientacoes(draft.category),
+  );
+  const [editorTab, setEditorTab] = useState<"refeicoes" | "orientacoes">("refeicoes");
+  const [shareOpen, setShareOpen] = useState(false);
 
   function updateMeal(mealId: string, fn: (m: MealSlot) => MealSlot) {
     setDraft((d) => ({
@@ -300,7 +305,6 @@ function TemplateEditor({
     }));
   }
 
-  /** Escala equivalentes proporcionalmente ao novo qty do main */
   function changeMainQty(mealId: string, newQty: number) {
     updateMeal(mealId, (m) => {
       const ratio = m.main.qty > 0 ? newQty / m.main.qty : 1;
@@ -353,6 +357,7 @@ function TemplateEditor({
       ...draft,
       id: isMine ? draft.id : `mine-${Date.now()}`,
       name: name.trim() || draft.name,
+      orientacoes: orientacoes.trim() || undefined,
       basedOn: isMine ? (existingMine?.basedOn ?? original.id) : original.id,
       savedAt: new Date().toISOString(),
       finalidade: finalidade.trim() || undefined,
@@ -361,7 +366,10 @@ function TemplateEditor({
     onSave(toSave);
   }
 
-  const totalKcal = draft.kcal; // placeholder — futuro: somar via tabela TACO
+  const totalKcal = draft.kcal;
+
+  // Snapshot atual (com orientacoes editadas) para PDF/WhatsApp
+  const currentForShare: DietTemplate = { ...draft, name: name || draft.name, orientacoes };
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
@@ -377,41 +385,108 @@ function TemplateEditor({
                 {original.name}
               </DialogTitle>
               <DialogDescription className="text-xs">
-                Tudo editável. Ao salvar, vira um novo item em <strong>Meus Templates</strong>{" "}
-                — o template original do sistema não é alterado.
+                Tudo editável. Ao salvar, vira um item em <strong>Meus Templates</strong> —
+                o template original do sistema não é alterado.
               </DialogDescription>
             </div>
+            <div className="flex gap-2 shrink-0">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  printHTML({
+                    title: currentForShare.name,
+                    html: templateToPrintHtml(currentForShare, { finalidade }),
+                  })
+                }
+              >
+                <Printer className="size-3.5" /> PDF
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setShareOpen(true)}
+                className="bg-[#25D366] hover:bg-[#1ebe57] text-white"
+              >
+                <MessageCircle className="size-3.5" /> WhatsApp
+              </Button>
+            </div>
+          </div>
+
+          {/* Tabs do editor */}
+          <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-fit mt-3">
+            <TabBtn
+              active={editorTab === "refeicoes"}
+              onClick={() => setEditorTab("refeicoes")}
+            >
+              <UtensilsCrossed className="size-3.5" /> Refeições
+              <span className="text-[10px] font-mono opacity-60">{draft.meals.length}</span>
+            </TabBtn>
+            <TabBtn
+              active={editorTab === "orientacoes"}
+              onClick={() => setEditorTab("orientacoes")}
+            >
+              <ClipboardList className="size-3.5" /> Orientações Nutricionais
+            </TabBtn>
           </div>
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-0">
-          {/* Canvas refeições */}
+          {/* Canvas */}
           <div className="p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Esqueleto da dieta</h3>
-              <Button size="sm" variant="outline" onClick={addMeal}>
-                <Plus className="size-3.5" /> Refeição
-              </Button>
-            </div>
+            {editorTab === "refeicoes" && (
+              <>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold">Esqueleto da dieta</h3>
+                  <Button size="sm" variant="outline" onClick={addMeal}>
+                    <Plus className="size-3.5" /> Refeição
+                  </Button>
+                </div>
 
-            {draft.meals.map((m) => (
-              <MealEditor
-                key={m.id}
-                meal={m}
-                onChange={(fn) => updateMeal(m.id, fn)}
-                onChangeMainQty={(q) => changeMainQty(m.id, q)}
-                onRemoveEquivalent={(itemId) => removeEquivalent(m.id, itemId)}
-                onRemove={() => removeMeal(m.id)}
-              />
-            ))}
+                {draft.meals.map((m) => (
+                  <MealEditor
+                    key={m.id}
+                    meal={m}
+                    onChange={(fn) => updateMeal(m.id, fn)}
+                    onChangeMainQty={(q) => changeMainQty(m.id, q)}
+                    onRemoveEquivalent={(itemId) => removeEquivalent(m.id, itemId)}
+                    onRemove={() => removeMeal(m.id)}
+                  />
+                ))}
+              </>
+            )}
+
+            {editorTab === "orientacoes" && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-semibold">Orientações Nutricionais</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Texto livre que vai junto no PDF e no WhatsApp. Editado aqui é salvo
+                      com este template em <strong>Meus Templates</strong>.
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setOrientacoes(defaultOrientacoes(draft.category))}
+                  >
+                    Restaurar padrão
+                  </Button>
+                </div>
+                <Textarea
+                  value={orientacoes}
+                  onChange={(e) => setOrientacoes(e.target.value)}
+                  className="min-h-[420px] font-mono text-xs leading-relaxed"
+                  placeholder="Hidratação, mastigação, evitar ultraprocessados, horários..."
+                />
+              </div>
+            )}
           </div>
 
           {/* Sidebar metadata */}
           <aside className="border-l border-border bg-muted/30 p-6 space-y-4">
             <div>
-              <Label htmlFor="t-name" className="text-xs">
-                Nome
-              </Label>
+              <Label htmlFor="t-name" className="text-xs">Nome</Label>
               <Input
                 id="t-name"
                 value={name}
@@ -420,9 +495,7 @@ function TemplateEditor({
               />
             </div>
             <div>
-              <Label htmlFor="t-fin" className="text-xs">
-                Finalidade / paciente
-              </Label>
+              <Label htmlFor="t-fin" className="text-xs">Finalidade / paciente</Label>
               <Input
                 id="t-fin"
                 value={finalidade}
@@ -432,9 +505,7 @@ function TemplateEditor({
               />
             </div>
             <div>
-              <Label htmlFor="t-obs" className="text-xs">
-                Observações
-              </Label>
+              <Label htmlFor="t-obs" className="text-xs">Observações</Label>
               <Textarea
                 id="t-obs"
                 value={observacoes}
@@ -454,15 +525,22 @@ function TemplateEditor({
         </div>
 
         <DialogFooter className="px-6 py-4 border-t border-border sticky bottom-0 bg-background">
-          <Button variant="outline" onClick={onClose}>
-            Cancelar
-          </Button>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
           <Button onClick={save}>
             {isMine ? <Save className="size-4" /> : <Copy className="size-4" />}
             {isMine ? "Salvar alterações" : "Salvar em Meus Templates"}
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <SendShareDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title={`Enviar "${name}" via WhatsApp`}
+        defaultMessage={templateToWhatsText(currentForShare, { finalidade })}
+        printHtml={templateToPrintHtml(currentForShare, { finalidade })}
+        printTitle={name}
+      />
     </Dialog>
   );
 }
