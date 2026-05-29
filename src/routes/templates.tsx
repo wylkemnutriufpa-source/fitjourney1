@@ -807,9 +807,10 @@ function EquivalentOptionEditor({
   const img = imgFor(option.imageKey);
   const kcal = mealKcalFromOption(option);
   const [expanded, setExpanded] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  function addItem() {
-    onChange((o) => ({ ...o, items: [...o.items, createEmptyFoodItem()] }));
+  function addItemFromCatalog(item: PlannerFoodItem) {
+    onChange((o) => ({ ...o, items: [...o.items, item] }));
   }
   function changeItem(id: string, updated: PlannerFoodItem) {
     onChange((o) => ({ ...o, items: o.items.map((i) => (i.id === id ? updated : i)) }));
