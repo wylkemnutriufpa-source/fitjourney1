@@ -23,6 +23,7 @@ import {
 import { imgFor } from "@/lib/food-images";
 import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
 import { SendShareDialog } from "@/components/SendShareDialog";
+import { FoodPickerDialog } from "@/components/FoodPickerDialog";
 import { templateToPrintHtml, templateToWhatsText } from "@/lib/diet-serializers";
 import { printHTML } from "@/lib/share-utils";
 import {
@@ -526,6 +527,7 @@ function MealEditor({
 }) {
   const heroUrl = imgFor(meal.heroKey || meal.main.imageKey);
   const kcal = mealKcalFromOption(meal.main);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   function changeMainItem(itemId: string, updater: (i: PlannerFoodItem) => PlannerFoodItem) {
     onChange((m) => updateMainItemWithScaling(m, itemId, updater));
@@ -535,8 +537,8 @@ function MealEditor({
     onChange((m) => ({ ...m, main: updater(m.main) }));
   }
 
-  function addMainItem() {
-    updateMainOption((o) => ({ ...o, items: [...o.items, createEmptyFoodItem()] }));
+  function addMainItemFromCatalog(food: PlannerFoodItem) {
+    updateMainOption((o) => ({ ...o, items: [...o.items, food] }));
   }
 
   function removeMainItem(itemId: string) {
@@ -618,7 +620,7 @@ function MealEditor({
                 Alimentos da refeição ({meal.main.items.length})
               </p>
               <button
-                onClick={addMainItem}
+                onClick={() => setPickerOpen(true)}
                 className="text-[10px] text-primary hover:underline"
               >
                 + alimento
@@ -675,6 +677,22 @@ function MealEditor({
           </div>
         </div>
       </div>
+      <FoodPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onPick={(f) =>
+          addMainItemFromCatalog(
+            createEmptyFoodItem({
+              foodKey: f.foodKey,
+              name: f.name,
+              qty: f.qty,
+              unit: f.unit,
+              kcal: f.kcal,
+              scaleGroup: f.scaleGroup,
+            }),
+          )
+        }
+      />
     </div>
   );
 }
@@ -690,7 +708,6 @@ function FoodItemRow({
   onRemove: () => void;
   primary?: boolean;
 }) {
-  const img = imgFor(item.foodKey);
   return (
     <div
       className={
@@ -700,15 +717,6 @@ function FoodItemRow({
           : "bg-muted/40 border-border")
       }
     >
-      <div className="size-9 rounded bg-muted overflow-hidden flex-shrink-0">
-        {img ? (
-          <img src={img} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full grid place-items-center text-muted-foreground">
-            <ImageOff className="size-3" />
-          </div>
-        )}
-      </div>
       <Input
         value={item.name}
         onChange={(e) => onChange({ ...item, name: e.target.value })}
@@ -799,9 +807,10 @@ function EquivalentOptionEditor({
   const img = imgFor(option.imageKey);
   const kcal = mealKcalFromOption(option);
   const [expanded, setExpanded] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  function addItem() {
-    onChange((o) => ({ ...o, items: [...o.items, createEmptyFoodItem()] }));
+  function addItemFromCatalog(item: PlannerFoodItem) {
+    onChange((o) => ({ ...o, items: [...o.items, item] }));
   }
   function changeItem(id: string, updated: PlannerFoodItem) {
     onChange((o) => ({ ...o, items: o.items.map((i) => (i.id === id ? updated : i)) }));
@@ -857,13 +866,29 @@ function EquivalentOptionEditor({
             />
           ))}
           <button
-            onClick={addItem}
+            onClick={() => setPickerOpen(true)}
             className="text-[10px] text-primary hover:underline"
           >
             + alimento
           </button>
         </div>
       )}
+      <FoodPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onPick={(f) =>
+          addItemFromCatalog(
+            createEmptyFoodItem({
+              foodKey: f.foodKey,
+              name: f.name,
+              qty: f.qty,
+              unit: f.unit,
+              kcal: f.kcal,
+              scaleGroup: f.scaleGroup,
+            }),
+          )
+        }
+      />
     </div>
   );
 }
