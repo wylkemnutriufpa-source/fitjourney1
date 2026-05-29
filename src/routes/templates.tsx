@@ -708,7 +708,6 @@ function FoodItemRow({
   onRemove: () => void;
   primary?: boolean;
 }) {
-  const img = imgFor(item.foodKey);
   return (
     <div
       className={
@@ -718,15 +717,6 @@ function FoodItemRow({
           : "bg-muted/40 border-border")
       }
     >
-      <div className="size-9 rounded bg-muted overflow-hidden flex-shrink-0">
-        {img ? (
-          <img src={img} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full grid place-items-center text-muted-foreground">
-            <ImageOff className="size-3" />
-          </div>
-        )}
-      </div>
       <Input
         value={item.name}
         onChange={(e) => onChange({ ...item, name: e.target.value })}
