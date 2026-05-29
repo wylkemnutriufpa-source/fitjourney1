@@ -19,14 +19,26 @@ import {
   categories,
   defaultOrientacoes,
   type DietTemplate,
-  type MealSlot,
-  type FoodItem,
 } from "@/lib/template-data";
 import { imgFor } from "@/lib/food-images";
 import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
 import { SendShareDialog } from "@/components/SendShareDialog";
 import { templateToPrintHtml, templateToWhatsText } from "@/lib/diet-serializers";
 import { printHTML } from "@/lib/share-utils";
+import {
+  toPlannerTemplate,
+  clonePlannerTemplate,
+  updateMainItemWithScaling,
+  mealKcalFromOption,
+  createEmptyMeal,
+  createEmptyFoodItem,
+  createEmptyMealOption,
+  templateKcal,
+  type PlannerTemplate,
+  type PlannerMeal,
+  type PlannerMealOption,
+  type PlannerFoodItem,
+} from "@/lib/meal-planner";
 import {
   Plus,
   Save,
@@ -41,6 +53,8 @@ import {
   MessageCircle,
   UtensilsCrossed,
   ClipboardList,
+  ChefHat,
+  Repeat2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/templates")({
@@ -53,7 +67,7 @@ type Tab = "biblioteca" | "meus";
 function TemplatesPage() {
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
-  const [editing, setEditing] = useState<{ tpl: DietTemplate; isMine: boolean } | null>(null);
+  const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: MyTemplate } | null>(null);
   const { list: myList, save: saveMine, remove: removeMine } = useMyTemplates();
 
   const filteredSystem = useMemo(
@@ -74,9 +88,9 @@ function TemplatesPage() {
             </p>
             <h1 className="text-3xl font-bold tracking-tight">Templates de Dieta</h1>
             <p className="text-sm text-muted-foreground max-w-2xl">
-              Clique em um template para abrir o canvas editável. Tudo é editável — quando você
-              salva, vira um novo template em <strong>Meus Templates</strong> sem alterar o
-              modelo original do sistema.
+              Clique em uma refeição para abrir o canvas: cada alimento aparece desacoplado
+              (pão, ovo, café…) com sua gramatura e kcal. Alterar a quantidade do principal
+              escala todas as substituições proporcionalmente.
             </p>
           </div>
         </div>
@@ -97,7 +111,6 @@ function TemplatesPage() {
 
         {tab === "biblioteca" && (
           <>
-            {/* Category filter */}
             <div className="flex gap-2 flex-wrap">
               {(["Todos", ...categories] as const).map((c) => (
                 <button
@@ -115,15 +128,17 @@ function TemplatesPage() {
               ))}
             </div>
 
-            {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredSystem.map((t) => (
-                <TemplateCard
-                  key={t.id}
-                  tpl={t}
-                  onOpen={() => setEditing({ tpl: t, isMine: false })}
-                />
-              ))}
+              {filteredSystem.map((t) => {
+                const planner = toPlannerTemplate(t);
+                return (
+                  <TemplateCard
+                    key={t.id}
+                    tpl={planner}
+                    onOpen={() => setEditing({ tpl: planner, isMine: false })}
+                  />
+                );
+              })}
             </div>
           </>
         )}
@@ -144,7 +159,7 @@ function TemplatesPage() {
                 key={t.id}
                 tpl={t}
                 mine
-                onOpen={() => setEditing({ tpl: t, isMine: true })}
+                onOpen={() => setEditing({ tpl: t, isMine: true, mine: t })}
                 onDelete={() => removeMine(t.id)}
               />
             ))}
@@ -156,13 +171,13 @@ function TemplatesPage() {
         <TemplateEditor
           original={editing.tpl}
           isMine={editing.isMine}
+          existingMine={editing.mine}
           onClose={() => setEditing(null)}
           onSave={(t) => {
             saveMine(t);
             setEditing(null);
             setTab("meus");
           }}
-          existingMine={editing.isMine ? (editing.tpl as MyTemplate) : undefined}
         />
       )}
     </AppShell>
@@ -199,12 +214,12 @@ function TemplateCard({
   mine = false,
   onDelete,
 }: {
-  tpl: DietTemplate;
+  tpl: PlannerTemplate;
   onOpen: () => void;
   mine?: boolean;
   onDelete?: () => void;
 }) {
-  const hero = imgFor(tpl.meals[0]?.main.foodKey || "");
+  const hero = imgFor(tpl.meals[0]?.main.imageKey || "");
   return (
     <div className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all flex flex-col">
       <button onClick={onOpen} className="text-left">
@@ -265,13 +280,8 @@ function TemplateCard({
 }
 
 // ====================================================================
-// EDITOR — modal/canvas com refeições editáveis
+// EDITOR
 // ====================================================================
-
-function cloneTemplate(t: DietTemplate): DietTemplate {
-  // deep clone seguro p/ objetos puros
-  return JSON.parse(JSON.stringify(t));
-}
 
 function TemplateEditor({
   original,
@@ -280,13 +290,13 @@ function TemplateEditor({
   onClose,
   onSave,
 }: {
-  original: DietTemplate;
+  original: PlannerTemplate;
   isMine: boolean;
   existingMine?: MyTemplate;
   onClose: () => void;
   onSave: (t: MyTemplate) => void;
 }) {
-  const [draft, setDraft] = useState<DietTemplate>(() => cloneTemplate(original));
+  const [draft, setDraft] = useState<PlannerTemplate>(() => clonePlannerTemplate(original));
   const [name, setName] = useState(
     isMine ? original.name : `${original.name} (cópia)`,
   );
@@ -298,58 +308,23 @@ function TemplateEditor({
   const [editorTab, setEditorTab] = useState<"refeicoes" | "orientacoes">("refeicoes");
   const [shareOpen, setShareOpen] = useState(false);
 
-  function updateMeal(mealId: string, fn: (m: MealSlot) => MealSlot) {
-    setDraft((d) => ({
-      ...d,
-      meals: d.meals.map((m) => (m.id === mealId ? fn(m) : m)),
-    }));
-  }
-
-  function changeMainQty(mealId: string, newQty: number) {
-    updateMeal(mealId, (m) => {
-      const ratio = m.main.qty > 0 ? newQty / m.main.qty : 1;
-      return {
-        ...m,
-        main: { ...m.main, qty: round(newQty) },
-        equivalents: m.equivalents.map((e) => ({
-          ...e,
-          qty: round(e.qty * ratio),
-        })),
-      };
+  function setMeals(updater: (meals: PlannerMeal[]) => PlannerMeal[]) {
+    setDraft((d) => {
+      const meals = updater(d.meals);
+      return { ...d, meals, kcal: templateKcal(meals) };
     });
   }
 
-  function removeEquivalent(mealId: string, itemId: string) {
-    updateMeal(mealId, (m) => ({
-      ...m,
-      equivalents: m.equivalents.filter((e) => e.id !== itemId),
-    }));
+  function updateMeal(mealId: string, fn: (m: PlannerMeal) => PlannerMeal) {
+    setMeals((meals) => meals.map((m) => (m.id === mealId ? fn(m) : m)));
   }
 
   function removeMeal(mealId: string) {
-    setDraft((d) => ({ ...d, meals: d.meals.filter((m) => m.id !== mealId) }));
+    setMeals((meals) => meals.filter((m) => m.id !== mealId));
   }
 
   function addMeal() {
-    setDraft((d) => ({
-      ...d,
-      meals: [
-        ...d.meals,
-        {
-          id: `m-new-${Date.now()}`,
-          time: "12:00",
-          label: "Nova refeição",
-          main: {
-            id: `it-new-${Date.now()}`,
-            foodKey: "frango-grelhado",
-            name: "Frango grelhado",
-            qty: 150,
-            unit: "g",
-          },
-          equivalents: [],
-        },
-      ],
-    }));
+    setMeals((meals) => [...meals, createEmptyMeal()]);
   }
 
   function save() {
@@ -367,9 +342,7 @@ function TemplateEditor({
   }
 
   const totalKcal = draft.kcal;
-
-  // Snapshot atual (com orientacoes editadas) para PDF/WhatsApp
-  const currentForShare: DietTemplate = { ...draft, name: name || draft.name, orientacoes };
+  const currentForShare: PlannerTemplate = { ...draft, name: name || draft.name, orientacoes };
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
@@ -385,8 +358,8 @@ function TemplateEditor({
                 {original.name}
               </DialogTitle>
               <DialogDescription className="text-xs">
-                Tudo editável. Ao salvar, vira um item em <strong>Meus Templates</strong> —
-                o template original do sistema não é alterado.
+                Cada alimento é editável de forma independente. Alterar a gramatura do principal
+                escala todas as substituições proporcionalmente.
               </DialogDescription>
             </div>
             <div className="flex gap-2 shrink-0">
@@ -412,7 +385,6 @@ function TemplateEditor({
             </div>
           </div>
 
-          {/* Tabs do editor */}
           <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-fit mt-3">
             <TabBtn
               active={editorTab === "refeicoes"}
@@ -431,7 +403,6 @@ function TemplateEditor({
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-0">
-          {/* Canvas */}
           <div className="p-6 space-y-4">
             {editorTab === "refeicoes" && (
               <>
@@ -447,8 +418,6 @@ function TemplateEditor({
                     key={m.id}
                     meal={m}
                     onChange={(fn) => updateMeal(m.id, fn)}
-                    onChangeMainQty={(q) => changeMainQty(m.id, q)}
-                    onRemoveEquivalent={(itemId) => removeEquivalent(m.id, itemId)}
                     onRemove={() => removeMeal(m.id)}
                   />
                 ))}
@@ -461,8 +430,7 @@ function TemplateEditor({
                   <div>
                     <h3 className="text-sm font-semibold">Orientações Nutricionais</h3>
                     <p className="text-xs text-muted-foreground">
-                      Texto livre que vai junto no PDF e no WhatsApp. Editado aqui é salvo
-                      com este template em <strong>Meus Templates</strong>.
+                      Texto livre que vai junto no PDF e no WhatsApp.
                     </p>
                   </div>
                   <Button
@@ -477,13 +445,11 @@ function TemplateEditor({
                   value={orientacoes}
                   onChange={(e) => setOrientacoes(e.target.value)}
                   className="min-h-[420px] font-mono text-xs leading-relaxed"
-                  placeholder="Hidratação, mastigação, evitar ultraprocessados, horários..."
                 />
               </div>
             )}
           </div>
 
-          {/* Sidebar metadata */}
           <aside className="border-l border-border bg-muted/30 p-6 space-y-4">
             <div>
               <Label htmlFor="t-name" className="text-xs">Nome</Label>
@@ -510,7 +476,7 @@ function TemplateEditor({
                 id="t-obs"
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
-                placeholder="Onde usou, ajustes feitos, intercorrências..."
+                placeholder="Onde usou, ajustes feitos..."
                 className="mt-1 min-h-[120px]"
               />
             </div>
@@ -545,24 +511,62 @@ function TemplateEditor({
   );
 }
 
+// ====================================================================
+// MEAL EDITOR — refeição com itens desacoplados + scaling
+// ====================================================================
+
 function MealEditor({
   meal,
   onChange,
-  onChangeMainQty,
-  onRemoveEquivalent,
   onRemove,
 }: {
-  meal: MealSlot;
-  onChange: (fn: (m: MealSlot) => MealSlot) => void;
-  onChangeMainQty: (q: number) => void;
-  onRemoveEquivalent: (itemId: string) => void;
+  meal: PlannerMeal;
+  onChange: (fn: (m: PlannerMeal) => PlannerMeal) => void;
   onRemove: () => void;
 }) {
-  const heroUrl = imgFor(meal.main.foodKey);
+  const heroUrl = imgFor(meal.heroKey || meal.main.imageKey);
+  const kcal = mealKcalFromOption(meal.main);
+
+  function changeMainItem(itemId: string, updater: (i: PlannerFoodItem) => PlannerFoodItem) {
+    onChange((m) => updateMainItemWithScaling(m, itemId, updater));
+  }
+
+  function updateMainOption(updater: (o: PlannerMealOption) => PlannerMealOption) {
+    onChange((m) => ({ ...m, main: updater(m.main) }));
+  }
+
+  function addMainItem() {
+    updateMainOption((o) => ({ ...o, items: [...o.items, createEmptyFoodItem()] }));
+  }
+
+  function removeMainItem(itemId: string) {
+    updateMainOption((o) => ({ ...o, items: o.items.filter((i) => i.id !== itemId) }));
+  }
+
+  function addEquivalent() {
+    onChange((m) => ({
+      ...m,
+      equivalents: [
+        ...m.equivalents,
+        createEmptyMealOption({ title: "Nova opção equivalente" }),
+      ],
+    }));
+  }
+
+  function updateEquivalent(eqId: string, updater: (o: PlannerMealOption) => PlannerMealOption) {
+    onChange((m) => ({
+      ...m,
+      equivalents: m.equivalents.map((e) => (e.id === eqId ? updater(e) : e)),
+    }));
+  }
+
+  function removeEquivalent(eqId: string) {
+    onChange((m) => ({ ...m, equivalents: m.equivalents.filter((e) => e.id !== eqId) }));
+  }
+
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-background">
-      <div className="grid grid-cols-[120px_1fr] gap-0">
-        {/* Imagem */}
+      <div className="grid grid-cols-[140px_1fr] gap-0">
         <div className="relative aspect-square bg-muted">
           {heroUrl ? (
             <img src={heroUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -571,11 +575,12 @@ function MealEditor({
               <ImageOff className="size-6" />
             </div>
           )}
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+            <p className="text-white text-[10px] font-mono">{kcal} kcal</p>
+          </div>
         </div>
 
-        {/* Conteúdo */}
         <div className="p-3 space-y-3">
-          {/* Linha topo: hora + label */}
           <div className="flex items-center gap-2">
             <Input
               value={meal.time}
@@ -598,77 +603,72 @@ function MealEditor({
             </Button>
           </div>
 
-          {/* Main item */}
-          <div className="flex items-center gap-2 bg-primary/5 border border-primary/20 rounded-md p-2">
-            <span className="text-[9px] font-mono uppercase tracking-widest text-primary px-1">
-              Principal
-            </span>
-            <Input
-              value={meal.main.name}
-              onChange={(e) =>
-                onChange((m) => ({ ...m, main: { ...m.main, name: e.target.value } }))
-              }
-              className="h-7 flex-1 text-sm"
-            />
-            <Input
-              type="number"
-              value={meal.main.qty}
-              onChange={(e) => onChangeMainQty(Number(e.target.value) || 0)}
-              className="h-7 w-20 text-sm text-right"
-            />
-            <Input
-              value={meal.main.unit}
-              onChange={(e) =>
-                onChange((m) => ({ ...m, main: { ...m.main, unit: e.target.value } }))
-              }
-              className="h-7 w-16 text-xs"
-            />
+          {/* Título da opção principal */}
+          <Input
+            value={meal.main.title}
+            onChange={(e) => updateMainOption((o) => ({ ...o, title: e.target.value }))}
+            className="h-7 text-sm font-medium"
+            placeholder="Título da refeição principal"
+          />
+
+          {/* Itens desacoplados */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-primary">
+                Alimentos da refeição ({meal.main.items.length})
+              </p>
+              <button
+                onClick={addMainItem}
+                className="text-[10px] text-primary hover:underline"
+              >
+                + alimento
+              </button>
+            </div>
+            {meal.main.items.map((item) => (
+              <FoodItemRow
+                key={item.id}
+                item={item}
+                primary
+                onChange={(updated) => changeMainItem(item.id, () => updated)}
+                onRemove={() => removeMainItem(item.id)}
+              />
+            ))}
+            {meal.main.items.length === 0 && (
+              <p className="text-[11px] text-muted-foreground italic">Sem alimentos.</p>
+            )}
           </div>
 
-          {/* Equivalentes */}
+          {/* Receita */}
+          <RecipeEditor
+            value={meal.main.recipe ?? ""}
+            onChange={(v) => updateMainOption((o) => ({ ...o, recipe: v || undefined }))}
+          />
+
+          {/* Equivalentes (substituem a refeição inteira) */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                Equivalentes ({meal.equivalents.length})
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1">
+                <Repeat2 className="size-3" /> Opções equivalentes ({meal.equivalents.length})
               </p>
               <button
                 className="text-[10px] text-primary hover:underline"
-                onClick={() =>
-                  onChange((m) => ({
-                    ...m,
-                    equivalents: [
-                      ...m.equivalents,
-                      {
-                        id: `eq-${Date.now()}`,
-                        foodKey: "iogurte-natural",
-                        name: "Novo equivalente",
-                        qty: 100,
-                        unit: "g",
-                      },
-                    ],
-                  }))
-                }
+                onClick={addEquivalent}
               >
-                + adicionar
+                + opção
               </button>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-2">
               {meal.equivalents.map((eq) => (
-                <EquivalentRow
+                <EquivalentOptionEditor
                   key={eq.id}
-                  item={eq}
-                  onChange={(updated) =>
-                    onChange((m) => ({
-                      ...m,
-                      equivalents: m.equivalents.map((e) => (e.id === eq.id ? updated : e)),
-                    }))
-                  }
-                  onRemove={() => onRemoveEquivalent(eq.id)}
+                  option={eq}
+                  onChange={(fn) => updateEquivalent(eq.id, fn)}
+                  onRemove={() => removeEquivalent(eq.id)}
                 />
               ))}
               {meal.equivalents.length === 0 && (
                 <p className="text-[11px] text-muted-foreground italic">
-                  Sem equivalentes nesta refeição.
+                  Sem equivalentes. Adicione opções que o paciente pode usar no lugar desta refeição.
                 </p>
               )}
             </div>
@@ -679,19 +679,28 @@ function MealEditor({
   );
 }
 
-function EquivalentRow({
+function FoodItemRow({
   item,
   onChange,
   onRemove,
+  primary = false,
 }: {
-  item: FoodItem;
-  onChange: (it: FoodItem) => void;
+  item: PlannerFoodItem;
+  onChange: (i: PlannerFoodItem) => void;
   onRemove: () => void;
+  primary?: boolean;
 }) {
   const img = imgFor(item.foodKey);
   return (
-    <div className="flex items-center gap-2 bg-muted/40 border border-border rounded-md p-1.5">
-      <div className="size-8 rounded bg-muted overflow-hidden flex-shrink-0">
+    <div
+      className={
+        "flex items-center gap-2 rounded-md p-1.5 border " +
+        (primary
+          ? "bg-primary/5 border-primary/20"
+          : "bg-muted/40 border-border")
+      }
+    >
+      <div className="size-9 rounded bg-muted overflow-hidden flex-shrink-0">
         {img ? (
           <img src={img} alt="" className="w-full h-full object-cover" />
         ) : (
@@ -716,6 +725,13 @@ function EquivalentRow({
         onChange={(e) => onChange({ ...item, unit: e.target.value })}
         className="h-7 w-14 text-xs"
       />
+      <Input
+        type="number"
+        value={item.kcal}
+        onChange={(e) => onChange({ ...item, kcal: Number(e.target.value) || 0 })}
+        className="h-7 w-16 text-xs text-right font-mono text-primary"
+        title="kcal"
+      />
       <button
         onClick={onRemove}
         className="text-muted-foreground hover:text-destructive p-1"
@@ -727,8 +743,127 @@ function EquivalentRow({
   );
 }
 
-function round(n: number) {
-  // arredonda para 1 casa quando < 10, inteiro acima
-  if (!isFinite(n)) return 0;
-  return n < 10 ? Math.round(n * 10) / 10 : Math.round(n);
+function RecipeEditor({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(Boolean(value));
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="text-[10px] text-muted-foreground hover:text-primary inline-flex items-center gap-1"
+      >
+        <ChefHat className="size-3" /> Adicionar modo de preparo
+      </button>
+    );
+  }
+  return (
+    <div className="border border-dashed border-border rounded-md p-2 bg-muted/20">
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1">
+          <ChefHat className="size-3" /> Modo de preparo
+        </p>
+        <button
+          onClick={() => {
+            onChange("");
+            setOpen(false);
+          }}
+          className="text-[10px] text-muted-foreground hover:text-destructive"
+        >
+          remover
+        </button>
+      </div>
+      <Textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="min-h-[80px] text-xs font-mono leading-relaxed"
+        placeholder="1. Bata a goma com o ovo...&#10;2. Despeje na frigideira..."
+      />
+    </div>
+  );
+}
+
+function EquivalentOptionEditor({
+  option,
+  onChange,
+  onRemove,
+}: {
+  option: PlannerMealOption;
+  onChange: (fn: (o: PlannerMealOption) => PlannerMealOption) => void;
+  onRemove: () => void;
+}) {
+  const img = imgFor(option.imageKey);
+  const kcal = mealKcalFromOption(option);
+  const [expanded, setExpanded] = useState(false);
+
+  function addItem() {
+    onChange((o) => ({ ...o, items: [...o.items, createEmptyFoodItem()] }));
+  }
+  function changeItem(id: string, updated: PlannerFoodItem) {
+    onChange((o) => ({ ...o, items: o.items.map((i) => (i.id === id ? updated : i)) }));
+  }
+  function removeItem(id: string) {
+    onChange((o) => ({ ...o, items: o.items.filter((i) => i.id !== id) }));
+  }
+
+  return (
+    <div className="border border-border rounded-md bg-muted/20 overflow-hidden">
+      <div className="flex items-center gap-2 p-1.5">
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="size-9 rounded bg-muted overflow-hidden flex-shrink-0"
+          title={expanded ? "Recolher" : "Expandir"}
+        >
+          {img ? (
+            <img src={img} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full grid place-items-center text-muted-foreground">
+              <ImageOff className="size-3" />
+            </div>
+          )}
+        </button>
+        <Input
+          value={option.title}
+          onChange={(e) => onChange((o) => ({ ...o, title: e.target.value }))}
+          className="h-7 flex-1 text-xs"
+        />
+        <span className="text-[10px] font-mono text-primary px-1">{kcal} kcal</span>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="text-[10px] text-primary hover:underline px-1"
+        >
+          {expanded ? "−" : `${option.items.length} itens`}
+        </button>
+        <button
+          onClick={onRemove}
+          className="text-muted-foreground hover:text-destructive p-1"
+          title="Remover opção"
+        >
+          <X className="size-3.5" />
+        </button>
+      </div>
+      {expanded && (
+        <div className="px-2 pb-2 space-y-1.5 border-t border-border pt-2">
+          {option.items.map((it) => (
+            <FoodItemRow
+              key={it.id}
+              item={it}
+              onChange={(u) => changeItem(it.id, u)}
+              onRemove={() => removeItem(it.id)}
+            />
+          ))}
+          <button
+            onClick={addItem}
+            className="text-[10px] text-primary hover:underline"
+          >
+            + alimento
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }

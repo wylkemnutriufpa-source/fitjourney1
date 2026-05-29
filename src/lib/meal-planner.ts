@@ -508,7 +508,7 @@ function legacyFoodToOption(food: LegacyFoodItem): PlannerMealOption {
   };
 }
 
-function mealKcalFromOption(option: PlannerMealOption) {
+export function mealKcalFromOption(option: PlannerMealOption) {
   return round(option.items.reduce((sum, item) => sum + item.kcal, 0));
 }
 
