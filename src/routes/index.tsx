@@ -19,6 +19,7 @@ function Login() {
   const [email, setEmail] = useState("wylkem.nutri.ufpa@gmail.com");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
