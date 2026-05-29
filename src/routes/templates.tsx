@@ -364,6 +364,14 @@ function TemplateEditor({
                 Cada alimento é editável de forma independente. Alterar a gramatura do principal
                 escala todas as substituições proporcionalmente.
               </DialogDescription>
+              {!isMine && (
+                <p className="mt-2 text-[11px] text-primary bg-primary/5 border border-primary/20 rounded px-2 py-1.5 inline-flex items-center gap-1.5">
+                  <FolderHeart className="size-3" />
+                  Suas edições são salvas em <strong>Meus Templates</strong> — o template
+                  original do sistema não é alterado.
+                </p>
+              )}
+
             </div>
             <div className="flex gap-2 shrink-0">
               <Button
