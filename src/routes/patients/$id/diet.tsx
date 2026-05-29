@@ -2,7 +2,13 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { getPatient, templates, type Meal } from "@/lib/mock-data";
-import { Plus, Save, Download, X, ArrowRightLeft, Clock } from "lucide-react";
+import { Plus, Save, Printer, MessageCircle, X, ArrowRightLeft, Clock, ClipboardList } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { SendShareDialog } from "@/components/SendShareDialog";
+import { dietToPrintHtml, dietToWhatsText } from "@/lib/diet-serializers";
+import { printHTML } from "@/lib/share-utils";
+import { defaultOrientacoes } from "@/lib/template-data";
 
 export const Route = createFileRoute("/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Dieta — FitJourney" }] }),
