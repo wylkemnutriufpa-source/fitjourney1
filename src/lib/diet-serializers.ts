@@ -3,31 +3,56 @@ import { escapeHtml } from "./share-utils";
 import type { DietTemplate } from "./template-data";
 import { defaultOrientacoes } from "./template-data";
 import type { Meal, Patient, DietVariation } from "./mock-data";
+import type { PlannerTemplate, PlannerMeal, PlannerMealOption } from "./meal-planner";
+import { toPlannerTemplate, mealKcalFromOption } from "./meal-planner";
 
 // ============ TEMPLATES ============
 
-export function templateToPrintHtml(t: DietTemplate, extra?: { finalidade?: string }): string {
-  const orient = (t.orientacoes ?? defaultOrientacoes(t.category)).trim();
-  const meals = t.meals
-    .map((m) => {
-      const eqs = m.equivalents
-        .map((e) => `<li>${escapeHtml(e.name)} — ${e.qty} ${escapeHtml(e.unit)}</li>`)
-        .join("");
-      return `
+function itemsToText(opt: PlannerMealOption) {
+  return opt.items.map((i) => `${i.name} — ${i.qty} ${i.unit}`).join("; ");
+}
+
+function renderMealHtml(m: PlannerMeal) {
+  const mainItems = m.main.items
+    .map(
+      (i) =>
+        `<li><strong>${escapeHtml(i.name)}</strong> — ${i.qty} ${escapeHtml(i.unit)} <span style="color:#666;font-family:ui-monospace,monospace;font-size:10.5px">(${i.kcal} kcal)</span></li>`,
+    )
+    .join("");
+  const recipe = m.main.recipe
+    ? `<p style="font-size:11px;color:#444;margin:6px 0 0;white-space:pre-wrap">📝 <em>Modo de preparo:</em>\n${escapeHtml(m.main.recipe)}</p>`
+    : "";
+  const eqs = m.equivalents
+    .map(
+      (e) =>
+        `<li><strong>${escapeHtml(e.title)}</strong> — ${escapeHtml(itemsToText(e))} <span style="color:#666;font-family:ui-monospace,monospace;font-size:10.5px">(${mealKcalFromOption(e)} kcal)</span></li>`,
+    )
+    .join("");
+  return `
 <div class="meal">
   <div class="meal-h">
     <span><span class="meal-time">${escapeHtml(m.time)}</span> · ${escapeHtml(m.label)}</span>
+    <span style="font-family:ui-monospace,monospace;color:#2563eb">${mealKcalFromOption(m.main)} kcal</span>
   </div>
-  <h3>${escapeHtml(m.main.name)} — ${m.main.qty} ${escapeHtml(m.main.unit)}</h3>
-  ${m.equivalents.length ? `<p style="font-size:11px;color:#666;margin:4px 0 2px">Substituições equivalentes:</p><ul>${eqs}</ul>` : ""}
+  <h3 style="margin:6px 0 4px">${escapeHtml(m.main.title)}</h3>
+  <ul>${mainItems}</ul>
+  ${recipe}
+  ${m.equivalents.length ? `<p style="font-size:11px;color:#666;margin:8px 0 2px">Opções equivalentes (substituem a refeição inteira):</p><ul>${eqs}</ul>` : ""}
 </div>`;
-    })
-    .join("");
+}
+
+export function templateToPrintHtml(
+  t: DietTemplate | PlannerTemplate,
+  extra?: { finalidade?: string },
+): string {
+  const tpl = toPlannerTemplate(t);
+  const orient = (tpl.orientacoes ?? defaultOrientacoes(tpl.category)).trim();
+  const meals = tpl.meals.map(renderMealHtml).join("");
 
   return `
-<h1>${escapeHtml(t.name)}</h1>
-<div class="meta">${escapeHtml(t.category)} · ${t.kcal} kcal · ${t.meals.length} refeições${extra?.finalidade ? ` · ${escapeHtml(extra.finalidade)}` : ""}</div>
-<p>${escapeHtml(t.description)}</p>
+<h1>${escapeHtml(tpl.name)}</h1>
+<div class="meta">${escapeHtml(tpl.category)} · ${tpl.kcal} kcal · ${tpl.meals.length} refeições${extra?.finalidade ? ` · ${escapeHtml(extra.finalidade)}` : ""}</div>
+<p>${escapeHtml(tpl.description)}</p>
 
 <h2>Plano alimentar</h2>
 ${meals}
@@ -36,16 +61,24 @@ ${meals}
 <div class="orientacoes">${escapeHtml(orient)}</div>`;
 }
 
-export function templateToWhatsText(t: DietTemplate, extra?: { finalidade?: string }): string {
-  const orient = (t.orientacoes ?? defaultOrientacoes(t.category)).trim();
-  const head = `*${t.name}*\n_${t.category} · ${t.kcal} kcal_${extra?.finalidade ? `\nPaciente/uso: ${extra.finalidade}` : ""}\n`;
-  const meals = t.meals
+export function templateToWhatsText(
+  t: DietTemplate | PlannerTemplate,
+  extra?: { finalidade?: string },
+): string {
+  const tpl = toPlannerTemplate(t);
+  const orient = (tpl.orientacoes ?? defaultOrientacoes(tpl.category)).trim();
+  const head = `*${tpl.name}*\n_${tpl.category} · ${tpl.kcal} kcal_${extra?.finalidade ? `\nPaciente/uso: ${extra.finalidade}` : ""}\n`;
+  const meals = tpl.meals
     .map((m) => {
-      const eqs = m.equivalents.length
-        ? "\n  _Substituições:_ " +
-          m.equivalents.map((e) => `${e.name} (${e.qty}${e.unit})`).join("; ")
+      const items = m.main.items.map((i) => `   • ${i.name} — ${i.qty}${i.unit}`).join("\n");
+      const recipe = m.main.recipe
+        ? `\n  📝 _Modo de preparo:_\n${m.main.recipe.split("\n").map((l) => `     ${l}`).join("\n")}`
         : "";
-      return `\n*${m.time} · ${m.label}*\n• ${m.main.name} — ${m.main.qty}${m.main.unit}${eqs}`;
+      const eqs = m.equivalents.length
+        ? "\n  _Opções equivalentes:_\n" +
+          m.equivalents.map((e) => `     ◦ ${e.title} (${itemsToText(e)})`).join("\n")
+        : "";
+      return `\n*${m.time} · ${m.label}* _(${mealKcalFromOption(m.main)}kcal)_\n  ▸ *${m.main.title}*\n${items}${recipe}${eqs}`;
     })
     .join("");
   return `${head}\n📋 *PLANO ALIMENTAR*${meals}\n\n💡 *ORIENTAÇÕES NUTRICIONAIS*\n${orient}\n\n— Enviado via FitJourney`;
