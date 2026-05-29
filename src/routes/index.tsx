@@ -1,6 +1,7 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Activity } from "lucide-react";
+import { createFileRoute, useNavigate, Navigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Activity, Loader2 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -14,10 +15,28 @@ export const Route = createFileRoute("/")({
 
 function Login() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const { signIn, session, loading } = useAuth();
+  const [email, setEmail] = useState("wylkem.nutri.ufpa@gmail.com");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function submit(e: React.FormEvent) {
+  useEffect(() => {
+    if (!loading && session) navigate({ to: "/dashboard" });
+  }, [loading, session, navigate]);
+
+  if (!loading && session) return <Navigate to="/dashboard" />;
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+    const { error } = await signIn(email, password);
+    setSubmitting(false);
+    if (error) {
+      setError(error);
+      return;
+    }
     navigate({ to: "/dashboard" });
   }
 
@@ -28,9 +47,7 @@ function Login() {
           <div className="size-8 bg-primary rounded-sm grid place-items-center">
             <div className="size-4 border-2 border-background rotate-45" />
           </div>
-          <span className="text-lg font-bold tracking-tight uppercase italic">
-            FitJourney
-          </span>
+          <span className="text-lg font-bold tracking-tight uppercase italic">FitJourney</span>
         </div>
 
         <div className="space-y-6 relative z-10">
@@ -67,29 +84,13 @@ function Login() {
       </div>
 
       <div className="flex items-center justify-center p-8">
-        <form onSubmit={submit} className="w-full max-w-sm space-y-8">
+        <form onSubmit={submit} className="w-full max-w-sm space-y-7">
           <div>
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              {mode === "signin" ? "Acesso" : "Cadastro"}
+              Acesso
             </p>
-            <h2 className="text-3xl font-bold tracking-tight mt-2">
-              {mode === "signin" ? "Entrar no painel" : "Criar conta"}
-            </h2>
+            <h2 className="text-3xl font-bold tracking-tight mt-2">Entrar no painel</h2>
           </div>
-
-          {mode === "signup" && (
-            <div className="space-y-2">
-              <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                Nome
-              </label>
-              <input
-                required
-                type="text"
-                placeholder="Dr. Marco Silva"
-                className="w-full bg-surface border border-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-primary"
-              />
-            </div>
-          )}
 
           <div className="space-y-2">
             <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
@@ -98,55 +99,45 @@ function Login() {
             <input
               required
               type="email"
-              placeholder="voce@clinica.com"
-              defaultValue="marco@fitjourney.app"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-surface border border-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-primary"
             />
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                Senha
-              </label>
-              {mode === "signin" && (
-                <button type="button" className="text-[10px] font-mono uppercase text-primary hover:underline">
-                  Recuperar
-                </button>
-              )}
-            </div>
+            <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+              Senha
+            </label>
             <input
               required
               type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              defaultValue="demo1234"
               className="w-full bg-surface border border-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-primary"
             />
           </div>
 
+          {error && (
+            <p className="text-xs font-mono text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
+              {error}
+            </p>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-primary text-primary-foreground rounded-md py-3 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
+            disabled={submitting}
+            className="w-full bg-primary text-primary-foreground rounded-md py-3 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-60"
           >
-            <Activity className="size-4" />
-            {mode === "signin" ? "Entrar" : "Cadastrar"}
+            {submitting ? <Loader2 className="size-4 animate-spin" /> : <Activity className="size-4" />}
+            Entrar
           </button>
 
-          <p className="text-xs text-muted-foreground text-center">
-            {mode === "signin" ? "Sem conta?" : "Já tem conta?"}{" "}
-            <button
-              type="button"
-              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              className="text-primary hover:underline font-medium"
-            >
-              {mode === "signin" ? "Criar conta" : "Entrar"}
-            </button>
-          </p>
-
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60 text-center">
-            <Link to="/dashboard" className="hover:text-primary">
-              Pular acesso → demo
-            </Link>
+            Acesso restrito · novos usuários por convite do administrador
           </p>
         </form>
       </div>
