@@ -47,6 +47,30 @@ function Crumbs() {
 
 export function AppShell({ children, header }: { children: ReactNode; header?: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const { session, user, roles, loading, signOut } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !session) navigate({ to: "/" });
+  }, [loading, session, navigate]);
+
+  if (loading || !session) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-background text-muted-foreground">
+        <Loader2 className="size-6 animate-spin" />
+      </div>
+    );
+  }
+
+  const isAdmin = roles.includes("admin");
+  const email = user?.email ?? "";
+  const initials = email.slice(0, 2).toUpperCase();
+  const displayName = email.split("@")[0];
+
+  async function handleSignOut() {
+    await signOut();
+    navigate({ to: "/" });
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -82,13 +106,13 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
           })}
         </nav>
 
-        <Link
-          to="/"
+        <button
+          onClick={handleSignOut}
           className="flex items-center gap-3 px-3 py-2 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground rounded-md"
         >
           <LogOut className="size-4" />
           Sair
-        </Link>
+        </button>
       </aside>
 
       <div className="pl-64">
@@ -97,13 +121,21 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
           <div className="flex items-center gap-4">
             {header}
             <div className="text-right">
-              <p className="text-xs font-medium">Dr. Marco Silva</p>
+              <p className="text-xs font-medium flex items-center gap-1.5 justify-end">
+                {displayName}
+                {isAdmin && (
+                  <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase text-primary border border-primary/40 rounded px-1.5 py-0.5">
+                    <ShieldCheck className="size-2.5" />
+                    Admin
+                  </span>
+                )}
+              </p>
               <p className="text-[10px] text-muted-foreground font-mono uppercase">
-                Sports Specialist
+                {email}
               </p>
             </div>
             <div className="size-10 rounded-full bg-surface border border-border grid place-items-center text-xs font-mono">
-              MS
+              {initials}
             </div>
           </div>
         </header>
