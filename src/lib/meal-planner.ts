@@ -574,19 +574,51 @@ export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate
   }
 
   const legacy = template as LegacyDietTemplate;
-  const meals = legacy.meals.map((meal: LegacyMealSlot) => ({
-    id: meal.id,
-    time: meal.time,
-    label: meal.label,
-    heroKey: meal.heroKey ?? meal.main.foodKey,
-    main: legacyFoodToOption(meal.main),
-    equivalents: meal.equivalents.map(legacyFoodToOption),
-  }));
+  const meals = legacy.meals.map((meal: LegacyMealSlot) => {
+    const isMainMeal = /almo[çc]o|jantar/i.test(meal.label);
+    const main = legacyFoodToOption(meal.main);
+    const equivalents = meal.equivalents.map(legacyFoodToOption);
+    return {
+      id: meal.id,
+      time: meal.time,
+      label: meal.label,
+      heroKey: meal.heroKey ?? meal.main.foodKey,
+      main: isMainMeal ? withLunchSides(main) : main,
+      equivalents: isMainMeal ? equivalents.map(withLunchSides) : equivalents,
+    };
+  });
 
   return {
     ...legacy,
     meals,
     kcal: templateKcal(meals),
+  };
+}
+
+/**
+ * Garante que pratos de almoço/jantar tenham acompanhamento padrão:
+ * arroz + feijão + salada livre + fruta de sobremesa.
+ * Só anexa o que ainda não estiver presente (detecção por nome).
+ */
+function withLunchSides(option: PlannerMealOption): PlannerMealOption {
+  const has = (re: RegExp) => option.items.some((i) => re.test(i.name.toLowerCase()));
+  const additions: BlueprintItem[] = [];
+  if (!has(/arroz|macarra|cuscuz|batata|macaxeira|pupunha|p[ãa]o|tapioca|quinoa|farofa/)) {
+    additions.push({ name: "Arroz cozido", qty: 100, unit: "g", kcal: 128, scaleGroup: "carb" });
+  }
+  if (!has(/feij[ãa]o|lentilha|gr[ãa]o-de-bico|ervilha/)) {
+    additions.push({ name: "Feijão cozido", qty: 80, unit: "g", kcal: 60, scaleGroup: "protein" });
+  }
+  if (!has(/salada|folhas|alface|r[úu]cula/)) {
+    additions.push({ name: "Salada verde (livre)", qty: 1, unit: "à vontade", kcal: 30, scaleGroup: "vegetable" });
+  }
+  if (!has(/fruta|ma[çc][ãa]|banana|mam[ãa]o|melancia|mel[ãa]o|abacaxi|manga|laranja|pera|uva|morango|goiaba|sobremesa/)) {
+    additions.push({ name: "Fruta de sobremesa", qty: 1, unit: "unid", kcal: 70, scaleGroup: "fruit" });
+  }
+  if (additions.length === 0) return option;
+  return {
+    ...option,
+    items: [...option.items, ...additions.map((b) => scaleItem(b, 1, option.imageKey))],
   };
 }
 
