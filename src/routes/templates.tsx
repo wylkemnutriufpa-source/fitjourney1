@@ -17,12 +17,16 @@ import { Badge } from "@/components/ui/badge";
 import {
   templates as systemTemplates,
   categories,
+  defaultOrientacoes,
   type DietTemplate,
   type MealSlot,
   type FoodItem,
 } from "@/lib/template-data";
 import { imgFor } from "@/lib/food-images";
 import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
+import { SendShareDialog } from "@/components/SendShareDialog";
+import { templateToPrintHtml, templateToWhatsText } from "@/lib/diet-serializers";
+import { printHTML } from "@/lib/share-utils";
 import {
   Plus,
   Save,
@@ -33,6 +37,10 @@ import {
   Library,
   FolderHeart,
   X,
+  Printer,
+  MessageCircle,
+  UtensilsCrossed,
+  ClipboardList,
 } from "lucide-react";
 
 export const Route = createFileRoute("/templates")({
