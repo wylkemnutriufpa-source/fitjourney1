@@ -81,6 +81,33 @@ function DietBuilder() {
           </div>
         </div>
 
+        {/* Tabs: Refeições / Orientações */}
+        <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-fit">
+          <button
+            onClick={() => setTab("refeicoes")}
+            className={
+              "flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md transition-colors " +
+              (tab === "refeicoes"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground")
+            }
+          >
+            Refeições
+            <span className="text-[10px] font-mono opacity-60">{variation.meals.length}</span>
+          </button>
+          <button
+            onClick={() => setTab("orientacoes")}
+            className={
+              "flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md transition-colors " +
+              (tab === "orientacoes"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground")
+            }
+          >
+            <ClipboardList className="size-3.5" />
+            Orientações Nutricionais
+          </button>
+
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
