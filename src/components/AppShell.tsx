@@ -1,4 +1,4 @@
-import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Users,
@@ -8,9 +8,11 @@ import {
   ChevronRight,
   Loader2,
   ShieldCheck,
+  ArrowLeft,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
+
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -117,7 +119,11 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
       <div className="pl-64">
         <header className="h-16 border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
-          <Crumbs />
+          <div className="flex items-center gap-3">
+            <BackButton />
+            <Crumbs />
+          </div>
+
           <div className="flex items-center gap-4">
             {header}
             <div className="text-right">
