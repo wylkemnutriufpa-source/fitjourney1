@@ -85,6 +85,197 @@ export function defaultOrientacoes(category: DietTemplate["category"]): string {
   return [...base, "", ...extras[category]].join("\n");
 }
 
+/** Orientações ESPECÍFICAS por template — texto clínico direcionado ao protocolo. */
+const templateOrientacoes: Record<string, string> = {
+  "esp-hipertrofia": `OBJETIVO: superávit calórico moderado (+300 a +500 kcal/dia) com ≈2 g de proteína/kg para maximizar síntese proteica.
+
+• Distribua a proteína em 5–6 refeições (25–40 g por refeição) — isso eleva a MPS ao longo do dia.
+• Pré-treino (60–90 min antes): priorize carbo de absorção média (pão+ovo, tapioca, cuscuz) + proteína.
+• Pós-treino (até 60 min): combine carbo + proteína (panqueca proteica, sanduíche de frango, iogurte+granola) para repor glicogênio.
+• Hidratação: 35–40 ml/kg/dia; em treinos longos adicione 500–750 ml/h com eletrólitos.
+• Creatina (3–5 g/dia) e whey podem ser úteis — discutir com nutricionista esportivo.
+• Durma 7–9 h: o crescimento muscular ocorre no sono.
+• Pesar quinzenalmente em jejum, mesmo horário. Ganho saudável: 0,25–0,5 kg/semana.`,
+
+  "esp-endurance": `OBJETIVO: alta disponibilidade de carboidrato (6–10 g/kg/dia) para sustentar treinos longos de corrida, ciclismo e triathlon.
+
+• Pré-treino longo (2–3 h antes): 1–4 g de carbo/kg (banana+aveia, mingau, tapioca).
+• Durante treinos > 60 min: 30–60 g de carbo/h (gel, banana, isotônico). Em >2,5 h, suba para 60–90 g/h.
+• Pós-treino: janela de 30 min — combine carbo (1 g/kg) + proteína (0,3 g/kg) para repor glicogênio.
+• Hidratação: pese antes e depois do treino — reponha 1,5 L para cada kg perdido.
+• Eletrólitos (Na 500–700 mg/L) em treinos > 1 h ou em calor.
+• Suplemente ferro se houver fadiga ou queda de performance — solicite ferritina nos exames.
+• Evite frituras 24 h antes de provas; teste qualquer alimento novo no treino, nunca na competição.`,
+
+  "esp-cutting": `OBJETIVO: déficit calórico moderado (300–500 kcal/dia) preservando massa magra. Proteína alta (2,2–2,6 g/kg).
+
+• Pese-se 1x/semana, em jejum, sempre no mesmo dia/horário. Meta: 0,5–1% do peso/semana.
+• Mantenha o treino de força pesado — o estímulo é o que protege a musculatura no déficit.
+• Pré-treino leve (omelete, crepioca) 60 min antes; pós-treino com proteína (whey, frango, ovos).
+• Use vegetais à vontade no almoço/jantar — saciedade sem custo calórico.
+• Café preto e chás (sem açúcar) ajudam na saciedade e podem ser ilimitados.
+• Cuidado com "calorias líquidas" — suco, refrigerante e álcool sabotam o déficit.
+• Se houver platô > 3 semanas: avalie atividade diária (passos) antes de cortar mais calorias.
+• Refeed (dia com carbo elevado) a cada 7–14 dias pode ajudar adesão e performance.`,
+
+  "cli-lowcarb": `OBJETIVO: reduzir carboidrato total para 60–80 g/dia para melhorar sensibilidade à insulina e perda de peso.
+
+• Elimine: açúcar, refrigerante, suco, pão branco, arroz branco, massa, batata, doces.
+• Permitidos à vontade: folhas, brócolis, couve-flor, abobrinha, pepino, tomate, ovos, carnes, peixes, queijos.
+• Frutas com moderação: prefira morango, framboesa, mirtilo (até 1 xícara/dia).
+• Gordura boa é amiga: azeite, abacate, castanhas, peixes gordos.
+• Beba 2,5–3 L de água/dia — low-carb aumenta diurese e perda de eletrólitos.
+• Adicione sal (himalaia/marinho) à comida — previne a "low-carb flu" nos primeiros 5 dias.
+• Monitore glicemia capilar se for diabético — pode ser necessário reduzir medicação (consulte médico).
+• Não é para sempre — após 8–12 semanas, reintroduza carbos complexos gradualmente.`,
+
+  "cli-diabetes": `OBJETIVO: controlar glicemia mantendo HbA1c < 7%. Fracionar carboidratos ao longo do dia e priorizar baixo índice glicêmico.
+
+• PROIBIDOS: açúcar, mel, rapadura, refrigerante, suco de caixinha, doces, pão branco.
+• Carbos liberados (com porção controlada): tapioca, cuscuz integral, pão integral, batata-doce, aveia, quinoa.
+• Sempre combine carbo + proteína + fibra na mesma refeição — reduz pico glicêmico.
+• Frutas: 1 unidade por vez, com casca/bagaço, preferencialmente após refeição.
+• Faça 5–6 refeições/dia em intervalos regulares (3–4 h) — evita hipoglicemia.
+• Monitore glicemia capilar: jejum, 2h pós-café, 2h pós-almoço, 2h pós-jantar (conforme orientação médica).
+• Caminhada de 15 min após refeições reduz glicemia pós-prandial em até 30%.
+• Hipoglicemia (suor, tremor, fome súbita): tomar 15 g de carbo rápido (1 colher de açúcar ou suco).`,
+
+  "cli-colesterol": `OBJETIVO: reduzir LDL e triglicerídeos. Eliminar gordura trans/saturada e aumentar fibras solúveis.
+
+• ELIMINE: frituras, manteiga, banha, bacon, embutidos (salsicha, mortadela, presunto), biscoito recheado, margarina dura.
+• Substitua por: azeite extra-virgem, abacate, castanhas (30 g/dia), peixes gordos (sardinha, atum, salmão) 2–3x/semana.
+• Aveia: 30–40 g/dia (mingau, panqueca) — a beta-glucana reduz colesterol em até 10%.
+• 5 porções de frutas e vegetais por dia — fibras solúveis "varrem" o colesterol intestinal.
+• Carnes vermelhas no máximo 2x/semana, sempre magras (patinho, alcatra, lagarto).
+• Retire pele de frango e gordura visível de qualquer carne antes do preparo.
+• Álcool eleva triglicerídeos — limite a 1 dose/dia (mulher) ou 2 doses/dia (homem).
+• Reavalie lipidograma em 3 meses; meta: LDL < 100 mg/dL (ou < 70 se alto risco).`,
+
+  "cli-figado": `OBJETIVO: reverter esteatose hepática. Perda de 7–10% do peso reduz gordura hepática significativamente.
+
+• ÁLCOOL: ZERO. Mesmo doses pequenas pioram a esteatose.
+• ELIMINE: frituras, refrigerante, suco de caixinha, açúcar adicionado, doces, frutose industrial.
+• Reduza carbos refinados — frutose hepática vira gordura direto no fígado.
+• Café (3–4 xícaras/dia, sem açúcar) é PROTETOR — comprovado em estudos.
+• Priorize proteína magra: peixe, frango sem pele, ovos, tofu.
+• Aumente vegetais verdes escuros (couve, brócolis, espinafre) — ricos em colina.
+• Caminhada de 30 min/dia 5x/semana reduz gordura hepática mesmo sem grande perda de peso.
+• Reavalie enzimas hepáticas (ALT, AST, GGT) e ultrassom em 3–6 meses.
+• Cuidado com suplementos "naturais" sem prescrição — muitos são hepatotóxicos.`,
+
+  "cli-hipertensao": `OBJETIVO: reduzir PA seguindo padrão DASH. Meta: < 130/80 mmHg.
+
+• SAL: máximo 5 g/dia (1 colher de chá rasa, somando tudo).
+• ELIMINE: caldos prontos, sopas de pacote, embutidos, salgadinhos, conservas, queijos amarelos.
+• Tempere com: alho, cebola, salsinha, cebolinha, açafrão, orégano, limão, vinagre.
+• Aumente POTÁSSIO: banana, laranja, mamão, melão, abacate, batata-doce, feijão, espinafre.
+• Aumente CÁLCIO/MAGNÉSIO: iogurte natural, leite magro, sementes (chia, linhaça), oleaginosas.
+• Reduza cafeína (máx. 2 xícaras de café/dia) e álcool (máx. 1 dose/dia).
+• Atividade aeróbica 150 min/semana reduz PA em 5–8 mmHg.
+• Meça PA em casa 2x/semana, sempre no mesmo horário, após 5 min de repouso.
+• Não interrompa medicação por conta própria mesmo com PA normalizada — converse com o médico.`,
+
+  "cli-renais": `OBJETIVO: prevenir formação de cálculos renais. Diluir urina e reduzir fatores litogênicos.
+
+• ÁGUA: mínimo 2,5–3 L/dia (urina deve ficar clara, quase incolor). Esta é a medida mais importante.
+• Adicione limão à água (1 limão/dia) — citrato inibe formação de cálculos.
+• REDUZA SAL: máximo 5 g/dia — sódio aumenta excreção de cálcio na urina.
+• MODERE OXALATO (se cálculo de oxalato): espinafre, beterraba, chocolate, amendoim, chá preto, soja.
+• NÃO restrinja cálcio — paradoxalmente, cálcio da dieta (laticínios, brócolis) PROTEGE contra cálculos.
+• Reduza proteína animal (máx. 1,2 g/kg/dia) — excesso aumenta acidez urinária.
+• Limite refrigerantes (especialmente cola — ricos em ácido fosfórico).
+• Frutas cítricas (laranja, lima) e melancia ajudam pelo alto teor de água e citrato.
+• Reavalie com urocultura/urina 24h e ultrassom conforme orientação do urologista.`,
+
+  "cli-vesicula": `OBJETIVO: reduzir crises de cólica biliar evitando estímulo à contração da vesícula por alimentos gordurosos.
+
+• ELIMINE TOTALMENTE: frituras, bacon, manteiga, creme de leite, leite integral, queijos amarelos, embutidos, frutos do mar gordurosos.
+• Evite: chocolate, gema de ovo em excesso (máx. 3/semana), oleaginosas em grande quantidade.
+• Prefira: peixes magros, frango sem pele, claras de ovo, laticínios desnatados, vegetais cozidos.
+• Faça 5–6 refeições pequenas/dia — jejum prolongado favorece formação de cálculos.
+• Cozinhe sempre: cozido, assado, grelhado, vapor. NUNCA frito.
+• Beba 2 L de água/dia, distribuídos.
+• Evite refeições muito volumosas, principalmente à noite.
+• Crise de cólica (dor intensa no hipocôndrio direito): jejum + procurar pronto-socorro.
+• Cirurgia de vesícula (colecistectomia) é a única solução definitiva — discuta com cirurgião.`,
+
+  "po-pre-op": `OBJETIVO: preparar o organismo para a cirurgia, otimizando reservas proteicas e reduzindo inflamação.
+
+• Suplementação proteica (whey ou caseinato 20–30 g 2x/dia) nas 2 semanas anteriores acelera recuperação.
+• Vitamina C e zinco (frutas cítricas, oleaginosas) auxiliam cicatrização.
+• ZERO ÁLCOOL nos 7 dias anteriores — aumenta sangramento e infecção.
+• ZERO TABACO — afeta cicatrização e oxigenação.
+• 48h antes: dieta de baixo resíduo (sem feijão, brócolis, repolho, cereais integrais).
+• JEJUM PRÉ-OPERATÓRIO (siga rigorosamente a orientação do anestesista):
+   – Sólidos: 6–8 h antes
+   – Líquidos claros (água, chá ralo): até 2 h antes (protocolo ERAS)
+• Carga de carboidrato (maltodextrina 100 g) até 2 h antes reduz resistência insulínica pós-operatória.
+• Suspenda anti-inflamatórios e suplementos como ginkgo, alho, ginseng 7 dias antes (risco de sangramento).
+• Confirme jejum, medicações e horário com a equipe cirúrgica 24 h antes.`,
+
+  "po-pos-op": `OBJETIVO: evoluir a consistência da dieta com segurança, fornecendo proteína para cicatrização sem sobrecarregar o sistema digestivo.
+
+• EVOLUÇÃO DA CONSISTÊNCIA (apenas com liberação médica):
+   1. Líquida clara (água, chá, isotônico): primeiras 24 h.
+   2. Líquida completa (caldos, vitaminas, mingau ralo): 24–72 h.
+   3. Pastosa (purê, sopa cremosa, mingau): 3–7 dias.
+   4. Branda (cozidos macios, sem casca/grão): 7–14 dias.
+   5. Geral, conforme tolerância.
+• PROTEÍNA é prioridade: 1,5–2 g/kg/dia para cicatrização.
+• Hidratação: 30–35 ml/kg/dia em pequenos goles ao longo do dia.
+• ZERO frituras, embutidos, ultraprocessados, álcool por pelo menos 30 dias.
+• Suplementação: whey, vitamina C, zinco, arginina podem acelerar cicatrização.
+• Sinais de alerta: vômitos persistentes, febre, dor abdominal forte, distensão → procurar atendimento.
+• Constipação é comum no pós-op: aumente fibras gradualmente conforme tolerar + caminhada leve.
+• Não force a evolução — respeite o tempo do seu organismo e as orientações da equipe.`,
+
+  "ges-gestante": `OBJETIVO: nutrir mãe e bebê no 2º/3º trimestre com +300 kcal/dia. Foco em ferro, cálcio, folato, DHA e proteína.
+
+• PROIBIDOS: peixes crus (sushi, sashimi), carnes mal-passadas, ovo cru, leite/queijos não pasteurizados, embutidos crus (presunto cru, salame), álcool (ZERO em qualquer quantidade).
+• Limite cafeína a 200 mg/dia (≈2 xícaras de café).
+• FERRO: carne vermelha magra 3x/semana + vegetais verdes escuros. Combine com vitamina C (laranja, limão) para melhor absorção.
+• CÁLCIO: 1.000 mg/dia — laticínios pasteurizados, sardinha, gergelim, tofu.
+• FOLATO/ÁCIDO FÓLICO: mantenha suplementação prescrita. Vegetais verdes, feijão, lentilha.
+• DHA (ômega-3): peixes de águas frias 2x/semana (sardinha, salmão) — fundamental para cérebro do bebê.
+• Fracione em 5–6 refeições pequenas — controla náusea, azia e hipoglicemia.
+• Ceia OBRIGATÓRIA (copo de leite, iogurte) — previne hipoglicemia noturna.
+• Hidratação: 2,5–3 L/dia. Caminhadas leves diárias, conforme liberação do obstetra.
+• Ganho de peso esperado no 2º/3º trim.: 350–500 g/semana (peso pré-gestacional normal).`,
+
+  "bar-pos-bariatrica": `OBJETIVO: fornecer proteína suficiente (60–80 g/dia) em volumes pequenos sem provocar dumping ou intolerância.
+
+• MASTIGUE 20–30 VEZES cada porção. Coma em 20–30 minutos cada refeição.
+• NÃO TOME LÍQUIDOS DURANTE AS REFEIÇÕES — aguarde 30 min antes e 30 min depois.
+• Hidratação: 1,5–2 L/dia em pequenos goles, fora das refeições.
+• PROTEÍNA SEMPRE PRIMEIRO no prato — depois vegetais, depois carbo (se houver espaço).
+• Suplementação OBRIGATÓRIA E VITALÍCIA: polivitamínico, B12, ferro, cálcio, vitamina D.
+• ZERO açúcar e doces — risco de dumping (sudorese, tontura, taquicardia, diarreia).
+• ZERO refrigerante (gases distendem o pouch) e álcool (absorção rápida).
+• Pare ao primeiro sinal de saciedade — forçar provoca vômito e pode dilatar o pouch.
+• Sinais de alerta: vômitos repetidos, dor torácica ao engolir, intolerância a líquidos → procurar equipe.
+• Acompanhamento mensal nos primeiros 6 meses, depois trimestral. Exames laboratoriais semestrais.`,
+
+  "reg-paraense": `OBJETIVO: aproveitar a riqueza nutricional da culinária paraense de forma equilibrada, com porções controladas.
+
+• AÇAÍ é fruta — mas tem ≈250 kcal por 100 g (puro). Limite a 300–400 ml/dia, sem xarope de guaraná ou açúcar.
+• Prefira açaí com tapioca, farinha d'água ou aveia — sem complementos açucarados.
+• PEIXES regionais (tambaqui, pirarucu, filhote, tucunaré) são excelentes — 2–3x/semana, grelhados ou cozidos.
+• Pupunha, macaxeira e bolo de macaxeira são carbos densos — pese a porção, evite no jantar.
+• Farofa de ovo: ótima fonte proteica, mas controle a quantidade de farinha (≈2 colheres de sopa).
+• Frutas regionais (cupuaçu, bacuri, taperebá, abacaxi, manga): livres na sobremesa.
+• Tucupi e jambu: liberados (baixa caloria), mas atenção ao sal em pratos como tacacá.
+• Hidratação: 35 ml/kg/dia. O calor amazônico exige reposição constante.
+• Limite refrigerantes guaraná locais — alta concentração de açúcar.
+• Combine sempre proteína (peixe/frango) + carbo regional + vegetal/fruta em cada refeição.`,
+};
+
+/** Retorna orientações específicas do template (se houver), ou fallback por categoria. */
+export function orientacoesFor(t: Pick<DietTemplate, "id" | "category">): string {
+  return templateOrientacoes[t.id] ?? defaultOrientacoes(t.category);
+}
+
+
+
 // ---- Catálogo enxuto de alimentos (apenas o que existe no banco de imagens) ----
 // Reaproveitamos para montar refeições. Cada chave corresponde a um arquivo .jpg
 // em src/assets/foods/.
