@@ -527,6 +527,7 @@ function MealEditor({
 }) {
   const heroUrl = imgFor(meal.heroKey || meal.main.imageKey);
   const kcal = mealKcalFromOption(meal.main);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   function changeMainItem(itemId: string, updater: (i: PlannerFoodItem) => PlannerFoodItem) {
     onChange((m) => updateMainItemWithScaling(m, itemId, updater));
@@ -536,8 +537,8 @@ function MealEditor({
     onChange((m) => ({ ...m, main: updater(m.main) }));
   }
 
-  function addMainItem() {
-    updateMainOption((o) => ({ ...o, items: [...o.items, createEmptyFoodItem()] }));
+  function addMainItemFromCatalog(food: PlannerFoodItem) {
+    updateMainOption((o) => ({ ...o, items: [...o.items, food] }));
   }
 
   function removeMainItem(itemId: string) {
