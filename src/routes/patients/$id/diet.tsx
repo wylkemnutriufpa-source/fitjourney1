@@ -158,65 +158,95 @@ function DietBuilder() {
               </div>
             </div>
 
-            <div className="relative border-l border-border ml-3 pl-8 space-y-6">
-              {variation.meals.map((m, i) => (
-                <div key={m.id + i} className="relative">
-                  <div
-                    className={
-                      "absolute -left-[37px] top-2 size-3 rounded-full ring-4 ring-background " +
-                      (i === 0 ? "bg-primary" : "bg-border")
-                    }
-                  />
-                  <button
-                    onClick={() => setOpenMeal(m)}
-                    className="w-full text-left bg-surface border border-border rounded-lg p-5 hover:border-primary/40 transition-colors group"
-                  >
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="space-y-1">
-                        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                          <Clock className="size-3" />
-                          {m.time} · {m.label}
-                        </p>
-                        <h4 className="font-bold text-lg group-hover:text-primary transition-colors">
-                          {m.title}
-                        </h4>
-                      </div>
-                      <span className="text-sm font-mono text-primary whitespace-nowrap">
-                        {m.kcal} kcal
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-3">
-                      {m.items.map((it) => `${it.qty} ${it.name}`).join(" · ")}
-                    </p>
-                    <div className="flex gap-6 mt-4 pt-3 border-t border-border">
-                      {[
-                        ["Prot", m.protein],
-                        ["Carbs", m.carbs],
-                        ["Gord", m.fat],
-                      ].map(([k, v]) => (
-                        <div key={k as string} className="space-y-0.5">
-                          <span className="text-[9px] font-mono uppercase text-muted-foreground">
-                            {k}
-                          </span>
-                          <p className="text-xs font-bold font-mono">{v}g</p>
+            {tab === "refeicoes" && (
+              <div className="relative border-l border-border ml-3 pl-8 space-y-6">
+                {variation.meals.map((m, i) => (
+                  <div key={m.id + i} className="relative">
+                    <div
+                      className={
+                        "absolute -left-[37px] top-2 size-3 rounded-full ring-4 ring-background " +
+                        (i === 0 ? "bg-primary" : "bg-border")
+                      }
+                    />
+                    <button
+                      onClick={() => setOpenMeal(m)}
+                      className="w-full text-left bg-surface border border-border rounded-lg p-5 hover:border-primary/40 transition-colors group"
+                    >
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                            <Clock className="size-3" />
+                            {m.time} · {m.label}
+                          </p>
+                          <h4 className="font-bold text-lg group-hover:text-primary transition-colors">
+                            {m.title}
+                          </h4>
                         </div>
-                      ))}
-                      <div className="ml-auto text-[10px] font-mono uppercase text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                        <ArrowRightLeft className="size-3" />
-                        {m.substitutions.length} substituições
+                        <span className="text-sm font-mono text-primary whitespace-nowrap">
+                          {m.kcal} kcal
+                        </span>
                       </div>
-                    </div>
+                      <p className="text-xs text-muted-foreground mt-3">
+                        {m.items.map((it) => `${it.qty} ${it.name}`).join(" · ")}
+                      </p>
+                      <div className="flex gap-6 mt-4 pt-3 border-t border-border">
+                        {[
+                          ["Prot", m.protein],
+                          ["Carbs", m.carbs],
+                          ["Gord", m.fat],
+                        ].map(([k, v]) => (
+                          <div key={k as string} className="space-y-0.5">
+                            <span className="text-[9px] font-mono uppercase text-muted-foreground">
+                              {k}
+                            </span>
+                            <p className="text-xs font-bold font-mono">{v}g</p>
+                          </div>
+                        ))}
+                        <div className="ml-auto text-[10px] font-mono uppercase text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                          <ArrowRightLeft className="size-3" />
+                          {m.substitutions.length} substituições
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                ))}
+                <div className="relative">
+                  <div className="absolute -left-[34px] top-2 size-2 rounded-full bg-border" />
+                  <button className="w-full border border-dashed border-border rounded-lg py-6 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40 flex items-center justify-center gap-2">
+                    <Plus className="size-3.5" />
+                    Adicionar Refeição
                   </button>
                 </div>
-              ))}
-              <div className="relative">
-                <div className="absolute -left-[34px] top-2 size-2 rounded-full bg-border" />
-                <button className="w-full border border-dashed border-border rounded-lg py-6 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40 flex items-center justify-center gap-2">
-                  <Plus className="size-3.5" />
-                  Adicionar Refeição
-                </button>
               </div>
-            </div>
+            )}
+
+            {tab === "orientacoes" && (
+              <div className="bg-surface border border-border rounded-lg p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                      Orientações Nutricionais
+                    </p>
+                    <h3 className="text-lg font-semibold mt-0.5">
+                      Vai junto no PDF e no WhatsApp
+                    </h3>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setOrientacoes(defaultOrientacoes("Esportivo"))}
+                  >
+                    Restaurar padrão
+                  </Button>
+                </div>
+                <Textarea
+                  value={orientacoes}
+                  onChange={(e) => setOrientacoes(e.target.value)}
+                  className="min-h-[420px] font-mono text-xs leading-relaxed"
+                  placeholder="Hidratação, mastigação, evitar ultraprocessados, horários, suplementação..."
+                />
+              </div>
+            )}
           </div>
 
           <aside className="space-y-4">
