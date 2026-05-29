@@ -866,13 +866,29 @@ function EquivalentOptionEditor({
             />
           ))}
           <button
-            onClick={addItem}
+            onClick={() => setPickerOpen(true)}
             className="text-[10px] text-primary hover:underline"
           >
             + alimento
           </button>
         </div>
       )}
+      <FoodPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onPick={(f) =>
+          addItemFromCatalog(
+            createEmptyFoodItem({
+              foodKey: f.foodKey,
+              name: f.name,
+              qty: f.qty,
+              unit: f.unit,
+              kcal: f.kcal,
+              scaleGroup: f.scaleGroup,
+            }),
+          )
+        }
+      />
     </div>
   );
 }
