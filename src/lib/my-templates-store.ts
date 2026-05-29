@@ -16,19 +16,19 @@ function read(): MyTemplate[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) || "[]") as Array<MyTemplate | Record<string, unknown>>;
-    return raw
-      .map((entry) => {
-        const normalized = normalizeStoredPlannerTemplate(entry);
-        if (!normalized) return null;
-        return {
-          ...normalized,
-          basedOn: typeof (entry as MyTemplate).basedOn === "string" ? (entry as MyTemplate).basedOn : normalized.id,
-          savedAt: typeof (entry as MyTemplate).savedAt === "string" ? (entry as MyTemplate).savedAt : new Date().toISOString(),
-          finalidade: typeof (entry as MyTemplate).finalidade === "string" ? (entry as MyTemplate).finalidade : undefined,
-          observacoes: typeof (entry as MyTemplate).observacoes === "string" ? (entry as MyTemplate).observacoes : undefined,
-        } satisfies MyTemplate;
-      })
-      .filter((entry): entry is MyTemplate => Boolean(entry));
+    const list: MyTemplate[] = [];
+    raw.forEach((entry) => {
+      const normalized = normalizeStoredPlannerTemplate(entry);
+      if (!normalized) return;
+      list.push({
+        ...normalized,
+        basedOn: typeof (entry as MyTemplate).basedOn === "string" ? (entry as MyTemplate).basedOn : normalized.id,
+        savedAt: typeof (entry as MyTemplate).savedAt === "string" ? (entry as MyTemplate).savedAt : new Date().toISOString(),
+        finalidade: typeof (entry as MyTemplate).finalidade === "string" ? (entry as MyTemplate).finalidade : undefined,
+        observacoes: typeof (entry as MyTemplate).observacoes === "string" ? (entry as MyTemplate).observacoes : undefined,
+      });
+    });
+    return list;
   } catch {
     return [];
   }
