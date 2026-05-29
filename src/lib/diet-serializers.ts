@@ -1,7 +1,7 @@
 // Serializadores: template / dieta → HTML (PDF) e texto (WhatsApp).
 import { escapeHtml } from "./share-utils";
 import type { DietTemplate } from "./template-data";
-import { defaultOrientacoes } from "./template-data";
+import { orientacoesFor } from "./template-data";
 import type { Meal, Patient, DietVariation } from "./mock-data";
 import type { PlannerTemplate, PlannerMeal, PlannerMealOption } from "./meal-planner";
 import { toPlannerTemplate, mealKcalFromOption } from "./meal-planner";
