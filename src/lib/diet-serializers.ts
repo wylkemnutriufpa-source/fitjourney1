@@ -46,7 +46,8 @@ export function templateToPrintHtml(
   extra?: { finalidade?: string },
 ): string {
   const tpl = toPlannerTemplate(t);
-  const orient = (tpl.orientacoes ?? defaultOrientacoes(tpl.category)).trim();
+  const orient = (tpl.orientacoes ?? orientacoesFor(tpl)).trim();
+
   const meals = tpl.meals.map(renderMealHtml).join("");
 
   return `
@@ -66,7 +67,7 @@ export function templateToWhatsText(
   extra?: { finalidade?: string },
 ): string {
   const tpl = toPlannerTemplate(t);
-  const orient = (tpl.orientacoes ?? defaultOrientacoes(tpl.category)).trim();
+  const orient = (tpl.orientacoes ?? orientacoesFor(tpl)).trim();
   const head = `*${tpl.name}*\n_${tpl.category} · ${tpl.kcal} kcal_${extra?.finalidade ? `\nPaciente/uso: ${extra.finalidade}` : ""}\n`;
   const meals = tpl.meals
     .map((m) => {
