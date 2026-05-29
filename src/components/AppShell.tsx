@@ -47,6 +47,33 @@ function Crumbs() {
   );
 }
 
+function BackButton() {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const router = useRouter();
+  const navigate = useNavigate();
+  // Esconde no dashboard (raiz) e na home pública.
+  if (path === "/" || path === "/dashboard") return null;
+  function goBack() {
+    // Se houver histórico no SPA, volta; senão sobe um nível.
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.history.back();
+      return;
+    }
+    const parent = path.split("/").slice(0, -1).join("/") || "/dashboard";
+    navigate({ to: parent });
+  }
+  return (
+    <button
+      onClick={goBack}
+      title="Voltar"
+      className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+    >
+      <ArrowLeft className="size-3.5" />
+      Voltar
+    </button>
+  );
+}
+
 export function AppShell({ children, header }: { children: ReactNode; header?: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
