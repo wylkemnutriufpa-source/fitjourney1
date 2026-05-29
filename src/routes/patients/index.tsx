@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AppShell } from "../components/AppShell";
-import { patients, type Goal } from "../lib/mock-data";
+import { AppShell } from "@/components/AppShell";
+import { patients, type Goal } from "@/lib/mock-data";
 import { Plus, Search, ArrowUpRight, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/patients/")({
