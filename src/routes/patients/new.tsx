@@ -6,7 +6,7 @@ import { Calculator, Save, Activity } from "lucide-react";
 
 export const Route = createFileRoute("/patients/new")({
   head: () => ({ meta: [{ title: "Nova Anamnese — FitJourney" }] }),
-  component: NewPatient;
+  component: NewPatient,
 });
 
 const sections = [
