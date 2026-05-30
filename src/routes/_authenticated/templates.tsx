@@ -552,6 +552,15 @@ function TemplateEditor({
         printHtml={templateToPrintHtml(currentForShare, { finalidade })}
         printTitle={name}
       />
+
+      <SendShareDialog
+        open={orientShareOpen}
+        onOpenChange={setOrientShareOpen}
+        title={`Enviar orientações de "${name}" via WhatsApp`}
+        defaultMessage={`*Orientações Nutricionais*\n_${name || draft.name}${finalidade ? ` · ${finalidade}` : ""}_\n\n${orientacoes.trim()}\n\n— Enviado via FitJourney`}
+        printHtml={`<h1>Orientações Nutricionais</h1><div class="meta">${escapeHtml(name || draft.name)}${finalidade ? ` · ${escapeHtml(finalidade)}` : ""}</div><div class="orientacoes">${escapeHtml(orientacoes.trim())}</div>`}
+        printTitle={`Orientações — ${name || draft.name}`}
+      />
     </Dialog>
   );
 }
