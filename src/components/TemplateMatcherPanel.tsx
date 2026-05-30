@@ -2,13 +2,21 @@
 // Usa o engine puro `matchTemplates` para ranquear a biblioteca pelo alvo informado.
 // Não modifica templates. Sem inferência. Só leitura + score.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Sparkles, Target, ChevronDown, ChevronUp } from "lucide-react";
-import { matchTemplates } from "@/lib/engine";
-import type { TemplateMeta, MatchResult } from "@/lib/engine";
+import { matchTemplates, calcFromAnamnese, calcMacroTarget } from "@/lib/engine";
+import type { TemplateMeta, MatchResult, Goal as EngineGoal } from "@/lib/engine";
 import { templates as systemTemplates } from "@/lib/template-data";
+import { PatientPicker } from "./PatientPicker";
+import type { Patient } from "@/lib/mock-data";
 
 const KCAL_TOLERANCE = 0.15; // ±15% se template não declarar range explícito
+
+function patientGoalToEngine(goal: Patient["goal"]): EngineGoal {
+  if (goal === "Emagrecimento") return "cut";
+  if (goal === "Hipertrofia") return "bulk";
+  return "maintain";
+}
 
 function toMeta(t: (typeof systemTemplates)[number]): TemplateMeta {
   return {
