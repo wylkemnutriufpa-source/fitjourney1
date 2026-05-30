@@ -134,6 +134,18 @@ export function TemplateMatcherPanel({
 
       {open && (
         <div className="border-t border-border p-4 space-y-4">
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Paciente (opcional · auto-preenche alvo)
+            </p>
+            <PatientPicker value={patient} onChange={setPatient} />
+            {patient && (
+              <p className="text-[10px] font-mono text-primary/80">
+                Alvo recalculado pelo motor a partir da anamnese de {patient.name}.
+              </p>
+            )}
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <NumInput label="kcal alvo" value={kcal} onChange={setKcal} step={50} />
             <NumInput label="prot (g)" value={proteinG} onChange={setProteinG} step={5} />
