@@ -332,8 +332,11 @@ function TemplateEditor({
   const [shareOpen, setShareOpen] = useState(false);
   const [orientShareOpen, setOrientShareOpen] = useState(false);
   const [applyOpen, setApplyOpen] = useState(false);
-  const [applyPatient, setApplyPatient] = useState<Patient | null>(null);
+  const [applyPatient, setApplyPatient] = useState<PatientLite | null>(null);
   const [applyDone, setApplyDone] = useState<string | null>(null);
+  const [applyBusy, setApplyBusy] = useState(false);
+  const [applyError, setApplyError] = useState<string | null>(null);
+  const publishPlan = useServerFn(publishPlanToPatient);
 
   function setMeals(updater: (meals: PlannerMeal[]) => PlannerMeal[]) {
     setDraft((d) => {
