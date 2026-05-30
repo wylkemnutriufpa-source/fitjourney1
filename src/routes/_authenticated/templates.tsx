@@ -799,12 +799,15 @@ function FoodInfoPopover({
           <p className="text-sm font-medium leading-tight">{item.name}</p>
         </div>
 
-        {match ? (
-          <div className="text-[11px] text-muted-foreground border-t border-border pt-2">
-            <p>Por 100 g (TACO/IBGE):</p>
-            <p className="font-mono">
-              {match.kcalPer100g} kcal · P {match.proteinPer100g}g · C {match.carbPer100g}g · G{" "}
-              {match.fatPer100g}g
+        {match && currentNutrition ? (
+          <div className="text-[11px] text-muted-foreground border-t border-border pt-2 space-y-1">
+            <p>Porção atual: {currentNutrition.grams} g equivalentes</p>
+            <p className="font-mono text-foreground">
+              {currentNutrition.kcal} kcal · P {currentNutrition.protein}g · C {currentNutrition.carbs}g · G{" "}
+              {currentNutrition.fat}g
+            </p>
+            <p className="text-[10px]">
+              Base TACO/IBGE por 100g apenas como referência técnica.
             </p>
           </div>
         ) : (
@@ -860,20 +863,29 @@ function FoodItemRow({
   const [editing, setEditing] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const listFoodsFn = useServerFn(listFoods);
+  const { data: foods } = useQuery({
+    queryKey: ["foods-catalog"],
+    queryFn: () => listFoodsFn(),
+    staleTime: 5 * 60_000,
+  });
+  const catalogMatch = useMemo(() => findCatalogFood(foods, item), [foods, item.foodKey, item.name]);
 
   useEffect(() => {
     if (editing) nameInputRef.current?.focus();
   }, [editing]);
 
   function applyMeasure(grams: number, measureName: string) {
-    onChange({
+    onChange(withCatalogKcal({
       ...item,
       qty: grams,
       unit: "g",
-      // mantém kcal atual (não recalcula automaticamente — quem decide é o nutri)
-      // mas atualiza o nome com a medida entre parênteses se ainda não tiver
-    });
+    }, catalogMatch));
     setInfoOpen(false);
+  }
+
+  function updatePortion(patch: Partial<PlannerFoodItem>) {
+    onChange(withCatalogKcal({ ...item, ...patch }, catalogMatch));
   }
 
   const baseClass =
@@ -903,7 +915,7 @@ function FoodItemRow({
               <ChevronDown className="size-3.5" />
             </button>
           </PopoverTrigger>
-          <FoodInfoPopover item={item} onApplyMeasure={applyMeasure} />
+          <FoodInfoPopover item={item} match={catalogMatch} onApplyMeasure={applyMeasure} />
         </Popover>
         <button
           onClick={(e) => {
@@ -946,12 +958,12 @@ function FoodItemRow({
       <Input
         type="number"
         value={item.qty}
-        onChange={(e) => onChange({ ...item, qty: Number(e.target.value) || 0 })}
+        onChange={(e) => updatePortion({ qty: Number(e.target.value) || 0 })}
         className="h-7 w-16 text-xs text-right"
       />
       <Input
         value={item.unit}
-        onChange={(e) => onChange({ ...item, unit: e.target.value })}
+        onChange={(e) => updatePortion({ unit: e.target.value })}
         className="h-7 w-14 text-xs"
       />
       <Input
