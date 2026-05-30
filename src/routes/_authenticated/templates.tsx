@@ -733,12 +733,27 @@ function findCatalogFood(foods: FoodDTO[] | undefined, item: PlannerFoodItem) {
   if (exactName) return exactName;
 
   const aliasMatchers: Array<[RegExp, (foodName: string) => boolean]> = [
+    [/arroz integral/, (foodName) => foodName.includes("arroz integral")],
+    [/\barroz\b/, (foodName) => foodName.includes("arroz branco")],
+    [/feijao preto/, (foodName) => foodName.includes("feijao preto")],
+    [/\bfeijao\b/, (foodName) => foodName.includes("feijao carioca")],
+    [/salada|folhas|alface/, (foodName) => foodName.includes("alface")],
+    [/fruta sobremesa|\bmaca\b/, (foodName) => foodName.includes("maca")],
+    [/\bleite\b/, (foodName) => foodName.includes("leite vaca integral")],
+    [/iogurte/, (foodName) => foodName.includes("iogurte natural integral")],
+    [/aveia/, (foodName) => foodName.includes("aveia")],
+    [/banana|fruta picada/, (foodName) => foodName.includes("banana")],
+    [/frango desfiado|frango grelhado|\bfrango\b/, (foodName) => foodName.includes("peito frango")],
+    [/tilapia|\bpeixe\b/, (foodName) => foodName.includes("tilapia")],
+    [/queijo branco|queijo minas/, (foodName) => foodName.includes("queijo minas")],
+    [/pao integral/, (foodName) => foodName.includes("pao integral")],
+    [/pao frances|\bpao\b/, (foodName) => foodName.includes("pao frances")],
+    [/macarrao/, (foodName) => foodName.includes("macarrao cozido")],
     [/\bovo\b/, (foodName) => /\bovo\b/.test(foodName)],
     [/goma de tapioca|\btapioca\b/, (foodName) => foodName.includes("goma tapioca")],
     [/\bcuscuz\b/, (foodName) => foodName.includes("cuscuz")],
     [/\bcafe\b/, (foodName) => foodName.includes("cafe")],
     [/\bcha\b/, (foodName) => foodName.includes("cha")],
-    [/\bpao frances\b/, (foodName) => foodName.includes("pao frances")],
   ];
 
   for (const [itemPattern, matchesFood] of aliasMatchers) {
@@ -748,8 +763,16 @@ function findCatalogFood(foods: FoodDTO[] | undefined, item: PlannerFoodItem) {
     }
   }
 
-  const nonCompositeKey = item.foodKey && !item.foodKey.includes("-com-");
-  return nonCompositeKey ? foods.find((food) => food.foodKey === item.foodKey) ?? null : null;
+  const keyMatches = item.foodKey ? foods.filter((food) => food.foodKey === item.foodKey) : [];
+  if (keyMatches.length === 1) return keyMatches[0];
+
+  const itemTokens = itemName.split(" ").filter((token) => token.length >= 4);
+  return (
+    keyMatches.find((food) => {
+      const foodName = normalizeFoodLabel(food.name);
+      return itemTokens.some((token) => foodName.includes(token));
+    }) ?? null
+  );
 }
 
 function gramsForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
