@@ -58,12 +58,40 @@ export function TemplateMatcherPanel({
   readonly onPickTemplate?: (templateId: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [patient, setPatient] = useState<Patient | null>(null);
   const [kcal, setKcal] = useState<number>(defaultKcal ?? 2200);
   const [proteinG, setProteinG] = useState<number>(defaultProtein ?? 140);
   const [carbG, setCarbG] = useState<number>(defaultCarb ?? 260);
   const [fatG, setFatG] = useState<number>(defaultFat ?? 70);
   const [meals, setMeals] = useState<number>(5);
   const [constraints, setConstraints] = useState<Set<Constraint>>(new Set());
+
+  // Quando um paciente é selecionado, recalcula alvo determinístico
+  // via engine (Mifflin + macros por kg) e pré-popula os campos.
+  useEffect(() => {
+    if (!patient) return;
+    try {
+      const { tdee } = calcFromAnamnese({
+        sex: patient.sex,
+        ageYears: patient.age,
+        weightKg: patient.weightKg,
+        heightCm: patient.heightCm,
+        activity: "moderate",
+        goal: patientGoalToEngine(patient.goal),
+      });
+      const target = calcMacroTarget({
+        tdee,
+        weightKg: patient.weightKg,
+        goal: patientGoalToEngine(patient.goal),
+      });
+      setKcal(target.kcal);
+      setProteinG(target.proteinG);
+      setCarbG(target.carbG);
+      setFatG(target.fatG);
+    } catch {
+      // ignora — mantém valores atuais
+    }
+  }, [patient]);
 
   const ranked = useMemo<MatchResult[]>(() => {
     const metas = systemTemplates.map(toMeta);
