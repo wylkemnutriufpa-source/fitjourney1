@@ -3,7 +3,7 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { listFoods } from "@/lib/foods.functions";
+import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { AppShell } from "@/components/AppShell";
 import {
   Dialog,
@@ -714,32 +714,85 @@ function MealEditor({
   );
 }
 
+function normalizeFoodLabel(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\b(cozido|cozida|grelhado|grelhada|preto|preta|de galinha|hidratada)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function findCatalogFood(foods: FoodDTO[] | undefined, item: PlannerFoodItem) {
+  if (!foods?.length) return null;
+
+  const itemName = normalizeFoodLabel(item.name);
+  const exactName = foods.find((food) => normalizeFoodLabel(food.name) === itemName);
+  if (exactName) return exactName;
+
+  const aliasMatchers: Array<[RegExp, (foodName: string) => boolean]> = [
+    [/\bovo\b/, (foodName) => /\bovo\b/.test(foodName)],
+    [/goma de tapioca|\btapioca\b/, (foodName) => foodName.includes("goma tapioca")],
+    [/\bcuscuz\b/, (foodName) => foodName.includes("cuscuz")],
+    [/\bcafe\b/, (foodName) => foodName.includes("cafe")],
+    [/\bcha\b/, (foodName) => foodName.includes("cha")],
+    [/\bpao frances\b/, (foodName) => foodName.includes("pao frances")],
+  ];
+
+  for (const [itemPattern, matchesFood] of aliasMatchers) {
+    if (itemPattern.test(itemName)) {
+      const alias = foods.find((food) => matchesFood(normalizeFoodLabel(food.name)));
+      if (alias) return alias;
+    }
+  }
+
+  const nonCompositeKey = item.foodKey && !item.foodKey.includes("-com-");
+  return nonCompositeKey ? foods.find((food) => food.foodKey === item.foodKey) ?? null : null;
+}
+
+function gramsForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
+  if (item.unit === "g" || item.unit === "ml") return item.qty;
+  const defaultMeasure = food.householdMeasures.find((measure) => measure.isDefault) ?? food.householdMeasures[0];
+  return item.qty * (defaultMeasure?.gramsEquivalent ?? food.qty);
+}
+
+function nutritionForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
+  const grams = gramsForCurrentPortion(item, food);
+  const factor = grams / 100;
+  const round = (value: number) => Math.round(value * 10) / 10;
+  return {
+    grams: round(grams),
+    kcal: Math.round(food.kcalPer100g * factor),
+    protein: round(food.proteinPer100g * factor),
+    carbs: round(food.carbPer100g * factor),
+    fat: round(food.fatPer100g * factor),
+    fiber: round(food.fiberPer100g * factor),
+  };
+}
+
+function withCatalogKcal(item: PlannerFoodItem, food: FoodDTO | null) {
+  if (!food) return item;
+  return { ...item, kcal: nutritionForCurrentPortion(item, food).kcal };
+}
+
+const FOOD_INFO_POPOVER_EVENT = "fitjourney-food-info-popover";
+
 function FoodInfoPopover({
   item,
+  match,
   onApplyMeasure,
 }: {
   item: PlannerFoodItem;
+  match: FoodDTO | null;
   onApplyMeasure: (grams: number, measureName: string) => void;
 }) {
-  const listFoodsFn = useServerFn(listFoods);
-  const { data: foods } = useQuery({
-    queryKey: ["foods-catalog"],
-    queryFn: () => listFoodsFn(),
-    staleTime: 5 * 60_000,
-  });
-
-  const match = useMemo(() => {
-    if (!foods) return null;
-    const byKey = foods.find((f) => f.foodKey === item.foodKey);
-    if (byKey) return byKey;
-    const needle = item.name.trim().toLowerCase();
-    return foods.find((f) => f.name.toLowerCase() === needle) ?? null;
-  }, [foods, item.foodKey, item.name]);
-
   const measures = match?.householdMeasures ?? [];
+  const currentNutrition = match ? nutritionForCurrentPortion(item, match) : null;
 
   return (
-    <PopoverContent align="end" className="w-72 p-3">
+    <PopoverContent side="right" align="start" sideOffset={8} className="w-72 p-3">
       <div className="space-y-2">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -748,12 +801,15 @@ function FoodInfoPopover({
           <p className="text-sm font-medium leading-tight">{item.name}</p>
         </div>
 
-        {match ? (
-          <div className="text-[11px] text-muted-foreground border-t border-border pt-2">
-            <p>Por 100 g (TACO/IBGE):</p>
-            <p className="font-mono">
-              {match.kcalPer100g} kcal · P {match.proteinPer100g}g · C {match.carbPer100g}g · G{" "}
-              {match.fatPer100g}g
+        {match && currentNutrition ? (
+          <div className="text-[11px] text-muted-foreground border-t border-border pt-2 space-y-1">
+            <p>Porção atual: {currentNutrition.grams} g equivalentes</p>
+            <p className="font-mono text-foreground">
+              {currentNutrition.kcal} kcal · P {currentNutrition.protein}g · C {currentNutrition.carbs}g · G{" "}
+              {currentNutrition.fat}g
+            </p>
+            <p className="text-[10px]">
+              Base TACO/IBGE por 100g apenas como referência técnica.
             </p>
           </div>
         ) : (
@@ -809,20 +865,45 @@ function FoodItemRow({
   const [editing, setEditing] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const listFoodsFn = useServerFn(listFoods);
+  const { data: foods } = useQuery({
+    queryKey: ["foods-catalog"],
+    queryFn: () => listFoodsFn(),
+    staleTime: 5 * 60_000,
+  });
+  const catalogMatch = useMemo(() => findCatalogFood(foods, item), [foods, item.foodKey, item.name]);
 
   useEffect(() => {
     if (editing) nameInputRef.current?.focus();
   }, [editing]);
 
+  useEffect(() => {
+    const closeOtherPopover = (event: Event) => {
+      const activeItemId = (event as CustomEvent<string>).detail;
+      if (activeItemId !== item.id) setInfoOpen(false);
+    };
+    window.addEventListener(FOOD_INFO_POPOVER_EVENT, closeOtherPopover);
+    return () => window.removeEventListener(FOOD_INFO_POPOVER_EVENT, closeOtherPopover);
+  }, [item.id]);
+
+  function setFoodInfoOpen(open: boolean) {
+    if (open) {
+      window.dispatchEvent(new CustomEvent(FOOD_INFO_POPOVER_EVENT, { detail: item.id }));
+    }
+    setInfoOpen(open);
+  }
+
   function applyMeasure(grams: number, measureName: string) {
-    onChange({
+    onChange(withCatalogKcal({
       ...item,
       qty: grams,
       unit: "g",
-      // mantém kcal atual (não recalcula automaticamente — quem decide é o nutri)
-      // mas atualiza o nome com a medida entre parênteses se ainda não tiver
-    });
+    }, catalogMatch));
     setInfoOpen(false);
+  }
+
+  function updatePortion(patch: Partial<PlannerFoodItem>) {
+    onChange(withCatalogKcal({ ...item, ...patch }, catalogMatch));
   }
 
   const baseClass =
@@ -842,7 +923,7 @@ function FoodItemRow({
             {item.qty} {item.unit} · {item.kcal} kcal
           </p>
         </div>
-        <Popover open={infoOpen} onOpenChange={setInfoOpen}>
+        <Popover open={infoOpen} onOpenChange={setFoodInfoOpen}>
           <PopoverTrigger asChild>
             <button
               className="text-muted-foreground hover:text-primary p-1 opacity-60 group-hover:opacity-100 transition-opacity"
@@ -852,7 +933,7 @@ function FoodItemRow({
               <ChevronDown className="size-3.5" />
             </button>
           </PopoverTrigger>
-          <FoodInfoPopover item={item} onApplyMeasure={applyMeasure} />
+          <FoodInfoPopover item={item} match={catalogMatch} onApplyMeasure={applyMeasure} />
         </Popover>
         <button
           onClick={(e) => {
@@ -895,12 +976,12 @@ function FoodItemRow({
       <Input
         type="number"
         value={item.qty}
-        onChange={(e) => onChange({ ...item, qty: Number(e.target.value) || 0 })}
+        onChange={(e) => updatePortion({ qty: Number(e.target.value) || 0 })}
         className="h-7 w-16 text-xs text-right"
       />
       <Input
         value={item.unit}
-        onChange={(e) => onChange({ ...item, unit: e.target.value })}
+        onChange={(e) => updatePortion({ unit: e.target.value })}
         className="h-7 w-14 text-xs"
       />
       <Input
