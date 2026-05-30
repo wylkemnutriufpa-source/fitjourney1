@@ -30,7 +30,7 @@ import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
 import { SendShareDialog } from "@/components/SendShareDialog";
 import { FoodPickerDialog } from "@/components/FoodPickerDialog";
 import { templateToPrintHtml, templateToWhatsText } from "@/lib/diet-serializers";
-import { printHTML } from "@/lib/share-utils";
+import { printHTML, escapeHtml } from "@/lib/share-utils";
 import {
   toPlannerTemplate,
   clonePlannerTemplate,
