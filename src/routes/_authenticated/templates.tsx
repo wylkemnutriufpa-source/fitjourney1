@@ -62,7 +62,6 @@ import {
   ChefHat,
   Repeat2,
   ChevronDown,
-  Info,
   Pencil as PencilIcon,
 } from "lucide-react";
 
