@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { getPatient } from "@/lib/mock-data";
+import { NutritionTargetCard } from "@/components/NutritionTargetCard";
 import { Edit3, FileText, ChevronRight } from "lucide-react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
