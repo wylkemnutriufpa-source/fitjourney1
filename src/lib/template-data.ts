@@ -267,6 +267,69 @@ const templateOrientacoes: Record<string, string> = {
 • Hidratação: 35 ml/kg/dia. O calor amazônico exige reposição constante.
 • Limite refrigerantes guaraná locais — alta concentração de açúcar.
 • Combine sempre proteína (peixe/frango) + carbo regional + vegetal/fruta em cada refeição.`,
+
+  "cli-sem-gluten": `OBJETIVO: eliminar completamente o glúten (doença celíaca, sensibilidade não-celíaca ou alergia ao trigo).
+
+• PROIBIDOS: trigo, centeio, cevada, aveia não certificada, malte, cerveja. Inclui pão francês, macarrão comum, biscoitos, bolos, salgados, pizza, cuscuz marroquino, seitan.
+• PERMITIDOS: arroz, milho, mandioca, batata, batata-doce, tapioca, polvilho, cuscuz de milho (paulista/nordestino), quinoa, amaranto, trigo-sarraceno, aveia certificada SEM glúten.
+• ATENÇÃO À CONTAMINAÇÃO CRUZADA: use utensílios separados (tábua, torradeira, panela). Leia rótulos — busque selo "SEM GLÚTEN" (lei 10.674/2003).
+• Embutidos, molhos prontos, shoyu, caldos em cubo, hambúrguer industrializado podem conter glúten — confirme no rótulo.
+• Reposição de fibras: feijão, lentilha, chia, linhaça, frutas com casca, vegetais — fundamental porque dietas SG tendem a ser pobres em fibra.
+• Suplementação: ferro, ácido fólico, B12, cálcio e vitamina D podem estar deficientes — solicite exames a cada 6 meses.
+• Em restaurantes: pergunte sobre preparo, frituras compartilhadas e farinhas de espessamento.
+• Sintomas após contaminação (diarreia, dor abdominal, fadiga) podem durar semanas — não relaxe a vigilância.`,
+
+  "cli-sem-lactose": `OBJETIVO: eliminar lactose (intolerância primária/secundária) mantendo cálcio e vitamina D adequados.
+
+• PROIBIDOS (com lactose): leite de vaca/cabra, iogurte comum, queijos frescos (minas, ricota, requeijão), creme de leite, leite condensado, manteiga comum, sorvete, doce de leite, achocolatado em pó.
+• PERMITIDOS: leites vegetais (amêndoa, coco, arroz, soja — sem adição de açúcar), leite ZERO lactose, queijos envelhecidos (parmesão, grana padano, gouda — naturalmente baixos em lactose), iogurtes ZERO lactose, manteiga ghee.
+• Lactase em cápsula (5.000–9.000 FCC) pode ser usada antes de exposições acidentais.
+• ATENÇÃO À LACTOSE OCULTA: pães, biscoitos, embutidos, molhos prontos, medicamentos, suplementos proteicos (whey concentrado tem lactose — prefira isolado ou hidrolisado).
+• Reposição de CÁLCIO (1.000 mg/dia): sardinha com espinha, brócolis, couve, gergelim, tofu, amêndoa, bebidas vegetais fortificadas.
+• Reposição de VITAMINA D: exposição solar 15 min/dia + suplementação conforme exame (25-OH-D).
+• Sintomas (gases, distensão, diarreia 30 min–2h após consumo) confirmam exposição.
+• Em intolerância secundária (pós-infecção intestinal), reintrodução gradual após 4–8 semanas pode ser tolerada.`,
+
+  "cli-sem-gluten-lactose": `OBJETIVO: eliminar simultaneamente glúten e lactose (celíaca + intolerância à lactose, comum por dano de vilosidades intestinais).
+
+• Combine TODAS as restrições dos protocolos SEM GLÚTEN e SEM LACTOSE.
+• Base segura: arroz, milho, mandioca, batata, batata-doce, tapioca, quinoa + proteínas (ovo, frango, peixe, carne) + frutas e vegetais.
+• Bebidas: leites vegetais sem adição (amêndoa, coco, arroz). Evite os "sabor cereais" que podem conter aveia/cevada não certificada.
+• Queijos envelhecidos certificados sem glúten (parmesão, grana) são uma opção quando há tolerância.
+• Pães e massas: específicos SG + sem lactose (linha Schar, Aminna, BellaVita — confirme rótulo).
+• Suplementação geralmente necessária: cálcio, vitamina D, ferro, B12, ácido fólico, zinco. Reavalie a cada 6 meses.
+• Refeições fora de casa: priorize grelhados simples + arroz + salada + fruta — minimiza risco de contaminação.
+• Em recuperação intestinal (3–6 meses sem glúten), a lactose pode voltar a ser tolerada — teste com orientação profissional.
+• Mantenha diário alimentar nos primeiros 90 dias para identificar gatilhos residuais.`,
+
+  "cli-fodmap": `OBJETIVO: reduzir FODMAPs (oligo, di e monossacarídeos fermentáveis e polióis) para controlar SII (síndrome do intestino irritável).
+
+• PROTOCOLO EM 3 FASES (sempre com nutricionista):
+   1. ELIMINAÇÃO (2–6 semanas): retira TODOS os alimentos altos em FODMAP.
+   2. REINTRODUÇÃO (6–8 semanas): testa cada grupo individualmente.
+   3. PERSONALIZAÇÃO: dieta sustentável de longo prazo com tolerâncias individuais.
+• ALTOS em FODMAP (EVITAR na fase 1): alho, cebola, trigo, centeio, feijão, lentilha, grão-de-bico, leite, iogurte, mel, maçã, pera, manga, melancia, abacate (>1/8), cogumelo, couve-flor, brócolis (haste), adoçantes em "-ol" (sorbitol, manitol, xilitol).
+• BAIXOS em FODMAP (LIBERADOS): arroz, batata, mandioca, quinoa, aveia (40 g), ovos, frango, peixe, carne, tofu firme, leites sem lactose, queijos envelhecidos, banana firme, morango, mamão, melão cantaloupe, uva, abacaxi, kiwi, laranja, abobrinha, cenoura, espinafre, alface, tomate, pepino, azeite.
+• Temperos seguros: óleo de alho-infundido (não o alho em si), cebolinha (só parte verde), gengibre, açafrão, ervas frescas.
+• Tamanho da porção importa — mesmo alimentos baixos podem virar altos em grandes quantidades.
+• Hidratação e exercício leve (caminhada) ajudam motilidade intestinal.
+• ATENÇÃO: não é dieta para vida toda. A fase 1 mais longa que 8 semanas pode prejudicar microbiota.
+• Use app Monash University FODMAP Diet como referência confiável.`,
+
+  "cli-gastrite": `OBJETIVO: aliviar inflamação gástrica, reduzir secreção ácida e proteger a mucosa (gastrite/úlcera/H. pylori).
+
+• EVITE: café, chá preto/mate, refrigerante (especialmente cola), bebida alcoólica, frituras, gordura em excesso, embutidos, alimentos defumados, pimenta, mostarda, vinagre em excesso.
+• EVITE FRUTAS ÁCIDAS em jejum: laranja, limão, abacaxi, kiwi, maracujá, acerola. Podem ser toleradas após refeição.
+• EVITE chocolate, hortelã (relaxam o esfíncter esofágico inferior — pioram refluxo).
+• PRIORIZE: mingau de aveia, banana, mamão, maçã sem casca, pera cozida, batata, batata-doce, arroz branco, frango/peixe grelhados, ovos cozidos/pochê, iogurte natural, queijos brancos magros.
+• FRACIONE em 5–6 refeições pequenas — estômago vazio aumenta acidez.
+• MASTIGUE BEM e coma devagar (20–30 min por refeição) — saliva neutraliza ácido.
+• NÃO se deite por 2–3 h após comer. Eleve cabeceira da cama em 15 cm se houver refluxo noturno.
+• Última refeição até 3 h antes de dormir.
+• ANTI-INFLAMATÓRIOS (AAS, ibuprofeno, diclofenaco) AGRAVAM — evite ou use com proteção gástrica prescrita.
+• Cigarro e estresse aumentam secreção ácida — manejo é parte do tratamento.
+• Em gastrite por H. pylori: tratamento antibiótico (10–14 dias) prescrito pelo médico é obrigatório para cura.
+• Sinais de alerta: dor noturna intensa, vômito com sangue, fezes pretas, perda de peso → procurar atendimento imediato.`,
 };
 
 /** Retorna orientações específicas do template (se houver), ou fallback por categoria. */
@@ -801,7 +864,143 @@ export const templates: DietTemplate[] = [
         [item("sopa_legumes", 400), item("frango_grelhado", 180)]),
     ],
   },
+
+  // ---------- RESTRITIVOS / ALERGIAS / INTOLERÂNCIAS ----------
+  {
+    id: "cli-sem-gluten",
+    name: "Sem Glúten (Celíaca / Sensibilidade)",
+    category: "Clínico",
+    description:
+      "Zero glúten. Base de arroz, milho, mandioca, tapioca, quinoa + proteínas magras.",
+    tags: ["Sem glúten", "Celíaca", "Restritivo"],
+    kcal: 2000,
+    meals: [
+      meal("07:00", "Café da manhã",
+        item("tapioca_ovo", 1),
+        [item("cuscuz_ovo", 1), item("crepioca", 2), item("omelete", 1)]),
+      meal("10:00", "Lanche da manhã",
+        item("mamao_aveia", 1),
+        [item("banana_aveia", 1), item("iogurte_fruta", 1), item("salada_frutas", 150)]),
+      meal("12:30", "Almoço",
+        item("frango_grelhado", 180),
+        [item("file_tilapia", 200), item("carne_grelhada", 180), item("acem", 180)]),
+      meal("16:00", "Lanche",
+        item("iogurte_natural", 170),
+        [item("vitamina_fruta", 300), item("pao_de_queijo", 2)]),
+      meal("19:30", "Jantar",
+        item("peixe_legumes", 200),
+        [item("frango_batata_doce", 200), item("sopa_legumes", 400), item("salada_completa", 250)]),
+    ],
+  },
+  {
+    id: "cli-sem-lactose",
+    name: "Sem Lactose (Intolerância)",
+    category: "Clínico",
+    description:
+      "Zero lactose. Substituições com bebidas vegetais e queijos envelhecidos.",
+    tags: ["Sem lactose", "Intolerância", "Restritivo"],
+    kcal: 2000,
+    meals: [
+      meal("07:00", "Café da manhã",
+        item("tapioca_ovo", 1),
+        [item("cuscuz_ovo", 1), item("ovos_mexidos", 3), item("omelete", 1)]),
+      meal("10:00", "Lanche",
+        item("banana_aveia", 1),
+        [item("mamao_aveia", 1), item("salada_frutas", 150), item("maca", 1)]),
+      meal("12:30", "Almoço",
+        item("frango_grelhado", 180),
+        [item("file_tilapia", 200), item("bife_acebolado", 180), item("carne_grelhada", 180)]),
+      meal("16:00", "Lanche",
+        item("ovos_cozidos", 2),
+        [item("pera", 1), item("frutas_vermelhas", 150), item("vitamina_fruta", 300)]),
+      meal("19:30", "Jantar",
+        item("peixe_legumes", 200),
+        [item("frango_batata_doce", 200), item("salada_completa", 250), item("sopa_legumes", 400)]),
+    ],
+  },
+  {
+    id: "cli-sem-gluten-lactose",
+    name: "Sem Glúten + Sem Lactose",
+    category: "Clínico",
+    description:
+      "Restrição dupla. Base segura: ovos, carnes, peixes, frutas, arroz, batata, tapioca.",
+    tags: ["Sem glúten", "Sem lactose", "Restritivo"],
+    kcal: 1950,
+    meals: [
+      meal("07:00", "Café da manhã",
+        item("tapioca_ovo", 1),
+        [item("cuscuz_ovo", 1), item("ovos_mexidos", 3), item("omelete", 1)]),
+      meal("10:00", "Lanche",
+        item("banana_aveia", 1),
+        [item("salada_frutas", 150), item("maca", 1), item("mamao", 150)]),
+      meal("12:30", "Almoço",
+        item("frango_grelhado", 180),
+        [item("file_tilapia", 200), item("carne_grelhada", 180), item("acem", 180)]),
+      meal("16:00", "Lanche",
+        item("ovos_cozidos", 2),
+        [item("frutas_vermelhas", 150), item("pera", 1), item("vitamina_fruta", 300)]),
+      meal("19:30", "Jantar",
+        item("peixe_legumes", 200),
+        [item("frango_batata_doce", 200), item("salada_completa", 250), item("sopa_legumes", 400)]),
+    ],
+  },
+  {
+    id: "cli-fodmap",
+    name: "Low-FODMAP (SII)",
+    category: "Clínico",
+    description:
+      "Fase de eliminação do protocolo FODMAP. Reduz fermentação e sintomas de SII.",
+    tags: ["FODMAP", "SII", "Intestino"],
+    kcal: 1900,
+    meals: [
+      meal("07:00", "Café da manhã",
+        item("ovos_mexidos", 3),
+        [item("omelete", 1), item("tapioca_ovo", 1), item("crepioca", 2)]),
+      meal("10:00", "Lanche",
+        item("morango", 120),
+        [item("uva", 100), item("mamao", 100), item("salada_frutas", 100)]),
+      meal("12:30", "Almoço",
+        item("frango_grelhado", 180),
+        [item("file_tilapia", 200), item("carne_grelhada", 180), item("acem", 180)]),
+      meal("16:00", "Lanche",
+        item("iogurte_natural", 150),
+        [item("ovos_cozidos", 2), item("frutas_vermelhas", 100)]),
+      meal("19:30", "Jantar",
+        item("peixe_legumes", 200),
+        [item("frango_batata_doce", 200), item("salada_completa", 250)]),
+    ],
+  },
+  {
+    id: "cli-gastrite",
+    name: "Gastrite / Úlcera / Refluxo",
+    category: "Clínico",
+    description:
+      "Refeições leves, fracionadas, sem ácidos e estimulantes. Protege a mucosa gástrica.",
+    tags: ["Gastrite", "Úlcera", "Refluxo"],
+    kcal: 1850,
+    meals: [
+      meal("07:00", "Café da manhã",
+        item("mingau_aveia", 200),
+        [item("banana_aveia", 1), item("tapioca_queijo", 1), item("cha_torrada", 1)]),
+      meal("10:00", "Lanche",
+        item("mamao", 150),
+        [item("pera", 1), item("maca", 1), item("banana_aveia", 1)]),
+      meal("12:30", "Almoço",
+        item("frango_grelhado", 150),
+        [item("file_tilapia", 180), item("peixe_legumes", 180), item("acem", 150)]),
+      meal("16:00", "Lanche",
+        item("iogurte_natural", 150),
+        [item("torrada_integral", 2), item("pao_de_queijo", 2)]),
+      meal("19:30", "Jantar",
+        item("canja", 400),
+        [item("sopa_legumes", 400), item("frango_batata_doce", 180)]),
+      meal("21:30", "Ceia",
+        item("mingau_aveia", 150),
+        [item("iogurte_natural", 120), item("copo_leite", 200)]),
+    ],
+  },
 ];
+
 
 export const categories: DietTemplate["category"][] = [
   "Esportivo",
