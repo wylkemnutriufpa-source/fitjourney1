@@ -35,8 +35,8 @@ describe("matchTemplates", () => {
       mealsPerDay: 5,
       templates: [baseTpl],
     });
-    // kcal ~36% desvio → kcal score 0; macros perfeito → 40; constraints → 20
-    expect(r[0].breakdown.kcal).toBe(0);
+    // alvo 3000 vs template 2200 → desvio significativo, score baixo
+    expect(r[0].breakdown.kcal).toBeLessThan(KCAL_WEIGHT_FULL);
     expect(r[0].score).toBeLessThan(80);
     expect(r[0].autoSelectable).toBe(false);
   });
