@@ -25,7 +25,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId);
-    setRoles((data ?? []).map((r) => r.role as AppRole));
+    const next = (data ?? []).map((r) => r.role as AppRole).sort();
+    setRoles((prev) => {
+      if (prev.length === next.length && prev.every((v, i) => v === next[i])) {
+        return prev; // mantém referência — evita re-render em cascata no iframe
+      }
+      return next;
+    });
   }, []);
 
   useEffect(() => {
