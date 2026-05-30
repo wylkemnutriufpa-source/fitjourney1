@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Navigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -23,10 +23,11 @@ function Login() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/dashboard" });
+    if (!loading && session) navigate({ to: "/dashboard", replace: true });
   }, [loading, session, navigate]);
 
-  if (!loading && session) return <Navigate to="/dashboard" />;
+  if (loading) return null;
+  if (session) return null;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

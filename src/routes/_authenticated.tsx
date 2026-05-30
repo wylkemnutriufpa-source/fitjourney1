@@ -1,27 +1,33 @@
 // _authenticated layout — server-side identity gate.
 // Resolve estado real (S1/S2/S3) via server fn antes de renderizar qualquer
 // rota protegida. Nenhum estado é inferido do cliente.
-//
-// Regras:
-//   - sem sessão (server fn lança Unauthorized) → redirect "/"
-//   - S1 (email não confirmado)                 → redirect "/auth/check-email"
-//   - S2 (sem profile)                          → força "/_authenticated/onboarding/nutritionist"
-//   - S3 (profile ativo)                        → bloqueia onboarding, libera app
-//
-// O gate aqui é UX. O gate de segurança real está no domain write layer.
 
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, isRedirect } from "@tanstack/react-router";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
-
-const ONBOARDING_PATH = "/_authenticated/onboarding/nutritionist";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
+    // 1) Client-side session gate — evita chamar serverFn sem token e
+    //    impede o loop "serverFn 401 → redirect / → login → redirect /dashboard".
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
+      throw redirect({ to: "/" });
+    }
+
+    // 2) Resolve estado autoritativo no servidor.
     let identity;
     try {
       identity = await getMyIdentityState();
-    } catch {
-      throw redirect({ to: "/" });
+    } catch (err) {
+      if (isRedirect(err)) throw err;
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[_authenticated guard] identity resolve failed:", msg);
+      // Só desloga em erro real de auth. Outros erros sobem pro errorComponent.
+      if (msg.includes("Unauthorized")) {
+        throw redirect({ to: "/" });
+      }
+      throw err;
     }
 
     const path = location.pathname;
