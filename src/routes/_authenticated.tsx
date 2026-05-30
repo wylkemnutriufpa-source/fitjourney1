@@ -35,6 +35,15 @@ export const Route = createFileRoute("/_authenticated")({
       path === "/onboarding/nutritionist" ||
       path.startsWith("/onboarding/nutritionist/");
 
+    const isAdmin = identity.appRoles.includes("admin");
+
+    if (isAdmin && identity.state !== "S1") {
+      if (onOnboarding) {
+        throw redirect({ to: "/dashboard" });
+      }
+      return { identity };
+    }
+
     if (identity.state === "S1") {
       throw redirect({ to: "/auth/check-email" });
     }
