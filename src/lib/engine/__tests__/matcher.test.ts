@@ -36,7 +36,7 @@ describe("matchTemplates", () => {
       templates: [baseTpl],
     });
     // alvo 3000 vs template 2200 → desvio significativo, score baixo
-    expect(r[0].breakdown.kcal).toBeLessThan(KCAL_WEIGHT_FULL);
+    expect(r[0].breakdown.kcal).toBeLessThan(40);
     expect(r[0].score).toBeLessThan(80);
     expect(r[0].autoSelectable).toBe(false);
   });
