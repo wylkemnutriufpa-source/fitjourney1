@@ -2,13 +2,21 @@
 // Usa o engine puro `matchTemplates` para ranquear a biblioteca pelo alvo informado.
 // Não modifica templates. Sem inferência. Só leitura + score.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Sparkles, Target, ChevronDown, ChevronUp } from "lucide-react";
-import { matchTemplates } from "@/lib/engine";
-import type { TemplateMeta, MatchResult } from "@/lib/engine";
+import { matchTemplates, calcFromAnamnese, calcMacroTarget } from "@/lib/engine";
+import type { TemplateMeta, MatchResult, Goal as EngineGoal } from "@/lib/engine";
 import { templates as systemTemplates } from "@/lib/template-data";
+import { PatientPicker } from "./PatientPicker";
+import type { Patient } from "@/lib/mock-data";
 
 const KCAL_TOLERANCE = 0.15; // ±15% se template não declarar range explícito
+
+function patientGoalToEngine(goal: Patient["goal"]): EngineGoal {
+  if (goal === "Emagrecimento") return "cut";
+  if (goal === "Hipertrofia") return "bulk";
+  return "maintain";
+}
 
 function toMeta(t: (typeof systemTemplates)[number]): TemplateMeta {
   return {
@@ -50,12 +58,40 @@ export function TemplateMatcherPanel({
   readonly onPickTemplate?: (templateId: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [patient, setPatient] = useState<Patient | null>(null);
   const [kcal, setKcal] = useState<number>(defaultKcal ?? 2200);
   const [proteinG, setProteinG] = useState<number>(defaultProtein ?? 140);
   const [carbG, setCarbG] = useState<number>(defaultCarb ?? 260);
   const [fatG, setFatG] = useState<number>(defaultFat ?? 70);
   const [meals, setMeals] = useState<number>(5);
   const [constraints, setConstraints] = useState<Set<Constraint>>(new Set());
+
+  // Quando um paciente é selecionado, recalcula alvo determinístico
+  // via engine (Mifflin + macros por kg) e pré-popula os campos.
+  useEffect(() => {
+    if (!patient) return;
+    try {
+      const { tdee } = calcFromAnamnese({
+        sex: patient.sex === "M" ? "male" : "female",
+        ageYears: patient.age,
+        weightKg: patient.weightKg,
+        heightCm: patient.heightCm,
+        activity: "moderate",
+        goal: patientGoalToEngine(patient.goal),
+      });
+      const target = calcMacroTarget({
+        tdee,
+        weightKg: patient.weightKg,
+        goal: patientGoalToEngine(patient.goal),
+      });
+      setKcal(target.kcal);
+      setProteinG(target.proteinG);
+      setCarbG(target.carbG);
+      setFatG(target.fatG);
+    } catch {
+      // ignora — mantém valores atuais
+    }
+  }, [patient]);
 
   const ranked = useMemo<MatchResult[]>(() => {
     const metas = systemTemplates.map(toMeta);
@@ -98,6 +134,18 @@ export function TemplateMatcherPanel({
 
       {open && (
         <div className="border-t border-border p-4 space-y-4">
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Paciente (opcional · auto-preenche alvo)
+            </p>
+            <PatientPicker value={patient} onChange={setPatient} />
+            {patient && (
+              <p className="text-[10px] font-mono text-primary/80">
+                Alvo recalculado pelo motor a partir da anamnese de {patient.name}.
+              </p>
+            )}
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <NumInput label="kcal alvo" value={kcal} onChange={setKcal} step={50} />
             <NumInput label="prot (g)" value={proteinG} onChange={setProteinG} step={5} />

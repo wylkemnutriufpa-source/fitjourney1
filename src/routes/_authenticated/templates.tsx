@@ -63,8 +63,12 @@ import {
   ChefHat,
   Repeat2,
   ChevronDown,
-  
+  Send,
+  CheckCircle2,
 } from "lucide-react";
+import { PatientPicker } from "@/components/PatientPicker";
+import { applyPlanToPatient } from "@/lib/patient-plans-store";
+import type { Patient } from "@/lib/mock-data";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
@@ -326,6 +330,9 @@ function TemplateEditor({
   const [editorTab, setEditorTab] = useState<"refeicoes" | "orientacoes">("refeicoes");
   const [shareOpen, setShareOpen] = useState(false);
   const [orientShareOpen, setOrientShareOpen] = useState(false);
+  const [applyOpen, setApplyOpen] = useState(false);
+  const [applyPatient, setApplyPatient] = useState<Patient | null>(null);
+  const [applyDone, setApplyDone] = useState<string | null>(null);
 
   function setMeals(updater: (meals: PlannerMeal[]) => PlannerMeal[]) {
     setDraft((d) => {
@@ -545,6 +552,16 @@ function TemplateEditor({
 
         <DialogFooter className="px-6 py-4 border-t border-border sticky bottom-0 bg-background">
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setApplyDone(null);
+              setApplyPatient(null);
+              setApplyOpen(true);
+            }}
+          >
+            <Send className="size-4" /> Aplicar a paciente
+          </Button>
           <Button onClick={save}>
             {isMine ? <Save className="size-4" /> : <Copy className="size-4" />}
             {isMine ? "Salvar alterações" : "Salvar em Meus Templates"}
@@ -569,6 +586,58 @@ function TemplateEditor({
         printHtml={`<h1>Orientações Nutricionais</h1><div class="meta">${escapeHtml(name || draft.name)}${finalidade ? ` · ${escapeHtml(finalidade)}` : ""}</div><div class="orientacoes">${escapeHtml(orientacoes.trim())}</div>`}
         printTitle={`Orientações — ${name || draft.name}`}
       />
+
+      <Dialog open={applyOpen} onOpenChange={setApplyOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Aplicar template a paciente</DialogTitle>
+            <DialogDescription>
+              Escolha o paciente. O snapshot atual ({draft.meals.length} refeições · {totalKcal} kcal) será salvo no plano dele.
+            </DialogDescription>
+          </DialogHeader>
+
+          {applyDone ? (
+            <div className="py-4 flex items-center gap-3 text-sm">
+              <CheckCircle2 className="size-5 text-emerald-400" />
+              <span>Plano aplicado para <strong>{applyDone}</strong>.</span>
+            </div>
+          ) : (
+            <div className="py-2 space-y-3">
+              <PatientPicker value={applyPatient} onChange={setApplyPatient} />
+              <p className="text-[11px] text-muted-foreground">
+                Sem trava, sem bloqueio: escolhe, aplica, salva. Paciente recebe.
+              </p>
+            </div>
+          )}
+
+          <DialogFooter>
+            {applyDone ? (
+              <Button onClick={() => setApplyOpen(false)}>Fechar</Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setApplyOpen(false)}>Cancelar</Button>
+                <Button
+                  disabled={!applyPatient}
+                  onClick={() => {
+                    if (!applyPatient) return;
+                    applyPlanToPatient({
+                      patientId: applyPatient.id,
+                      patientName: applyPatient.name,
+                      templateId: draft.id,
+                      templateName: name || draft.name,
+                      snapshot: currentForShare,
+                      finalidade: finalidade || undefined,
+                    });
+                    setApplyDone(applyPatient.name);
+                  }}
+                >
+                  <Send className="size-4" /> Aplicar e salvar
+                </Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
