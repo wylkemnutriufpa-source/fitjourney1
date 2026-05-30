@@ -938,12 +938,12 @@ function FoodItemRow({
       ...item,
       qty: grams,
       unit: "g",
-    }, catalogMatch));
+    }, catalogMatch, item));
     setInfoOpen(false);
   }
 
   function updatePortion(patch: Partial<PlannerFoodItem>) {
-    onChange(withCatalogKcal({ ...item, ...patch }, catalogMatch));
+    onChange(withCatalogKcal({ ...item, ...patch }, catalogMatch, item));
   }
 
   const baseClass =
