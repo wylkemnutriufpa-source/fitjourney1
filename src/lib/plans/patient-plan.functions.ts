@@ -12,7 +12,7 @@ export type ActivePlanDTO = {
   id: string;
   publishedAt: string;
   schemaVersion: number;
-  snapshot: Record<string, unknown>;
+  snapshot: any;
 } | null;
 
 export const getMyActivePlan = createServerFn({ method: "GET" })
