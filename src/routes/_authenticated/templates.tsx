@@ -988,10 +988,9 @@ function FoodItemRow({
         ref={nameInputRef}
         value={item.name}
         onChange={(e) => onChange({ ...item, name: e.target.value })}
-        onBlur={() => setEditing(false)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === "Escape") {
-            (e.target as HTMLInputElement).blur();
+            setEditing(false);
           }
         }}
         className="h-7 flex-1 text-xs"
