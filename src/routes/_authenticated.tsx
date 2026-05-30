@@ -8,6 +8,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
+    // SSR não enxerga a sessão persistida no browser. Se redirecionar aqui,
+    // um hard reload em /dashboard vira 307 -> / e o iframe do preview pode
+    // alternar entre / e /dashboard indefinidamente. O guard autoritativo
+    // continua rodando no client antes da navegação/renderização interativa.
+    if (typeof window === "undefined") {
+      return;
+    }
+
     // 1) Client-side session gate — evita chamar serverFn sem token e
     //    impede o loop "serverFn 401 → redirect / → login → redirect /dashboard".
     const { data: sessionData } = await supabase.auth.getSession();
