@@ -603,43 +603,53 @@ function TemplateEditor({
           {applyDone ? (
             <div className="py-4 flex items-center gap-3 text-sm">
               <CheckCircle2 className="size-5 text-emerald-400" />
-              <span>Plano aplicado para <strong>{applyDone}</strong>.</span>
+              <span>Plano publicado para <strong>{applyDone}</strong>.</span>
             </div>
           ) : (
             <div className="py-2 space-y-3">
-              <PatientPicker value={applyPatient} onChange={setApplyPatient} />
+              <RealPatientPicker value={applyPatient} onChange={setApplyPatient} />
               <p className="text-[11px] text-muted-foreground">
-                Sem trava, sem bloqueio: escolhe, aplica, salva. Paciente recebe.
+                Snapshot atual (com suas edições) é congelado no banco como plano publicado. Imutável após publicar.
               </p>
+              {applyError && (
+                <p className="text-[11px] text-destructive">{applyError}</p>
+              )}
             </div>
           )}
 
           <DialogFooter>
             {applyDone ? (
-              <Button onClick={() => setApplyOpen(false)}>Fechar</Button>
+              <Button onClick={() => { setApplyOpen(false); setApplyDone(null); setApplyPatient(null); }}>Fechar</Button>
             ) : (
               <>
                 <Button variant="outline" onClick={() => setApplyOpen(false)}>Cancelar</Button>
                 <Button
-                  disabled={!applyPatient}
-                  onClick={() => {
+                  disabled={!applyPatient || applyBusy}
+                  onClick={async () => {
                     if (!applyPatient) return;
-                    applyPlanToPatient({
-                      patientId: applyPatient.id,
-                      patientName: applyPatient.name,
-                      templateId: draft.id,
-                      templateName: name || draft.name,
-                      snapshot: currentForShare,
-                      finalidade: finalidade || undefined,
-                    });
-                    setApplyDone(applyPatient.name);
+                    setApplyBusy(true);
+                    setApplyError(null);
+                    try {
+                      await publishPlan({
+                        data: {
+                          patientId: applyPatient.id,
+                          snapshot: JSON.parse(JSON.stringify(currentForShare)),
+                        },
+                      });
+                      setApplyDone(applyPatient.fullName);
+                    } catch (e: any) {
+                      setApplyError(e?.message ?? "Falha ao publicar plano.");
+                    } finally {
+                      setApplyBusy(false);
+                    }
                   }}
                 >
-                  <Send className="size-4" /> Aplicar e salvar
+                  <Send className="size-4" /> {applyBusy ? "Publicando..." : "Publicar plano"}
                 </Button>
               </>
             )}
           </DialogFooter>
+
         </DialogContent>
       </Dialog>
     </Dialog>
