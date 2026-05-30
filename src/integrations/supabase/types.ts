@@ -14,6 +14,272 @@ export type Database = {
   }
   public: {
     Tables: {
+      anamneses: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          nutritionist_id: string | null
+          patient_id: string
+          schema_version: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data: Json
+          id?: string
+          nutritionist_id?: string | null
+          patient_id: string
+          schema_version?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          nutritionist_id?: string | null
+          patient_id?: string
+          schema_version?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anamneses_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anamneses_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nutritionists: {
+        Row: {
+          auth_user_id: string
+          created_at: string
+          crn: string | null
+          email: string
+          full_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          auth_user_id: string
+          created_at?: string
+          crn?: string | null
+          email: string
+          full_name: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          auth_user_id?: string
+          created_at?: string
+          crn?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      patients: {
+        Row: {
+          auth_user_id: string
+          birth_date: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          nutritionist_id: string | null
+          source_referral_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          auth_user_id: string
+          birth_date?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          nutritionist_id?: string | null
+          source_referral_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          auth_user_id?: string
+          birth_date?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          nutritionist_id?: string | null
+          source_referral_code?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patients_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          created_at: string
+          id: string
+          nutritionist_id: string | null
+          patient_id: string
+          published_at: string | null
+          schema_version: number
+          snapshot: Json
+          source_template_id: string | null
+          status: Database["public"]["Enums"]["plan_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nutritionist_id?: string | null
+          patient_id: string
+          published_at?: string | null
+          schema_version?: number
+          snapshot: Json
+          source_template_id?: string | null
+          status?: Database["public"]["Enums"]["plan_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nutritionist_id?: string | null
+          patient_id?: string
+          published_at?: string | null
+          schema_version?: number
+          snapshot?: Json
+          source_template_id?: string | null
+          status?: Database["public"]["Enums"]["plan_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plans_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plans_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plans_source_template_id_fkey"
+            columns: ["source_template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          consumed_at: string | null
+          consumed_by: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          nutritionist_id: string
+          status: Database["public"]["Enums"]["referral_code_status"]
+        }
+        Insert: {
+          code: string
+          consumed_at?: string | null
+          consumed_by?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          nutritionist_id: string
+          status?: Database["public"]["Enums"]["referral_code_status"]
+        }
+        Update: {
+          code?: string
+          consumed_at?: string | null
+          consumed_by?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          nutritionist_id?: string
+          status?: Database["public"]["Enums"]["referral_code_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_codes_consumed_by_fkey"
+            columns: ["consumed_by"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_codes_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          name: string
+          nutritionist_id: string
+          schema_version: number
+          updated_at: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          id?: string
+          name: string
+          nutritionist_id: string
+          schema_version?: number
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          nutritionist_id?: string
+          schema_version?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "templates_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -33,13 +299,32 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "orphan_auth_users"
+            referencedColumns: ["auth_user_id"]
+          },
+        ]
       }
     }
     Views: {
-      [_ in never]: never
+      orphan_auth_users: {
+        Row: {
+          auth_user_id: string | null
+          created_at: string | null
+          email: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      cleanup_orphan_auth_user: {
+        Args: { _auth_user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -50,6 +335,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      plan_status: "draft" | "published" | "archived"
+      referral_code_status: "active" | "consumed" | "revoked" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -178,6 +465,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      plan_status: ["draft", "published", "archived"],
+      referral_code_status: ["active", "consumed", "revoked", "expired"],
     },
   },
 } as const
