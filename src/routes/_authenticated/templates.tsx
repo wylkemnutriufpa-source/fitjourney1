@@ -330,6 +330,9 @@ function TemplateEditor({
   const [editorTab, setEditorTab] = useState<"refeicoes" | "orientacoes">("refeicoes");
   const [shareOpen, setShareOpen] = useState(false);
   const [orientShareOpen, setOrientShareOpen] = useState(false);
+  const [applyOpen, setApplyOpen] = useState(false);
+  const [applyPatient, setApplyPatient] = useState<Patient | null>(null);
+  const [applyDone, setApplyDone] = useState<string | null>(null);
 
   function setMeals(updater: (meals: PlannerMeal[]) => PlannerMeal[]) {
     setDraft((d) => {
