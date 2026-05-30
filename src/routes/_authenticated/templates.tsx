@@ -3,7 +3,7 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { listFoods } from "@/lib/foods.functions";
+import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { AppShell } from "@/components/AppShell";
 import {
   Dialog,
@@ -714,29 +714,80 @@ function MealEditor({
   );
 }
 
+function normalizeFoodLabel(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\b(cozido|cozida|grelhado|grelhada|preto|preta|de galinha|hidratada)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function findCatalogFood(foods: FoodDTO[] | undefined, item: PlannerFoodItem) {
+  if (!foods?.length) return null;
+
+  const itemName = normalizeFoodLabel(item.name);
+  const exactName = foods.find((food) => normalizeFoodLabel(food.name) === itemName);
+  if (exactName) return exactName;
+
+  const aliasMatchers: Array<[RegExp, (foodName: string) => boolean]> = [
+    [/\bovo\b/, (foodName) => /\bovo\b/.test(foodName)],
+    [/goma de tapioca|\btapioca\b/, (foodName) => foodName.includes("goma tapioca")],
+    [/\bcuscuz\b/, (foodName) => foodName.includes("cuscuz")],
+    [/\bcafe\b/, (foodName) => foodName.includes("cafe")],
+    [/\bcha\b/, (foodName) => foodName.includes("cha")],
+    [/\bpao frances\b/, (foodName) => foodName.includes("pao frances")],
+  ];
+
+  for (const [itemPattern, matchesFood] of aliasMatchers) {
+    if (itemPattern.test(itemName)) {
+      const alias = foods.find((food) => matchesFood(normalizeFoodLabel(food.name)));
+      if (alias) return alias;
+    }
+  }
+
+  const nonCompositeKey = item.foodKey && !item.foodKey.includes("-com-");
+  return nonCompositeKey ? foods.find((food) => food.foodKey === item.foodKey) ?? null : null;
+}
+
+function gramsForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
+  if (item.unit === "g" || item.unit === "ml") return item.qty;
+  const defaultMeasure = food.householdMeasures.find((measure) => measure.isDefault) ?? food.householdMeasures[0];
+  return item.qty * (defaultMeasure?.gramsEquivalent ?? food.qty);
+}
+
+function nutritionForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
+  const grams = gramsForCurrentPortion(item, food);
+  const factor = grams / 100;
+  const round = (value: number) => Math.round(value * 10) / 10;
+  return {
+    grams: round(grams),
+    kcal: Math.round(food.kcalPer100g * factor),
+    protein: round(food.proteinPer100g * factor),
+    carbs: round(food.carbPer100g * factor),
+    fat: round(food.fatPer100g * factor),
+    fiber: round(food.fiberPer100g * factor),
+  };
+}
+
+function withCatalogKcal(item: PlannerFoodItem, food: FoodDTO | null) {
+  if (!food) return item;
+  return { ...item, kcal: nutritionForCurrentPortion(item, food).kcal };
+}
+
 function FoodInfoPopover({
   item,
+  match,
   onApplyMeasure,
 }: {
   item: PlannerFoodItem;
+  match: FoodDTO | null;
   onApplyMeasure: (grams: number, measureName: string) => void;
 }) {
-  const listFoodsFn = useServerFn(listFoods);
-  const { data: foods } = useQuery({
-    queryKey: ["foods-catalog"],
-    queryFn: () => listFoodsFn(),
-    staleTime: 5 * 60_000,
-  });
-
-  const match = useMemo(() => {
-    if (!foods) return null;
-    const byKey = foods.find((f) => f.foodKey === item.foodKey);
-    if (byKey) return byKey;
-    const needle = item.name.trim().toLowerCase();
-    return foods.find((f) => f.name.toLowerCase() === needle) ?? null;
-  }, [foods, item.foodKey, item.name]);
-
   const measures = match?.householdMeasures ?? [];
+  const currentNutrition = match ? nutritionForCurrentPortion(item, match) : null;
 
   return (
     <PopoverContent align="end" className="w-72 p-3">
