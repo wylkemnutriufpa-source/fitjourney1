@@ -67,7 +67,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { PatientPicker } from "@/components/PatientPicker";
-import { applyPlanToPatient } from "@/lib/patient-plans-store";
+import { RealPatientPicker } from "@/components/RealPatientPicker";
+import { publishPlanToPatient, type PatientLite } from "@/lib/plans/plans.functions";
 import type { Patient } from "@/lib/mock-data";
 
 
