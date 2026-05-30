@@ -24,6 +24,7 @@ import {
   orientacoesFor,
   type DietTemplate,
 } from "@/lib/template-data";
+import { TemplateMatcherPanel } from "@/components/TemplateMatcherPanel";
 
 import { imgFor } from "@/lib/food-images";
 import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
@@ -120,6 +121,13 @@ function TemplatesPage() {
 
         {tab === "biblioteca" && (
           <>
+            <TemplateMatcherPanel
+              onPickTemplate={(id) => {
+                const t = systemTemplates.find((x) => x.id === id);
+                if (t) setEditing({ tpl: toPlannerTemplate(t), isMine: false });
+              }}
+            />
+
             <div className="flex gap-2 flex-wrap">
               {(["Todos", ...categories] as const).map((c) => (
                 <button
