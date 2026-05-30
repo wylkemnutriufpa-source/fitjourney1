@@ -862,7 +862,7 @@ function FoodItemRow({
           className="text-muted-foreground hover:text-primary p-1 opacity-0 group-hover:opacity-100 transition-opacity"
           title="Editar"
         >
-          <PencilIcon className="size-3.5" />
+          <Pencil className="size-3.5" />
         </button>
         <button
           onClick={(e) => {
