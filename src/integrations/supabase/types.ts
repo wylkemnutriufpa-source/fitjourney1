@@ -59,6 +59,122 @@ export type Database = {
           },
         ]
       }
+      food_household_measures: {
+        Row: {
+          created_at: string
+          display_order: number
+          food_id: string
+          grams_equivalent: number
+          id: string
+          is_default: boolean
+          measure_name: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          food_id: string
+          grams_equivalent: number
+          id?: string
+          is_default?: boolean
+          measure_name: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          food_id?: string
+          grams_equivalent?: number
+          id?: string
+          is_default?: boolean
+          measure_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "food_household_measures_food_id_fkey"
+            columns: ["food_id"]
+            isOneToOne: false
+            referencedRelation: "foods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      foods: {
+        Row: {
+          carb_g: number
+          category: string
+          created_at: string
+          default_qty: number
+          default_unit: string
+          fat_g: number
+          fiber_g: number
+          food_key: string | null
+          id: string
+          is_fodmap_safe: boolean
+          is_gastrite_safe: boolean
+          is_gluten_free: boolean
+          is_lactose_free: boolean
+          is_vegan: boolean
+          is_vegetarian: boolean
+          kcal_per_100g: number
+          name: string
+          protein_g: number
+          scale_group: Database["public"]["Enums"]["food_scale_group"]
+          source: Database["public"]["Enums"]["food_source"]
+          source_ref: string | null
+          tags: string[]
+          updated_at: string
+        }
+        Insert: {
+          carb_g?: number
+          category: string
+          created_at?: string
+          default_qty?: number
+          default_unit?: string
+          fat_g?: number
+          fiber_g?: number
+          food_key?: string | null
+          id?: string
+          is_fodmap_safe?: boolean
+          is_gastrite_safe?: boolean
+          is_gluten_free?: boolean
+          is_lactose_free?: boolean
+          is_vegan?: boolean
+          is_vegetarian?: boolean
+          kcal_per_100g: number
+          name: string
+          protein_g?: number
+          scale_group: Database["public"]["Enums"]["food_scale_group"]
+          source?: Database["public"]["Enums"]["food_source"]
+          source_ref?: string | null
+          tags?: string[]
+          updated_at?: string
+        }
+        Update: {
+          carb_g?: number
+          category?: string
+          created_at?: string
+          default_qty?: number
+          default_unit?: string
+          fat_g?: number
+          fiber_g?: number
+          food_key?: string | null
+          id?: string
+          is_fodmap_safe?: boolean
+          is_gastrite_safe?: boolean
+          is_gluten_free?: boolean
+          is_lactose_free?: boolean
+          is_vegan?: boolean
+          is_vegetarian?: boolean
+          kcal_per_100g?: number
+          name?: string
+          protein_g?: number
+          scale_group?: Database["public"]["Enums"]["food_scale_group"]
+          source?: Database["public"]["Enums"]["food_source"]
+          source_ref?: string | null
+          tags?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nutritionists: {
         Row: {
           auth_user_id: string
@@ -335,6 +451,16 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      food_scale_group:
+        | "protein"
+        | "carb"
+        | "fat"
+        | "fruit"
+        | "vegetable"
+        | "dairy"
+        | "beverage"
+        | "mixed"
+      food_source: "taco" | "ibge" | "custom"
       plan_status: "draft" | "published" | "archived"
       referral_code_status: "active" | "consumed" | "revoked" | "expired"
     }
@@ -465,6 +591,17 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      food_scale_group: [
+        "protein",
+        "carb",
+        "fat",
+        "fruit",
+        "vegetable",
+        "dairy",
+        "beverage",
+        "mixed",
+      ],
+      food_source: ["taco", "ibge", "custom"],
       plan_status: ["draft", "published", "archived"],
       referral_code_status: ["active", "consumed", "revoked", "expired"],
     },
