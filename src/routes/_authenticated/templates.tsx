@@ -59,7 +59,7 @@ import {
   Repeat2,
 } from "lucide-react";
 
-export const Route = createFileRoute("/templates")({
+export const Route = createFileRoute("/_authenticated/templates")({
   head: () => ({ meta: [{ title: "Templates — FitJourney" }] }),
   component: TemplatesPage,
 });

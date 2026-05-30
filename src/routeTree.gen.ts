@@ -9,86 +9,90 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TemplatesRouteImport } from './routes/templates'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PatientsIndexRouteImport } from './routes/patients/index'
-import { Route as PatientsNewRouteImport } from './routes/patients/new'
-import { Route as PatientsIdIndexRouteImport } from './routes/patients/$id/index'
-import { Route as PatientsIdDietRouteImport } from './routes/patients/$id/diet'
+import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients/index'
+import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients/new'
+import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
+import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
 
-const TemplatesRoute = TemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PatientsIndexRoute = PatientsIndexRouteImport.update({
-  id: '/patients/',
-  path: '/patients/',
+const AuthenticatedTemplatesRoute = AuthenticatedTemplatesRouteImport.update({
+  id: '/_authenticated/templates',
+  path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PatientsNewRoute = PatientsNewRouteImport.update({
-  id: '/patients/new',
-  path: '/patients/new',
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/_authenticated/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PatientsIdIndexRoute = PatientsIdIndexRouteImport.update({
-  id: '/patients/$id/',
-  path: '/patients/$id/',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/_authenticated/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PatientsIdDietRoute = PatientsIdDietRouteImport.update({
-  id: '/patients/$id/diet',
-  path: '/patients/$id/diet',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedPatientsIndexRoute =
+  AuthenticatedPatientsIndexRouteImport.update({
+    id: '/_authenticated/patients/',
+    path: '/patients/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedPatientsNewRoute =
+  AuthenticatedPatientsNewRouteImport.update({
+    id: '/_authenticated/patients/new',
+    path: '/patients/new',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedPatientsIdIndexRoute =
+  AuthenticatedPatientsIdIndexRouteImport.update({
+    id: '/_authenticated/patients/$id/',
+    path: '/patients/$id/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedPatientsIdDietRoute =
+  AuthenticatedPatientsIdDietRouteImport.update({
+    id: '/_authenticated/patients/$id/diet',
+    path: '/patients/$id/diet',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/settings': typeof SettingsRoute
-  '/templates': typeof TemplatesRoute
-  '/patients/new': typeof PatientsNewRoute
-  '/patients/': typeof PatientsIndexRoute
-  '/patients/$id/diet': typeof PatientsIdDietRoute
-  '/patients/$id/': typeof PatientsIdIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
+  '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
+  '/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/settings': typeof SettingsRoute
-  '/templates': typeof TemplatesRoute
-  '/patients/new': typeof PatientsNewRoute
-  '/patients': typeof PatientsIndexRoute
-  '/patients/$id/diet': typeof PatientsIdDietRoute
-  '/patients/$id': typeof PatientsIdIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
+  '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/patients': typeof AuthenticatedPatientsIndexRoute
+  '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
+  '/patients/$id': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/settings': typeof SettingsRoute
-  '/templates': typeof TemplatesRoute
-  '/patients/new': typeof PatientsNewRoute
-  '/patients/': typeof PatientsIndexRoute
-  '/patients/$id/diet': typeof PatientsIdDietRoute
-  '/patients/$id/': typeof PatientsIdIndexRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
+  '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/_authenticated/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
+  '/_authenticated/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -114,49 +118,28 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/dashboard'
-    | '/settings'
-    | '/templates'
-    | '/patients/new'
-    | '/patients/'
-    | '/patients/$id/diet'
-    | '/patients/$id/'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/settings'
+    | '/_authenticated/templates'
+    | '/_authenticated/patients/new'
+    | '/_authenticated/patients/'
+    | '/_authenticated/patients/$id/diet'
+    | '/_authenticated/patients/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRoute
-  SettingsRoute: typeof SettingsRoute
-  TemplatesRoute: typeof TemplatesRoute
-  PatientsNewRoute: typeof PatientsNewRoute
-  PatientsIndexRoute: typeof PatientsIndexRoute
-  PatientsIdDietRoute: typeof PatientsIdDietRoute
-  PatientsIdIndexRoute: typeof PatientsIdIndexRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
+  AuthenticatedPatientsNewRoute: typeof AuthenticatedPatientsNewRoute
+  AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
+  AuthenticatedPatientsIdDietRoute: typeof AuthenticatedPatientsIdDietRoute
+  AuthenticatedPatientsIdIndexRoute: typeof AuthenticatedPatientsIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/templates': {
-      id: '/templates'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof TemplatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -164,32 +147,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/patients/': {
-      id: '/patients/'
+    '/_authenticated/templates': {
+      id: '/_authenticated/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof AuthenticatedTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/patients/': {
+      id: '/_authenticated/patients/'
       path: '/patients'
       fullPath: '/patients/'
-      preLoaderRoute: typeof PatientsIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedPatientsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/patients/new': {
-      id: '/patients/new'
+    '/_authenticated/patients/new': {
+      id: '/_authenticated/patients/new'
       path: '/patients/new'
       fullPath: '/patients/new'
-      preLoaderRoute: typeof PatientsNewRouteImport
+      preLoaderRoute: typeof AuthenticatedPatientsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/patients/$id/': {
-      id: '/patients/$id/'
+    '/_authenticated/patients/$id/': {
+      id: '/_authenticated/patients/$id/'
       path: '/patients/$id'
       fullPath: '/patients/$id/'
-      preLoaderRoute: typeof PatientsIdIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedPatientsIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/patients/$id/diet': {
-      id: '/patients/$id/diet'
+    '/_authenticated/patients/$id/diet': {
+      id: '/_authenticated/patients/$id/diet'
       path: '/patients/$id/diet'
       fullPath: '/patients/$id/diet'
-      preLoaderRoute: typeof PatientsIdDietRouteImport
+      preLoaderRoute: typeof AuthenticatedPatientsIdDietRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -197,13 +201,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRoute,
-  SettingsRoute: SettingsRoute,
-  TemplatesRoute: TemplatesRoute,
-  PatientsNewRoute: PatientsNewRoute,
-  PatientsIndexRoute: PatientsIndexRoute,
-  PatientsIdDietRoute: PatientsIdDietRoute,
-  PatientsIdIndexRoute: PatientsIdIndexRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
+  AuthenticatedPatientsNewRoute: AuthenticatedPatientsNewRoute,
+  AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
+  AuthenticatedPatientsIdDietRoute: AuthenticatedPatientsIdDietRoute,
+  AuthenticatedPatientsIdIndexRoute: AuthenticatedPatientsIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -18,7 +18,7 @@ const MOCK_TO_SYSTEM_ID: Record<string, string> = {
 };
 
 
-export const Route = createFileRoute("/patients/$id/diet")({
+export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Dieta — FitJourney" }] }),
   loader: ({ params }) => {
     const patient = getPatient(params.id);
