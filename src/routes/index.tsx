@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate, Link, Navigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -22,12 +22,10 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!loading && session) navigate({ to: "/dashboard", replace: true });
-  }, [loading, session, navigate]);
-
   if (loading) return null;
-  if (session) return null;
+  // Redirect declarativo (sem useEffect) — evita reagir a mudanças de
+  // referência de `session` (TOKEN_REFRESHED no iframe causava loop).
+  if (session) return <Navigate to="/dashboard" replace />;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

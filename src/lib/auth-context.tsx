@@ -25,14 +25,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId);
-    setRoles((data ?? []).map((r) => r.role as AppRole));
+    const next = (data ?? []).map((r) => r.role as AppRole).sort();
+    setRoles((prev) => {
+      if (prev.length === next.length && prev.every((v, i) => v === next[i])) {
+        return prev; // mantém referência — evita re-render em cascata no iframe
+      }
+      return next;
+    });
   }, []);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
+      setSession((prev) => {
+        if (prev?.access_token === s?.access_token && prev?.user?.id === s?.user?.id) {
+          return prev; // idem token → não re-renderiza
+        }
+        return s;
+      });
       if (s?.user) {
-        // Defer DB call to avoid deadlock inside listener
         setTimeout(() => loadRoles(s.user.id), 0);
       } else {
         setRoles([]);
