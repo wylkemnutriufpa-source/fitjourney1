@@ -63,8 +63,12 @@ import {
   ChefHat,
   Repeat2,
   ChevronDown,
-  
+  Send,
+  CheckCircle2,
 } from "lucide-react";
+import { PatientPicker } from "@/components/PatientPicker";
+import { applyPlanToPatient } from "@/lib/patient-plans-store";
+import type { Patient } from "@/lib/mock-data";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
