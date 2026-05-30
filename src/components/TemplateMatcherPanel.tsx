@@ -62,7 +62,7 @@ export function TemplateMatcherPanel({
     return matchTemplates({
       target: { kcal, proteinG, carbG, fatG },
       mealsPerDay: meals,
-      constraintsRequired: Array.from(constraints),
+      restrictions: Array.from(constraints),
       templates: metas,
     });
   }, [kcal, proteinG, carbG, fatG, meals, constraints]);
