@@ -23,10 +23,11 @@ function Login() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/dashboard" });
+    if (!loading && session) navigate({ to: "/dashboard", replace: true });
   }, [loading, session, navigate]);
 
-  if (!loading && session) return <Navigate to="/dashboard" />;
+  if (loading) return null;
+  if (session) return null;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
