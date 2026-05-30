@@ -9,28 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TemplatesRouteImport } from './routes/templates'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PatientsIndexRouteImport } from './routes/patients/index'
-import { Route as PatientsNewRouteImport } from './routes/patients/new'
-import { Route as PatientsIdIndexRouteImport } from './routes/patients/$id/index'
-import { Route as PatientsIdDietRouteImport } from './routes/patients/$id/diet'
+import { Route as SignupNutritionistRouteImport } from './routes/signup/nutritionist'
+import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
+import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients/index'
+import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients/new'
+import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './routes/_authenticated/onboarding/nutritionist'
+import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
+import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
 
-const TemplatesRoute = TemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -38,57 +31,102 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PatientsIndexRoute = PatientsIndexRouteImport.update({
-  id: '/patients/',
-  path: '/patients/',
+const SignupNutritionistRoute = SignupNutritionistRouteImport.update({
+  id: '/signup/nutritionist',
+  path: '/signup/nutritionist',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PatientsNewRoute = PatientsNewRouteImport.update({
-  id: '/patients/new',
-  path: '/patients/new',
+const AuthCheckEmailRoute = AuthCheckEmailRouteImport.update({
+  id: '/auth/check-email',
+  path: '/auth/check-email',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PatientsIdIndexRoute = PatientsIdIndexRouteImport.update({
-  id: '/patients/$id/',
-  path: '/patients/$id/',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedTemplatesRoute = AuthenticatedTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const PatientsIdDietRoute = PatientsIdDietRouteImport.update({
-  id: '/patients/$id/diet',
-  path: '/patients/$id/diet',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPatientsIndexRoute =
+  AuthenticatedPatientsIndexRouteImport.update({
+    id: '/patients/',
+    path: '/patients/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPatientsNewRoute =
+  AuthenticatedPatientsNewRouteImport.update({
+    id: '/patients/new',
+    path: '/patients/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOnboardingNutritionistRoute =
+  AuthenticatedOnboardingNutritionistRouteImport.update({
+    id: '/onboarding/nutritionist',
+    path: '/onboarding/nutritionist',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPatientsIdIndexRoute =
+  AuthenticatedPatientsIdIndexRouteImport.update({
+    id: '/patients/$id/',
+    path: '/patients/$id/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPatientsIdDietRoute =
+  AuthenticatedPatientsIdDietRouteImport.update({
+    id: '/patients/$id/diet',
+    path: '/patients/$id/diet',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/settings': typeof SettingsRoute
-  '/templates': typeof TemplatesRoute
-  '/patients/new': typeof PatientsNewRoute
-  '/patients/': typeof PatientsIndexRoute
-  '/patients/$id/diet': typeof PatientsIdDietRoute
-  '/patients/$id/': typeof PatientsIdIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
+  '/signup/nutritionist': typeof SignupNutritionistRoute
+  '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
+  '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
+  '/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/settings': typeof SettingsRoute
-  '/templates': typeof TemplatesRoute
-  '/patients/new': typeof PatientsNewRoute
-  '/patients': typeof PatientsIndexRoute
-  '/patients/$id/diet': typeof PatientsIdDietRoute
-  '/patients/$id': typeof PatientsIdIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
+  '/signup/nutritionist': typeof SignupNutritionistRoute
+  '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
+  '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/patients': typeof AuthenticatedPatientsIndexRoute
+  '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
+  '/patients/$id': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/settings': typeof SettingsRoute
-  '/templates': typeof TemplatesRoute
-  '/patients/new': typeof PatientsNewRoute
-  '/patients/': typeof PatientsIndexRoute
-  '/patients/$id/diet': typeof PatientsIdDietRoute
-  '/patients/$id/': typeof PatientsIdIndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
+  '/signup/nutritionist': typeof SignupNutritionistRoute
+  '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
+  '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/_authenticated/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
+  '/_authenticated/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +135,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/settings'
     | '/templates'
+    | '/auth/check-email'
+    | '/signup/nutritionist'
+    | '/onboarding/nutritionist'
     | '/patients/new'
     | '/patients/'
     | '/patients/$id/diet'
@@ -107,6 +148,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/settings'
     | '/templates'
+    | '/auth/check-email'
+    | '/signup/nutritionist'
+    | '/onboarding/nutritionist'
     | '/patients/new'
     | '/patients'
     | '/patients/$id/diet'
@@ -114,47 +158,33 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/dashboard'
-    | '/settings'
-    | '/templates'
-    | '/patients/new'
-    | '/patients/'
-    | '/patients/$id/diet'
-    | '/patients/$id/'
+    | '/_authenticated'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/settings'
+    | '/_authenticated/templates'
+    | '/auth/check-email'
+    | '/signup/nutritionist'
+    | '/_authenticated/onboarding/nutritionist'
+    | '/_authenticated/patients/new'
+    | '/_authenticated/patients/'
+    | '/_authenticated/patients/$id/diet'
+    | '/_authenticated/patients/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRoute
-  SettingsRoute: typeof SettingsRoute
-  TemplatesRoute: typeof TemplatesRoute
-  PatientsNewRoute: typeof PatientsNewRoute
-  PatientsIndexRoute: typeof PatientsIndexRoute
-  PatientsIdDietRoute: typeof PatientsIdDietRoute
-  PatientsIdIndexRoute: typeof PatientsIdIndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthCheckEmailRoute: typeof AuthCheckEmailRoute
+  SignupNutritionistRoute: typeof SignupNutritionistRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/templates': {
-      id: '/templates'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof TemplatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -164,46 +194,111 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/patients/': {
-      id: '/patients/'
+    '/signup/nutritionist': {
+      id: '/signup/nutritionist'
+      path: '/signup/nutritionist'
+      fullPath: '/signup/nutritionist'
+      preLoaderRoute: typeof SignupNutritionistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/check-email': {
+      id: '/auth/check-email'
+      path: '/auth/check-email'
+      fullPath: '/auth/check-email'
+      preLoaderRoute: typeof AuthCheckEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/templates': {
+      id: '/_authenticated/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof AuthenticatedTemplatesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/patients/': {
+      id: '/_authenticated/patients/'
       path: '/patients'
       fullPath: '/patients/'
-      preLoaderRoute: typeof PatientsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPatientsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/patients/new': {
-      id: '/patients/new'
+    '/_authenticated/patients/new': {
+      id: '/_authenticated/patients/new'
       path: '/patients/new'
       fullPath: '/patients/new'
-      preLoaderRoute: typeof PatientsNewRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPatientsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/patients/$id/': {
-      id: '/patients/$id/'
+    '/_authenticated/onboarding/nutritionist': {
+      id: '/_authenticated/onboarding/nutritionist'
+      path: '/onboarding/nutritionist'
+      fullPath: '/onboarding/nutritionist'
+      preLoaderRoute: typeof AuthenticatedOnboardingNutritionistRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/patients/$id/': {
+      id: '/_authenticated/patients/$id/'
       path: '/patients/$id'
       fullPath: '/patients/$id/'
-      preLoaderRoute: typeof PatientsIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPatientsIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/patients/$id/diet': {
-      id: '/patients/$id/diet'
+    '/_authenticated/patients/$id/diet': {
+      id: '/_authenticated/patients/$id/diet'
       path: '/patients/$id/diet'
       fullPath: '/patients/$id/diet'
-      preLoaderRoute: typeof PatientsIdDietRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPatientsIdDietRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
+  AuthenticatedOnboardingNutritionistRoute: typeof AuthenticatedOnboardingNutritionistRoute
+  AuthenticatedPatientsNewRoute: typeof AuthenticatedPatientsNewRoute
+  AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
+  AuthenticatedPatientsIdDietRoute: typeof AuthenticatedPatientsIdDietRoute
+  AuthenticatedPatientsIdIndexRoute: typeof AuthenticatedPatientsIdIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
+  AuthenticatedOnboardingNutritionistRoute:
+    AuthenticatedOnboardingNutritionistRoute,
+  AuthenticatedPatientsNewRoute: AuthenticatedPatientsNewRoute,
+  AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
+  AuthenticatedPatientsIdDietRoute: AuthenticatedPatientsIdDietRoute,
+  AuthenticatedPatientsIdIndexRoute: AuthenticatedPatientsIdIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRoute,
-  SettingsRoute: SettingsRoute,
-  TemplatesRoute: TemplatesRoute,
-  PatientsNewRoute: PatientsNewRoute,
-  PatientsIndexRoute: PatientsIndexRoute,
-  PatientsIdDietRoute: PatientsIdDietRoute,
-  PatientsIdIndexRoute: PatientsIdIndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthCheckEmailRoute: AuthCheckEmailRoute,
+  SignupNutritionistRoute: SignupNutritionistRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

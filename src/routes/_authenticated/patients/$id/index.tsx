@@ -4,7 +4,7 @@ import { getPatient } from "@/lib/mock-data";
 import { Edit3, FileText, ChevronRight } from "lucide-react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-export const Route = createFileRoute("/patients/$id/")({
+export const Route = createFileRoute("/_authenticated/patients/$id/")({
   head: () => ({ meta: [{ title: "Perfil do paciente — FitJourney" }] }),
   loader: ({ params }) => {
     const patient = getPatient(params.id);

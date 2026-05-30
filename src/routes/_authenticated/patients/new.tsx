@@ -4,7 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { calcTMB, calcGET, type Goal } from "@/lib/mock-data";
 import { Calculator, Save, Activity } from "lucide-react";
 
-export const Route = createFileRoute("/patients/new")({
+export const Route = createFileRoute("/_authenticated/patients/new")({
   head: () => ({ meta: [{ title: "Nova Anamnese — FitJourney" }] }),
   component: NewPatient,
 });

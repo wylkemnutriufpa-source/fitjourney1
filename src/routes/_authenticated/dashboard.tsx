@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "../components/AppShell";
-import { patients, recentActivity } from "../lib/mock-data";
+import { AppShell } from "@/components/AppShell";
+import { patients, recentActivity } from "@/lib/mock-data";
 import { Plus, ArrowUpRight, TrendingUp, Users, Activity, AlertCircle } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — FitJourney" }] }),
   component: Dashboard,
 });
