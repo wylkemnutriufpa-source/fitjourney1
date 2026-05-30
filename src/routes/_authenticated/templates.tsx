@@ -795,9 +795,26 @@ function nutritionForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
   };
 }
 
-function withCatalogKcal(item: PlannerFoodItem, food: FoodDTO | null) {
-  if (!food) return item;
-  return { ...item, kcal: nutritionForCurrentPortion(item, food).kcal };
+function withCatalogKcal(
+  item: PlannerFoodItem,
+  food: FoodDTO | null,
+  previous?: PlannerFoodItem,
+) {
+  if (food) {
+    return { ...item, kcal: nutritionForCurrentPortion(item, food).kcal };
+  }
+  // Sem ficha no catálogo: escala kcal proporcionalmente à mudança de qty,
+  // desde que a unidade não tenha mudado. Caso contrário mantém kcal.
+  if (
+    previous &&
+    previous.unit === item.unit &&
+    previous.qty > 0 &&
+    item.qty !== previous.qty
+  ) {
+    const ratio = item.qty / previous.qty;
+    return { ...item, kcal: Math.round(item.kcal * ratio) };
+  }
+  return item;
 }
 
 const FOOD_INFO_POPOVER_EVENT = "fitjourney-food-info-popover";
@@ -921,12 +938,12 @@ function FoodItemRow({
       ...item,
       qty: grams,
       unit: "g",
-    }, catalogMatch));
+    }, catalogMatch, item));
     setInfoOpen(false);
   }
 
   function updatePortion(patch: Partial<PlannerFoodItem>) {
-    onChange(withCatalogKcal({ ...item, ...patch }, catalogMatch));
+    onChange(withCatalogKcal({ ...item, ...patch }, catalogMatch, item));
   }
 
   const baseClass =
