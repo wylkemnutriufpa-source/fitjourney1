@@ -360,29 +360,56 @@ export type Database = {
       }
       templates: {
         Row: {
+          carb_g_target: number | null
+          constraints_tags: string[]
           content: Json
           created_at: string
+          fat_g_target: number | null
+          goal_tag: string | null
           id: string
+          kcal_range_max: number | null
+          kcal_range_min: number | null
+          kcal_target: number | null
+          meals_per_day: number | null
           name: string
           nutritionist_id: string
+          protein_g_target: number | null
           schema_version: number
           updated_at: string
         }
         Insert: {
+          carb_g_target?: number | null
+          constraints_tags?: string[]
           content: Json
           created_at?: string
+          fat_g_target?: number | null
+          goal_tag?: string | null
           id?: string
+          kcal_range_max?: number | null
+          kcal_range_min?: number | null
+          kcal_target?: number | null
+          meals_per_day?: number | null
           name: string
           nutritionist_id: string
+          protein_g_target?: number | null
           schema_version?: number
           updated_at?: string
         }
         Update: {
+          carb_g_target?: number | null
+          constraints_tags?: string[]
           content?: Json
           created_at?: string
+          fat_g_target?: number | null
+          goal_tag?: string | null
           id?: string
+          kcal_range_max?: number | null
+          kcal_range_min?: number | null
+          kcal_target?: number | null
+          meals_per_day?: number | null
           name?: string
           nutritionist_id?: string
+          protein_g_target?: number | null
           schema_version?: number
           updated_at?: string
         }

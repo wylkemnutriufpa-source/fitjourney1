@@ -1,112 +1,149 @@
 
-# Plano — FitJourney v2.0: Onboarding do Paciente + Sistema Real
+# Fase 2 — Motor de Cálculo + Template Matcher
 
-Vou entregar em **5 fases independentes**, cada uma testável e publicável separadamente. Você aprova a sequência ou reordena.
-
----
-
-## Fase 1 — Banco de Alimentos Real (TACO/IBGE) + Medidas Caseiras
-
-**Objetivo:** transformar `food-catalog.ts` (mock) em tabela `foods` real no banco, populada com padrão TACO/IBGE, com medidas caseiras fidedignas.
-
-**Mudanças de banco (migration):**
-- Nova tabela `foods`: `id`, `name`, `category`, `source` (`taco`|`ibge`|`custom`), `kcal_per_100g`, `protein_g`, `carb_g`, `fat_g`, `fiber_g`, `scale_group`, `tags` (gluten_free, lactose_free, fodmap_safe, gastrite_safe — array), `default_qty`, `default_unit`.
-- Nova tabela `food_household_measures`: `food_id`, `measure_name` ("colher de sopa cheia", "filé médio", "fatia"), `grams_equivalent`, `is_default`.
-- RLS: leitura pública para `authenticated` (catálogo é compartilhado), escrita só `service_role`.
-
-**Seed:**
-- Script de seed com ~200 alimentos TACO mais usados nos templates atuais, cada um com 2-4 medidas caseiras.
-- Marcadores de protocolo: `gluten_free`, `lactose_free`, `fodmap_safe`, `gastrite_safe`.
-
-**Frontend:**
-- `FoodPickerDialog` passa a ler de `foods` via server fn (não mais do `food-catalog.ts`).
-- Modal de substituição mostra medidas caseiras (`"50g de tapioca = 3 colheres de sopa"`).
-- `food-catalog.ts` vira fallback de leitura legada apenas (marcado deprecated).
+Objetivo: construir o **coração clínico** do FitJourney (TDEE → Macros → Matcher → Validação) sem alterar o layout/editor atual. Tudo determinístico, puro, testável, server-side.
 
 ---
 
-## Fase 2 — Acoplamento kcal ↔ gramas no Editor
+## Escopo desta entrega
 
-**Objetivo:** quando o nutri ajusta kcal, gramas recalculam proporcionalmente (e vice-versa). Nada de campos independentes.
+Entregar 4 blocos **isolados e puros**, prontos para serem plugados depois no fluxo do editor:
 
-**Mudanças (frontend, editor clínico apenas):**
-- No `FoodItemRow` (editor): kcal e gramas viram **derivados um do outro** via `kcal_per_100g` do alimento.
-  - Editou gramas → recalcula kcal, protein, carb, fat.
-  - Editou kcal → recalcula gramas proporcionalmente, mantém o `food_id`.
-- Macros (P/C/G) sempre derivados de `grams × per_100g`. Travados (não editáveis manualmente).
-- Patient App e PDF **não mudam** — continuam render burro do snapshot.
+1. **TMB/TDEE Engine** — Mifflin-St Jeor + fatores de atividade
+2. **Macro Engine** — distribuição por objetivo (cut/bulk/manutenção)
+3. **Template Matcher** — score ponderado kcal/macros/restrições
+4. **Clinical Gate** — validação pré-publicação
 
----
-
-## Fase 3 — Templates Reais no Banco + Novos Protocolos
-
-**Objetivo:** migrar `template-data.ts` (mock, 813 linhas) para registros reais na tabela `templates` já existente, e criar os faltantes.
-
-**Templates a popular (cada um com 7 dias, substituições, orientações):**
-- Os atuais (emagrecimento, hipertrofia, manutenção, etc. — mantém estrutura).
-- **Novos:** sem glúten, sem lactose, sem glúten **e** sem lactose, FODMAP, gastrite.
-- Cada novo protocolo: filtra `foods` pelas tags correspondentes + traz bloco de **orientações personalizadas** (campo `content.guidelines` no JSONB) — ex: gastrite sem cítricos/café/pimenta, FODMAP fase de eliminação etc.
-
-**Como vou popular:**
-- Gero os JSONs dos templates (a partir do `template-data.ts` atual + variações para cada protocolo) e faço seed via `supabase--insert`.
-- `nutritionist_id` dos templates seed = um "system" nutricionista (template global) OU cópia para cada nutri novo. Sugestão: **system templates** (nutritionist_id = NULL allowed, RLS permite leitura por todos), nutri pode duplicar e editar.
-- Migration adiciona suporte a `nutritionist_id NULL` = template global.
+**Não escopo desta fase:** integração visual no editor, UI de seleção de template, recálculo no editor existente. Isso vem em fase posterior, sem desfazer nada.
 
 ---
 
-## Fase 4 — Onboarding do Paciente (link de convite → anamnese)
+## Matriz de Impacto
 
-**Objetivo:** experiência premium do paciente. Nutri gera link (já existe `referral_codes`), paciente clica, cadastra, preenche anamnese guiada em steps, fica disponível para o nutri.
+**Módulo alterado:** novo módulo `phase2/engine` + adição de colunas em `templates` (metadados de matching).
 
-**Fluxo:**
-1. Nutri gera código em `/patients` → link `app/onboarding/{code}`.
-2. Rota pública `signup/patient/$code.tsx` — paciente cria conta (email/senha + Google).
-3. Após signup → redireciona para `_authenticated/onboarding/patient` (anamnese multi-step, premium).
-4. Steps da anamnese:
-   - Dados pessoais (idade, peso, altura, sexo, atividade)
-   - Objetivo (emagrecer / hipertrofia / manutenção / saúde)
-   - Restrições alimentares (glúten, lactose, FODMAP, gastrite, vegetariano, alergias livres)
-   - Rotina (horários, refeições/dia)
-   - Histórico/saúde
-   - Preferências e aversões alimentares
-5. Salva em `anamneses.data` (JSONB, schema_version=1). Vincula `patient_id` + `nutritionist_id` (resolvido pelo `referral_code`).
-6. Nutri recebe na lista de pacientes com badge "Anamnese pronta".
+**Tipo:** DDL aditivo (colunas nullable) + código novo puro.
 
-**Mudanças de código:**
-- Server fn `signupPatientViaReferral` (em `src/domain/write/patient.functions.ts`, seguindo regra do `domain/write`).
-- Server fn `submitPatientAnamnese`.
-- Rotas: `signup/patient.$code.tsx`, `_authenticated/onboarding/patient.tsx`, `_authenticated/patients/$id/anamnese.tsx` (visualização nutri).
+**Dependências diretas:** nenhuma. Colunas são opcionais, default null. Editor atual ignora.
 
-**Importante:** NÃO há engine automática classificando e copiando template. O nutri **vê a anamnese pronta**, escolhe o template manualmente, ajusta no editor clínico, publica. Engine automática fica para v3.
+**Dependências indiretas:** nenhuma. Engines são funções puras server-side, não chamadas pelo render do paciente nem pelo PDF.
+
+**Risco de cascata:** zero. Nada existente lê essas colunas. Nada existente chama os engines.
+
+**Rollback:** drop colunas + delete pasta `src/lib/engine/`.
+
+**Checklist de não-regressão (Templates):**
+- Planos antigos permanecem idênticos (snapshot intacto) — OK, não tocamos em plans
+- Render do plano não faz JOIN com templates — OK, inalterado
+- `source_template_id` continua apenas rastreabilidade — OK
+- Editor atual continua funcional — OK, nenhuma alteração em `templates.tsx`
 
 ---
 
-## Fase 5 — Limpeza dos Mocks
+## 1. Schema (migration aditiva)
 
-- Remover/marcar deprecated: `src/lib/mock-data.ts`, `src/lib/template-data.ts` (depois que tudo migrou).
-- Garantir que nenhum componente do app importa mock-data em runtime.
-- Testes de fumaça: nutri novo → cria paciente manual → cria template do zero → publica plano → paciente vê.
+```sql
+ALTER TABLE public.templates
+  ADD COLUMN kcal_target          numeric,
+  ADD COLUMN kcal_range_min       numeric,
+  ADD COLUMN kcal_range_max       numeric,
+  ADD COLUMN protein_g_target     numeric,
+  ADD COLUMN carb_g_target        numeric,
+  ADD COLUMN fat_g_target         numeric,
+  ADD COLUMN meals_per_day        smallint,
+  ADD COLUMN constraints_tags     text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN goal_tag             text;  -- 'cut' | 'bulk' | 'maintain' | null
+```
+
+Todas nullable (exceto array com default). Templates existentes seguem funcionando. Backfill manual depois.
+
+---
+
+## 2. Engines (código puro)
+
+```
+src/lib/engine/
+├── tdee.ts            # mifflin-st jeor + fatores
+├── macros.ts          # distribuição por goal
+├── matcher.ts         # score 40/40/20
+├── clinical-gate.ts   # validações pré-publicação
+├── types.ts           # AnamneseInput, MacroTarget, MatchResult, GateResult
+└── __tests__/         # vitest puro, sem mocks
+    ├── tdee.test.ts
+    ├── macros.test.ts
+    ├── matcher.test.ts
+    └── clinical-gate.test.ts
+```
+
+**Contratos:**
+
+```ts
+// tdee.ts
+type Sex = 'male' | 'female';
+type Activity = 'sedentary' | 'light' | 'moderate' | 'high' | 'extreme';
+calcTMB({ sex, weightKg, heightCm, ageYears }): number
+calcTDEE(tmb, activity): number
+
+// macros.ts
+type Goal = 'cut' | 'bulk' | 'maintain';
+calcMacroTarget({ tdee, weightKg, goal }): { kcal, proteinG, fatG, carbG }
+
+// matcher.ts
+matchTemplates(target: MacroTarget, restrictions: string[], mealsPerDay: number, templates: TemplateMeta[]): MatchResult[]
+// retorna ordenado por score desc, com score: number (0-100), reasons: string[]
+// templates com score < 80 são marcados como `autoSelectable: false`
+
+// clinical-gate.ts
+validatePlan({ snapshot, target, weightKg }): { errors: GateIssue[], warnings: GateIssue[], blocked: boolean }
+// regras: prot > 2.5g/kg, déficit > 25% TDEE, monotonia > 4x/sem, desvio macro > 10%
+```
+
+**Puro:** zero IO, zero supabase, zero React. Só funções → entrada/saída.
+
+---
+
+## 3. Server function (exposição controlada)
+
+`src/lib/engine/engine.functions.ts` — uma única serverFn `computeNutritionTargets({ anamneseId })` que:
+- lê anamnese via supabase autenticado
+- roda TDEE → Macros
+- retorna `{ tdee, target }`
+
+Sem efeito colateral. Sem persistência. Sem mudar nada existente.
+
+---
+
+## 4. O que NÃO vou fazer
+
+- Não toco em `src/routes/_authenticated/templates.tsx`
+- Não toco em `src/lib/template-data.ts`
+- Não toco em renderers do paciente
+- Não toco em PDF
+- Não crio UI nova
+- Não altero snapshot/plans
+- Não removo nem renomeio nada
 
 ---
 
 ## Detalhes técnicos
 
-**Stack respeitada:**
-- Toda mutação em `nutritionists`/`patients`/`referral_codes`/`anamneses` passa por `src/domain/write/` com `withDomainGate` (já é regra do projeto).
-- Server fns com `requireSupabaseAuth` para nutri; signup do paciente usa fluxo público com validação do referral code via `supabaseAdmin`.
-- `plans.snapshot` continua imutável após publicação (trigger já existe).
-- Patient App / PDF não recalculam nada (regra soberana mantida).
-
-**Ordem recomendada de execução:** 1 → 2 → 3 → 4 → 5. Posso fazer Fase 1+2 juntas (afetam o mesmo módulo: editor + catálogo). Fases 3, 4, 5 separadas.
-
-**Tempo estimado por fase:** cada fase = 1 conversa dedicada. Não tente empilhar tudo em um turno só — vai estourar contexto e quebrar coisas que hoje funcionam.
+- TypeScript strict, funções puras com `Readonly<T>` nos inputs
+- Vitest para todos os engines (TDD-friendly)
+- Fórmulas conferidas: Mifflin-St Jeor padrão, fatores 1.2/1.375/1.55/1.725/1.9
+- Matcher: kcal compatível se |kcal_target - target.kcal| ≤ (range_max - range_min)/2; macros compatíveis se desvio ≤ 10%; restrições: todas devem estar em `constraints_tags`
+- Gate: roda só no servidor, retorna estrutura; UI de exibição vem em fase posterior
 
 ---
 
-## O que NÃO está no plano (confirma se quer adicionar)
+## Próximos passos (fora desta entrega)
 
-- Engine automática de classificação anamnese→template (você disse que confundi — confirmado, fora).
-- Login social do paciente (incluo Google por padrão no signup do paciente? sim/não).
-- Notificação para o nutri quando paciente termina anamnese (email? in-app badge? ambos?).
+1. UI de "Calcular alvo" na anamnese do paciente
+2. UI de "Sugerir template" no fluxo de criação de plano
+3. UI de validação clínica no editor (banner de alerta antes de publicar)
+4. Backfill dos metadados dos templates atuais
 
-**Aprova para eu começar pela Fase 1?**
+Cada um desses entra em PR separado, sem desfazer nada do que existe.
+
+---
+
+**Aprova para eu executar a migration + criar os engines?**
