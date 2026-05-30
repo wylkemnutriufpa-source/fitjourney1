@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Navigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Navigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -149,7 +149,10 @@ function Login() {
           </button>
 
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60 text-center">
-            Acesso restrito · novos usuários por convite do administrador
+            Novo aqui?{" "}
+            <Link to="/signup/nutritionist" className="text-primary hover:underline">
+              Criar conta de nutricionista
+            </Link>
           </p>
         </form>
       </div>
