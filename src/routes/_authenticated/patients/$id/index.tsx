@@ -186,30 +186,19 @@ function PatientProfile() {
             </dl>
           </div>
 
-          <div className="bg-surface border border-border rounded-lg p-6 space-y-3">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Macros Alvo (TDEE)
-            </p>
-            <div className="space-y-3">
-              {[
-                { k: "Proteínas", g: Math.round((p.tdee * 0.3) / 4), pct: 30, c: "bg-primary" },
-                { k: "Carboidratos", g: Math.round((p.tdee * 0.5) / 4), pct: 50, c: "bg-emerald-400" },
-                { k: "Gorduras", g: Math.round((p.tdee * 0.2) / 9), pct: 20, c: "bg-amber-400" },
-              ].map((m) => (
-                <div key={m.k} className="space-y-1.5">
-                  <div className="flex justify-between text-xs">
-                    <span>{m.k}</span>
-                    <span className="font-mono text-muted-foreground">
-                      {m.g}g · {m.pct}%
-                    </span>
-                  </div>
-                  <div className="h-1.5 bg-background rounded-full overflow-hidden">
-                    <div className={m.c + " h-full rounded-full"} style={{ width: `${m.pct}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <NutritionTargetCard
+            sex={p.sex === "M" ? "male" : "female"}
+            ageYears={p.age}
+            weightKg={p.weightKg}
+            heightCm={p.heightCm}
+            defaultGoal={
+              p.goal === "Emagrecimento"
+                ? "cut"
+                : p.goal === "Hipertrofia"
+                  ? "bulk"
+                  : "maintain"
+            }
+          />
         </section>
       </div>
     </AppShell>
