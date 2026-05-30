@@ -4,6 +4,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { validateSnapshot } from "./snapshot.schema";
 
 export type PatientLite = {
   id: string;
