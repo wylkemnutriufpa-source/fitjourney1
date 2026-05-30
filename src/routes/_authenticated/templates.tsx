@@ -777,6 +777,8 @@ function withCatalogKcal(item: PlannerFoodItem, food: FoodDTO | null) {
   return { ...item, kcal: nutritionForCurrentPortion(item, food).kcal };
 }
 
+const FOOD_INFO_POPOVER_EVENT = "fitjourney-food-info-popover";
+
 function FoodInfoPopover({
   item,
   match,
@@ -875,6 +877,22 @@ function FoodItemRow({
     if (editing) nameInputRef.current?.focus();
   }, [editing]);
 
+  useEffect(() => {
+    const closeOtherPopover = (event: Event) => {
+      const activeItemId = (event as CustomEvent<string>).detail;
+      if (activeItemId !== item.id) setInfoOpen(false);
+    };
+    window.addEventListener(FOOD_INFO_POPOVER_EVENT, closeOtherPopover);
+    return () => window.removeEventListener(FOOD_INFO_POPOVER_EVENT, closeOtherPopover);
+  }, [item.id]);
+
+  function setFoodInfoOpen(open: boolean) {
+    if (open) {
+      window.dispatchEvent(new CustomEvent(FOOD_INFO_POPOVER_EVENT, { detail: item.id }));
+    }
+    setInfoOpen(open);
+  }
+
   function applyMeasure(grams: number, measureName: string) {
     onChange(withCatalogKcal({
       ...item,
@@ -905,7 +923,7 @@ function FoodItemRow({
             {item.qty} {item.unit} · {item.kcal} kcal
           </p>
         </div>
-        <Popover open={infoOpen} onOpenChange={setInfoOpen}>
+        <Popover open={infoOpen} onOpenChange={setFoodInfoOpen}>
           <PopoverTrigger asChild>
             <button
               className="text-muted-foreground hover:text-primary p-1 opacity-60 group-hover:opacity-100 transition-opacity"
