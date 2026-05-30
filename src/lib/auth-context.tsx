@@ -36,9 +36,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
+      setSession((prev) => {
+        if (prev?.access_token === s?.access_token && prev?.user?.id === s?.user?.id) {
+          return prev; // idem token → não re-renderiza
+        }
+        return s;
+      });
       if (s?.user) {
-        // Defer DB call to avoid deadlock inside listener
         setTimeout(() => loadRoles(s.user.id), 0);
       } else {
         setRoles([]);
