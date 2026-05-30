@@ -24,6 +24,7 @@ import {
   orientacoesFor,
   type DietTemplate,
 } from "@/lib/template-data";
+import { TemplateMatcherPanel } from "@/components/TemplateMatcherPanel";
 
 import { imgFor } from "@/lib/food-images";
 import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
