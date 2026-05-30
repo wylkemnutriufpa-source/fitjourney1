@@ -445,11 +445,11 @@ function TemplateEditor({
 
             {editorTab === "orientacoes" && (
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div>
                     <h3 className="text-sm font-semibold">Orientações Nutricionais</h3>
                     <p className="text-xs text-muted-foreground">
-                      Texto livre que vai junto no PDF e no WhatsApp.
+                      Texto livre que vai junto no PDF e no WhatsApp do plano — ou enviado isolado abaixo.
                     </p>
                   </div>
                   <Button
@@ -465,6 +465,32 @@ function TemplateEditor({
                   onChange={(e) => setOrientacoes(e.target.value)}
                   className="min-h-[420px] font-mono text-xs leading-relaxed"
                 />
+                <div className="flex items-center gap-2 pt-2 border-t border-border">
+                  <p className="text-xs text-muted-foreground flex-1">
+                    Enviar somente as orientações:
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      printHTML({
+                        title: `Orientações — ${name || draft.name}`,
+                        html: `<h1>Orientações Nutricionais</h1><div class="meta">${escapeHtml(name || draft.name)}${finalidade ? ` · ${escapeHtml(finalidade)}` : ""}</div><div class="orientacoes">${escapeHtml(orientacoes.trim())}</div>`,
+                      })
+                    }
+                    disabled={!orientacoes.trim()}
+                  >
+                    <Printer className="size-3.5" /> PDF
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setOrientShareOpen(true)}
+                    disabled={!orientacoes.trim()}
+                    className="bg-[#25D366] hover:bg-[#1ebe57] text-white"
+                  >
+                    <MessageCircle className="size-3.5" /> WhatsApp
+                  </Button>
+                </div>
               </div>
             )}
           </div>
