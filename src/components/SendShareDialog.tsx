@@ -39,14 +39,18 @@ export function SendShareDialog({
   // Reset message when defaultMessage changes (new template/diet)
   if (open && message === "" && defaultMessage) setMessage(defaultMessage);
 
+  const phoneDigits = phone.replace(/\D/g, "");
+  const phoneValid = phoneDigits.length >= 10; // DDD + número (Brasil)
+  const [touched, setTouched] = useState(false);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            Edite a mensagem antes de enviar. O WhatsApp abre na sua conta — você escolhe o
-            contato ou usa uma conversa aberta. Para imprimir em PDF, escolha
+            Informe o telefone do paciente (com DDD). O WhatsApp abrirá direto na conversa
+            dele a partir da sua conta. Para imprimir em PDF, escolha
             <strong> Salvar como PDF</strong> no diálogo de impressão.
           </DialogDescription>
         </DialogHeader>
@@ -54,15 +58,23 @@ export function SendShareDialog({
         <div className="space-y-3">
           <div>
             <Label htmlFor="wa-phone" className="text-xs">
-              Telefone do paciente (opcional)
+              Telefone do paciente <span className="text-destructive">*</span>
             </Label>
             <Input
               id="wa-phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="(91) 9XXXX-XXXX  ·  ou deixe vazio p/ escolher contato"
+              onBlur={() => setTouched(true)}
+              placeholder="(91) 9XXXX-XXXX"
               className="mt-1"
+              aria-invalid={touched && !phoneValid}
             />
+            {touched && !phoneValid && (
+              <p className="mt-1 text-xs text-destructive">
+                Informe um telefone válido com DDD (mín. 10 dígitos). Sem destinatário, o
+                WhatsApp abre na sua própria conversa.
+              </p>
+            )}
           </div>
           <div>
             <Label htmlFor="wa-msg" className="text-xs">
@@ -85,11 +97,14 @@ export function SendShareDialog({
             <Printer className="size-4" /> Imprimir / PDF
           </Button>
           <Button
+            disabled={!phoneValid}
             onClick={() => {
+              setTouched(true);
+              if (!phoneValid) return;
               openWhatsApp({ phone, message });
               onOpenChange(false);
             }}
-            className="bg-[#25D366] hover:bg-[#1ebe57] text-white"
+            className="bg-[#25D366] hover:bg-[#1ebe57] text-white disabled:opacity-50"
           >
             <MessageCircle className="size-4" /> Enviar WhatsApp
           </Button>
@@ -98,3 +113,4 @@ export function SendShareDialog({
     </Dialog>
   );
 }
+
