@@ -72,7 +72,7 @@ export function TemplateMatcherPanel({
     if (!patient) return;
     try {
       const { tdee } = calcFromAnamnese({
-        sex: patient.sex,
+        sex: patient.sex === "M" ? "male" : "female",
         ageYears: patient.age,
         weightKg: patient.weightKg,
         heightCm: patient.heightCm,
