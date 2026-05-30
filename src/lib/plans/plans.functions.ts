@@ -75,12 +75,19 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     if (pErr) throw new Error(pErr.message);
     if (!pat) throw new Error("Paciente não pertence a você.");
 
+    // Gate clínico server-side: VALIDA mas NÃO bloqueia.
+    // O profissional é a fonte da verdade clínica. O servidor só anota
+    // warnings em snapshot.clinical_review como auditoria. Publicação
+    // sempre passa, mesmo com avisos.
+    const { snapshot, review } = validateSnapshot(data.snapshot);
+    const snapshotWithReview = { ...snapshot, clinical_review: review };
+
     const insertRow: Record<string, any> = {
       patient_id: data.patientId,
       nutritionist_id: nutri.id,
       schema_version: 3,
       status: "published",
-      snapshot: data.snapshot,
+      snapshot: snapshotWithReview,
     };
     if (data.sourceTemplateId) insertRow.source_template_id = data.sourceTemplateId;
 
