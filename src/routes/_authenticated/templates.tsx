@@ -66,10 +66,8 @@ import {
   Send,
   CheckCircle2,
 } from "lucide-react";
-import { PatientPicker } from "@/components/PatientPicker";
 import { RealPatientPicker } from "@/components/RealPatientPicker";
 import { publishPlanToPatient, type PatientLite } from "@/lib/plans/plans.functions";
-import type { Patient } from "@/lib/mock-data";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
