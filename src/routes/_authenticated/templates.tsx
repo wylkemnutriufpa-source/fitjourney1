@@ -61,7 +61,11 @@ import {
   ClipboardList,
   ChefHat,
   Repeat2,
+  ChevronDown,
+  Info,
+  Pencil as PencilIcon,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/templates")({
   head: () => ({ meta: [{ title: "Templates — FitJourney" }] }),
