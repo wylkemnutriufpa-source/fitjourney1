@@ -863,6 +863,7 @@ export const templates: DietTemplate[] = [
         item("canja", 400),
         [item("sopa_legumes", 400), item("frango_grelhado", 180)]),
     ],
+  },
 
   // ---------- RESTRITIVOS / ALERGIAS / INTOLERÂNCIAS ----------
   {
