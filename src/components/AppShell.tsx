@@ -1,4 +1,4 @@
-import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Users,
@@ -8,9 +8,11 @@ import {
   ChevronRight,
   Loader2,
   ShieldCheck,
+  ArrowLeft,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
+
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -42,6 +44,33 @@ function Crumbs() {
         </span>
       ))}
     </div>
+  );
+}
+
+function BackButton() {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const router = useRouter();
+  const navigate = useNavigate();
+  // Esconde no dashboard (raiz) e na home pública.
+  if (path === "/" || path === "/dashboard") return null;
+  function goBack() {
+    // Se houver histórico no SPA, volta; senão sobe um nível.
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.history.back();
+      return;
+    }
+    const parent = path.split("/").slice(0, -1).join("/") || "/dashboard";
+    navigate({ to: parent });
+  }
+  return (
+    <button
+      onClick={goBack}
+      title="Voltar"
+      className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+    >
+      <ArrowLeft className="size-3.5" />
+      Voltar
+    </button>
   );
 }
 
@@ -117,7 +146,11 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
       <div className="pl-64">
         <header className="h-16 border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
-          <Crumbs />
+          <div className="flex items-center gap-3">
+            <BackButton />
+            <Crumbs />
+          </div>
+
           <div className="flex items-center gap-4">
             {header}
             <div className="text-right">

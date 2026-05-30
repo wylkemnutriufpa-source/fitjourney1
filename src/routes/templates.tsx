@@ -17,9 +17,10 @@ import { Badge } from "@/components/ui/badge";
 import {
   templates as systemTemplates,
   categories,
-  defaultOrientacoes,
+  orientacoesFor,
   type DietTemplate,
 } from "@/lib/template-data";
+
 import { imgFor } from "@/lib/food-images";
 import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
 import { SendShareDialog } from "@/components/SendShareDialog";
@@ -304,8 +305,9 @@ function TemplateEditor({
   const [finalidade, setFinalidade] = useState(existingMine?.finalidade ?? "");
   const [observacoes, setObservacoes] = useState(existingMine?.observacoes ?? "");
   const [orientacoes, setOrientacoes] = useState<string>(
-    draft.orientacoes ?? defaultOrientacoes(draft.category),
+    draft.orientacoes ?? orientacoesFor(draft),
   );
+
   const [editorTab, setEditorTab] = useState<"refeicoes" | "orientacoes">("refeicoes");
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -362,6 +364,14 @@ function TemplateEditor({
                 Cada alimento é editável de forma independente. Alterar a gramatura do principal
                 escala todas as substituições proporcionalmente.
               </DialogDescription>
+              {!isMine && (
+                <p className="mt-2 text-[11px] text-primary bg-primary/5 border border-primary/20 rounded px-2 py-1.5 inline-flex items-center gap-1.5">
+                  <FolderHeart className="size-3" />
+                  Suas edições são salvas em <strong>Meus Templates</strong> — o template
+                  original do sistema não é alterado.
+                </p>
+              )}
+
             </div>
             <div className="flex gap-2 shrink-0">
               <Button
@@ -437,7 +447,7 @@ function TemplateEditor({
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setOrientacoes(defaultOrientacoes(draft.category))}
+                    onClick={() => setOrientacoes(orientacoesFor(draft))}
                   >
                     Restaurar padrão
                   </Button>
