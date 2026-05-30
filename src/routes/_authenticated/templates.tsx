@@ -715,6 +715,87 @@ function MealEditor({
   );
 }
 
+function FoodInfoPopover({
+  item,
+  onApplyMeasure,
+}: {
+  item: PlannerFoodItem;
+  onApplyMeasure: (grams: number, measureName: string) => void;
+}) {
+  const listFoodsFn = useServerFn(listFoods);
+  const { data: foods } = useQuery({
+    queryKey: ["foods-catalog"],
+    queryFn: () => listFoodsFn(),
+    staleTime: 5 * 60_000,
+  });
+
+  const match = useMemo(() => {
+    if (!foods) return null;
+    const byKey = foods.find((f) => f.foodKey === item.foodKey);
+    if (byKey) return byKey;
+    const needle = item.name.trim().toLowerCase();
+    return foods.find((f) => f.name.toLowerCase() === needle) ?? null;
+  }, [foods, item.foodKey, item.name]);
+
+  const measures = match?.householdMeasures ?? [];
+
+  return (
+    <PopoverContent align="end" className="w-72 p-3">
+      <div className="space-y-2">
+        <div>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Informações do alimento
+          </p>
+          <p className="text-sm font-medium leading-tight">{item.name}</p>
+        </div>
+
+        {match ? (
+          <div className="text-[11px] text-muted-foreground border-t border-border pt-2">
+            <p>Por 100 g (TACO/IBGE):</p>
+            <p className="font-mono">
+              {match.kcalPer100g} kcal · P {match.proteinPer100g}g · C {match.carbPer100g}g · G{" "}
+              {match.fatPer100g}g
+            </p>
+          </div>
+        ) : (
+          <p className="text-[11px] text-muted-foreground italic border-t border-border pt-2">
+            Sem ficha no catálogo TACO. Editando manualmente.
+          </p>
+        )}
+
+        <div className="border-t border-border pt-2">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1.5">
+            Medidas caseiras
+          </p>
+          {measures.length === 0 ? (
+            <p className="text-[11px] text-muted-foreground italic">
+              Nenhuma medida cadastrada.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-1">
+              {measures.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => onApplyMeasure(m.gramsEquivalent, m.measureName)}
+                  className="text-left text-xs border border-border rounded px-2 py-1 hover:border-primary/50 hover:bg-primary/5 flex items-center justify-between gap-2"
+                >
+                  <span>{m.measureName}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {m.gramsEquivalent} g
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+          <p className="text-[10px] text-muted-foreground mt-1.5">
+            Clique em uma medida para aplicar na quantidade.
+          </p>
+        </div>
+      </div>
+    </PopoverContent>
+  );
+}
+
 function FoodItemRow({
   item,
   onChange,
@@ -726,18 +807,90 @@ function FoodItemRow({
   onRemove: () => void;
   primary?: boolean;
 }) {
+  const [editing, setEditing] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) nameInputRef.current?.focus();
+  }, [editing]);
+
+  function applyMeasure(grams: number, measureName: string) {
+    onChange({
+      ...item,
+      qty: grams,
+      unit: "g",
+      // mantém kcal atual (não recalcula automaticamente — quem decide é o nutri)
+      // mas atualiza o nome com a medida entre parênteses se ainda não tiver
+    });
+    setInfoOpen(false);
+  }
+
+  const baseClass =
+    "flex items-center gap-2 rounded-md p-1.5 border " +
+    (primary ? "bg-primary/5 border-primary/20" : "bg-muted/40 border-border");
+
+  if (!editing) {
+    return (
+      <div
+        className={baseClass + " group cursor-default select-none"}
+        onDoubleClick={() => setEditing(true)}
+        title="Duplo clique para editar"
+      >
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium truncate">{item.name}</p>
+          <p className="text-[10px] text-muted-foreground font-mono">
+            {item.qty} {item.unit} · {item.kcal} kcal
+          </p>
+        </div>
+        <Popover open={infoOpen} onOpenChange={setInfoOpen}>
+          <PopoverTrigger asChild>
+            <button
+              className="text-muted-foreground hover:text-primary p-1 opacity-60 group-hover:opacity-100 transition-opacity"
+              title="Ver medidas caseiras"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ChevronDown className="size-3.5" />
+            </button>
+          </PopoverTrigger>
+          <FoodInfoPopover item={item} onApplyMeasure={applyMeasure} />
+        </Popover>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditing(true);
+          }}
+          className="text-muted-foreground hover:text-primary p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+          title="Editar"
+        >
+          <PencilIcon className="size-3.5" />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="text-muted-foreground hover:text-destructive p-1 opacity-60 group-hover:opacity-100 transition-opacity"
+          title="Remover"
+        >
+          <X className="size-3.5" />
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={
-        "flex items-center gap-2 rounded-md p-1.5 border " +
-        (primary
-          ? "bg-primary/5 border-primary/20"
-          : "bg-muted/40 border-border")
-      }
-    >
+    <div className={baseClass}>
       <Input
+        ref={nameInputRef}
         value={item.name}
         onChange={(e) => onChange({ ...item, name: e.target.value })}
+        onBlur={() => setEditing(false)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === "Escape") {
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
         className="h-7 flex-1 text-xs"
       />
       <Input
@@ -759,6 +912,13 @@ function FoodItemRow({
         title="kcal"
       />
       <button
+        onClick={() => setEditing(false)}
+        className="text-primary hover:text-primary/80 p-1"
+        title="Concluir edição"
+      >
+        <Save className="size-3.5" />
+      </button>
+      <button
         onClick={onRemove}
         className="text-muted-foreground hover:text-destructive p-1"
         title="Remover"
@@ -768,6 +928,7 @@ function FoodItemRow({
     </div>
   );
 }
+
 
 function RecipeEditor({
   value,
