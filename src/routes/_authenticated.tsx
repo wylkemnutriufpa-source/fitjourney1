@@ -38,22 +38,22 @@ export const Route = createFileRoute("/_authenticated")({
     const isAdmin = identity.appRoles.includes("admin");
 
     if (isAdmin && identity.state !== "S1") {
-      if (onOnboarding) {
-        throw redirect({ to: "/dashboard" });
+      if (onOnboarding && path !== "/dashboard") {
+        throw redirect({ to: "/dashboard", replace: true });
       }
       return { identity };
     }
 
-    if (identity.state === "S1") {
-      throw redirect({ to: "/auth/check-email" });
+    if (identity.state === "S1" && path !== "/auth/check-email") {
+      throw redirect({ to: "/auth/check-email", replace: true });
     }
 
     if (identity.state === "S2" && !onOnboarding) {
-      throw redirect({ to: "/onboarding/nutritionist" });
+      throw redirect({ to: "/onboarding/nutritionist", replace: true });
     }
 
     if (identity.state === "S3" && onOnboarding) {
-      throw redirect({ to: "/dashboard" });
+      throw redirect({ to: "/dashboard", replace: true });
     }
 
     return { identity };
