@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Navigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
