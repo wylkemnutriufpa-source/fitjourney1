@@ -6,11 +6,10 @@ import {
   Settings,
   LogOut,
   ChevronRight,
-  Loader2,
   ShieldCheck,
   ArrowLeft,
 } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 
 
@@ -77,19 +76,7 @@ function BackButton() {
 export function AppShell({ children, header }: { children: ReactNode; header?: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
-  const { session, user, roles, loading, signOut } = useAuth();
-
-  useEffect(() => {
-    if (!loading && !session) navigate({ to: "/" });
-  }, [loading, session, navigate]);
-
-  if (loading || !session) {
-    return (
-      <div className="min-h-screen grid place-items-center bg-background text-muted-foreground">
-        <Loader2 className="size-6 animate-spin" />
-      </div>
-    );
-  }
+  const { user, roles, signOut } = useAuth();
 
   const isAdmin = roles.includes("admin");
   const email = user?.email ?? "";
