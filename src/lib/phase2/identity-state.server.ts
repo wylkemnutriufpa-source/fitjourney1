@@ -24,7 +24,13 @@ export interface ResolvedIdentity {
   emailConfirmed: boolean;
   profile:
     | { role: "nutritionist"; id: string }
-    | { role: "patient"; id: string; nutritionistId: string | null }
+    | {
+        role: "patient";
+        id: string;
+        nutritionistId: string | null;
+        onboardingVersion: number | null;
+        onboardingCompletedAt: string | null;
+      }
     | null;
 }
 
