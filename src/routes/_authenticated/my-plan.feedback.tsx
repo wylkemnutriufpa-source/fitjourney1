@@ -169,6 +169,9 @@ function FeedbackPage() {
         data: {
           id: feedbackId,
           weightKg: weightNum,
+          waistCm: waistNum,
+          abdomenCm: abdomenNum,
+          hipCm: hipNum,
           adherenceRating: adherence,
           resultRating: resultR ?? undefined,
           notes: notes.trim() || undefined,
@@ -180,6 +183,9 @@ function FeedbackPage() {
     onSuccess: () => {
       toast.success("Feedback enviado. Obrigado por se manter ativo!");
       setWeight("");
+      setWaist("");
+      setAbdomen("");
+      setHip("");
       setAdherence(null);
       setResultR(null);
       setNotes("");
