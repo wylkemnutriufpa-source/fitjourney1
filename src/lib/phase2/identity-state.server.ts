@@ -94,6 +94,8 @@ export async function resolveIdentityState(
         role: "patient",
         id: patient.id,
         nutritionistId: patient.nutritionist_id ?? null,
+        onboardingVersion: patient.onboarding_version ?? null,
+        onboardingCompletedAt: patient.onboarding_completed_at ?? null,
       },
     };
   }
