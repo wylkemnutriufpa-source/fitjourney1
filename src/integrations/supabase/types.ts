@@ -371,6 +371,7 @@ export type Database = {
       patients: {
         Row: {
           auth_user_id: string
+          avatar_url: string | null
           birth_date: string | null
           created_at: string
           email: string
@@ -386,6 +387,7 @@ export type Database = {
         }
         Insert: {
           auth_user_id: string
+          avatar_url?: string | null
           birth_date?: string | null
           created_at?: string
           email: string
@@ -401,6 +403,7 @@ export type Database = {
         }
         Update: {
           auth_user_id?: string
+          avatar_url?: string | null
           birth_date?: string | null
           created_at?: string
           email?: string

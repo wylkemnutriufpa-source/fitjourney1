@@ -12,6 +12,7 @@ export interface MyPatientProfile {
   phone: string | null;
   birthDate: string | null;
   heightCm: number | null;
+  avatarUrl: string | null;
 }
 
 export const getMyPatientProfile = createServerFn({ method: "POST" })
@@ -20,7 +21,7 @@ export const getMyPatientProfile = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("patients")
-      .select("id, full_name, email, phone, birth_date, height_cm")
+      .select("id, full_name, email, phone, birth_date, height_cm, avatar_url")
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -32,6 +33,7 @@ export const getMyPatientProfile = createServerFn({ method: "POST" })
       phone: data.phone ?? null,
       birthDate: data.birth_date ?? null,
       heightCm: data.height_cm != null ? Number(data.height_cm) : null,
+      avatarUrl: data.avatar_url ?? null,
     };
   });
 
@@ -51,6 +53,7 @@ const UpdateInput = z.object({
   fullName: z.string().trim().min(1).max(120).optional(),
   phone: PhoneSchema.optional(),
   heightCm: z.number().min(80).max(260).nullable().optional(),
+  avatarUrl: z.string().url().max(1024).nullable().optional(),
 });
 
 export const updateMyPatientProfile = createServerFn({ method: "POST" })
@@ -62,10 +65,12 @@ export const updateMyPatientProfile = createServerFn({ method: "POST" })
       full_name?: string;
       phone?: string | null;
       height_cm?: number | null;
+      avatar_url?: string | null;
     } = {};
     if (data.fullName !== undefined) patch.full_name = data.fullName;
     if (data.phone !== undefined) patch.phone = data.phone === "" ? null : data.phone;
     if (data.heightCm !== undefined) patch.height_cm = data.heightCm;
+    if (data.avatarUrl !== undefined) patch.avatar_url = data.avatarUrl;
 
     if (Object.keys(patch).length === 0) {
       return { ok: true };

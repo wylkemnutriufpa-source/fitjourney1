@@ -2,17 +2,18 @@
 // Dados clínicos NÃO entram aqui: vão pelo Runner (anamnese versionada).
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { Save, Loader2, ArrowLeft, Sun, Moon, Monitor } from "lucide-react";
+import { Save, Loader2, ArrowLeft, Sun, Moon, Monitor, Camera, User } from "lucide-react";
 import { toast } from "sonner";
 import {
   getMyPatientProfile,
   updateMyPatientProfile,
 } from "@/lib/profile/patient-profile.functions";
 import { getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/my-plan/settings")({
   head: () => ({ meta: [{ title: "Minha conta — FitJourney" }] }),
@@ -35,6 +36,9 @@ function PatientSettings() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [heightCm, setHeightCm] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const [saving, setSaving] = useState(false);
   const [theme, setThemeState] = useState<ThemeMode>("system");
 
@@ -52,8 +56,44 @@ function PatientSettings() {
       setFullName(data.fullName ?? "");
       setPhone(data.phone ?? "");
       setHeightCm(data.heightCm != null ? String(data.heightCm) : "");
+      setAvatarUrl(data.avatarUrl ?? null);
     }
   }, [data]);
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("Imagem muito grande (máx 4MB)");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem");
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userData.user) throw new Error("Sessão expirada");
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = `${userData.user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, cacheControl: "3600" });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      setAvatarUrl(pub.publicUrl);
+      // Persiste imediatamente — UX melhor que esperar "Salvar".
+      await updateProfile({ data: { avatarUrl: pub.publicUrl } });
+      await refetch();
+      toast.success("Foto atualizada");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha no upload");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
 
   async function handleSave() {
     if (!fullName.trim()) {
@@ -122,6 +162,42 @@ function PatientSettings() {
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Carregando…</p>
           ) : (
+            <>
+              <div className="flex items-center gap-4 pb-2">
+                <div className="relative size-20 rounded-full overflow-hidden border border-border bg-background grid place-items-center">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Foto de perfil" className="size-full object-cover" />
+                  ) : (
+                    <User className="size-8 text-muted-foreground" />
+                  )}
+                  {uploadingAvatar && (
+                    <div className="absolute inset-0 bg-background/70 grid place-items-center">
+                      <Loader2 className="size-5 animate-spin text-primary" />
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    className="inline-flex items-center gap-2 text-xs font-semibold py-2 px-3 rounded-md border border-border hover:border-primary hover:text-primary transition-colors disabled:opacity-60"
+                  >
+                    <Camera className="size-3.5" />
+                    {avatarUrl ? "Trocar foto" : "Adicionar foto"}
+                  </button>
+                  <p className="text-[10px] text-muted-foreground/70">
+                    JPG ou PNG, até 4MB.
+                  </p>
+                </div>
+              </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -183,6 +259,7 @@ function PatientSettings() {
                 </p>
               </div>
             </div>
+            </>
           )}
         </section>
 
