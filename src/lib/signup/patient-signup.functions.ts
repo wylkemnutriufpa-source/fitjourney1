@@ -21,6 +21,8 @@ export interface ValidatedReferral {
   ok: true;
   nutritionistId: string;
   nutritionistName: string;
+  nutritionistAvatarUrl: string | null;
+  nutritionistSpecialty: string | null;
 }
 
 export const validateReferralCode = createServerFn({ method: "POST" })
@@ -40,7 +42,7 @@ export const validateReferralCode = createServerFn({ method: "POST" })
 
     const { data: nutri, error: nutriErr } = await supabaseAdmin
       .from("nutritionists")
-      .select("id, full_name")
+      .select("id, full_name, display_name, avatar_url, specialty")
       .eq("id", row.nutritionist_id)
       .maybeSingle();
     if (nutriErr) throw new Error(nutriErr.message);
@@ -49,7 +51,9 @@ export const validateReferralCode = createServerFn({ method: "POST" })
     return {
       ok: true,
       nutritionistId: nutri.id,
-      nutritionistName: nutri.full_name,
+      nutritionistName: nutri.display_name?.trim() || nutri.full_name,
+      nutritionistAvatarUrl: nutri.avatar_url,
+      nutritionistSpecialty: nutri.specialty,
     };
   });
 
