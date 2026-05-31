@@ -171,26 +171,26 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
             </div>
 
             <div className="grid grid-cols-3 gap-2 pt-1">
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => window.open(whatsappUrl, "_blank", "noopener,noreferrer")}
                 className="flex flex-col items-center gap-1.5 py-3 rounded-md border border-border hover:border-primary hover:bg-primary/5 transition-colors"
               >
                 <MessageCircle className="size-4" />
                 <span className="text-[10px] font-mono uppercase tracking-widest">
                   WhatsApp
                 </span>
-              </a>
-              <a
-                href={mailUrl}
+              </button>
+              <button
+                type="button"
+                onClick={() => window.open(mailUrl, "_blank", "noopener,noreferrer")}
                 className="flex flex-col items-center gap-1.5 py-3 rounded-md border border-border hover:border-primary hover:bg-primary/5 transition-colors"
               >
                 <Mail className="size-4" />
                 <span className="text-[10px] font-mono uppercase tracking-widest">
                   Email
                 </span>
-              </a>
+              </button>
               <button
                 type="button"
                 onClick={copyLink}
