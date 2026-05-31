@@ -365,6 +365,39 @@ function Settings() {
         </section>
 
         <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
+            02 · Frequência de feedback
+          </h2>
+          <p className="text-xs text-muted-foreground -mt-1">
+            De quantos em quantos dias seus pacientes devem registrar feedback?
+            O paciente recebe um lembrete visual quando passa do prazo.
+          </p>
+          <div className="flex items-center gap-3 max-w-md">
+            <input
+              type="number"
+              min={1}
+              max={90}
+              step={1}
+              value={freqDays}
+              onChange={(e) => setFreqDays(Math.max(1, Math.min(90, Number(e.target.value) || 1)))}
+              className={inputCls + " w-24"}
+              disabled={savingFreq}
+            />
+            <span className="text-xs text-muted-foreground">dias</span>
+            <button
+              type="button"
+              onClick={handleSaveFreq}
+              disabled={savingFreq || freqDays === freqData?.days}
+              className="ml-auto bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 rounded-md hover:bg-primary/90 disabled:opacity-60 inline-flex items-center gap-1.5"
+            >
+              {savingFreq ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
+              Salvar
+            </button>
+          </div>
+        </section>
+
+
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
               02 · Link público de convite
