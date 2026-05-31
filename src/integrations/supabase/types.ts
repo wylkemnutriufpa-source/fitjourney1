@@ -28,6 +28,7 @@ export type Database = {
           nutritionist_id: string | null
           origin: string
           patient_id: string
+          review_notes: string | null
           review_status: string
           reviewed_at: string | null
           schema_version: number
@@ -50,6 +51,7 @@ export type Database = {
           nutritionist_id?: string | null
           origin?: string
           patient_id: string
+          review_notes?: string | null
           review_status?: string
           reviewed_at?: string | null
           schema_version?: number
@@ -72,6 +74,7 @@ export type Database = {
           nutritionist_id?: string | null
           origin?: string
           patient_id?: string
+          review_notes?: string | null
           review_status?: string
           reviewed_at?: string | null
           schema_version?: number
