@@ -65,14 +65,24 @@ export const Route = createFileRoute("/_authenticated")({
     }
 
     // Patient gate: pacientes acessam /my-plan e /onboarding/patient.
-    // Soberania: admin/nutricionista nunca caem aqui (admin retorna acima,
-    // nutricionista tem role !== "patient").
+    // Onboarding obrigatório: enquanto onboarding_completed_at IS NULL, força /onboarding/patient.
     if (identity.state === "S3" && identity.role === "patient") {
-      const isPatientRoute =
-        path === "/my-plan" ||
-        path.startsWith("/my-plan/") ||
-        path === "/onboarding/patient" ||
-        path.startsWith("/onboarding/patient/");
+      const onPatientOnboarding =
+        path === "/onboarding/patient" || path.startsWith("/onboarding/patient/");
+      const onboardingDone = Boolean(identity.patient?.onboardingCompletedAt);
+
+      if (!onboardingDone) {
+        if (!onPatientOnboarding) {
+          throw redirect({ to: "/onboarding/patient", replace: true });
+        }
+        return { identity };
+      }
+
+      // Onboarding concluído: bloqueia rotas não-paciente e impede revisitar onboarding.
+      if (onPatientOnboarding) {
+        throw redirect({ to: "/my-plan", replace: true });
+      }
+      const isPatientRoute = path === "/my-plan" || path.startsWith("/my-plan/");
       if (!isPatientRoute) {
         throw redirect({ to: "/my-plan", replace: true });
       }
