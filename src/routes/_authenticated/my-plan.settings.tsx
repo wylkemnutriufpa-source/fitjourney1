@@ -35,6 +35,16 @@ function PatientSettings() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
+  const [theme, setThemeState] = useState<ThemeMode>("system");
+
+  useEffect(() => {
+    setThemeState(getStoredTheme());
+  }, []);
+
+  function changeTheme(mode: ThemeMode) {
+    setThemeState(mode);
+    setTheme(mode);
+  }
 
   useEffect(() => {
     if (data) {
