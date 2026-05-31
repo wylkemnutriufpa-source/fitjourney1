@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
-import { Plus, Search, ArrowUpRight, FileText, Share2, Loader2 } from "lucide-react";
+import { Plus, Search, FileText, Share2, Loader2 } from "lucide-react";
 import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
@@ -93,25 +93,9 @@ function Patients() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar por nome ou esporte..."
+              placeholder="Buscar por nome, email ou telefone..."
               className="w-full bg-surface border border-border rounded-md pl-10 pr-3 py-2.5 text-sm focus:outline-none focus:border-primary"
             />
-          </div>
-          <div className="flex gap-1.5 bg-surface border border-border rounded-md p-1">
-            {goals.map((g) => (
-              <button
-                key={g}
-                onClick={() => setGoal(g)}
-                className={
-                  "px-3 py-1.5 text-xs font-medium rounded transition-colors " +
-                  (goal === g
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground")
-                }
-              >
-                {g}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -120,10 +104,8 @@ function Patients() {
             <thead>
               <tr className="border-b border-border text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                 <th className="text-left p-4 font-medium">Paciente</th>
-                <th className="text-left p-4 font-medium hidden md:table-cell">Esporte</th>
-                <th className="text-left p-4 font-medium">Objetivo</th>
-                <th className="text-left p-4 font-medium hidden lg:table-cell">TDEE</th>
-                <th className="text-left p-4 font-medium hidden lg:table-cell">Última visita</th>
+                <th className="text-left p-4 font-medium hidden md:table-cell">Contato</th>
+                <th className="text-left p-4 font-medium hidden lg:table-cell">Cadastro</th>
                 <th className="text-left p-4 font-medium">Status</th>
                 <th className="text-right p-4 font-medium">Ações</th>
               </tr>
