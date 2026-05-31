@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
 import { AppShell } from "@/components/AppShell";
+import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
 import { Clock, AlertTriangle, Info } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/my-plan")({
@@ -73,6 +74,7 @@ function MyPlanPage() {
   return (
     <AppShell>
       <div className="space-y-8 max-w-3xl">
+        <ClinicalAlerts />
         <header className="border-b border-border pb-4 space-y-1">
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Publicado em {new Date(data.publishedAt).toLocaleDateString("pt-BR")} · {snap.kcal ?? "—"} kcal

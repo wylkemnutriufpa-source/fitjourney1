@@ -161,6 +161,10 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
           {nav.map((item) => {
             const active = path === item.to || path.startsWith(item.to + "/");
             const Icon = item.icon;
+            const badgeCount =
+              "badgeKey" in item && item.badgeKey === "pending-anamneses"
+                ? pending?.pendingCount ?? 0
+                : 0;
             return (
               <Link
                 key={item.to}
@@ -173,11 +177,17 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 }
               >
                 <Icon className="size-4" />
-                {item.label}
+                <span className="flex-1">{item.label}</span>
+                {badgeCount > 0 && (
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-mono">
+                    {badgeCount}
+                  </span>
+                )}
               </Link>
             );
           })}
         </nav>
+
 
         <button
           onClick={handleSignOut}
