@@ -422,18 +422,50 @@ function FoodItemReadonlyRow({
   const measures = match?.householdMeasures ?? [];
   const hasMeasures = measures.length > 0;
 
+  // Substituições equivalentes: mesmo scaleGroup, exceto o próprio alimento.
+  // Cálculo: gramas equivalentes = kcal do item / kcal_per_100g * 100.
+  const itemKcal = Number.isFinite(item?.kcal) ? Number(item.kcal) : 0;
+  const substitutions = useMemo(() => {
+    if (!foods?.length || !match?.scaleGroup) return [];
+    return foods
+      .filter(
+        (f) =>
+          f.scaleGroup === match.scaleGroup &&
+          f.id !== match.id &&
+          f.kcalPer100g > 0,
+      )
+      .slice(0, 12)
+      .map((f) => {
+        const useGrams = f.unit === "g" || f.unit === "ml";
+        const grams = itemKcal > 0
+          ? Math.max(5, Math.round((itemKcal / f.kcalPer100g) * 100))
+          : Math.round(f.qty);
+        return {
+          id: f.id,
+          name: f.name,
+          unit: useGrams ? f.unit : f.unit,
+          qty: useGrams ? grams : f.qty,
+          kcal: useGrams
+            ? Math.round((f.kcalPer100g * grams) / 100)
+            : f.kcal,
+          defaultMeasure:
+            f.householdMeasures.find((m) => m.isDefault) ??
+            f.householdMeasures[0] ??
+            null,
+        };
+      });
+  }, [foods, match?.id, match?.scaleGroup, itemKcal]);
+
   return (
     <li className="border-b border-border/50 last:border-0">
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
           <button
             type="button"
             className="w-full flex items-center justify-between gap-3 py-1.5 text-left hover:bg-primary/5 rounded-sm px-1 -mx-1 transition-colors"
           >
             <span className="flex items-center gap-1.5 min-w-0">
-              {hasMeasures && (
-                <Scale className="size-3 text-primary/70 shrink-0" />
-              )}
+              <Scale className="size-3 text-primary/70 shrink-0" />
               <span className="truncate">{item?.name ?? "—"}</span>
             </span>
             <span className="text-muted-foreground tabular-nums text-xs shrink-0">
@@ -441,22 +473,30 @@ function FoodItemReadonlyRow({
               {Number.isFinite(item?.kcal) ? ` · ${item.kcal} kcal` : ""}
             </span>
           </button>
-        </PopoverTrigger>
-        <PopoverContent side="bottom" align="start" className="w-72 p-3">
-          <div className="space-y-2">
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                Medidas caseiras
-              </p>
-              <p className="text-sm font-medium leading-tight">{item?.name}</p>
-            </div>
+        </DialogTrigger>
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Alimento
+            </p>
+            <DialogTitle className="text-base">{item?.name}</DialogTitle>
+            <p className="text-xs text-muted-foreground">
+              {item?.qty} {item?.unit}
+              {Number.isFinite(item?.kcal) ? ` · ${item.kcal} kcal` : ""}
+            </p>
+          </DialogHeader>
 
+          {/* Medidas caseiras */}
+          <section className="space-y-2">
+            <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Medidas caseiras
+            </h3>
             {hasMeasures ? (
-              <div className="grid grid-cols-1 gap-1 border-t border-border pt-2">
+              <div className="grid grid-cols-1 gap-1">
                 {measures.map((m) => (
                   <div
                     key={m.id}
-                    className="text-xs border border-border rounded px-2 py-1 flex items-center justify-between gap-2"
+                    className="text-xs border border-border rounded px-2 py-1.5 flex items-center justify-between gap-2"
                   >
                     <span>{m.measureName}</span>
                     <span className="font-mono text-[10px] text-muted-foreground">
@@ -466,17 +506,56 @@ function FoodItemReadonlyRow({
                 ))}
               </div>
             ) : (
-              <p className="text-[11px] text-muted-foreground italic border-t border-border pt-2">
+              <p className="text-[11px] text-muted-foreground italic">
                 Sem medidas caseiras cadastradas para este alimento.
               </p>
             )}
+          </section>
 
-            <p className="text-[10px] text-muted-foreground pt-1">
-              Use estas medidas como referência para porcionar em casa.
+          {/* Substituições equivalentes (mesmo grupo nutricional) */}
+          <section className="space-y-2 border-t border-border pt-3">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Substituições equivalentes
+              </h3>
+              <span className="text-[10px] font-mono text-muted-foreground">
+                ~{itemKcal || 0} kcal
+              </span>
+            </div>
+            {substitutions.length > 0 ? (
+              <div className="space-y-1">
+                {substitutions.map((s) => (
+                  <div
+                    key={s.id}
+                    className="text-xs border border-border rounded px-2 py-1.5"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium truncate">{s.name}</span>
+                      <span className="font-mono text-[10px] text-muted-foreground tabular-nums shrink-0">
+                        {s.qty} {s.unit} · {s.kcal} kcal
+                      </span>
+                    </div>
+                    {s.defaultMeasure && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        ≈ {s.defaultMeasure.measureName} (
+                        {s.defaultMeasure.gramsEquivalent} g)
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[11px] text-muted-foreground italic">
+                Sem substituições equivalentes cadastradas para este alimento.
+              </p>
+            )}
+            <p className="text-[10px] text-muted-foreground pt-1 leading-relaxed">
+              Você pode trocar este alimento por qualquer um da lista mantendo
+              o mesmo valor calórico aproximado.
             </p>
-          </div>
-        </PopoverContent>
-      </Popover>
+          </section>
+        </DialogContent>
+      </Dialog>
     </li>
   );
 }
