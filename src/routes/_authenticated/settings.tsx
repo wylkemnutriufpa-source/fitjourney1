@@ -11,6 +11,10 @@ import {
   updateMyNutritionistProfile,
   getOrCreateMyReferralCode,
 } from "@/lib/profile/nutritionist-profile.functions";
+import {
+  getMyFeedbackFrequency,
+  setMyFeedbackFrequency,
+} from "@/lib/feedback/feedback.functions";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações — FitJourney" }] }),
