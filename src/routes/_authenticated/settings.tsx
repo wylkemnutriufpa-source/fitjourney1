@@ -39,6 +39,32 @@ function Settings() {
     staleTime: 10_000,
   });
 
+  // Frequência de feedback (lado nutri).
+  const getFreq = useServerFn(getMyFeedbackFrequency);
+  const setFreq = useServerFn(setMyFeedbackFrequency);
+  const { data: freqData, refetch: refetchFreq } = useQuery({
+    queryKey: ["my-feedback-frequency"],
+    queryFn: () => getFreq(),
+    staleTime: 60_000,
+  });
+  const [freqDays, setFreqDays] = useState<number>(7);
+  const [savingFreq, setSavingFreq] = useState(false);
+  useEffect(() => {
+    if (freqData?.days) setFreqDays(freqData.days);
+  }, [freqData]);
+  async function handleSaveFreq() {
+    setSavingFreq(true);
+    try {
+      await setFreq({ data: { days: freqDays } });
+      toast.success("Frequência atualizada");
+      await refetchFreq();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao salvar frequência");
+    } finally {
+      setSavingFreq(false);
+    }
+  }
+
   const [fullName, setFullName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
