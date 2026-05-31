@@ -37,13 +37,32 @@ export const Route = createFileRoute("/_authenticated/my-plan")({
 
 function MyPlanPage() {
   const fetchPlan = useServerFn(getMyActivePlan);
+  const fetchProfile = useServerFn(getMyPatientProfile);
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient", "active-plan"],
     queryFn: () => fetchPlan(),
     staleTime: 30_000,
   });
+  const { data: profile } = useQuery({
+    queryKey: ["my-patient-profile"],
+    queryFn: () => fetchProfile(),
+    staleTime: 60_000,
+  });
 
-  if (isLoading) {
+  // Saudação calculada uma vez por montagem. Sorteia evitando repetir
+  // a última mensagem mostrada (persistido em localStorage).
+  const greeting = useMemo(() => {
+    const now = new Date();
+    const period = getPeriod(now.getHours());
+    return {
+      label: periodLabel(period),
+      message: pickGreetingMessage(period),
+      date: formatTodayPtBr(now),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const firstName = (profile?.fullName ?? "").trim().split(/\s+/)[0] ?? "";
     return (
       <AppShell>
         <p className="text-sm text-muted-foreground">Carregando seu plano…</p>
