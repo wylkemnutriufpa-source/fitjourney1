@@ -88,7 +88,7 @@ export const submitInitialAnamnesis = createServerFn({ method: "POST" })
         patient_id: patient.id,
         nutritionist_id: patient.nutritionist_id,
         schema_version: 3,
-        data: { canonical, raw: data.answers },
+        data: { canonical, raw: data.answers } as unknown as Record<string, unknown>,
         origin: "online",
         status: "submitted",
         review_status: "submitted",
