@@ -105,6 +105,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     if (typeof window !== "undefined" && window.innerWidth < 768) {
       setSidebarOpen(false);
     }
+    applyTheme(getStoredTheme());
   }, []);
 
   // Fecha sidebar automaticamente ao navegar em telas mobile.
