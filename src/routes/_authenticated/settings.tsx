@@ -105,6 +105,8 @@ function Settings() {
       await updateProfile({
         data: {
           fullName: fullName.trim(),
+          displayName: displayName.trim() || undefined,
+          avatarUrl: avatarUrl || undefined,
           crn: crn.trim() || undefined,
           email: email.trim(),
           specialty: specialty.trim() || undefined,
@@ -120,6 +122,39 @@ function Settings() {
       setSaving(false);
     }
   }
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("Imagem muito grande (máx 4MB)");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem");
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userData.user) throw new Error("Sessão expirada");
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = `${userData.user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, cacheControl: "3600" });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      setAvatarUrl(pub.publicUrl);
+      toast.success("Foto carregada — clique em Salvar para confirmar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha no upload");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
+
 
   async function copy(text: string, label: string) {
     if (!text) return;
