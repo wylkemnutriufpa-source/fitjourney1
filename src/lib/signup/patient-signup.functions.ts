@@ -124,6 +124,7 @@ export const consumeReferralCodeAndCreatePatient = createServerFn({
         source_referral_code: data.code,
         full_name: data.fullName,
         email: data.email,
+        phone: data.phone,
       })
       .select("id")
       .single();
