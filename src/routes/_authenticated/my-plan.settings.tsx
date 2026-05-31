@@ -34,6 +34,7 @@ function PatientSettings() {
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [heightCm, setHeightCm] = useState("");
   const [saving, setSaving] = useState(false);
   const [theme, setThemeState] = useState<ThemeMode>("system");
 
@@ -50,6 +51,7 @@ function PatientSettings() {
     if (data) {
       setFullName(data.fullName ?? "");
       setPhone(data.phone ?? "");
+      setHeightCm(data.heightCm != null ? String(data.heightCm) : "");
     }
   }, [data]);
 
@@ -58,12 +60,23 @@ function PatientSettings() {
       toast.error("Nome é obrigatório");
       return;
     }
+    let heightVal: number | null = null;
+    const trimmedH = heightCm.trim().replace(",", ".");
+    if (trimmedH !== "") {
+      const n = Number(trimmedH);
+      if (!Number.isFinite(n) || n < 80 || n > 260) {
+        toast.error("Altura inválida (80–260 cm).");
+        return;
+      }
+      heightVal = n;
+    }
     setSaving(true);
     try {
       await updateProfile({
         data: {
           fullName: fullName.trim(),
           phone: phone.trim(),
+          heightCm: heightVal,
         },
       });
       toast.success("Conta atualizada");
