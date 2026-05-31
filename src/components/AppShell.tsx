@@ -17,15 +17,21 @@ import {
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
+import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 
 
-const nav = [
+const nutritionistNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/patients", label: "Pacientes", icon: Users },
   { to: "/anamneses", label: "Anamneses", icon: ClipboardList, badgeKey: "pending-anamneses" as const },
   { to: "/templates", label: "Templates", icon: FileStack },
   { to: "/settings", label: "Configurações", icon: Settings },
-];
+] as const;
+
+const patientNav = [
+  { to: "/my-plan", label: "Meu Plano", icon: LayoutDashboard },
+  { to: "/my-plan/settings", label: "Configurações", icon: Settings },
+] as const;
 
 function Crumbs() {
   const path = useRouterState({ select: (s) => s.location.pathname });
