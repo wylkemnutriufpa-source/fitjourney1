@@ -122,30 +122,31 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   // Identity → determina qual nav exibir. Patient nunca pode ver nav de nutri.
   const fetchIdentity = useServerFn(getMyIdentityState);
   const { data: identity } = useQuery({
-    queryKey: ["identity-state"],
+    queryKey: ["identity-state", user?.id ?? "anonymous"],
     queryFn: () => fetchIdentity(),
     staleTime: 60_000,
-    enabled: mounted,
+    enabled: mounted && !!user?.id,
   });
-  const isPatient = identity?.role === "patient";
+  const isPatientRoute = path === "/my-plan" || path.startsWith("/my-plan/");
+  const isPatient = identity?.role === "patient" || isPatientRoute;
   const nav = isPatient ? patientNav : nutritionistNav;
 
   // Badge de anamneses pendentes (silencioso para não-nutri: retorna 0).
   const fetchPending = useServerFn(getMyPendingAnamnesesCount);
   const { data: pending } = useQuery({
-    queryKey: ["nav", "pending-anamneses"],
+    queryKey: ["nav", "pending-anamneses", user?.id ?? "anonymous"],
     queryFn: () => fetchPending(),
     staleTime: 30_000,
-    enabled: mounted && !isPatient,
+    enabled: mounted && !!user?.id && !isPatient,
   });
 
   // Badge de feedback pendente (paciente).
   const fetchFbStatus = useServerFn(getMyFeedbackStatus);
   const { data: fbStatus } = useQuery({
-    queryKey: ["patient-feedback-status-nav"],
+    queryKey: ["patient-feedback-status-nav", user?.id ?? "anonymous"],
     queryFn: () => fetchFbStatus(),
     staleTime: 60_000,
-    enabled: mounted && isPatient,
+    enabled: mounted && !!user?.id && isPatient,
   });
 
   async function handleSignOut() {
