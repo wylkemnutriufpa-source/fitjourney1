@@ -48,16 +48,33 @@ function Patients() {
       }
     >
       <div className="space-y-8">
-        <div className="flex items-end justify-between border-b border-border pb-4">
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-4">
           <div className="space-y-1">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Base ativa
             </p>
             <h1 className="text-3xl font-bold tracking-tight">Pacientes</h1>
+            <p className="text-xs font-mono text-muted-foreground">
+              {filtered.length} de {patients.length} resultados
+            </p>
           </div>
-          <p className="text-xs font-mono text-muted-foreground">
-            {filtered.length} de {patients.length} resultados
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setInviteOpen(true)}
+              className="bg-surface border border-primary/40 text-primary text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Share2 className="size-3.5" />
+              Convite Online
+            </button>
+            <Link
+              to="/patients/new"
+              className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+            >
+              <Plus className="size-3.5" />
+              Adicionar Paciente
+            </Link>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-3 items-center">
