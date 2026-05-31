@@ -156,9 +156,45 @@ function PatientSettings() {
           )}
         </section>
 
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
+            02 · Aparência
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Escolha o tema que você prefere. Salvo neste dispositivo.
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {(
+              [
+                { mode: "light", label: "Claro", Icon: Sun },
+                { mode: "dark", label: "Escuro", Icon: Moon },
+                { mode: "system", label: "Sistema", Icon: Monitor },
+              ] as const
+            ).map(({ mode, label, Icon }) => {
+              const active = theme === mode;
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => changeTheme(mode)}
+                  className={
+                    "flex flex-col items-center gap-1.5 py-3 rounded-md border text-xs font-medium transition-colors " +
+                    (active
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40")
+                  }
+                >
+                  <Icon className="size-4" />
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
         <section className="bg-surface border border-border rounded-lg p-6 space-y-3">
           <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-            02 · Dados clínicos
+            03 · Dados clínicos
           </h2>
           <p className="text-sm text-muted-foreground">
             Histórico clínico, condições, medicações e exames são versionados
