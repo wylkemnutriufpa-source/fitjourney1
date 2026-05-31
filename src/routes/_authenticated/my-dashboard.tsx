@@ -297,6 +297,64 @@ function MyDashboardPage() {
   );
 }
 
+function SubscriptionInfo({
+  planKind,
+  status,
+  priceCents,
+  startsAt,
+  endsAt,
+}: {
+  planKind: Parameters<typeof planKindLabel>[0];
+  status: Parameters<typeof statusLabel>[0];
+  priceCents: number;
+  startsAt: string;
+  endsAt: string | null;
+}) {
+  const remaining = daysUntil(endsAt);
+  const isExpired = remaining !== null && remaining < 0;
+  const isExpiringSoon =
+    remaining !== null && remaining >= 0 && remaining <= 7;
+  return (
+    <div className="space-y-2">
+      <div className="flex items-baseline gap-3 flex-wrap">
+        <span className="text-xl font-semibold tracking-tight">
+          {planKindLabel(planKind)}
+        </span>
+        <span className="text-base font-mono">
+          {formatMoneyBRL(priceCents)}
+        </span>
+        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground border border-border rounded px-1.5 py-0.5">
+          {statusLabel(status)}
+        </span>
+      </div>
+      <p className="text-xs font-mono text-muted-foreground">
+        {formatSubDate(startsAt)} → {formatSubDate(endsAt)}
+        {remaining !== null && !isExpired && (
+          <> · faltam {remaining} dia{remaining === 1 ? "" : "s"}</>
+        )}
+      </p>
+      {isExpired && (
+        <p
+          className="text-xs font-medium text-amber-500 border border-amber-500/40 rounded px-2 py-1.5 bg-amber-500/5"
+          role="status"
+        >
+          Seu plano venceu em {formatSubDate(endsAt)}. Entre em contato com seu
+          nutricionista para renovar. Seu acompanhamento continua acessível.
+        </p>
+      )}
+      {!isExpired && isExpiringSoon && (
+        <p
+          className="text-xs font-medium text-amber-500 border border-amber-500/40 rounded px-2 py-1.5 bg-amber-500/5"
+          role="status"
+        >
+          Seu plano vence em {remaining} dia{remaining === 1 ? "" : "s"}. Lembre
+          de combinar a renovação.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function ClinicalStat({
   icon: Icon,
   label,
