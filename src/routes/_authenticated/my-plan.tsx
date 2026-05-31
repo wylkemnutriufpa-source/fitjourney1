@@ -66,6 +66,17 @@ function MyPlanPage() {
 
   const firstName = (profile?.fullName ?? "").trim().split(/\s+/)[0] ?? "";
 
+  const objectiveMsg = useMemo(() => {
+    const snap = data?.snapshot ?? {};
+    const tag: string | null =
+      snap?.template?.goal_tag ??
+      snap?.goal_tag ??
+      snap?.objective ??
+      null;
+    return pickObjectiveMessage(inferObjectiveFromTag(tag));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.id]);
+
   if (isLoading) {
     return (
       <AppShell>
@@ -101,17 +112,6 @@ function MyPlanPage() {
   const snap = data.snapshot ?? {};
   const meals: any[] = Array.isArray(snap.meals) ? snap.meals : [];
   const review = snap.clinical_review;
-
-  // Mensagem premium por objetivo. Deriva do snapshot existente — sem inferência clínica.
-  const objectiveMsg = useMemo(() => {
-    const tag: string | null =
-      snap?.template?.goal_tag ??
-      snap?.goal_tag ??
-      snap?.objective ??
-      null;
-    return pickObjectiveMessage(inferObjectiveFromTag(tag));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.id]);
 
   return (
     <AppShell>
