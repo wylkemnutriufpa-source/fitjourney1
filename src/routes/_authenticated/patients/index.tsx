@@ -178,6 +178,7 @@ function Patients() {
           </table>
         </div>
       </div>
+      <OnlineInviteDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
     </AppShell>
   );
 }
