@@ -1,6 +1,9 @@
 // Patient App — visualização do plano publicado.
 // READ ONLY. Renderização burra. Zero recálculo. Zero normalização.
 // Fonte única: snapshot V3 retornado por getMyActivePlan (public.plans).
+// Renderiza com a mesma riqueza visual do editor do nutricionista
+// (imagem da refeição, kcal, itens, modo de preparo, substituições em modal,
+// orientações nutricionais), porém em modo somente leitura.
 
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -9,8 +12,29 @@ import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
 import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
-import { Clock, AlertTriangle, Info } from "lucide-react";
-import { useMemo } from "react";
+import {
+  Clock,
+  AlertTriangle,
+  Info,
+  ImageOff,
+  Repeat2,
+  ChefHat,
+} from "lucide-react";
+import { useMemo, useState } from "react";
+import { imgFor } from "@/lib/food-images";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   getPeriod,
   periodLabel,
@@ -52,8 +76,6 @@ function MyPlanPage() {
     staleTime: 60_000,
   });
 
-  // Saudação calculada uma vez por montagem. Sorteia evitando repetir
-  // a última mensagem mostrada (persistido em localStorage).
   const greeting = useMemo(() => {
     const now = new Date();
     const period = getPeriod(now.getHours());
@@ -68,12 +90,9 @@ function MyPlanPage() {
   const firstName = (profile?.fullName ?? "").trim().split(/\s+/)[0] ?? "";
 
   const objectiveMsg = useMemo(() => {
-    const snap = data?.snapshot ?? {};
+    const snap: any = data?.snapshot ?? {};
     const tag: string | null =
-      snap?.template?.goal_tag ??
-      snap?.goal_tag ??
-      snap?.objective ??
-      null;
+      snap?.template?.goal_tag ?? snap?.goal_tag ?? snap?.objective ?? null;
     return pickObjectiveMessage(inferObjectiveFromTag(tag));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.id]);
@@ -114,9 +133,11 @@ function MyPlanPage() {
     );
   }
 
-  const snap = data.snapshot ?? {};
+  const snap: any = data.snapshot ?? {};
   const meals: any[] = Array.isArray(snap.meals) ? snap.meals : [];
   const review = snap.clinical_review;
+  const orientacoes: string =
+    typeof snap.orientacoes === "string" ? snap.orientacoes.trim() : "";
 
   return (
     <AppShell>
@@ -160,54 +181,219 @@ function MyPlanPage() {
             Este plano não possui refeições registradas.
           </p>
         ) : (
-          <div className="space-y-6">
-            {meals.map((m, idx) => {
-              const main = m?.main ?? {};
-              const items: any[] = Array.isArray(main.items) ? main.items : [];
-              return (
-                <section
-                  key={m?.id ?? idx}
-                  className="border border-border rounded-lg p-4 space-y-3"
-                >
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h2 className="text-lg font-semibold">
-                      {m?.label ?? `Refeição ${idx + 1}`}
-                    </h2>
-                    {m?.time && (
-                      <span className="flex items-center gap-1 text-[11px] font-mono text-muted-foreground">
-                        <Clock className="size-3" />
-                        {m.time}
-                      </span>
-                    )}
-                  </div>
-                  {main.title && (
-                    <p className="text-xs text-muted-foreground">{main.title}</p>
-                  )}
-                  <ul className="text-sm space-y-1">
-                    {items.map((it, i) => (
-                      <li
-                        key={it?.id ?? i}
-                        className="flex justify-between gap-3"
-                      >
-                        <span>{it?.name ?? "—"}</span>
-                        <span className="text-muted-foreground tabular-nums">
-                          {it?.qty} {it?.unit}
-                          {Number.isFinite(it?.kcal) ? ` · ${it.kcal} kcal` : ""}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  {main.recipe && (
-                    <p className="text-xs text-muted-foreground whitespace-pre-wrap">
-                      {main.recipe}
-                    </p>
-                  )}
-                </section>
-              );
-            })}
+          <div className="space-y-4">
+            {meals.map((m, idx) => (
+              <MealCard key={m?.id ?? idx} meal={m} index={idx} />
+            ))}
           </div>
+        )}
+
+        {orientacoes && (
+          <section className="border border-border rounded-lg p-5 bg-surface space-y-2">
+            <h2 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Orientações nutricionais
+            </h2>
+            <p className="text-sm whitespace-pre-wrap leading-relaxed">
+              {orientacoes}
+            </p>
+          </section>
         )}
       </div>
     </AppShell>
+  );
+}
+
+// ====================================================================
+// Componentes de renderização burra (read-only)
+// ====================================================================
+
+function mealKcal(option: any): number {
+  const items: any[] = Array.isArray(option?.items) ? option.items : [];
+  return items.reduce(
+    (s, it) => s + (Number.isFinite(it?.kcal) ? Number(it.kcal) : 0),
+    0,
+  );
+}
+
+function MealCard({ meal, index }: { meal: any; index: number }) {
+  const main = meal?.main ?? {};
+  const items: any[] = Array.isArray(main.items) ? main.items : [];
+  const equivalents: any[] = Array.isArray(meal?.equivalents)
+    ? meal.equivalents
+    : [];
+  const heroUrl = imgFor(meal?.heroKey || main?.imageKey || "");
+  const kcal = mealKcal(main);
+
+  return (
+    <div className="border border-border rounded-lg overflow-hidden bg-background">
+      <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-0">
+        <div className="relative aspect-square sm:aspect-auto bg-muted min-h-[140px]">
+          {heroUrl ? (
+            <img
+              src={heroUrl}
+              alt={main?.title ?? ""}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center text-muted-foreground">
+              <ImageOff className="size-6" />
+            </div>
+          )}
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+            <p className="text-white text-[10px] font-mono">{kcal} kcal</p>
+          </div>
+        </div>
+
+        <div className="p-4 space-y-3">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-base font-semibold">
+              {meal?.label ?? `Refeição ${index + 1}`}
+            </h2>
+            {meal?.time && (
+              <span className="flex items-center gap-1 text-[11px] font-mono text-muted-foreground">
+                <Clock className="size-3" />
+                {meal.time}
+              </span>
+            )}
+          </div>
+
+          {main?.title && (
+            <p className="text-sm font-medium text-foreground/90">
+              {main.title}
+            </p>
+          )}
+
+          <ul className="text-sm space-y-1">
+            {items.map((it, i) => (
+              <li
+                key={it?.id ?? i}
+                className="flex justify-between gap-3 border-b border-border/50 last:border-0 py-1"
+              >
+                <span>{it?.name ?? "—"}</span>
+                <span className="text-muted-foreground tabular-nums text-xs">
+                  {it?.qty} {it?.unit}
+                  {Number.isFinite(it?.kcal) ? ` · ${it.kcal} kcal` : ""}
+                </span>
+              </li>
+            ))}
+            {items.length === 0 && (
+              <li className="text-xs text-muted-foreground italic">
+                Sem alimentos registrados.
+              </li>
+            )}
+          </ul>
+
+          {/* Modo de preparo (collapsable) */}
+          {main?.recipe && (
+            <Accordion type="single" collapsible>
+              <AccordionItem value="recipe" className="border-0">
+                <AccordionTrigger className="py-2 text-xs font-mono uppercase tracking-widest text-primary hover:no-underline">
+                  <span className="inline-flex items-center gap-1.5">
+                    <ChefHat className="size-3.5" /> Modo de preparo
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-sm whitespace-pre-wrap text-muted-foreground leading-relaxed">
+                  {main.recipe}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          )}
+
+          {/* Substituições / equivalentes em modal */}
+          {equivalents.length > 0 && (
+            <EquivalentsButton
+              mealLabel={meal?.label ?? `Refeição ${index + 1}`}
+              equivalents={equivalents}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EquivalentsButton({
+  mealLabel,
+  equivalents,
+}: {
+  mealLabel: string;
+  equivalents: any[];
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+        >
+          <Repeat2 className="size-3.5" /> Ver substituições (
+          {equivalents.length})
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Substituições — {mealLabel}</DialogTitle>
+        </DialogHeader>
+        <p className="text-xs text-muted-foreground">
+          Cada opção abaixo substitui a refeição inteira.
+        </p>
+        <div className="space-y-3 pt-2">
+          {equivalents.map((eq, i) => (
+            <EquivalentCard key={eq?.id ?? i} option={eq} />
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function EquivalentCard({ option }: { option: any }) {
+  const items: any[] = Array.isArray(option?.items) ? option.items : [];
+  const imgUrl = imgFor(option?.imageKey || "");
+  const kcal = mealKcal(option);
+  return (
+    <div className="border border-border rounded-md overflow-hidden">
+      <div className="grid grid-cols-[88px_1fr] gap-0">
+        <div className="relative aspect-square bg-muted">
+          {imgUrl ? (
+            <img
+              src={imgUrl}
+              alt={option?.title ?? ""}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center text-muted-foreground">
+              <ImageOff className="size-4" />
+            </div>
+          )}
+        </div>
+        <div className="p-3 space-y-2">
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="text-sm font-medium">
+              {option?.title ?? "Opção equivalente"}
+            </p>
+            <span className="text-[10px] font-mono text-muted-foreground">
+              {kcal} kcal
+            </span>
+          </div>
+          <ul className="text-xs space-y-0.5">
+            {items.map((it, i) => (
+              <li key={it?.id ?? i} className="flex justify-between gap-2">
+                <span>{it?.name ?? "—"}</span>
+                <span className="text-muted-foreground tabular-nums">
+                  {it?.qty} {it?.unit}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {option?.recipe && (
+            <p className="text-[11px] text-muted-foreground whitespace-pre-wrap pt-1 border-t border-border/50">
+              {option.recipe}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
