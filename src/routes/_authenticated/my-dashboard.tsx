@@ -16,11 +16,20 @@ import {
   Scale,
   Target,
   ArrowRight,
+  Wallet,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
 import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { getMyClinicalContext } from "@/lib/clinical/context.functions";
+import { getMyActiveSubscription } from "@/lib/finance/subscriptions.functions";
+import {
+  daysUntil,
+  formatMoneyBRL,
+  formatShortDate as formatSubDate,
+  planKindLabel,
+  statusLabel,
+} from "@/lib/finance/format";
 import {
   getPeriod,
   periodLabel,
