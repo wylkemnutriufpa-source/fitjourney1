@@ -22,6 +22,7 @@ import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients/new'
 import { Route as AuthenticatedOnboardingPatientRouteImport } from './routes/_authenticated/onboarding/patient'
 import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './routes/_authenticated/onboarding/nutritionist'
+import { Route as AuthenticatedMyPlanSettingsRouteImport } from './routes/_authenticated/my-plan.settings'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
 import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
 
@@ -93,6 +94,12 @@ const AuthenticatedOnboardingNutritionistRoute =
     path: '/onboarding/nutritionist',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedMyPlanSettingsRoute =
+  AuthenticatedMyPlanSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedMyPlanRoute,
+  } as any)
 const AuthenticatedPatientsIdIndexRoute =
   AuthenticatedPatientsIdIndexRouteImport.update({
     id: '/patients/$id/',
@@ -109,12 +116,13 @@ const AuthenticatedPatientsIdDietRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/my-plan': typeof AuthenticatedMyPlanRoute
+  '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -125,12 +133,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/my-plan': typeof AuthenticatedMyPlanRoute
+  '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -143,12 +152,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/my-plan': typeof AuthenticatedMyPlanRoute
+  '/_authenticated/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/_authenticated/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/_authenticated/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/my-plan/settings'
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/my-plan/settings'
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
@@ -200,6 +212,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/_authenticated/my-plan/settings'
     | '/_authenticated/onboarding/nutritionist'
     | '/_authenticated/onboarding/patient'
     | '/_authenticated/patients/new'
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingNutritionistRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/my-plan/settings': {
+      id: '/_authenticated/my-plan/settings'
+      path: '/settings'
+      fullPath: '/my-plan/settings'
+      preLoaderRoute: typeof AuthenticatedMyPlanSettingsRouteImport
+      parentRoute: typeof AuthenticatedMyPlanRoute
+    }
     '/_authenticated/patients/$id/': {
       id: '/_authenticated/patients/$id/'
       path: '/patients/$id'
@@ -326,9 +346,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedMyPlanRouteChildren {
+  AuthenticatedMyPlanSettingsRoute: typeof AuthenticatedMyPlanSettingsRoute
+}
+
+const AuthenticatedMyPlanRouteChildren: AuthenticatedMyPlanRouteChildren = {
+  AuthenticatedMyPlanSettingsRoute: AuthenticatedMyPlanSettingsRoute,
+}
+
+const AuthenticatedMyPlanRouteWithChildren =
+  AuthenticatedMyPlanRoute._addFileChildren(AuthenticatedMyPlanRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedMyPlanRoute: typeof AuthenticatedMyPlanRoute
+  AuthenticatedMyPlanRoute: typeof AuthenticatedMyPlanRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
   AuthenticatedOnboardingNutritionistRoute: typeof AuthenticatedOnboardingNutritionistRoute
@@ -341,7 +372,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedMyPlanRoute: AuthenticatedMyPlanRoute,
+  AuthenticatedMyPlanRoute: AuthenticatedMyPlanRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
   AuthenticatedOnboardingNutritionistRoute:
@@ -367,3 +398,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -11,6 +11,11 @@ export interface IdentityStateDTO {
   emailConfirmed: boolean;
   role: "nutritionist" | "patient" | null;
   appRoles: Array<"admin" | "user">;
+  patient: {
+    id: string;
+    onboardingVersion: number | null;
+    onboardingCompletedAt: string | null;
+  } | null;
 }
 
 export const getMyIdentityState = createServerFn({ method: "POST" })
@@ -27,11 +32,21 @@ export const getMyIdentityState = createServerFn({ method: "POST" })
       throw new Error(`Failed to resolve app roles: ${rolesError.message}`);
     }
 
+    const patient =
+      id.profile?.role === "patient"
+        ? {
+            id: id.profile.id,
+            onboardingVersion: id.profile.onboardingVersion,
+            onboardingCompletedAt: id.profile.onboardingCompletedAt,
+          }
+        : null;
+
     return {
       state: id.state,
       userId: id.userId,
       emailConfirmed: id.emailConfirmed,
       role: id.profile?.role ?? null,
       appRoles: (roles ?? []).map((r) => r.role as "admin" | "user"),
+      patient,
     };
   });

@@ -24,7 +24,13 @@ export interface ResolvedIdentity {
   emailConfirmed: boolean;
   profile:
     | { role: "nutritionist"; id: string }
-    | { role: "patient"; id: string; nutritionistId: string | null }
+    | {
+        role: "patient";
+        id: string;
+        nutritionistId: string | null;
+        onboardingVersion: number | null;
+        onboardingCompletedAt: string | null;
+      }
     | null;
 }
 
@@ -58,7 +64,7 @@ export async function resolveIdentityState(
       .maybeSingle(),
     authedSupabase
       .from("patients")
-      .select("id, nutritionist_id")
+      .select("id, nutritionist_id, onboarding_version, onboarding_completed_at")
       .eq("auth_user_id", userId)
       .maybeSingle(),
   ]);
@@ -88,6 +94,8 @@ export async function resolveIdentityState(
         role: "patient",
         id: patient.id,
         nutritionistId: patient.nutritionist_id ?? null,
+        onboardingVersion: patient.onboarding_version ?? null,
+        onboardingCompletedAt: patient.onboarding_completed_at ?? null,
       },
     };
   }
