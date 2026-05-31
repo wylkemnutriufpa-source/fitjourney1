@@ -324,23 +324,23 @@ function MealCard({
 
   return (
     <article className="space-y-2">
-      {/* Cabeçalho fora do card — libera espaço da imagem */}
-      <header className="flex items-baseline justify-between gap-3 px-1">
-        <div className="min-w-0">
+      {/* Cabeçalho fora do card — hora ao lado do nome da refeição */}
+      <header className="px-1 space-y-0.5">
+        <div className="flex items-center gap-2 flex-wrap">
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             {meal?.label ?? `Refeição ${index + 1}`}
           </p>
-          {main?.title && (
-            <h2 className="text-base sm:text-lg font-semibold truncate">
-              {main.title}
-            </h2>
+          {meal?.time && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+              <Clock className="size-3" />
+              {meal.time}
+            </span>
           )}
         </div>
-        {meal?.time && (
-          <span className="flex items-center gap-1 text-[11px] font-mono text-muted-foreground shrink-0">
-            <Clock className="size-3" />
-            {meal.time}
-          </span>
+        {main?.title && (
+          <h2 className="text-base sm:text-lg font-semibold truncate">
+            {main.title}
+          </h2>
         )}
       </header>
 
