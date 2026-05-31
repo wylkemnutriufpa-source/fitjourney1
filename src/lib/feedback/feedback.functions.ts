@@ -100,6 +100,9 @@ export const submitFeedback = createServerFn({ method: "POST" })
       nutritionist_id: patient.nutritionist_id,
       weight_kg: data.weightKg ?? null,
       height_cm_snapshot: patient.height_cm ?? null,
+      waist_cm: data.waistCm ?? null,
+      abdomen_cm: data.abdomenCm ?? null,
+      hip_cm: data.hipCm ?? null,
       adherence_rating: data.adherenceRating,
       result_rating: data.resultRating ?? null,
       notes: data.notes?.trim() || null,
@@ -110,9 +113,7 @@ export const submitFeedback = createServerFn({ method: "POST" })
     const { data: row, error } = await supabase
       .from("patient_feedbacks")
       .insert(insertPayload)
-      .select(
-        "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at",
-      )
+      .select(SELECT_COLS)
       .single();
     if (error) throw new Error(error.message);
     return rowToDto(row);
