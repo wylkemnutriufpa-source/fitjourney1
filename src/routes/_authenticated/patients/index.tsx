@@ -111,59 +111,50 @@ function Patients() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p) => (
+              {isLoading && (
+                <tr>
+                  <td colSpan={5} className="p-12 text-center text-muted-foreground text-sm">
+                    <Loader2 className="mx-auto mb-2 size-4 animate-spin" />
+                    Carregando pacientes…
+                  </td>
+                </tr>
+              )}
+              {error && !isLoading && (
+                <tr>
+                  <td colSpan={5} className="p-12 text-center text-destructive text-sm">
+                    Erro ao carregar pacientes reais.
+                  </td>
+                </tr>
+              )}
+              {!isLoading && !error && filtered.map((p) => (
                 <tr key={p.id} className="border-b border-border last:border-0 hover:bg-accent/30">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="size-9 rounded-full bg-background border border-border grid place-items-center text-[10px] font-mono">
-                        {p.initials}
+                        {initialsFromName(p.fullName)}
                       </div>
                       <div>
-                        <p className="font-medium">{p.name}</p>
+                        <p className="font-medium">{p.fullName}</p>
                         <p className="text-xs text-muted-foreground font-mono">
-                          {p.age}a • {p.sex} • {p.weightKg}kg
+                          {p.email}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 text-muted-foreground hidden md:table-cell">{p.sport}</td>
-                  <td className="p-4">
-                    <span className="text-[10px] font-mono uppercase px-2 py-1 rounded bg-background border border-border">
-                      {p.goal}
-                    </span>
+                  <td className="p-4 font-mono text-muted-foreground hidden lg:table-cell">
+                    {p.phone ?? "Sem telefone"}
                   </td>
                   <td className="p-4 font-mono text-muted-foreground hidden lg:table-cell">
-                    {p.tdee} kcal
-                  </td>
-                  <td className="p-4 font-mono text-muted-foreground hidden lg:table-cell">
-                    {p.lastVisit}
+                    {formatDate(p.createdAt)}
                   </td>
                   <td className="p-4">
-                    <span
-                      className={
-                        "inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " +
-                        (p.status === "Ativo" ? "text-emerald-400" : "text-amber-400")
-                      }
-                    >
-                      <span
-                        className={
-                          "size-1.5 rounded-full " +
-                          (p.status === "Ativo" ? "bg-emerald-400" : "bg-amber-400")
-                        }
-                      />
-                      {p.status}
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase text-amber-400">
+                      <span className="size-1.5 rounded-full bg-amber-400" />
+                      Aguardando anamnese
                     </span>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-1">
-                      <Link
-                        to="/patients/$id"
-                        params={{ id: p.id }}
-                        className="size-8 grid place-items-center rounded hover:bg-background text-muted-foreground hover:text-foreground"
-                        title="Ver perfil"
-                      >
-                        <ArrowUpRight className="size-4" />
-                      </Link>
                       <Link
                         to="/patients/$id/diet"
                         params={{ id: p.id }}
@@ -176,9 +167,9 @@ function Patients() {
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {!isLoading && !error && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-12 text-center text-muted-foreground text-sm">
+                  <td colSpan={5} className="p-12 text-center text-muted-foreground text-sm">
                     Nenhum paciente encontrado.
                   </td>
                 </tr>
