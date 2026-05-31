@@ -137,18 +137,46 @@ function PatientSignupPage() {
 
   return (
     <div className="min-h-screen grid place-items-center bg-background text-foreground px-4 py-10">
-      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-7">
+      <form onSubmit={onSubmit} className="w-full max-w-md space-y-7">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-            <CheckCircle2 className="size-3.5 text-emerald-400" />
+            <CheckCircle2 className="size-3.5 text-primary" />
             Convite válido
           </p>
+          {validatedNutri && (
+            <div className="mt-4 flex items-center gap-4 rounded-xl border border-primary/30 bg-primary/5 p-4 shadow-sm">
+              <div className="size-16 rounded-full bg-background border border-border overflow-hidden flex items-center justify-center shrink-0">
+                {validatedNutri.avatarUrl ? (
+                  <img
+                    src={validatedNutri.avatarUrl}
+                    alt={validatedNutri.name}
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <User className="size-7 text-muted-foreground" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Convite de
+                </p>
+                <p className="text-lg font-bold tracking-tight truncate">
+                  {validatedNutri.name}
+                </p>
+                {validatedNutri.specialty && (
+                  <p className="text-xs text-muted-foreground truncate">
+                    {validatedNutri.specialty}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
           <h2 className="text-3xl font-bold tracking-tight mt-2">
             Cadastro de paciente
           </h2>
           {validatedNutri && (
             <p className="text-xs text-muted-foreground mt-2">
-              Você foi convidado por <strong>{validatedNutri}</strong>.
+              Você foi convidado por <strong>{validatedNutri.name}</strong>.
             </p>
           )}
         </div>
