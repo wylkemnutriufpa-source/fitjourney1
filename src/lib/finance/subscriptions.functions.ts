@@ -227,7 +227,15 @@ export const updateSubscription = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => UpdateInput.parse(input))
   .handler(async ({ data, context }): Promise<Subscription> => {
     const { supabase } = context;
-    const patch: Record<string, unknown> = {};
+    const patch: {
+      plan_kind?: SubscriptionPlanKind;
+      price_cents?: number;
+      starts_at?: string;
+      ends_at?: string | null;
+      status?: SubscriptionStatus;
+      payment_method?: SubscriptionPaymentMethod | null;
+      notes?: string | null;
+    } = {};
     if (data.planKind !== undefined) patch.plan_kind = data.planKind;
     if (data.priceCents !== undefined) patch.price_cents = data.priceCents;
     if (data.startsAt !== undefined) patch.starts_at = data.startsAt;
