@@ -194,6 +194,70 @@ function Settings() {
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Carregando perfil…</p>
           ) : (
+            <>
+              {/* Avatar + display name row */}
+              <div className="flex items-start gap-4 pb-4 border-b border-border">
+                <div className="relative">
+                  <div className="size-20 rounded-full bg-background border border-border overflow-hidden flex items-center justify-center">
+                    {avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={avatarUrl} alt="Avatar" className="size-full object-cover" />
+                    ) : (
+                      <User className="size-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  {uploadingAvatar && (
+                    <div className="absolute inset-0 grid place-items-center bg-background/70 rounded-full">
+                      <Loader2 className="size-5 animate-spin text-primary" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                      Como você quer ser chamado
+                    </label>
+                    <input
+                      className={inputCls}
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      disabled={saving}
+                      placeholder="Dr. Wylkem Raiol"
+                      maxLength={120}
+                    />
+                    <p className="text-[10px] text-muted-foreground/70">
+                      Aparece no convite enviado ao paciente.
+                    </p>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingAvatar || saving}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest px-3 py-1.5 border border-border rounded-md hover:border-primary disabled:opacity-50"
+                  >
+                    <Upload className="size-3.5" />
+                    {avatarUrl ? "Trocar foto" : "Enviar foto"}
+                  </button>
+                  {avatarUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setAvatarUrl(null)}
+                      disabled={uploadingAvatar || saving}
+                      className="ml-2 text-[11px] text-muted-foreground hover:text-destructive underline"
+                    >
+                      remover
+                    </button>
+                  )}
+                </div>
+              </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
