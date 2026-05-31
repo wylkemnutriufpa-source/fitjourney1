@@ -114,13 +114,24 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
+  // Identity → determina qual nav exibir. Patient nunca pode ver nav de nutri.
+  const fetchIdentity = useServerFn(getMyIdentityState);
+  const { data: identity } = useQuery({
+    queryKey: ["identity-state"],
+    queryFn: () => fetchIdentity(),
+    staleTime: 60_000,
+    enabled: mounted,
+  });
+  const isPatient = identity?.role === "patient";
+  const nav = isPatient ? patientNav : nutritionistNav;
+
   // Badge de anamneses pendentes (silencioso para não-nutri: retorna 0).
   const fetchPending = useServerFn(getMyPendingAnamnesesCount);
   const { data: pending } = useQuery({
     queryKey: ["nav", "pending-anamneses"],
     queryFn: () => fetchPending(),
     staleTime: 30_000,
-    enabled: mounted,
+    enabled: mounted && !isPatient,
   });
 
   async function handleSignOut() {
