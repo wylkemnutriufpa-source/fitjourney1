@@ -1,4 +1,6 @@
 import { Link, Outlet, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import {
   LayoutDashboard,
   Users,
@@ -10,14 +12,17 @@ import {
   ArrowLeft,
   Menu,
   X,
+  ClipboardList,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/patients", label: "Pacientes", icon: Users },
+  { to: "/anamneses", label: "Anamneses", icon: ClipboardList, badgeKey: "pending-anamneses" as const },
   { to: "/templates", label: "Templates", icon: FileStack },
   { to: "/settings", label: "Configurações", icon: Settings },
 ];
@@ -83,19 +88,34 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   const initials = email.slice(0, 2).toUpperCase();
   const displayName = email.split("@")[0];
 
-  // Sidebar: aberto por padrão em desktop, fechado em mobile.
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    return window.innerWidth >= 768;
-  });
+  // Sidebar: começa sempre aberto (SSR e client) para evitar hydration mismatch.
+  // Fecha em mobile após o mount via useEffect.
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  }, []);
 
   // Fecha sidebar automaticamente ao navegar em telas mobile.
   useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
+    if (mounted && typeof window !== "undefined" && window.innerWidth < 768) {
       setSidebarOpen(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
+
+  // Badge de anamneses pendentes (silencioso para não-nutri: retorna 0).
+  const fetchPending = useServerFn(getMyPendingAnamnesesCount);
+  const { data: pending } = useQuery({
+    queryKey: ["nav", "pending-anamneses"],
+    queryFn: () => fetchPending(),
+    staleTime: 30_000,
+    enabled: mounted,
+  });
 
   async function handleSignOut() {
     await signOut();
