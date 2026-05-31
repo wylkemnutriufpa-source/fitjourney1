@@ -36,6 +36,9 @@ function PatientSettings() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [heightCm, setHeightCm] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const [saving, setSaving] = useState(false);
   const [theme, setThemeState] = useState<ThemeMode>("system");
 
@@ -53,8 +56,44 @@ function PatientSettings() {
       setFullName(data.fullName ?? "");
       setPhone(data.phone ?? "");
       setHeightCm(data.heightCm != null ? String(data.heightCm) : "");
+      setAvatarUrl(data.avatarUrl ?? null);
     }
   }, [data]);
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("Imagem muito grande (máx 4MB)");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem");
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userData.user) throw new Error("Sessão expirada");
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = `${userData.user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, cacheControl: "3600" });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      setAvatarUrl(pub.publicUrl);
+      // Persiste imediatamente — UX melhor que esperar "Salvar".
+      await updateProfile({ data: { avatarUrl: pub.publicUrl } });
+      await refetch();
+      toast.success("Foto atualizada");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha no upload");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
 
   async function handleSave() {
     if (!fullName.trim()) {
