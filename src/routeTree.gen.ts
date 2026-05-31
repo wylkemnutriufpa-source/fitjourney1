@@ -18,6 +18,7 @@ import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedMyPlanRouteImport } from './routes/_authenticated/my-plan'
 import { Route as AuthenticatedMyDashboardRouteImport } from './routes/_authenticated/my-dashboard'
+import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients/index'
 import { Route as AuthenticatedAnamnesesIndexRouteImport } from './routes/_authenticated/anamneses.index'
@@ -77,6 +78,11 @@ const AuthenticatedMyDashboardRoute =
     path: '/my-dashboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -158,6 +164,7 @@ const AuthenticatedPatientsIdDietRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/_authenticated/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/financeiro'
     | '/my-dashboard'
     | '/my-plan'
     | '/settings'
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/financeiro'
     | '/my-dashboard'
     | '/my-plan'
     | '/settings'
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/_authenticated/dashboard'
+    | '/_authenticated/financeiro'
     | '/_authenticated/my-dashboard'
     | '/_authenticated/my-plan'
     | '/_authenticated/settings'
@@ -370,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/my-dashboard'
       fullPath: '/my-dashboard'
       preLoaderRoute: typeof AuthenticatedMyDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro': {
+      id: '/_authenticated/financeiro'
+      path: '/financeiro'
+      fullPath: '/financeiro'
+      preLoaderRoute: typeof AuthenticatedFinanceiroRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
@@ -484,6 +503,7 @@ const AuthenticatedMyPlanRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedMyDashboardRoute: typeof AuthenticatedMyDashboardRoute
   AuthenticatedMyPlanRoute: typeof AuthenticatedMyPlanRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -501,6 +521,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedMyDashboardRoute: AuthenticatedMyDashboardRoute,
   AuthenticatedMyPlanRoute: AuthenticatedMyPlanRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
@@ -531,3 +552,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
