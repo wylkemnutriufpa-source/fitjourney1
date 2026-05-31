@@ -19,10 +19,13 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedMyPlanRouteImport } from './routes/_authenticated/my-plan'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients/index'
+import { Route as AuthenticatedAnamnesesIndexRouteImport } from './routes/_authenticated/anamneses.index'
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients/new'
 import { Route as AuthenticatedOnboardingPatientRouteImport } from './routes/_authenticated/onboarding/patient'
 import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './routes/_authenticated/onboarding/nutritionist'
+import { Route as AuthenticatedMyPlanUpdateHealthProfileRouteImport } from './routes/_authenticated/my-plan.update-health-profile'
 import { Route as AuthenticatedMyPlanSettingsRouteImport } from './routes/_authenticated/my-plan.settings'
+import { Route as AuthenticatedAnamnesesIdRouteImport } from './routes/_authenticated/anamneses.$id'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
 import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
 
@@ -76,6 +79,12 @@ const AuthenticatedPatientsIndexRoute =
     path: '/patients/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAnamnesesIndexRoute =
+  AuthenticatedAnamnesesIndexRouteImport.update({
+    id: '/anamneses/',
+    path: '/anamneses/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPatientsNewRoute =
   AuthenticatedPatientsNewRouteImport.update({
     id: '/patients/new',
@@ -94,11 +103,23 @@ const AuthenticatedOnboardingNutritionistRoute =
     path: '/onboarding/nutritionist',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedMyPlanUpdateHealthProfileRoute =
+  AuthenticatedMyPlanUpdateHealthProfileRouteImport.update({
+    id: '/update-health-profile',
+    path: '/update-health-profile',
+    getParentRoute: () => AuthenticatedMyPlanRoute,
+  } as any)
 const AuthenticatedMyPlanSettingsRoute =
   AuthenticatedMyPlanSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
     getParentRoute: () => AuthenticatedMyPlanRoute,
+  } as any)
+const AuthenticatedAnamnesesIdRoute =
+  AuthenticatedAnamnesesIdRouteImport.update({
+    id: '/anamneses/$id',
+    path: '/anamneses/$id',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedPatientsIdIndexRoute =
   AuthenticatedPatientsIdIndexRouteImport.update({
@@ -122,10 +143,13 @@ export interface FileRoutesByFullPath {
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
+  '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
   '/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
@@ -139,10 +163,13 @@ export interface FileRoutesByTo {
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
+  '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/anamneses': typeof AuthenticatedAnamnesesIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
   '/patients/$id': typeof AuthenticatedPatientsIdIndexRoute
@@ -158,10 +185,13 @@ export interface FileRoutesById {
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/_authenticated/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/_authenticated/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
+  '/_authenticated/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/_authenticated/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/_authenticated/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
   '/_authenticated/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
   '/_authenticated/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
@@ -177,10 +207,13 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/anamneses/$id'
     | '/my-plan/settings'
+    | '/my-plan/update-health-profile'
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
+    | '/anamneses/'
     | '/patients/'
     | '/patients/$id/diet'
     | '/patients/$id/'
@@ -194,10 +227,13 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/anamneses/$id'
     | '/my-plan/settings'
+    | '/my-plan/update-health-profile'
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
+    | '/anamneses'
     | '/patients'
     | '/patients/$id/diet'
     | '/patients/$id'
@@ -212,10 +248,13 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/_authenticated/anamneses/$id'
     | '/_authenticated/my-plan/settings'
+    | '/_authenticated/my-plan/update-health-profile'
     | '/_authenticated/onboarding/nutritionist'
     | '/_authenticated/onboarding/patient'
     | '/_authenticated/patients/new'
+    | '/_authenticated/anamneses/'
     | '/_authenticated/patients/'
     | '/_authenticated/patients/$id/diet'
     | '/_authenticated/patients/$id/'
@@ -301,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPatientsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/anamneses/': {
+      id: '/_authenticated/anamneses/'
+      path: '/anamneses'
+      fullPath: '/anamneses/'
+      preLoaderRoute: typeof AuthenticatedAnamnesesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/patients/new': {
       id: '/_authenticated/patients/new'
       path: '/patients/new'
@@ -322,12 +368,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingNutritionistRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/my-plan/update-health-profile': {
+      id: '/_authenticated/my-plan/update-health-profile'
+      path: '/update-health-profile'
+      fullPath: '/my-plan/update-health-profile'
+      preLoaderRoute: typeof AuthenticatedMyPlanUpdateHealthProfileRouteImport
+      parentRoute: typeof AuthenticatedMyPlanRoute
+    }
     '/_authenticated/my-plan/settings': {
       id: '/_authenticated/my-plan/settings'
       path: '/settings'
       fullPath: '/my-plan/settings'
       preLoaderRoute: typeof AuthenticatedMyPlanSettingsRouteImport
       parentRoute: typeof AuthenticatedMyPlanRoute
+    }
+    '/_authenticated/anamneses/$id': {
+      id: '/_authenticated/anamneses/$id'
+      path: '/anamneses/$id'
+      fullPath: '/anamneses/$id'
+      preLoaderRoute: typeof AuthenticatedAnamnesesIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/patients/$id/': {
       id: '/_authenticated/patients/$id/'
@@ -348,10 +408,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedMyPlanRouteChildren {
   AuthenticatedMyPlanSettingsRoute: typeof AuthenticatedMyPlanSettingsRoute
+  AuthenticatedMyPlanUpdateHealthProfileRoute: typeof AuthenticatedMyPlanUpdateHealthProfileRoute
 }
 
 const AuthenticatedMyPlanRouteChildren: AuthenticatedMyPlanRouteChildren = {
   AuthenticatedMyPlanSettingsRoute: AuthenticatedMyPlanSettingsRoute,
+  AuthenticatedMyPlanUpdateHealthProfileRoute:
+    AuthenticatedMyPlanUpdateHealthProfileRoute,
 }
 
 const AuthenticatedMyPlanRouteWithChildren =
@@ -362,9 +425,11 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMyPlanRoute: typeof AuthenticatedMyPlanRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
+  AuthenticatedAnamnesesIdRoute: typeof AuthenticatedAnamnesesIdRoute
   AuthenticatedOnboardingNutritionistRoute: typeof AuthenticatedOnboardingNutritionistRoute
   AuthenticatedOnboardingPatientRoute: typeof AuthenticatedOnboardingPatientRoute
   AuthenticatedPatientsNewRoute: typeof AuthenticatedPatientsNewRoute
+  AuthenticatedAnamnesesIndexRoute: typeof AuthenticatedAnamnesesIndexRoute
   AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
   AuthenticatedPatientsIdDietRoute: typeof AuthenticatedPatientsIdDietRoute
   AuthenticatedPatientsIdIndexRoute: typeof AuthenticatedPatientsIdIndexRoute
@@ -375,10 +440,12 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMyPlanRoute: AuthenticatedMyPlanRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
+  AuthenticatedAnamnesesIdRoute: AuthenticatedAnamnesesIdRoute,
   AuthenticatedOnboardingNutritionistRoute:
     AuthenticatedOnboardingNutritionistRoute,
   AuthenticatedOnboardingPatientRoute: AuthenticatedOnboardingPatientRoute,
   AuthenticatedPatientsNewRoute: AuthenticatedPatientsNewRoute,
+  AuthenticatedAnamnesesIndexRoute: AuthenticatedAnamnesesIndexRoute,
   AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
   AuthenticatedPatientsIdDietRoute: AuthenticatedPatientsIdDietRoute,
   AuthenticatedPatientsIdIndexRoute: AuthenticatedPatientsIdIndexRoute,
@@ -398,13 +465,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
