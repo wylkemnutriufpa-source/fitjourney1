@@ -52,10 +52,6 @@ function MyPlanPage() {
     staleTime: 60_000,
   });
 
-  if (path !== "/my-plan") {
-    return <Outlet />;
-  }
-
   // Saudação calculada uma vez por montagem. Sorteia evitando repetir
   // a última mensagem mostrada (persistido em localStorage).
   const greeting = useMemo(() => {
@@ -81,6 +77,10 @@ function MyPlanPage() {
     return pickObjectiveMessage(inferObjectiveFromTag(tag));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.id]);
+
+  if (path !== "/my-plan") {
+    return <Outlet />;
+  }
 
   if (isLoading) {
     return (
