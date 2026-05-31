@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { patients, type Goal } from "@/lib/mock-data";
-import { Plus, Search, ArrowUpRight, FileText, Share2 } from "lucide-react";
+import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
+import { Plus, Search, FileText, Share2, Loader2 } from "lucide-react";
 import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
@@ -10,20 +12,45 @@ export const Route = createFileRoute("/_authenticated/patients/")({
   component: Patients,
 });
 
-const goals: ("Todos" | Goal)[] = ["Todos", "Performance", "Hipertrofia", "Emagrecimento", "Manutenção"];
+function initialsFromName(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("") || "P";
+}
+
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }).format(new Date(value));
+}
 
 function Patients() {
+  const fetchPatients = useServerFn(listMyPatientsForPlan);
+  const { data: patients = [], isLoading, error } = useQuery({
+    queryKey: ["patients-index"],
+    queryFn: () => fetchPatients(),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
   const [q, setQ] = useState("");
-  const [goal, setGoal] = useState<(typeof goals)[number]>("Todos");
   const [inviteOpen, setInviteOpen] = useState(false);
 
   const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
     return patients.filter((p) => {
-      const okQ = p.name.toLowerCase().includes(q.toLowerCase()) || p.sport.toLowerCase().includes(q.toLowerCase());
-      const okG = goal === "Todos" || p.goal === goal;
-      return okQ && okG;
+      if (!term) return true;
+      return (
+        p.fullName.toLowerCase().includes(term) ||
+        p.email.toLowerCase().includes(term) ||
+        (p.phone ?? "").toLowerCase().includes(term)
+      );
     });
-  }, [q, goal]);
+  }, [patients, q]);
 
   return (
     <AppShell
@@ -83,25 +110,9 @@ function Patients() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar por nome ou esporte..."
+              placeholder="Buscar por nome, email ou telefone..."
               className="w-full bg-surface border border-border rounded-md pl-10 pr-3 py-2.5 text-sm focus:outline-none focus:border-primary"
             />
-          </div>
-          <div className="flex gap-1.5 bg-surface border border-border rounded-md p-1">
-            {goals.map((g) => (
-              <button
-                key={g}
-                onClick={() => setGoal(g)}
-                className={
-                  "px-3 py-1.5 text-xs font-medium rounded transition-colors " +
-                  (goal === g
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground")
-                }
-              >
-                {g}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -110,83 +121,72 @@ function Patients() {
             <thead>
               <tr className="border-b border-border text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                 <th className="text-left p-4 font-medium">Paciente</th>
-                <th className="text-left p-4 font-medium hidden md:table-cell">Esporte</th>
-                <th className="text-left p-4 font-medium">Objetivo</th>
-                <th className="text-left p-4 font-medium hidden lg:table-cell">TDEE</th>
-                <th className="text-left p-4 font-medium hidden lg:table-cell">Última visita</th>
+                <th className="text-left p-4 font-medium hidden md:table-cell">Contato</th>
+                <th className="text-left p-4 font-medium hidden lg:table-cell">Cadastro</th>
                 <th className="text-left p-4 font-medium">Status</th>
                 <th className="text-right p-4 font-medium">Ações</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p) => (
+              {isLoading && (
+                <tr>
+                  <td colSpan={5} className="p-12 text-center text-muted-foreground text-sm">
+                    <Loader2 className="mx-auto mb-2 size-4 animate-spin" />
+                    Carregando pacientes…
+                  </td>
+                </tr>
+              )}
+              {error && !isLoading && (
+                <tr>
+                  <td colSpan={5} className="p-12 text-center text-destructive text-sm">
+                    Erro ao carregar pacientes reais.
+                  </td>
+                </tr>
+              )}
+              {!isLoading && !error && filtered.map((p) => (
                 <tr key={p.id} className="border-b border-border last:border-0 hover:bg-accent/30">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="size-9 rounded-full bg-background border border-border grid place-items-center text-[10px] font-mono">
-                        {p.initials}
+                        {initialsFromName(p.fullName)}
                       </div>
                       <div>
-                        <p className="font-medium">{p.name}</p>
+                        <p className="font-medium">{p.fullName}</p>
                         <p className="text-xs text-muted-foreground font-mono">
-                          {p.age}a • {p.sex} • {p.weightKg}kg
+                          {p.email}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 text-muted-foreground hidden md:table-cell">{p.sport}</td>
-                  <td className="p-4">
-                    <span className="text-[10px] font-mono uppercase px-2 py-1 rounded bg-background border border-border">
-                      {p.goal}
-                    </span>
+                  <td className="p-4 font-mono text-muted-foreground hidden md:table-cell">
+                    {p.phone ?? "Sem telefone"}
                   </td>
                   <td className="p-4 font-mono text-muted-foreground hidden lg:table-cell">
-                    {p.tdee} kcal
-                  </td>
-                  <td className="p-4 font-mono text-muted-foreground hidden lg:table-cell">
-                    {p.lastVisit}
+                    {formatDate(p.createdAt)}
                   </td>
                   <td className="p-4">
-                    <span
-                      className={
-                        "inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " +
-                        (p.status === "Ativo" ? "text-emerald-400" : "text-amber-400")
-                      }
-                    >
-                      <span
-                        className={
-                          "size-1.5 rounded-full " +
-                          (p.status === "Ativo" ? "bg-emerald-400" : "bg-amber-400")
-                        }
-                      />
-                      {p.status}
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase text-amber-400">
+                      <span className="size-1.5 rounded-full bg-amber-400" />
+                      Aguardando anamnese
                     </span>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-1">
-                      <Link
-                        to="/patients/$id"
-                        params={{ id: p.id }}
-                        className="size-8 grid place-items-center rounded hover:bg-background text-muted-foreground hover:text-foreground"
-                        title="Ver perfil"
-                      >
-                        <ArrowUpRight className="size-4" />
-                      </Link>
-                      <Link
-                        to="/patients/$id/diet"
-                        params={{ id: p.id }}
-                        className="size-8 grid place-items-center rounded hover:bg-background text-muted-foreground hover:text-primary"
-                        title="Montar dieta"
+                      <button
+                        type="button"
+                        disabled
+                        className="size-8 grid place-items-center rounded text-muted-foreground/50 cursor-not-allowed"
+                        title="Disponível após anamnese"
                       >
                         <FileText className="size-4" />
-                      </Link>
+                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {!isLoading && !error && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-12 text-center text-muted-foreground text-sm">
+                  <td colSpan={5} className="p-12 text-center text-muted-foreground text-sm">
                     Nenhum paciente encontrado.
                   </td>
                 </tr>

@@ -142,12 +142,13 @@ export const getOrCreateMyReferralCode = createServerFn({ method: "POST" })
     if (nutriErr) throw new Error(nutriErr.message);
     if (!nutri) return null;
 
-    // Tenta reaproveitar um código ativo existente.
+    // Tenta reaproveitar o código único existente. "consumed" virou legado:
+    // o convite online identifica o nutricionista e pode cadastrar vários pacientes.
     const { data: existing, error: existingErr } = await supabaseAdmin
       .from("referral_codes")
       .select("code, created_at")
       .eq("nutritionist_id", nutri.id)
-      .eq("status", "active")
+      .in("status", ["active", "consumed"])
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
