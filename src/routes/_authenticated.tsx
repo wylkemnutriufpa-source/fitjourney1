@@ -64,10 +64,11 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/dashboard", replace: true });
     }
 
-    // Patient gate: pacientes acessam /my-plan/* e /onboarding/patient.
+    // Patient gate: pacientes acessam /my-dashboard, /my-plan/* e
+    // /onboarding/patient.
     // - Enquanto onboarding_completed_at IS NULL → força /onboarding/patient.
     // - Após onboarding concluído: /onboarding/patient bloqueado (semântica de
-    //   primeira entrada). Atualização clínica vive em /my-plan/update-health-profile.
+    //   primeira entrada). Tela inicial = /my-dashboard (invariante #6).
     if (identity.state === "S3" && identity.role === "patient") {
       const onPatientOnboarding =
         path === "/onboarding/patient" || path.startsWith("/onboarding/patient/");
@@ -81,11 +82,15 @@ export const Route = createFileRoute("/_authenticated")({
       }
 
       if (onPatientOnboarding) {
-        throw redirect({ to: "/my-plan", replace: true });
+        throw redirect({ to: "/my-dashboard", replace: true });
       }
-      const isPatientRoute = path === "/my-plan" || path.startsWith("/my-plan/");
+      const isPatientRoute =
+        path === "/my-dashboard" ||
+        path.startsWith("/my-dashboard/") ||
+        path === "/my-plan" ||
+        path.startsWith("/my-plan/");
       if (!isPatientRoute) {
-        throw redirect({ to: "/my-plan", replace: true });
+        throw redirect({ to: "/my-dashboard", replace: true });
       }
     }
 
