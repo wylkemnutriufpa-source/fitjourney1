@@ -7,7 +7,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
 import { z } from "zod";
-import { Activity, Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Activity, Loader2, Eye, EyeOff, CheckCircle2, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   validateReferralCode,
@@ -36,7 +36,11 @@ function PatientSignupPage() {
   const consume = useServerFn(consumeReferralCodeAndCreatePatient);
 
   const [validating, setValidating] = useState(true);
-  const [validatedNutri, setValidatedNutri] = useState<string | null>(null);
+  const [validatedNutri, setValidatedNutri] = useState<{
+    name: string;
+    avatarUrl: string | null;
+    specialty: string | null;
+  } | null>(null);
   const [codeError, setCodeError] = useState<string | null>(null);
 
   const [fullName, setFullName] = useState("");
@@ -57,7 +61,11 @@ function PatientSignupPage() {
       try {
         const r = await validate({ data: { code } });
         if (cancelled) return;
-        setValidatedNutri(r.nutritionistName);
+        setValidatedNutri({
+          name: r.nutritionistName,
+          avatarUrl: r.nutritionistAvatarUrl,
+          specialty: r.nutritionistSpecialty,
+        });
       } catch (e) {
         if (cancelled) return;
         const msg = e instanceof Error ? e.message : "Código inválido.";
