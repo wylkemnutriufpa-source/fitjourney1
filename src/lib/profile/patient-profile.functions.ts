@@ -58,9 +58,14 @@ export const updateMyPatientProfile = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => UpdateInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const patch: { full_name?: string; phone?: string | null } = {};
+    const patch: {
+      full_name?: string;
+      phone?: string | null;
+      height_cm?: number | null;
+    } = {};
     if (data.fullName !== undefined) patch.full_name = data.fullName;
     if (data.phone !== undefined) patch.phone = data.phone === "" ? null : data.phone;
+    if (data.heightCm !== undefined) patch.height_cm = data.heightCm;
 
     if (Object.keys(patch).length === 0) {
       return { ok: true };
