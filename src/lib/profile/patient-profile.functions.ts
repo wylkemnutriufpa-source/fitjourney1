@@ -11,6 +11,7 @@ export interface MyPatientProfile {
   email: string;
   phone: string | null;
   birthDate: string | null;
+  heightCm: number | null;
 }
 
 export const getMyPatientProfile = createServerFn({ method: "POST" })
@@ -19,7 +20,7 @@ export const getMyPatientProfile = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("patients")
-      .select("id, full_name, email, phone, birth_date")
+      .select("id, full_name, email, phone, birth_date, height_cm")
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -30,6 +31,7 @@ export const getMyPatientProfile = createServerFn({ method: "POST" })
       email: data.email,
       phone: data.phone ?? null,
       birthDate: data.birth_date ?? null,
+      heightCm: data.height_cm != null ? Number(data.height_cm) : null,
     };
   });
 
@@ -48,6 +50,7 @@ const PhoneSchema = z
 const UpdateInput = z.object({
   fullName: z.string().trim().min(1).max(120).optional(),
   phone: PhoneSchema.optional(),
+  heightCm: z.number().min(80).max(260).nullable().optional(),
 });
 
 export const updateMyPatientProfile = createServerFn({ method: "POST" })
