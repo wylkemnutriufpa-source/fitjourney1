@@ -6,9 +6,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
+import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
 import { Clock, AlertTriangle, Info } from "lucide-react";
+import { useMemo } from "react";
+import {
+  getPeriod,
+  periodLabel,
+  pickGreetingMessage,
+  formatTodayPtBr,
+} from "@/lib/patient/greetings";
 
 export const Route = createFileRoute("/_authenticated/my-plan")({
   head: () => ({ meta: [{ title: "Meu Plano — FitJourney" }] }),
