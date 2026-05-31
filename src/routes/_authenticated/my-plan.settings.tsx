@@ -34,6 +34,7 @@ function PatientSettings() {
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [heightCm, setHeightCm] = useState("");
   const [saving, setSaving] = useState(false);
   const [theme, setThemeState] = useState<ThemeMode>("system");
 
@@ -50,6 +51,7 @@ function PatientSettings() {
     if (data) {
       setFullName(data.fullName ?? "");
       setPhone(data.phone ?? "");
+      setHeightCm(data.heightCm != null ? String(data.heightCm) : "");
     }
   }, [data]);
 
@@ -58,12 +60,23 @@ function PatientSettings() {
       toast.error("Nome é obrigatório");
       return;
     }
+    let heightVal: number | null = null;
+    const trimmedH = heightCm.trim().replace(",", ".");
+    if (trimmedH !== "") {
+      const n = Number(trimmedH);
+      if (!Number.isFinite(n) || n < 80 || n > 260) {
+        toast.error("Altura inválida (80–260 cm).");
+        return;
+      }
+      heightVal = n;
+    }
     setSaving(true);
     try {
       await updateProfile({
         data: {
           fullName: fullName.trim(),
           phone: phone.trim(),
+          heightCm: heightVal,
         },
       });
       toast.success("Conta atualizada");
@@ -137,6 +150,23 @@ function PatientSettings() {
                 />
                 <p className="text-[10px] text-muted-foreground/70">
                   Usado pelo seu nutricionista para contato direto.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Altura (cm)
+                </label>
+                <input
+                  className={inputCls}
+                  value={heightCm}
+                  onChange={(e) => setHeightCm(e.target.value)}
+                  disabled={saving}
+                  placeholder="ex: 168"
+                  inputMode="decimal"
+                  maxLength={6}
+                />
+                <p className="text-[10px] text-muted-foreground/70">
+                  Usado para acompanhar evolução de IMC nos feedbacks.
                 </p>
               </div>
               <div className="space-y-1.5">

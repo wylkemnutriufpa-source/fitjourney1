@@ -21,6 +21,9 @@ export type FeedbackDTO = {
   nutritionistId: string;
   weightKg: number | null;
   heightCmSnapshot: number | null;
+  waistCm: number | null;
+  abdomenCm: number | null;
+  hipCm: number | null;
   adherenceRating: z.infer<typeof AdherenceEnum>;
   resultRating: z.infer<typeof ResultEnum> | null;
   notes: string | null;
@@ -28,6 +31,9 @@ export type FeedbackDTO = {
   photoSidePath: string | null;
   createdAt: string;
 };
+
+const SELECT_COLS =
+  "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, waist_cm, abdomen_cm, hip_cm, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at";
 
 function rowToDto(r: any): FeedbackDTO {
   return {
@@ -37,6 +43,9 @@ function rowToDto(r: any): FeedbackDTO {
     weightKg: r.weight_kg != null ? Number(r.weight_kg) : null,
     heightCmSnapshot:
       r.height_cm_snapshot != null ? Number(r.height_cm_snapshot) : null,
+    waistCm: r.waist_cm != null ? Number(r.waist_cm) : null,
+    abdomenCm: r.abdomen_cm != null ? Number(r.abdomen_cm) : null,
+    hipCm: r.hip_cm != null ? Number(r.hip_cm) : null,
     adherenceRating: r.adherence_rating,
     resultRating: r.result_rating ?? null,
     notes: r.notes ?? null,
@@ -54,12 +63,10 @@ function rowToDto(r: any): FeedbackDTO {
 
 const SubmitInput = z.object({
   id: z.string().uuid(),
-  weightKg: z
-    .number()
-    .min(20)
-    .max(400)
-    .optional()
-    .nullable(),
+  weightKg: z.number().min(20).max(400).optional().nullable(),
+  waistCm: z.number().min(30).max(250).optional().nullable(),
+  abdomenCm: z.number().min(30).max(250).optional().nullable(),
+  hipCm: z.number().min(30).max(250).optional().nullable(),
   adherenceRating: AdherenceEnum,
   resultRating: ResultEnum.optional().nullable(),
   notes: z.string().trim().max(2000).optional().nullable(),
@@ -93,6 +100,9 @@ export const submitFeedback = createServerFn({ method: "POST" })
       nutritionist_id: patient.nutritionist_id,
       weight_kg: data.weightKg ?? null,
       height_cm_snapshot: patient.height_cm ?? null,
+      waist_cm: data.waistCm ?? null,
+      abdomen_cm: data.abdomenCm ?? null,
+      hip_cm: data.hipCm ?? null,
       adherence_rating: data.adherenceRating,
       result_rating: data.resultRating ?? null,
       notes: data.notes?.trim() || null,
@@ -103,9 +113,7 @@ export const submitFeedback = createServerFn({ method: "POST" })
     const { data: row, error } = await supabase
       .from("patient_feedbacks")
       .insert(insertPayload)
-      .select(
-        "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at",
-      )
+      .select(SELECT_COLS)
       .single();
     if (error) throw new Error(error.message);
     return rowToDto(row);
@@ -127,9 +135,7 @@ export const listMyFeedbacks = createServerFn({ method: "GET" })
     if (!patient) return [];
     const { data, error } = await supabase
       .from("patient_feedbacks")
-      .select(
-        "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at",
-      )
+      .select(SELECT_COLS)
       .eq("patient_id", patient.id)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -219,9 +225,7 @@ export const listPatientFeedbacks = createServerFn({ method: "GET" })
     // RLS faz a checagem de ownership (nutri reads patient feedback).
     const { data: rows, error } = await supabase
       .from("patient_feedbacks")
-      .select(
-        "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at",
-      )
+      .select(SELECT_COLS)
       .eq("patient_id", data.patientId)
       .order("created_at", { ascending: false })
       .limit(200);

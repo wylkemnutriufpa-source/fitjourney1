@@ -91,6 +91,9 @@ function FeedbackPage() {
 
   // Form state
   const [weight, setWeight] = useState<string>("");
+  const [waist, setWaist] = useState<string>("");
+  const [abdomen, setAbdomen] = useState<string>("");
+  const [hip, setHip] = useState<string>("");
   const [adherence, setAdherence] = useState<AdherenceRating | null>(null);
   const [resultR, setResultR] = useState<ResultRating | null>(null);
   const [notes, setNotes] = useState<string>("");
@@ -100,6 +103,16 @@ function FeedbackPage() {
   const frontInputRef = useRef<HTMLInputElement>(null);
   const sideInputRef = useRef<HTMLInputElement>(null);
 
+  function parseOptionalCm(s: string): number | null {
+    const t = s.trim().replace(",", ".");
+    if (t === "") return null;
+    const n = Number(t);
+    if (!Number.isFinite(n) || n < 30 || n > 250) {
+      throw new Error("Medida fora do intervalo (30–250 cm).");
+    }
+    return n;
+  }
+
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!adherence) throw new Error("Escolha como foi seguir o plano.");
@@ -108,6 +121,9 @@ function FeedbackPage() {
       if (weightNum !== null && (!Number.isFinite(weightNum) || weightNum <= 0)) {
         throw new Error("Peso inválido.");
       }
+      const waistNum = parseOptionalCm(waist);
+      const abdomenNum = parseOptionalCm(abdomen);
+      const hipNum = parseOptionalCm(hip);
 
       // Precisamos do patient_id para o path do storage.
       const { data: userData } = await supabase.auth.getUser();
@@ -153,6 +169,9 @@ function FeedbackPage() {
         data: {
           id: feedbackId,
           weightKg: weightNum,
+          waistCm: waistNum,
+          abdomenCm: abdomenNum,
+          hipCm: hipNum,
           adherenceRating: adherence,
           resultRating: resultR ?? undefined,
           notes: notes.trim() || undefined,
@@ -164,6 +183,9 @@ function FeedbackPage() {
     onSuccess: () => {
       toast.success("Feedback enviado. Obrigado por se manter ativo!");
       setWeight("");
+      setWaist("");
+      setAbdomen("");
+      setHip("");
       setAdherence(null);
       setResultR(null);
       setNotes("");
@@ -295,10 +317,50 @@ function FeedbackPage() {
               )}
             </section>
 
+            {/* Medidas corporais — opcionais */}
+            <section className="bg-surface border border-border rounded-lg p-5 space-y-3">
+              <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
+                02 · Medidas (opcional)
+              </h2>
+              <p className="text-[11px] text-muted-foreground -mt-1">
+                Cintura, abdômen e quadril em centímetros. Ajudam a acompanhar
+                evolução além do peso.
+              </p>
+              <div className="grid grid-cols-3 gap-3 max-w-md">
+                {[
+                  { label: "Cintura", v: waist, set: setWaist },
+                  { label: "Abdômen", v: abdomen, set: setAbdomen },
+                  { label: "Quadril", v: hip, set: setHip },
+                ].map((f) => (
+                  <div key={f.label} className="space-y-1">
+                    <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                      {f.label}
+                    </label>
+                    <div className="flex items-baseline gap-1">
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="30"
+                        max="250"
+                        inputMode="decimal"
+                        value={f.v}
+                        onChange={(e) => f.set(e.target.value)}
+                        placeholder="—"
+                        className="w-full bg-background border border-border rounded-md px-2 py-2 text-sm tabular-nums focus:outline-none focus:border-primary"
+                      />
+                      <span className="text-[10px] text-muted-foreground font-mono">
+                        cm
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             {/* Aderência */}
             <section className="bg-surface border border-border rounded-lg p-5 space-y-3">
               <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-                02 · Como foi seguir o plano?
+                03 · Como foi seguir o plano?
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 {ADHERENCE_OPTIONS.map((opt) => {
@@ -550,7 +612,7 @@ function PhotoSlot({
   label: string;
   file: File | null;
   onSelect: (f: File | null) => void;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
 }) {
   const [preview, setPreview] = useState<string | null>(null);
   useEffect(() => {

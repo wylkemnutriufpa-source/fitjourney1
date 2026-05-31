@@ -13,11 +13,13 @@ import {
   Menu,
   X,
   ClipboardList,
+  MessageSquareHeart,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
+import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { applyTheme, getStoredTheme } from "@/lib/patient/theme";
 
 
@@ -31,6 +33,7 @@ const nutritionistNav = [
 
 const patientNav = [
   { to: "/my-plan", label: "Meu Plano", icon: LayoutDashboard },
+  { to: "/my-plan/feedback", label: "Feedback", icon: MessageSquareHeart, badgeKey: "feedback-pending" as const },
   { to: "/my-plan/settings", label: "Configurações", icon: Settings },
 ] as const;
 
@@ -136,6 +139,15 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     enabled: mounted && !isPatient,
   });
 
+  // Badge de feedback pendente (paciente).
+  const fetchFbStatus = useServerFn(getMyFeedbackStatus);
+  const { data: fbStatus } = useQuery({
+    queryKey: ["patient-feedback-status-nav"],
+    queryFn: () => fetchFbStatus(),
+    staleTime: 60_000,
+    enabled: mounted && isPatient,
+  });
+
   async function handleSignOut() {
     await signOut();
     navigate({ to: "/" });
@@ -180,10 +192,13 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
           {nav.map((item) => {
             const active = path === item.to || path.startsWith(item.to + "/");
             const Icon = item.icon;
+            const badgeKey = "badgeKey" in item ? item.badgeKey : null;
             const badgeCount =
-              "badgeKey" in item && item.badgeKey === "pending-anamneses"
+              badgeKey === "pending-anamneses"
                 ? pending?.pendingCount ?? 0
                 : 0;
+            const showDot =
+              badgeKey === "feedback-pending" && !!fbStatus?.isPending && !!fbStatus.hasNutritionist;
             return (
               <Link
                 key={item.to}
@@ -201,6 +216,12 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                   <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-mono">
                     {badgeCount}
                   </span>
+                )}
+                {showDot && (
+                  <span
+                    title="Feedback pendente"
+                    className="size-2 rounded-full bg-primary animate-pulse"
+                  />
                 )}
               </Link>
             );
