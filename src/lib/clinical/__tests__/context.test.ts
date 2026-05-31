@@ -38,8 +38,8 @@ describe("buildClinicalContext", () => {
       "heightCm",
       "activity",
     ]);
-    expect(ctx.weight.current).toBeNull();
-    expect(ctx.goal.current).toBeNull();
+    expect(ctx.currentWeight).toBeNull();
+    expect(ctx.currentGoal).toBeNull();
   });
 
   it("ready=true quando há anamnese aprovada + peso", () => {
@@ -57,8 +57,8 @@ describe("buildClinicalContext", () => {
     });
     expect(ctx.ready).toBe(true);
     expect(ctx.missing).toEqual([]);
-    expect(ctx.weight.current?.weightKg).toBe(82);
-    expect(ctx.goal.current?.kind).toBe("cut");
+    expect(ctx.currentWeight?.weightKg).toBe(82);
+    expect(ctx.currentGoal?.kind).toBe("cut");
     expect(ctx.demographics.sourceAnamnesisId).toBe("a1");
   });
 
@@ -86,18 +86,17 @@ describe("buildClinicalContext", () => {
     expect(ctx.demographics.sex).toBe("female");
     expect(ctx.demographics.activity).toBe("high");
     expect(ctx.demographics.sourceAnamnesisId).toBe("a2");
-    expect(ctx.goal.current?.kind).toBe("maintain");
+    expect(ctx.currentGoal?.kind).toBe("maintain");
   });
 
   it("peso da anamnese NÃO é usado como leitura — só vem se passado em weightReadings", () => {
-    // Garantia: motor não pode pegar peso silenciosamente do basics.
     const ana = mkAnamnese("a1", "2026-05-01T00:00:00Z", 99);
     const ctx = buildClinicalContext({
       patientId: "p1",
       weightReadings: [],
       approvedAnamneses: [ana],
     });
-    expect(ctx.weight.current).toBeNull();
+    expect(ctx.currentWeight).toBeNull();
     expect(ctx.missing).toContain("weight");
   });
 });
