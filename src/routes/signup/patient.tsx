@@ -45,6 +45,7 @@ function PatientSignupPage() {
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -87,7 +88,7 @@ function PatientSignupPage() {
     setSubmitting(true);
     try {
       await consume({
-        data: { code, fullName, email, password },
+        data: { code, fullName, email, password, phone: normalizePhone(phone) },
       });
       // login automático
       const { error: signInErr } = await supabase.auth.signInWithPassword({
@@ -95,7 +96,7 @@ function PatientSignupPage() {
         password,
       });
       if (signInErr) throw signInErr;
-      navigate({ to: "/my-plan", replace: true });
+      navigate({ to: "/onboarding/patient" as never, replace: true });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Falha ao criar conta.";
@@ -211,6 +212,25 @@ function PatientSignupPage() {
 
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            WhatsApp
+          </label>
+          <input
+            required
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="+55 11 99999-9999"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full bg-surface border border-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-primary"
+          />
+          <p className="text-[10px] text-muted-foreground/70 font-mono">
+            Usado pelo seu nutricionista para contato direto.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             Senha (mín. 8 caracteres)
           </label>
           <div className="relative">
@@ -280,4 +300,10 @@ function translateCodeError(msg: string): string {
   if (msg.toLowerCase().includes("already") && msg.toLowerCase().includes("registered"))
     return "Já existe uma conta com este email.";
   return msg;
+}
+
+function normalizePhone(input: string): string {
+  const digits = input.replace(/\D/g, "");
+  if (!digits) return "";
+  return input.trim().startsWith("+") ? `+${digits}` : `+${digits}`;
 }
