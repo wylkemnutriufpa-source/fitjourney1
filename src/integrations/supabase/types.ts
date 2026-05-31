@@ -190,8 +190,10 @@ export type Database = {
       nutritionists: {
         Row: {
           auth_user_id: string
+          avatar_url: string | null
           created_at: string
           crn: string | null
+          display_name: string | null
           email: string
           full_name: string
           id: string
@@ -201,8 +203,10 @@ export type Database = {
         }
         Insert: {
           auth_user_id: string
+          avatar_url?: string | null
           created_at?: string
           crn?: string | null
+          display_name?: string | null
           email: string
           full_name: string
           id?: string
@@ -212,8 +216,10 @@ export type Database = {
         }
         Update: {
           auth_user_id?: string
+          avatar_url?: string | null
           created_at?: string
           crn?: string | null
+          display_name?: string | null
           email?: string
           full_name?: string
           id?: string

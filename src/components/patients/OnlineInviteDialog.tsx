@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import {
   X,
   Copy,
@@ -12,9 +13,13 @@ import {
   Mail,
   Loader2,
   Check,
+  User,
 } from "lucide-react";
 import { toast } from "sonner";
-import { getOrCreateMyReferralCode } from "@/lib/profile/nutritionist-profile.functions";
+import {
+  getOrCreateMyReferralCode,
+  getMyNutritionistProfile,
+} from "@/lib/profile/nutritionist-profile.functions";
 
 interface Props {
   open: boolean;
@@ -24,10 +29,22 @@ interface Props {
 
 export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
   const getReferral = useServerFn(getOrCreateMyReferralCode);
+  const fetchProfile = useServerFn(getMyNutritionistProfile);
   const [code, setCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [message, setMessage] = useState("");
+
+  const { data: profile } = useQuery({
+    queryKey: ["my-nutritionist-profile"],
+    queryFn: () => fetchProfile(),
+    staleTime: 30_000,
+    enabled: open,
+  });
+
+  const displayName =
+    profile?.displayName?.trim() || profile?.fullName?.trim() || "Seu nutricionista";
+  const avatarUrl = profile?.avatarUrl || null;
 
   const inviteUrl = useMemo(() => {
     if (!code) return "";
@@ -62,11 +79,12 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
   useEffect(() => {
     if (open) {
       const who = patientName ? ` ${patientName}` : "";
+      const from = displayName && displayName !== "Seu nutricionista" ? ` ${displayName}` : "";
       setMessage(
-        `Olá${who}! Aqui está o link para você criar sua conta no FitJourney e começar sua anamnese: `
+        `Olá${who}! Aqui é${from}. Estou te enviando o link para você criar sua conta no FitJourney e começar sua anamnese: `
       );
     }
-  }, [open, patientName]);
+  }, [open, patientName, displayName]);
 
   if (!open) return null;
 
@@ -116,6 +134,27 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
             O paciente cria a conta sozinho via link e cai direto na anamnese.
           </p>
         </div>
+
+        {/* Cartão de identidade do profissional */}
+        <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/30 bg-primary/5">
+          <div className="size-12 rounded-full bg-background border border-border overflow-hidden flex items-center justify-center shrink-0">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={displayName} className="size-full object-cover" />
+            ) : (
+              <User className="size-5 text-muted-foreground" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Convite de
+            </p>
+            <p className="text-sm font-semibold truncate">{displayName}</p>
+            {profile?.specialty && (
+              <p className="text-[11px] text-muted-foreground truncate">{profile.specialty}</p>
+            )}
+          </div>
+        </div>
+
 
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">

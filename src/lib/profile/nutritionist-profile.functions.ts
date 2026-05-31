@@ -10,6 +10,8 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export interface MyNutritionistProfile {
   id: string;
   fullName: string;
+  displayName: string | null;
+  avatarUrl: string | null;
   email: string;
   crn: string | null;
   specialty: string | null;
@@ -20,11 +22,9 @@ export const getMyNutritionistProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<MyNutritionistProfile | null> => {
     const { userId } = context;
-    // Usa admin para enxergar mesmo perfis criados por outros caminhos
-    // (admin que ainda não tem row, fluxo de onboarding pendente, etc.).
     const { data, error } = await supabaseAdmin
       .from("nutritionists")
-      .select("id, full_name, email, crn, specialty, phone")
+      .select("id, full_name, display_name, avatar_url, email, crn, specialty, phone")
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -32,6 +32,8 @@ export const getMyNutritionistProfile = createServerFn({ method: "GET" })
     return {
       id: data.id,
       fullName: data.full_name,
+      displayName: data.display_name,
+      avatarUrl: data.avatar_url,
       email: data.email,
       crn: data.crn,
       specialty: data.specialty,
@@ -41,6 +43,19 @@ export const getMyNutritionistProfile = createServerFn({ method: "GET" })
 
 const UpdateInput = z.object({
   fullName: z.string().trim().min(1).max(255),
+  displayName: z
+    .string()
+    .trim()
+    .max(120)
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  avatarUrl: z
+    .string()
+    .trim()
+    .max(1024)
+    .url()
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
   crn: z
     .string()
     .trim()
@@ -65,14 +80,14 @@ export const updateMyNutritionistProfile = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<MyNutritionistProfile> => {
     const { userId } = context;
 
-    // Upsert por auth_user_id (constraint unique existe).
-    // Garante que admins/usuários sem row ainda consigam materializar o perfil.
     const { data: upserted, error } = await supabaseAdmin
       .from("nutritionists")
       .upsert(
         {
           auth_user_id: userId,
           full_name: data.fullName,
+          display_name: data.displayName ?? null,
+          avatar_url: data.avatarUrl ?? null,
           crn: data.crn ?? null,
           email: data.email,
           specialty: data.specialty ?? null,
@@ -80,18 +95,21 @@ export const updateMyNutritionistProfile = createServerFn({ method: "POST" })
         },
         { onConflict: "auth_user_id" }
       )
-      .select("id, full_name, email, crn, specialty, phone")
+      .select("id, full_name, display_name, avatar_url, email, crn, specialty, phone")
       .single();
     if (error) throw new Error(`Failed to save profile: ${error.message}`);
     return {
       id: upserted.id,
       fullName: upserted.full_name,
+      displayName: upserted.display_name,
+      avatarUrl: upserted.avatar_url,
       email: upserted.email,
       crn: upserted.crn,
       specialty: upserted.specialty,
       phone: upserted.phone,
     };
   });
+
 
 // Gera (ou recupera) um código de convite ativo do nutricionista logado.
 // Usado para gerar a URL pública que o paciente usa no cadastro.

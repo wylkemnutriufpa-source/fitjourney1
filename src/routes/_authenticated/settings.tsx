@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { Save, Loader2, Copy, Link2, MessageCircle } from "lucide-react";
+import { Save, Loader2, Copy, Link2, MessageCircle, Upload, User } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   getMyNutritionistProfile,
   updateMyNutritionistProfile,
@@ -35,6 +36,10 @@ function Settings() {
   });
 
   const [fullName, setFullName] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [crn, setCrn] = useState("");
   const [email, setEmail] = useState("");
   const [specialty, setSpecialty] = useState("");
@@ -44,6 +49,8 @@ function Settings() {
   useEffect(() => {
     if (profile) {
       setFullName(profile.fullName ?? "");
+      setDisplayName(profile.displayName ?? "");
+      setAvatarUrl(profile.avatarUrl ?? null);
       setCrn(profile.crn ?? "");
       setEmail(profile.email ?? "");
       setSpecialty(profile.specialty ?? "");
@@ -98,6 +105,8 @@ function Settings() {
       await updateProfile({
         data: {
           fullName: fullName.trim(),
+          displayName: displayName.trim() || undefined,
+          avatarUrl: avatarUrl || undefined,
           crn: crn.trim() || undefined,
           email: email.trim(),
           specialty: specialty.trim() || undefined,
@@ -113,6 +122,39 @@ function Settings() {
       setSaving(false);
     }
   }
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("Imagem muito grande (máx 4MB)");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem");
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userData.user) throw new Error("Sessão expirada");
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = `${userData.user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, cacheControl: "3600" });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      setAvatarUrl(pub.publicUrl);
+      toast.success("Foto carregada — clique em Salvar para confirmar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha no upload");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
+
 
   async function copy(text: string, label: string) {
     if (!text) return;
@@ -152,6 +194,70 @@ function Settings() {
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Carregando perfil…</p>
           ) : (
+            <>
+              {/* Avatar + display name row */}
+              <div className="flex items-start gap-4 pb-4 border-b border-border">
+                <div className="relative">
+                  <div className="size-20 rounded-full bg-background border border-border overflow-hidden flex items-center justify-center">
+                    {avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={avatarUrl} alt="Avatar" className="size-full object-cover" />
+                    ) : (
+                      <User className="size-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  {uploadingAvatar && (
+                    <div className="absolute inset-0 grid place-items-center bg-background/70 rounded-full">
+                      <Loader2 className="size-5 animate-spin text-primary" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                      Como você quer ser chamado
+                    </label>
+                    <input
+                      className={inputCls}
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      disabled={saving}
+                      placeholder="Dr. Wylkem Raiol"
+                      maxLength={120}
+                    />
+                    <p className="text-[10px] text-muted-foreground/70">
+                      Aparece no convite enviado ao paciente.
+                    </p>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingAvatar || saving}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest px-3 py-1.5 border border-border rounded-md hover:border-primary disabled:opacity-50"
+                  >
+                    <Upload className="size-3.5" />
+                    {avatarUrl ? "Trocar foto" : "Enviar foto"}
+                  </button>
+                  {avatarUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setAvatarUrl(null)}
+                      disabled={uploadingAvatar || saving}
+                      className="ml-2 text-[11px] text-muted-foreground hover:text-destructive underline"
+                    >
+                      remover
+                    </button>
+                  )}
+                </div>
+              </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -224,6 +330,7 @@ function Settings() {
                 />
               </div>
             </div>
+            </>
           )}
         </section>
 
