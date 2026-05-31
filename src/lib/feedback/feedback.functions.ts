@@ -21,6 +21,9 @@ export type FeedbackDTO = {
   nutritionistId: string;
   weightKg: number | null;
   heightCmSnapshot: number | null;
+  waistCm: number | null;
+  abdomenCm: number | null;
+  hipCm: number | null;
   adherenceRating: z.infer<typeof AdherenceEnum>;
   resultRating: z.infer<typeof ResultEnum> | null;
   notes: string | null;
@@ -28,6 +31,9 @@ export type FeedbackDTO = {
   photoSidePath: string | null;
   createdAt: string;
 };
+
+const SELECT_COLS =
+  "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, waist_cm, abdomen_cm, hip_cm, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at";
 
 function rowToDto(r: any): FeedbackDTO {
   return {
@@ -37,6 +43,9 @@ function rowToDto(r: any): FeedbackDTO {
     weightKg: r.weight_kg != null ? Number(r.weight_kg) : null,
     heightCmSnapshot:
       r.height_cm_snapshot != null ? Number(r.height_cm_snapshot) : null,
+    waistCm: r.waist_cm != null ? Number(r.waist_cm) : null,
+    abdomenCm: r.abdomen_cm != null ? Number(r.abdomen_cm) : null,
+    hipCm: r.hip_cm != null ? Number(r.hip_cm) : null,
     adherenceRating: r.adherence_rating,
     resultRating: r.result_rating ?? null,
     notes: r.notes ?? null,
