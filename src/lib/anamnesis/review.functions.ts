@@ -224,8 +224,13 @@ export const getAnamnesisForReview = createServerFn({ method: "POST" })
 
     const json = (row.data ?? {}) as {
       canonical?: { riskFlags?: string[] };
-      raw?: Record<string, unknown>;
+      raw?: unknown;
     };
+
+    // rawAnswers e canonical são serializados como JSON string para evitar
+    // SerializationError no boundary de createServerFn (RPC só aceita JSON-safe).
+    const rawAnswersJson = JSON.stringify(json.raw ?? {});
+    const canonicalJson = JSON.stringify(json.canonical ?? null);
 
     return {
       id: row.id as string,
