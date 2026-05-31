@@ -400,7 +400,7 @@ function Settings() {
         <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-              02 · Link público de convite
+              03 · Link público de convite
             </h2>
             <button
               onClick={loadReferral}
