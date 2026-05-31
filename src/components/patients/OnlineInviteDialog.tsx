@@ -79,11 +79,12 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
   useEffect(() => {
     if (open) {
       const who = patientName ? ` ${patientName}` : "";
+      const from = displayName && displayName !== "Seu nutricionista" ? ` ${displayName}` : "";
       setMessage(
-        `Olá${who}! Aqui está o link para você criar sua conta no FitJourney e começar sua anamnese: `
+        `Olá${who}! Aqui é${from}. Estou te enviando o link para você criar sua conta no FitJourney e começar sua anamnese: `
       );
     }
-  }, [open, patientName]);
+  }, [open, patientName, displayName]);
 
   if (!open) return null;
 
