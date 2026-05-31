@@ -4,7 +4,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Sparkles, Target, ChevronDown, ChevronUp } from "lucide-react";
-import { matchTemplates, calcFromAnamnese, calcMacroTarget } from "@/lib/engine";
+import { matchTemplates } from "@/lib/engine";
+import { runNutritionEnginesManual } from "@/lib/clinical/run-nutrition-engines";
 import type { TemplateMeta, MatchResult, Goal as EngineGoal } from "@/lib/engine";
 import { templates as systemTemplates } from "@/lib/template-data";
 import { PatientPicker } from "./PatientPicker";
@@ -71,18 +72,14 @@ export function TemplateMatcherPanel({
   useEffect(() => {
     if (!patient) return;
     try {
-      const { tdee } = calcFromAnamnese({
+      const goal = patientGoalToEngine(patient.goal);
+      const { target } = runNutritionEnginesManual({
         sex: patient.sex === "M" ? "male" : "female",
         ageYears: patient.age,
         weightKg: patient.weightKg,
         heightCm: patient.heightCm,
         activity: "moderate",
-        goal: patientGoalToEngine(patient.goal),
-      });
-      const target = calcMacroTarget({
-        tdee,
-        weightKg: patient.weightKg,
-        goal: patientGoalToEngine(patient.goal),
+        goal,
       });
       setKcal(target.kcal);
       setProteinG(target.proteinG);
