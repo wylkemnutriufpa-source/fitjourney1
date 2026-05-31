@@ -63,12 +63,10 @@ function rowToDto(r: any): FeedbackDTO {
 
 const SubmitInput = z.object({
   id: z.string().uuid(),
-  weightKg: z
-    .number()
-    .min(20)
-    .max(400)
-    .optional()
-    .nullable(),
+  weightKg: z.number().min(20).max(400).optional().nullable(),
+  waistCm: z.number().min(30).max(250).optional().nullable(),
+  abdomenCm: z.number().min(30).max(250).optional().nullable(),
+  hipCm: z.number().min(30).max(250).optional().nullable(),
   adherenceRating: AdherenceEnum,
   resultRating: ResultEnum.optional().nullable(),
   notes: z.string().trim().max(2000).optional().nullable(),
