@@ -185,6 +185,39 @@ function MyDashboardPage() {
           )}
         </section>
 
+        {/* Plano contratado (financeiro) */}
+        <section
+          aria-labelledby="subscription"
+          className="bg-surface border border-border rounded-lg p-5 space-y-3"
+        >
+          <div className="flex items-center justify-between">
+            <h2
+              id="subscription"
+              className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground"
+            >
+              Plano contratado
+            </h2>
+            <Wallet className="size-3 text-muted-foreground" />
+          </div>
+          {subLoading ? (
+            <p className="text-sm text-muted-foreground">Carregando…</p>
+          ) : !subscription ? (
+            <p className="text-sm text-muted-foreground">
+              Nenhum plano financeiro registrado pelo seu nutricionista.
+            </p>
+          ) : (
+            <SubscriptionInfo
+              planKind={subscription.planKind}
+              status={subscription.status}
+              priceCents={subscription.priceCents}
+              startsAt={subscription.startsAt}
+              endsAt={subscription.endsAt}
+            />
+          )}
+        </section>
+
+
+
         {/* Plano ativo resumido */}
         <section
           aria-labelledby="active-plan"
