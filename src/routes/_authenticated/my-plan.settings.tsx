@@ -6,12 +6,13 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { Save, Loader2, ArrowLeft } from "lucide-react";
+import { Save, Loader2, ArrowLeft, Sun, Moon, Monitor } from "lucide-react";
 import { toast } from "sonner";
 import {
   getMyPatientProfile,
   updateMyPatientProfile,
 } from "@/lib/profile/patient-profile.functions";
+import { getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 
 export const Route = createFileRoute("/_authenticated/my-plan/settings")({
   head: () => ({ meta: [{ title: "Minha conta — FitJourney" }] }),
