@@ -135,6 +135,27 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
           </p>
         </div>
 
+        {/* Cartão de identidade do profissional */}
+        <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/30 bg-primary/5">
+          <div className="size-12 rounded-full bg-background border border-border overflow-hidden flex items-center justify-center shrink-0">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={displayName} className="size-full object-cover" />
+            ) : (
+              <User className="size-5 text-muted-foreground" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Convite de
+            </p>
+            <p className="text-sm font-semibold truncate">{displayName}</p>
+            {profile?.specialty && (
+              <p className="text-[11px] text-muted-foreground truncate">{profile.specialty}</p>
+            )}
+          </div>
+        </div>
+
+
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
