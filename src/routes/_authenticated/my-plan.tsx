@@ -6,9 +6,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
+import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
 import { Clock, AlertTriangle, Info } from "lucide-react";
+import { useMemo } from "react";
+import {
+  getPeriod,
+  periodLabel,
+  pickGreetingMessage,
+  formatTodayPtBr,
+} from "@/lib/patient/greetings";
 
 export const Route = createFileRoute("/_authenticated/my-plan")({
   head: () => ({ meta: [{ title: "Meu Plano — FitJourney" }] }),
@@ -29,11 +37,32 @@ export const Route = createFileRoute("/_authenticated/my-plan")({
 
 function MyPlanPage() {
   const fetchPlan = useServerFn(getMyActivePlan);
+  const fetchProfile = useServerFn(getMyPatientProfile);
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient", "active-plan"],
     queryFn: () => fetchPlan(),
     staleTime: 30_000,
   });
+  const { data: profile } = useQuery({
+    queryKey: ["my-patient-profile"],
+    queryFn: () => fetchProfile(),
+    staleTime: 60_000,
+  });
+
+  // Saudação calculada uma vez por montagem. Sorteia evitando repetir
+  // a última mensagem mostrada (persistido em localStorage).
+  const greeting = useMemo(() => {
+    const now = new Date();
+    const period = getPeriod(now.getHours());
+    return {
+      label: periodLabel(period),
+      message: pickGreetingMessage(period),
+      date: formatTodayPtBr(now),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const firstName = (profile?.fullName ?? "").trim().split(/\s+/)[0] ?? "";
 
   if (isLoading) {
     return (
@@ -75,13 +104,17 @@ function MyPlanPage() {
     <AppShell>
       <div className="space-y-8 max-w-3xl">
         <ClinicalAlerts />
-        <header className="border-b border-border pb-4 space-y-1">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Publicado em {new Date(data.publishedAt).toLocaleDateString("pt-BR")} · {snap.kcal ?? "—"} kcal
+        <header className="border-b border-border pb-5 space-y-2">
+          <p className="text-2xl sm:text-3xl font-bold tracking-tight">
+            {greeting.label}
+            {firstName ? `, ${firstName}` : ""}
           </p>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {snap.name ?? "Meu Plano"}
-          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            {greeting.message}
+          </p>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80 pt-1">
+            {greeting.date}
+          </p>
         </header>
 
         {review?.clinical_warnings?.length > 0 && (

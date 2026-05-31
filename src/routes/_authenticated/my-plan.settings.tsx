@@ -6,12 +6,13 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { Save, Loader2, ArrowLeft } from "lucide-react";
+import { Save, Loader2, ArrowLeft, Sun, Moon, Monitor } from "lucide-react";
 import { toast } from "sonner";
 import {
   getMyPatientProfile,
   updateMyPatientProfile,
 } from "@/lib/profile/patient-profile.functions";
+import { getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 
 export const Route = createFileRoute("/_authenticated/my-plan/settings")({
   head: () => ({ meta: [{ title: "Minha conta — FitJourney" }] }),
@@ -34,6 +35,16 @@ function PatientSettings() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
+  const [theme, setThemeState] = useState<ThemeMode>("system");
+
+  useEffect(() => {
+    setThemeState(getStoredTheme());
+  }, []);
+
+  function changeTheme(mode: ThemeMode) {
+    setThemeState(mode);
+    setTheme(mode);
+  }
 
   useEffect(() => {
     if (data) {
@@ -145,9 +156,45 @@ function PatientSettings() {
           )}
         </section>
 
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
+            02 · Aparência
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Escolha o tema que você prefere. Salvo neste dispositivo.
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {(
+              [
+                { mode: "light", label: "Claro", Icon: Sun },
+                { mode: "dark", label: "Escuro", Icon: Moon },
+                { mode: "system", label: "Sistema", Icon: Monitor },
+              ] as const
+            ).map(({ mode, label, Icon }) => {
+              const active = theme === mode;
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => changeTheme(mode)}
+                  className={
+                    "flex flex-col items-center gap-1.5 py-3 rounded-md border text-xs font-medium transition-colors " +
+                    (active
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40")
+                  }
+                >
+                  <Icon className="size-4" />
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
         <section className="bg-surface border border-border rounded-lg p-6 space-y-3">
           <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-            02 · Dados clínicos
+            03 · Dados clínicos
           </h2>
           <p className="text-sm text-muted-foreground">
             Histórico clínico, condições, medicações e exames são versionados
