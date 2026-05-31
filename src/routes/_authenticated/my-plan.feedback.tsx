@@ -91,6 +91,9 @@ function FeedbackPage() {
 
   // Form state
   const [weight, setWeight] = useState<string>("");
+  const [waist, setWaist] = useState<string>("");
+  const [abdomen, setAbdomen] = useState<string>("");
+  const [hip, setHip] = useState<string>("");
   const [adherence, setAdherence] = useState<AdherenceRating | null>(null);
   const [resultR, setResultR] = useState<ResultRating | null>(null);
   const [notes, setNotes] = useState<string>("");
@@ -99,6 +102,16 @@ function FeedbackPage() {
   const [uploading, setUploading] = useState(false);
   const frontInputRef = useRef<HTMLInputElement>(null);
   const sideInputRef = useRef<HTMLInputElement>(null);
+
+  function parseOptionalCm(s: string): number | null {
+    const t = s.trim().replace(",", ".");
+    if (t === "") return null;
+    const n = Number(t);
+    if (!Number.isFinite(n) || n < 30 || n > 250) {
+      throw new Error("Medida fora do intervalo (30–250 cm).");
+    }
+    return n;
+  }
 
   const submitMutation = useMutation({
     mutationFn: async () => {
