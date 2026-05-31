@@ -53,6 +53,7 @@ const UpdateInput = z.object({
   fullName: z.string().trim().min(1).max(120).optional(),
   phone: PhoneSchema.optional(),
   heightCm: z.number().min(80).max(260).nullable().optional(),
+  avatarUrl: z.string().url().max(1024).nullable().optional(),
 });
 
 export const updateMyPatientProfile = createServerFn({ method: "POST" })
@@ -64,10 +65,12 @@ export const updateMyPatientProfile = createServerFn({ method: "POST" })
       full_name?: string;
       phone?: string | null;
       height_cm?: number | null;
+      avatar_url?: string | null;
     } = {};
     if (data.fullName !== undefined) patch.full_name = data.fullName;
     if (data.phone !== undefined) patch.phone = data.phone === "" ? null : data.phone;
     if (data.heightCm !== undefined) patch.height_cm = data.heightCm;
+    if (data.avatarUrl !== undefined) patch.avatar_url = data.avatarUrl;
 
     if (Object.keys(patch).length === 0) {
       return { ok: true };
