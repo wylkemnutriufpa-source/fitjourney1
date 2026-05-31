@@ -67,7 +67,9 @@ export function buildClinicalContext(
     sourceAnamnesisId: latest?.id ?? null,
   };
 
-  const missing: ClinicalContext["missing"] = [];
+  const missing: Array<
+    "weight" | "goal" | "sex" | "ageYears" | "heightCm" | "activity"
+  > = [];
   if (!weight.current) missing.push("weight");
   if (!goal.current) missing.push("goal");
   if (!demographics.sex) missing.push("sex");
