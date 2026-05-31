@@ -18,6 +18,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
+import { applyTheme, getStoredTheme } from "@/lib/patient/theme";
 
 
 const nutritionistNav = [
