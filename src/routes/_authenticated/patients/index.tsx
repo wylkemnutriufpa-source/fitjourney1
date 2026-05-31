@@ -172,14 +172,14 @@ function Patients() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-1">
-                      <Link
-                        to="/patients/$id/diet"
-                        params={{ id: p.id }}
-                        className="size-8 grid place-items-center rounded hover:bg-background text-muted-foreground hover:text-primary"
-                        title="Montar dieta"
+                      <button
+                        type="button"
+                        disabled
+                        className="size-8 grid place-items-center rounded text-muted-foreground/50 cursor-not-allowed"
+                        title="Disponível após anamnese"
                       >
                         <FileText className="size-4" />
-                      </Link>
+                      </button>
                     </div>
                   </td>
                 </tr>
