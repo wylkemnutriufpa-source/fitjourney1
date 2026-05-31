@@ -330,6 +330,7 @@ function Settings() {
                 />
               </div>
             </div>
+            </>
           )}
         </section>
 
