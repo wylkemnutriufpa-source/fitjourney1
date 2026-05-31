@@ -550,7 +550,7 @@ function PhotoSlot({
   label: string;
   file: File | null;
   onSelect: (f: File | null) => void;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
 }) {
   const [preview, setPreview] = useState<string | null>(null);
   useEffect(() => {
