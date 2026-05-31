@@ -29,10 +29,22 @@ interface Props {
 
 export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
   const getReferral = useServerFn(getOrCreateMyReferralCode);
+  const fetchProfile = useServerFn(getMyNutritionistProfile);
   const [code, setCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [message, setMessage] = useState("");
+
+  const { data: profile } = useQuery({
+    queryKey: ["my-nutritionist-profile"],
+    queryFn: () => fetchProfile(),
+    staleTime: 30_000,
+    enabled: open,
+  });
+
+  const displayName =
+    profile?.displayName?.trim() || profile?.fullName?.trim() || "Seu nutricionista";
+  const avatarUrl = profile?.avatarUrl || null;
 
   const inviteUrl = useMemo(() => {
     if (!code) return "";
