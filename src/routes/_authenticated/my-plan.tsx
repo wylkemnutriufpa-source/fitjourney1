@@ -16,6 +16,8 @@ import {
   periodLabel,
   pickGreetingMessage,
   formatTodayPtBr,
+  pickObjectiveMessage,
+  inferObjectiveFromTag,
 } from "@/lib/patient/greetings";
 
 export const Route = createFileRoute("/_authenticated/my-plan")({
