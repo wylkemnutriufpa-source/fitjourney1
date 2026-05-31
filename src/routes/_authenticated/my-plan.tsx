@@ -1,15 +1,13 @@
 // Patient App — visualização do plano publicado.
 // READ ONLY. Renderização burra. Zero recálculo. Zero normalização.
-// Fonte única: snapshot V3 retornado por getMyActivePlan (public.plans).
-// Renderiza com a mesma riqueza visual do editor do nutricionista
-// (imagem da refeição, kcal, itens, modo de preparo, substituições em modal,
-// orientações nutricionais), porém em modo somente leitura.
+// Mesma riqueza visual do editor do nutricionista, sem edição.
 
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
 import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
+import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
 import {
@@ -19,6 +17,7 @@ import {
   ImageOff,
   Repeat2,
   ChefHat,
+  Scale,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { imgFor } from "@/lib/food-images";
@@ -35,6 +34,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   getPeriod,
   periodLabel,
@@ -65,6 +69,8 @@ function MyPlanPage() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const fetchPlan = useServerFn(getMyActivePlan);
   const fetchProfile = useServerFn(getMyPatientProfile);
+  const fetchFoods = useServerFn(listFoods);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient", "active-plan"],
     queryFn: () => fetchPlan(),
@@ -74,6 +80,11 @@ function MyPlanPage() {
     queryKey: ["my-patient-profile"],
     queryFn: () => fetchProfile(),
     staleTime: 60_000,
+  });
+  const { data: foods } = useQuery({
+    queryKey: ["foods-catalog"],
+    queryFn: () => fetchFoods(),
+    staleTime: 5 * 60_000,
   });
 
   const greeting = useMemo(() => {
@@ -181,9 +192,14 @@ function MyPlanPage() {
             Este plano não possui refeições registradas.
           </p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {meals.map((m, idx) => (
-              <MealCard key={m?.id ?? idx} meal={m} index={idx} />
+              <MealCard
+                key={m?.id ?? idx}
+                meal={m}
+                index={idx}
+                foods={foods}
+              />
             ))}
           </div>
         )}
@@ -204,6 +220,80 @@ function MyPlanPage() {
 }
 
 // ====================================================================
+// Helpers de matching com o catálogo (mesmo padrão do editor do nutri)
+// ====================================================================
+
+function normalizeFoodLabel(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\b(cozido|cozida|grelhado|grelhada|preto|preta|de galinha|hidratada)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function findCatalogFood(
+  foods: FoodDTO[] | undefined,
+  item: { name: string; foodKey?: string | null },
+): FoodDTO | null {
+  if (!foods?.length) return null;
+
+  const itemName = normalizeFoodLabel(item.name);
+  const exactName = foods.find((f) => normalizeFoodLabel(f.name) === itemName);
+  if (exactName) return exactName;
+
+  const aliasMatchers: Array<[RegExp, (foodName: string) => boolean]> = [
+    [/arroz integral/, (n) => n.includes("arroz integral")],
+    [/\barroz\b/, (n) => n.includes("arroz branco")],
+    [/feijao preto/, (n) => n.includes("feijao preto")],
+    [/\bfeijao\b/, (n) => n.includes("feijao carioca")],
+    [/salada|folhas|alface/, (n) => n.includes("alface")],
+    [/fruta sobremesa|\bmaca\b/, (n) => n.includes("maca")],
+    [/\bleite\b/, (n) => n.includes("leite vaca integral")],
+    [/iogurte/, (n) => n.includes("iogurte natural integral")],
+    [/aveia/, (n) => n.includes("aveia")],
+    [/banana|fruta picada/, (n) => n.includes("banana")],
+    [/frango desfiado|frango grelhado|\bfrango\b/, (n) => n.includes("peito frango")],
+    [/tilapia|\bpeixe\b/, (n) => n.includes("tilapia")],
+    [/carne|patinho|alcatra|coxao/, (n) =>
+      n.includes("patinho") || n.includes("alcatra") || n.includes("coxao") || n.includes("carne")],
+    [/queijo branco|queijo minas/, (n) => n.includes("queijo minas")],
+    [/pao integral/, (n) => n.includes("pao integral")],
+    [/pao frances|\bpao\b/, (n) => n.includes("pao frances")],
+    [/macarrao/, (n) => n.includes("macarrao cozido")],
+    [/\bovo\b/, (n) => /\bovo\b/.test(n)],
+    [/goma de tapioca|\btapioca\b/, (n) => n.includes("goma tapioca")],
+    [/\bcuscuz\b/, (n) => n.includes("cuscuz")],
+    [/\bcafe\b/, (n) => n.includes("cafe")],
+    [/\bcha\b/, (n) => n.includes("cha")],
+    [/batata doce/, (n) => n.includes("batata doce")],
+    [/\bbatata\b/, (n) => n.includes("batata")],
+    [/legume|brocolis|cenoura|abobrinha/, (n) =>
+      n.includes("brocolis") || n.includes("cenoura") || n.includes("abobrinha")],
+  ];
+
+  for (const [pat, matchFn] of aliasMatchers) {
+    if (pat.test(itemName)) {
+      const alias = foods.find((f) => matchFn(normalizeFoodLabel(f.name)));
+      if (alias) return alias;
+    }
+  }
+
+  const tokens = itemName.split(" ").filter((t) => t.length >= 4);
+  if (tokens.length) {
+    const partial = foods.find((f) => {
+      const fname = normalizeFoodLabel(f.name);
+      return tokens.some((t) => fname.includes(t));
+    });
+    if (partial) return partial;
+  }
+
+  return null;
+}
+
+// ====================================================================
 // Componentes de renderização burra (read-only)
 // ====================================================================
 
@@ -215,7 +305,15 @@ function mealKcal(option: any): number {
   );
 }
 
-function MealCard({ meal, index }: { meal: any; index: number }) {
+function MealCard({
+  meal,
+  index,
+  foods,
+}: {
+  meal: any;
+  index: number;
+  foods: FoodDTO[] | undefined;
+}) {
   const main = meal?.main ?? {};
   const items: any[] = Array.isArray(main.items) ? main.items : [];
   const equivalents: any[] = Array.isArray(meal?.equivalents)
@@ -225,99 +323,172 @@ function MealCard({ meal, index }: { meal: any; index: number }) {
   const kcal = mealKcal(main);
 
   return (
-    <div className="border border-border rounded-lg overflow-hidden bg-background">
-      <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-0">
-        <div className="relative aspect-square sm:aspect-auto bg-muted min-h-[140px]">
-          {heroUrl ? (
-            <img
-              src={heroUrl}
-              alt={main?.title ?? ""}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0 grid place-items-center text-muted-foreground">
-              <ImageOff className="size-6" />
-            </div>
-          )}
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-            <p className="text-white text-[10px] font-mono">{kcal} kcal</p>
-          </div>
-        </div>
-
-        <div className="p-4 space-y-3">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-base font-semibold">
-              {meal?.label ?? `Refeição ${index + 1}`}
-            </h2>
-            {meal?.time && (
-              <span className="flex items-center gap-1 text-[11px] font-mono text-muted-foreground">
-                <Clock className="size-3" />
-                {meal.time}
-              </span>
-            )}
-          </div>
-
+    <article className="space-y-2">
+      {/* Cabeçalho fora do card — libera espaço da imagem */}
+      <header className="flex items-baseline justify-between gap-3 px-1">
+        <div className="min-w-0">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            {meal?.label ?? `Refeição ${index + 1}`}
+          </p>
           {main?.title && (
-            <p className="text-sm font-medium text-foreground/90">
+            <h2 className="text-base sm:text-lg font-semibold truncate">
               {main.title}
-            </p>
+            </h2>
           )}
+        </div>
+        {meal?.time && (
+          <span className="flex items-center gap-1 text-[11px] font-mono text-muted-foreground shrink-0">
+            <Clock className="size-3" />
+            {meal.time}
+          </span>
+        )}
+      </header>
 
-          <ul className="text-sm space-y-1">
-            {items.map((it, i) => (
-              <li
-                key={it?.id ?? i}
-                className="flex justify-between gap-3 border-b border-border/50 last:border-0 py-1"
-              >
-                <span>{it?.name ?? "—"}</span>
-                <span className="text-muted-foreground tabular-nums text-xs">
-                  {it?.qty} {it?.unit}
-                  {Number.isFinite(it?.kcal) ? ` · ${it.kcal} kcal` : ""}
-                </span>
-              </li>
-            ))}
-            {items.length === 0 && (
-              <li className="text-xs text-muted-foreground italic">
-                Sem alimentos registrados.
-              </li>
+      {/* Card horizontal com imagem menor (não estica) */}
+      <div className="border border-border rounded-lg overflow-hidden bg-background">
+        <div className="grid grid-cols-[112px_1fr] sm:grid-cols-[140px_1fr] gap-0">
+          <div className="relative aspect-square bg-muted">
+            {heroUrl ? (
+              <img
+                src={heroUrl}
+                alt={main?.title ?? ""}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 grid place-items-center text-muted-foreground">
+                <ImageOff className="size-5" />
+              </div>
             )}
-          </ul>
+            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-1.5">
+              <p className="text-white text-[10px] font-mono">{kcal} kcal</p>
+            </div>
+          </div>
 
-          {/* Modo de preparo (collapsable) */}
-          {main?.recipe && (
-            <Accordion type="single" collapsible>
-              <AccordionItem value="recipe" className="border-0">
-                <AccordionTrigger className="py-2 text-xs font-mono uppercase tracking-widest text-primary hover:no-underline">
-                  <span className="inline-flex items-center gap-1.5">
-                    <ChefHat className="size-3.5" /> Modo de preparo
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-sm whitespace-pre-wrap text-muted-foreground leading-relaxed">
-                  {main.recipe}
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          )}
+          <div className="p-3 space-y-2.5">
+            <ul className="text-sm space-y-1">
+              {items.map((it, i) => (
+                <FoodItemReadonlyRow key={it?.id ?? i} item={it} foods={foods} />
+              ))}
+              {items.length === 0 && (
+                <li className="text-xs text-muted-foreground italic">
+                  Sem alimentos registrados.
+                </li>
+              )}
+            </ul>
 
-          {/* Substituições / equivalentes em modal */}
-          {equivalents.length > 0 && (
-            <EquivalentsButton
-              mealLabel={meal?.label ?? `Refeição ${index + 1}`}
-              equivalents={equivalents}
-            />
-          )}
+            {/* Modo de preparo (collapsable) */}
+            {main?.recipe && (
+              <Accordion type="single" collapsible>
+                <AccordionItem value="recipe" className="border-0">
+                  <AccordionTrigger className="py-1.5 text-xs font-mono uppercase tracking-widest text-primary hover:no-underline">
+                    <span className="inline-flex items-center gap-1.5">
+                      <ChefHat className="size-3.5" /> Modo de preparo
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm whitespace-pre-wrap text-muted-foreground leading-relaxed">
+                    {main.recipe}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )}
+
+            {/* Substituições / equivalentes em modal */}
+            {equivalents.length > 0 && (
+              <EquivalentsButton
+                mealLabel={meal?.label ?? `Refeição ${index + 1}`}
+                equivalents={equivalents}
+                foods={foods}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </article>
+  );
+}
+
+function FoodItemReadonlyRow({
+  item,
+  foods,
+}: {
+  item: any;
+  foods: FoodDTO[] | undefined;
+}) {
+  const [open, setOpen] = useState(false);
+  const match = useMemo(
+    () => (item?.name ? findCatalogFood(foods, item) : null),
+    [foods, item?.name, item?.foodKey],
+  );
+  const measures = match?.householdMeasures ?? [];
+  const hasMeasures = measures.length > 0;
+
+  return (
+    <li className="border-b border-border/50 last:border-0">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="w-full flex items-center justify-between gap-3 py-1.5 text-left hover:bg-primary/5 rounded-sm px-1 -mx-1 transition-colors"
+          >
+            <span className="flex items-center gap-1.5 min-w-0">
+              {hasMeasures && (
+                <Scale className="size-3 text-primary/70 shrink-0" />
+              )}
+              <span className="truncate">{item?.name ?? "—"}</span>
+            </span>
+            <span className="text-muted-foreground tabular-nums text-xs shrink-0">
+              {item?.qty} {item?.unit}
+              {Number.isFinite(item?.kcal) ? ` · ${item.kcal} kcal` : ""}
+            </span>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="bottom" align="start" className="w-72 p-3">
+          <div className="space-y-2">
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Medidas caseiras
+              </p>
+              <p className="text-sm font-medium leading-tight">{item?.name}</p>
+            </div>
+
+            {hasMeasures ? (
+              <div className="grid grid-cols-1 gap-1 border-t border-border pt-2">
+                {measures.map((m) => (
+                  <div
+                    key={m.id}
+                    className="text-xs border border-border rounded px-2 py-1 flex items-center justify-between gap-2"
+                  >
+                    <span>{m.measureName}</span>
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      {m.gramsEquivalent} g
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[11px] text-muted-foreground italic border-t border-border pt-2">
+                Sem medidas caseiras cadastradas para este alimento.
+              </p>
+            )}
+
+            <p className="text-[10px] text-muted-foreground pt-1">
+              Use estas medidas como referência para porcionar em casa.
+            </p>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </li>
   );
 }
 
 function EquivalentsButton({
   mealLabel,
   equivalents,
+  foods,
 }: {
   mealLabel: string;
   equivalents: any[];
+  foods: FoodDTO[] | undefined;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -340,7 +511,7 @@ function EquivalentsButton({
         </p>
         <div className="space-y-3 pt-2">
           {equivalents.map((eq, i) => (
-            <EquivalentCard key={eq?.id ?? i} option={eq} />
+            <EquivalentCard key={eq?.id ?? i} option={eq} foods={foods} />
           ))}
         </div>
       </DialogContent>
@@ -348,7 +519,13 @@ function EquivalentsButton({
   );
 }
 
-function EquivalentCard({ option }: { option: any }) {
+function EquivalentCard({
+  option,
+  foods,
+}: {
+  option: any;
+  foods: FoodDTO[] | undefined;
+}) {
   const items: any[] = Array.isArray(option?.items) ? option.items : [];
   const imgUrl = imgFor(option?.imageKey || "");
   const kcal = mealKcal(option);
@@ -379,12 +556,7 @@ function EquivalentCard({ option }: { option: any }) {
           </div>
           <ul className="text-xs space-y-0.5">
             {items.map((it, i) => (
-              <li key={it?.id ?? i} className="flex justify-between gap-2">
-                <span>{it?.name ?? "—"}</span>
-                <span className="text-muted-foreground tabular-nums">
-                  {it?.qty} {it?.unit}
-                </span>
-              </li>
+              <FoodItemReadonlyRow key={it?.id ?? i} item={it} foods={foods} />
             ))}
           </ul>
           {option?.recipe && (
