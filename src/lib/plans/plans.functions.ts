@@ -10,6 +10,8 @@ export type PatientLite = {
   id: string;
   fullName: string;
   email: string;
+  phone: string | null;
+  createdAt: string;
 };
 
 export const listMyPatientsForPlan = createServerFn({ method: "GET" })
@@ -27,7 +29,7 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
 
     const { data, error } = await supabase
       .from("patients")
-      .select("id, full_name, email")
+      .select("id, full_name, email, phone, created_at")
       .eq("nutritionist_id", nutri.id)
       .order("full_name", { ascending: true });
     if (error) throw new Error(error.message);
@@ -36,6 +38,8 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
       id: p.id,
       fullName: p.full_name,
       email: p.email,
+      phone: p.phone ?? null,
+      createdAt: p.created_at,
     }));
   });
 
