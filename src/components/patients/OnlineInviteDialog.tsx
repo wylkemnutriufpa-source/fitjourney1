@@ -38,7 +38,8 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
   const { data: profile } = useQuery({
     queryKey: ["my-nutritionist-profile"],
     queryFn: () => fetchProfile(),
-    staleTime: 30_000,
+    staleTime: 0,
+    refetchOnMount: "always",
     enabled: open,
   });
 
