@@ -1,5 +1,6 @@
 // Tema claro/escuro — preferência do paciente, persistida em localStorage.
-// Aplica classe `dark` no <html>. Sem dependência de cookie/SSR.
+// Base do app é DARK (definido em :root). Quando o usuário escolhe "claro",
+// aplicamos a classe `.light` no <html> que sobrescreve os tokens.
 
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -22,8 +23,10 @@ export function applyTheme(mode: ThemeMode) {
   const prefersDark =
     typeof window !== "undefined" &&
     window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-  const useDark = mode === "dark" || (mode === "system" && prefersDark);
-  root.classList.toggle("dark", useDark);
+  const useLight = mode === "light" || (mode === "system" && !prefersDark);
+  root.classList.toggle("light", useLight);
+  // Compat: também removemos qualquer .dark legado.
+  root.classList.remove("dark");
 }
 
 export function setTheme(mode: ThemeMode) {
