@@ -104,13 +104,17 @@ function MyPlanPage() {
     <AppShell>
       <div className="space-y-8 max-w-3xl">
         <ClinicalAlerts />
-        <header className="border-b border-border pb-4 space-y-1">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Publicado em {new Date(data.publishedAt).toLocaleDateString("pt-BR")} · {snap.kcal ?? "—"} kcal
+        <header className="border-b border-border pb-5 space-y-2">
+          <p className="text-2xl sm:text-3xl font-bold tracking-tight">
+            {greeting.label}
+            {firstName ? `, ${firstName}` : ""}
           </p>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {snap.name ?? "Meu Plano"}
-          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            {greeting.message}
+          </p>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80 pt-1">
+            {greeting.date}
+          </p>
         </header>
 
         {review?.clinical_warnings?.length > 0 && (
