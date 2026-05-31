@@ -1,149 +1,169 @@
 
-# Fase 2 — Motor de Cálculo + Template Matcher
+# Relatório de Impacto — Anamnese Clínica Adaptativa V2
 
-Objetivo: construir o **coração clínico** do FitJourney (TDEE → Macros → Matcher → Validação) sem alterar o layout/editor atual. Tudo determinístico, puro, testável, server-side.
+Escopo solicitado: introduzir uma 2ª via de captura de anamnese (paciente online via convite + nutricionista manual), convergindo num modelo canônico único (`CanonicalAnamnesis`) consumido pelos motores. NÃO substitui a anamnese manual existente.
 
----
-
-## Escopo desta entrega
-
-Entregar 4 blocos **isolados e puros**, prontos para serem plugados depois no fluxo do editor:
-
-1. **TMB/TDEE Engine** — Mifflin-St Jeor + fatores de atividade
-2. **Macro Engine** — distribuição por objetivo (cut/bulk/manutenção)
-3. **Template Matcher** — score ponderado kcal/macros/restrições
-4. **Clinical Gate** — validação pré-publicação
-
-**Não escopo desta fase:** integração visual no editor, UI de seleção de template, recálculo no editor existente. Isso vem em fase posterior, sem desfazer nada.
+Status: **NENHUMA LINHA DE CÓDIGO SERÁ ESCRITA** até aprovação explícita (`APPROVED FOR EXECUTION`).
 
 ---
 
-## Matriz de Impacto
+## 1. Mapeamento da estrutura atual
 
-**Módulo alterado:** novo módulo `phase2/engine` + adição de colunas em `templates` (metadados de matching).
+### 1.1. Tabela `public.anamneses` (já existe)
+- Colunas: `id, patient_id, nutritionist_id, schema_version (int, default 1), data (jsonb), created_at, updated_at`.
+- RLS: nutri lê/escreve/atualiza anamneses dos seus pacientes; paciente lê a própria. Sem DELETE.
+- **Hoje o campo `data` é jsonb livre** — não há schema canônico documentado. A rota `/patients/new` (mock) nem persiste anamnese real; só calcula TMB/GET em memória.
 
-**Tipo:** DDL aditivo (colunas nullable) + código novo puro.
+### 1.2. Consumidores clínicos atuais (motores)
+Mapeados via `rg`:
+- `src/lib/engine/tdee.ts` → `calcFromAnamnese({sex, ageYears, weightKg, heightCm, activity, goal})` — função pura.
+- `src/lib/engine/engine.functions.ts` → `computeNutritionTargets` server fn. **Recebe inputs explícitos via Zod**, NÃO lê `anamneses.data`. Comentário diz "Versão 2 (futura): aceitar patientId".
+- `src/lib/engine/macros.ts` → `calcMacroTarget({tdee, weightKg, goal})`.
+- `src/lib/engine/matcher.ts` → consome `kcal/macros` já calculados, não anamnese crua.
+- `src/components/NutritionTargetCard.tsx` e `TemplateMatcherPanel.tsx` → consomem props já tipadas (`sex/ageYears/...`), não payload bruto.
 
-**Dependências diretas:** nenhuma. Colunas são opcionais, default null. Editor atual ignora.
+**Conclusão crítica:** hoje **nenhum motor lê `anamneses.data` diretamente**. Toda a cadeia já espera o shape canônico mínimo `{sex, ageYears, weightKg, heightCm, activity, goal}`. Isso facilita: introduzir `CanonicalAnamnesis` é formalizar um contrato que já existe de fato.
 
-**Dependências indiretas:** nenhuma. Engines são funções puras server-side, não chamadas pelo render do paciente nem pelo PDF.
+### 1.3. UI atual de captura
+- `/patients/new` — formulário mock (não grava em `anamneses`), usa `calcTMB/calcGET` de `mock-data`.
+- `/patients/$id` — exibe `p.tmb/get/tdee` de `mock-data`, botão "Editar Anamnese" sem destino real.
+- Não existe formulário real persistindo em `public.anamneses` ainda.
 
-**Risco de cascata:** zero. Nada existente lê essas colunas. Nada existente chama os engines.
-
-**Rollback:** drop colunas + delete pasta `src/lib/engine/`.
-
-**Checklist de não-regressão (Templates):**
-- Planos antigos permanecem idênticos (snapshot intacto) — OK, não tocamos em plans
-- Render do plano não faz JOIN com templates — OK, inalterado
-- `source_template_id` continua apenas rastreabilidade — OK
-- Editor atual continua funcional — OK, nenhuma alteração em `templates.tsx`
+### 1.4. Convite/onboarding paciente
+- `referral_codes` tabela já existe + `getOrCreateMyReferralCode` em `nutritionist-profile.functions.ts`.
+- Link público gerado em `/settings`, **mas `/signup/patient?code=…` ainda NÃO existe.**
+- `/patients` (lista) ainda não tem botão "ONLINE" para abrir modal de convite por paciente.
+- `_authenticated.tsx` já tem patient gate redirecionando S3+role=patient para `/my-plan`. **Falta gate para anamnese ausente → forçar `/onboarding/patient`.**
 
 ---
 
-## 1. Schema (migration aditiva)
+## 2. Arquivos afetados
+
+### Criação
+- `src/lib/anamnesis/canonical.schema.ts` — Zod schema do `CanonicalAnamnesis` v1 (cobre os 8 domínios clínicos pedidos).
+- `src/lib/anamnesis/adapters/orbital-to-canonical.ts` — adapter determinístico (paciente online).
+- `src/lib/anamnesis/adapters/manual-to-canonical.ts` — adapter do form manual.
+- `src/lib/anamnesis/anamnesis.functions.ts` — server fns: `submitOnlineAnamnesis`, `submitManualAnamnesis`, `getCanonicalAnamnesis`, `approveAnamnesis`.
+- `src/lib/anamnesis/question-catalog.ts` — catálogo clínico novo (Question com `id/type/title/required/trigger/children[]/clinical_tags[]`), NÃO copia perguntas orbitais cegamente.
+- `src/components/anamnesis/AdaptiveAnamnesisRunner.tsx` — runner que usa a UI orbital (já no zip) como camada de apresentação, mas alimentada pelo novo catálogo.
+- `src/components/patients/OnlineInviteDialog.tsx` — modal "ONLINE" (link, WhatsApp, email, copiar, mensagem editável).
+- `src/lib/signup/patient-signup.functions.ts` — `validateReferralCode`, `consumeReferralCodeAndCreatePatient`.
+- `src/routes/signup/patient.tsx` — rota pública com `?code=…`.
+- `src/routes/_authenticated/onboarding/patient.tsx` — anamnese inicial do paciente recém-cadastrado.
+- `src/routes/_authenticated/patients/$id/anamnesis.tsx` — visualização/edição/aprovação pelo nutri.
+
+### Edição
+- `src/routes/_authenticated/patients/index.tsx` — adicionar botão "ONLINE" abrindo o dialog.
+- `src/routes/_authenticated.tsx` — adicionar gate: paciente sem anamnese aprovada → `/onboarding/patient`.
+- `src/lib/engine/engine.functions.ts` — adicionar overload que aceita `patientId` e resolve `CanonicalAnamnesis` (mantém overload manual atual, retrocompatível).
+- `src/components/NutritionTargetCard.tsx` / `TemplateMatcherPanel.tsx` — sem mudança de contrato (já consomem o shape canônico).
+- `src/routeTree.gen.ts` — auto-gerado.
+
+### NÃO tocar
+- `src/lib/engine/tdee.ts`, `macros.ts`, `matcher.ts`, `clinical-gate.ts` — motores puros permanecem intocados (consomem exatamente o que `CanonicalAnamnesis` exporta).
+- `src/lib/plans/*` — snapshot/publish intactos.
+- `src/lib/profile/nutritionist-profile.functions.ts` — referral code já existe.
+- RLS de `anamneses`, `plans`, `templates`, `patients` — sem mudança.
+
+---
+
+## 3. Migrações necessárias
+
+**Migration única, sem destruir nada:**
 
 ```sql
-ALTER TABLE public.templates
-  ADD COLUMN kcal_target          numeric,
-  ADD COLUMN kcal_range_min       numeric,
-  ADD COLUMN kcal_range_max       numeric,
-  ADD COLUMN protein_g_target     numeric,
-  ADD COLUMN carb_g_target        numeric,
-  ADD COLUMN fat_g_target         numeric,
-  ADD COLUMN meals_per_day        smallint,
-  ADD COLUMN constraints_tags     text[] NOT NULL DEFAULT '{}',
-  ADD COLUMN goal_tag             text;  -- 'cut' | 'bulk' | 'maintain' | null
+-- 1. Versão do schema canônico
+ALTER TABLE public.anamneses
+  ADD COLUMN IF NOT EXISTS origin text
+    CHECK (origin IN ('manual','online','migrated')) DEFAULT 'manual',
+  ADD COLUMN IF NOT EXISTS status text
+    CHECK (status IN ('draft','submitted','approved')) DEFAULT 'draft',
+  ADD COLUMN IF NOT EXISTS approved_at timestamptz,
+  ADD COLUMN IF NOT EXISTS approved_by uuid;
+
+-- 2. Bump schema_version default para 2 (canônico) — linhas antigas ficam em 1
+ALTER TABLE public.anamneses ALTER COLUMN schema_version SET DEFAULT 2;
+
+-- 3. Index para lookup por paciente + status
+CREATE INDEX IF NOT EXISTS idx_anamneses_patient_status
+  ON public.anamneses (patient_id, status);
 ```
 
-Todas nullable (exceto array com default). Templates existentes seguem funcionando. Backfill manual depois.
+**Sem `ON DELETE CASCADE`. Sem alteração de RLS.** Linhas antigas (`schema_version=1`) permanecem legíveis — parser legado preservado.
+
+`referral_codes` já existe e cobre o fluxo de convite. Sem nova tabela.
 
 ---
 
-## 2. Engines (código puro)
+## 4. Riscos
 
-```
-src/lib/engine/
-├── tdee.ts            # mifflin-st jeor + fatores
-├── macros.ts          # distribuição por goal
-├── matcher.ts         # score 40/40/20
-├── clinical-gate.ts   # validações pré-publicação
-├── types.ts           # AnamneseInput, MacroTarget, MatchResult, GateResult
-└── __tests__/         # vitest puro, sem mocks
-    ├── tdee.test.ts
-    ├── macros.test.ts
-    ├── matcher.test.ts
-    └── clinical-gate.test.ts
-```
-
-**Contratos:**
-
-```ts
-// tdee.ts
-type Sex = 'male' | 'female';
-type Activity = 'sedentary' | 'light' | 'moderate' | 'high' | 'extreme';
-calcTMB({ sex, weightKg, heightCm, ageYears }): number
-calcTDEE(tmb, activity): number
-
-// macros.ts
-type Goal = 'cut' | 'bulk' | 'maintain';
-calcMacroTarget({ tdee, weightKg, goal }): { kcal, proteinG, fatG, carbG }
-
-// matcher.ts
-matchTemplates(target: MacroTarget, restrictions: string[], mealsPerDay: number, templates: TemplateMeta[]): MatchResult[]
-// retorna ordenado por score desc, com score: number (0-100), reasons: string[]
-// templates com score < 80 são marcados como `autoSelectable: false`
-
-// clinical-gate.ts
-validatePlan({ snapshot, target, weightKg }): { errors: GateIssue[], warnings: GateIssue[], blocked: boolean }
-// regras: prot > 2.5g/kg, déficit > 25% TDEE, monotonia > 4x/sem, desvio macro > 10%
-```
-
-**Puro:** zero IO, zero supabase, zero React. Só funções → entrada/saída.
+| Risco | Severidade | Mitigação |
+|---|---|---|
+| Motor passar a ler `anamneses.data` e quebrar com row antiga `schema_version=1` | **Alto** | Server fn `getCanonicalAnamnesis` faz roteamento por `schema_version`: v1 → parser legado / null; v2 → canônico. Motor nunca acessa jsonb cru. |
+| Adapter orbital→canônico perder dado clínico | **Médio** | Salvar payload orbital cru em `data.raw_orbital` ao lado do canônico em `data.canonical`. Auditável e reversível. |
+| Convite consumir código duas vezes (race) | **Médio** | `consumeReferralCodeAndCreatePatient` em transação via `supabaseAdmin`, com `UPDATE referral_codes SET status='consumed' WHERE status='active'` e checagem de affected rows. |
+| Gate de anamnese bloquear paciente legítimo já cadastrado antes da V2 | **Alto** | Gate só dispara se NÃO existir nenhuma anamnese (`status IN ('submitted','approved')`) para `patient_id`. Pacientes antigos com anamnese manual em v1 contam como "submitted" (backfill via migration opcional). |
+| Duplicação de regras canônicas (frontend e backend) | **Médio** | Zod schema único em `src/lib/anamnesis/canonical.schema.ts` importado por ambos. |
+| UI orbital alimentar diretamente motor (violação arquitetural) | **Crítico** | Runner só chama `submitOnlineAnamnesis`. Motor só consome via `getCanonicalAnamnesis`. PR-check manual antes do merge. |
 
 ---
 
-## 3. Server function (exposição controlada)
+## 5. Plano de rollback
 
-`src/lib/engine/engine.functions.ts` — uma única serverFn `computeNutritionTargets({ anamneseId })` que:
-- lê anamnese via supabase autenticado
-- roda TDEE → Macros
-- retorna `{ tdee, target }`
-
-Sem efeito colateral. Sem persistência. Sem mudar nada existente.
+1. **Migration**: `ALTER TABLE public.anamneses DROP COLUMN origin, DROP COLUMN status, DROP COLUMN approved_at, DROP COLUMN approved_by; ALTER TABLE ... ALTER COLUMN schema_version SET DEFAULT 1; DROP INDEX idx_anamneses_patient_status;` — não-destrutivo (data preservado).
+2. **Código**: remover diretório `src/lib/anamnesis/`, `src/components/anamnesis/`, rotas `signup/patient.tsx`, `onboarding/patient.tsx`, `patients/$id/anamnesis.tsx`. Reverter overload em `engine.functions.ts`. Reverter botão "ONLINE" e gate em `_authenticated.tsx`.
+3. **Dados**: zero perda — `anamneses.data` continua jsonb livre; rows v2 permanecem legíveis mesmo sem o novo código (apenas não são interpretadas).
+4. **Convites já consumidos**: `referral_codes.status='consumed'` permanece; pacientes criados permanecem (FK `SET NULL`-compatível, não-CASCADE).
 
 ---
 
-## 4. O que NÃO vou fazer
+## 6. Checklist de não-regressão (matriz de impacto)
 
-- Não toco em `src/routes/_authenticated/templates.tsx`
-- Não toco em `src/lib/template-data.ts`
-- Não toco em renderers do paciente
-- Não toco em PDF
-- Não crio UI nova
-- Não altero snapshot/plans
-- Não removo nem renomeio nada
+### Planos
+- [x] Snapshot publicado segue imutável (trigger `plans_snapshot_immutable` intocado).
+- [x] PDF/Patient App não dependem de `anamneses` — renderizam só `plans.snapshot`. Sem regressão.
+
+### Templates
+- [x] Não tocados. `templates.content` intocado.
+
+### Referral/Convites
+- [x] `referral_codes` ganha apenas novo consumidor; estrutura intocada.
+- [x] Pacientes existentes (vinculados via `nutritionist_id`) preservados.
+
+### Onboarding/Anamneses
+- [x] Anamneses v1 legíveis via `schema_version=1` (parser legado retorna `null` canônico, força nutri a re-coletar; opção: backfill manual via UI de edição).
+- [x] Anamneses manuais futuras passam pelo mesmo adapter → canônico v2.
+
+### Auth
+- [x] FK `auth.users` em `patients.auth_user_id` permanece. `cleanup_orphan_auth_user` continua funcional.
+- [x] Novo paciente criado via `signup/patient` segue mesmo padrão de `phase2/signup.functions.ts`.
+
+### Dashboard / PDFs / Pagamentos
+- [x] Não tocados.
+
+### Invariantes
+- [x] Sem `ON DELETE CASCADE`.
+- [x] `plans.snapshot` imutável preservado.
+- [x] Templates não viram fonte de plano.
+- [x] Referral continua histórico.
+- [x] `schema_version` presente em `anamneses` desde sempre, agora explicitamente versionado.
+- [x] PDF é saída.
+- [x] Dashboard read-only.
+- [x] Renderers não recalculam — runner orbital só captura, adapter normaliza no SUBMIT (server-side), motor consome canônico.
+- [x] DAG: UI orbital → adapter → CanonicalAnamnesis → motor → snapshot. Sem ciclo.
 
 ---
 
-## Detalhes técnicos
+## 7. Plano de execução faseado (após aprovação)
 
-- TypeScript strict, funções puras com `Readonly<T>` nos inputs
-- Vitest para todos os engines (TDD-friendly)
-- Fórmulas conferidas: Mifflin-St Jeor padrão, fatores 1.2/1.375/1.55/1.725/1.9
-- Matcher: kcal compatível se |kcal_target - target.kcal| ≤ (range_max - range_min)/2; macros compatíveis se desvio ≤ 10%; restrições: todas devem estar em `constraints_tags`
-- Gate: roda só no servidor, retorna estrutura; UI de exibição vem em fase posterior
+Vou pedir aprovação **uma fase por vez** para minimizar superfície de risco.
 
----
-
-## Próximos passos (fora desta entrega)
-
-1. UI de "Calcular alvo" na anamnese do paciente
-2. UI de "Sugerir template" no fluxo de criação de plano
-3. UI de validação clínica no editor (banner de alerta antes de publicar)
-4. Backfill dos metadados dos templates atuais
-
-Cada um desses entra em PR separado, sem desfazer nada do que existe.
+- **Fase 1 (P0):** Migration + `canonical.schema.ts` + `signup/patient` (rota pública + consumo de convite) + botão "ONLINE" + dialog.
+- **Fase 2 (P1):** Catálogo clínico + adapter manual + runner reaproveitando UI orbital + `/onboarding/patient` + gate em `_authenticated.tsx`.
+- **Fase 3 (P2):** Tela de revisão/aprovação pelo nutri (`/patients/$id/anamnesis`) + overload `computeNutritionTargets(patientId)` lendo `CanonicalAnamnesis`.
 
 ---
 
-**Aprova para eu executar a migration + criar os engines?**
+## Aguardando
+
+Responda **`APPROVED FOR EXECUTION FASE 1`** (ou outra) para eu começar a codar. Qualquer ajuste no escopo acima também é bem-vindo antes da aprovação.
