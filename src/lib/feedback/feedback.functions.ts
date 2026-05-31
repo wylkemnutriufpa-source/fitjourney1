@@ -135,9 +135,7 @@ export const listMyFeedbacks = createServerFn({ method: "GET" })
     if (!patient) return [];
     const { data, error } = await supabase
       .from("patient_feedbacks")
-      .select(
-        "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at",
-      )
+      .select(SELECT_COLS)
       .eq("patient_id", patient.id)
       .order("created_at", { ascending: false })
       .limit(200);
