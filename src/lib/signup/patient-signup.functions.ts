@@ -139,7 +139,7 @@ export const consumeReferralCodeAndCreatePatient = createServerFn({
       .from("referral_codes")
       .update({
         status: "consumed",
-        consumed_by: authUserId,
+        consumed_by: patient.id, // FK → patients(id), não auth.users(id)
         consumed_at: new Date().toISOString(),
       })
       .eq("id", codeRow.id)
