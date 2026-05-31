@@ -64,7 +64,7 @@ export async function resolveIdentityState(
       .maybeSingle(),
     authedSupabase
       .from("patients")
-      .select("id, nutritionist_id")
+      .select("id, nutritionist_id, onboarding_version, onboarding_completed_at")
       .eq("auth_user_id", userId)
       .maybeSingle(),
   ]);
