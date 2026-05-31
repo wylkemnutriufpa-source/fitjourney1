@@ -2,7 +2,7 @@
 // READ ONLY. Renderização burra. Zero recálculo. Zero normalização.
 // Fonte única: snapshot V3 retornado por getMyActivePlan (public.plans).
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
@@ -38,6 +38,7 @@ export const Route = createFileRoute("/_authenticated/my-plan")({
 });
 
 function MyPlanPage() {
+  const path = useRouterState({ select: (s) => s.location.pathname });
   const fetchPlan = useServerFn(getMyActivePlan);
   const fetchProfile = useServerFn(getMyPatientProfile);
   const { data, isLoading, error } = useQuery({
@@ -76,6 +77,10 @@ function MyPlanPage() {
     return pickObjectiveMessage(inferObjectiveFromTag(tag));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.id]);
+
+  if (path !== "/my-plan") {
+    return <Outlet />;
+  }
 
   if (isLoading) {
     return (
