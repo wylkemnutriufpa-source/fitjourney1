@@ -12,6 +12,23 @@ export const Route = createFileRoute("/_authenticated/patients/")({
   component: Patients,
 });
 
+function initialsFromName(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("") || "P";
+}
+
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }).format(new Date(value));
+}
+
 function Patients() {
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const { data: patients = [], isLoading, error } = useQuery({
