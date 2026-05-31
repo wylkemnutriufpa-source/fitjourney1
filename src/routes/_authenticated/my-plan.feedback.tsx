@@ -121,6 +121,9 @@ function FeedbackPage() {
       if (weightNum !== null && (!Number.isFinite(weightNum) || weightNum <= 0)) {
         throw new Error("Peso inválido.");
       }
+      const waistNum = parseOptionalCm(waist);
+      const abdomenNum = parseOptionalCm(abdomen);
+      const hipNum = parseOptionalCm(hip);
 
       // Precisamos do patient_id para o path do storage.
       const { data: userData } = await supabase.auth.getUser();
