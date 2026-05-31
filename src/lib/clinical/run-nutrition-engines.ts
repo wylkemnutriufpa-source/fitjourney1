@@ -21,7 +21,12 @@
 
 import { calcTMB, calcTDEE } from "@/lib/engine/tdee";
 import { calcMacroTarget } from "@/lib/engine/macros";
-import type { Goal, NutritionTargets } from "@/lib/engine/types";
+import type {
+  ActivityLevel,
+  Goal,
+  NutritionTargets,
+  Sex,
+} from "@/lib/engine/types";
 import type { GoalKind } from "./resolve-goal";
 import type { ClinicalContext } from "./context";
 
