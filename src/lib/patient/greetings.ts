@@ -99,3 +99,125 @@ export function formatTodayPtBr(d = new Date()): string {
     month: "long",
   });
 }
+
+// -------------------------------------------------------------------
+// Banco de mensagens por objetivo clínico.
+// Mostradas como linha "premium" abaixo da saudação.
+// Determinístico-rotacional via localStorage (anti-repetição).
+// -------------------------------------------------------------------
+
+export type Objective =
+  | "emagrecimento"
+  | "hipertrofia"
+  | "gestante"
+  | "diabetes"
+  | "manutencao"
+  | "performance"
+  | "geral";
+
+const OBJECTIVE_MESSAGES: Record<Objective, ReadonlyArray<string>> = {
+  emagrecimento: [
+    "Cada escolha de hoje aproxima você da meta.",
+    "Déficit não é privação — é direção.",
+    "O resultado aparece quando a constância vira hábito.",
+    "Você não está cortando comida, está escolhendo prioridade.",
+    "Magro de verdade é quem mantém. E manter começa hoje.",
+  ],
+  hipertrofia: [
+    "Alimentação é parte do treino.",
+    "Músculo se constrói na cozinha tanto quanto na academia.",
+    "Proteína em cada refeição. Sem exceção.",
+    "Volume hoje, força amanhã.",
+    "Treinou pesado? Coma à altura.",
+  ],
+  gestante: [
+    "Cuidar da alimentação é cuidar de dois corpos.",
+    "Cada nutriente importa — pra você e pra ele(a).",
+    "Hidratação, ferro e cálcio: tripé desta fase.",
+    "Comer com calma também é cuidar.",
+    "Você está construindo uma vida inteira. Vá com gentileza.",
+  ],
+  diabetes: [
+    "Consistência gera estabilidade.",
+    "Glicemia estável é qualidade de vida.",
+    "Refeição na hora certa vale tanto quanto o que está no prato.",
+    "Pequenos ajustes, grandes diferenças no dia.",
+    "Conhecer seu corpo é metade do controle.",
+  ],
+  manutencao: [
+    "Manter é uma vitória silenciosa.",
+    "O que você conquistou merece ser preservado.",
+    "Equilíbrio é o objetivo mais difícil — e o seu.",
+    "Cada dia mantendo é um dia escolhendo de novo.",
+  ],
+  performance: [
+    "Combustível certo, resultado certo.",
+    "Recuperação começa no garfo.",
+    "Atleta é quem cuida fora do treino.",
+    "Timing nutricional faz diferença no desempenho.",
+  ],
+  geral: [
+    "Seu plano é seu mapa. Siga um passo de cada vez.",
+    "Pequenas escolhas repetidas geram grandes resultados.",
+    "Hoje é mais uma chance de seguir o combinado.",
+  ],
+};
+
+const OBJ_STORAGE_KEY = "fitjourney.patient.lastObjMsg.v1";
+
+type StoredObj = { objective: Objective; index: number };
+
+function readLastObj(): StoredObj | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(OBJ_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredObj;
+    if (parsed && typeof parsed.index === "number" && parsed.objective) {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function writeLastObj(s: StoredObj) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(OBJ_STORAGE_KEY, JSON.stringify(s));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function pickObjectiveMessage(objective: Objective): string {
+  const pool = OBJECTIVE_MESSAGES[objective] ?? OBJECTIVE_MESSAGES.geral;
+  if (pool.length === 0) return "";
+  const last = readLastObj();
+  let candidate = Math.floor(Math.random() * pool.length);
+  if (last && last.objective === objective && pool.length > 1) {
+    let safety = 5;
+    while (candidate === last.index && safety-- > 0) {
+      candidate = Math.floor(Math.random() * pool.length);
+    }
+  }
+  writeLastObj({ objective, index: candidate });
+  return pool[candidate];
+}
+
+/**
+ * Heurística pura — não infere dados clínicos, apenas mapeia rótulos
+ * de objetivo/goal_tag conhecidos para a categoria de mensagem.
+ */
+export function inferObjectiveFromTag(tag: string | null | undefined): Objective {
+  if (!tag) return "geral";
+  const t = tag.toLowerCase();
+  if (t.includes("emagre") || t.includes("perda") || t.includes("cut")) return "emagrecimento";
+  if (t.includes("hipertr") || t.includes("massa") || t.includes("bulk")) return "hipertrofia";
+  if (t.includes("gestan") || t.includes("gravid") || t.includes("trimestre")) return "gestante";
+  if (t.includes("diabet") || t.includes("glic")) return "diabetes";
+  if (t.includes("manut")) return "manutencao";
+  if (t.includes("perform") || t.includes("atlet") || t.includes("endurance")) return "performance";
+  return "geral";
+}
