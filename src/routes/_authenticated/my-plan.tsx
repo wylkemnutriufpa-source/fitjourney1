@@ -102,6 +102,17 @@ function MyPlanPage() {
   const meals: any[] = Array.isArray(snap.meals) ? snap.meals : [];
   const review = snap.clinical_review;
 
+  // Mensagem premium por objetivo. Deriva do snapshot existente — sem inferência clínica.
+  const objectiveMsg = useMemo(() => {
+    const tag: string | null =
+      snap?.template?.goal_tag ??
+      snap?.goal_tag ??
+      snap?.objective ??
+      null;
+    return pickObjectiveMessage(inferObjectiveFromTag(tag));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.id]);
+
   return (
     <AppShell>
       <div className="space-y-8 max-w-3xl">
@@ -114,6 +125,11 @@ function MyPlanPage() {
           <p className="text-sm sm:text-base text-muted-foreground">
             {greeting.message}
           </p>
+          {objectiveMsg && (
+            <p className="text-xs sm:text-sm text-primary/90 italic">
+              {objectiveMsg}
+            </p>
+          )}
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80 pt-1">
             {greeting.date}
           </p>
