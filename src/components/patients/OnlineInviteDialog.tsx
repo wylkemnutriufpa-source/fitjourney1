@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import {
   X,
   Copy,
@@ -12,9 +13,13 @@ import {
   Mail,
   Loader2,
   Check,
+  User,
 } from "lucide-react";
 import { toast } from "sonner";
-import { getOrCreateMyReferralCode } from "@/lib/profile/nutritionist-profile.functions";
+import {
+  getOrCreateMyReferralCode,
+  getMyNutritionistProfile,
+} from "@/lib/profile/nutritionist-profile.functions";
 
 interface Props {
   open: boolean;
