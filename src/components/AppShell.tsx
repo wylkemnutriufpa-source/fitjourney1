@@ -17,15 +17,21 @@ import {
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
+import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 
 
-const nav = [
+const nutritionistNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/patients", label: "Pacientes", icon: Users },
   { to: "/anamneses", label: "Anamneses", icon: ClipboardList, badgeKey: "pending-anamneses" as const },
   { to: "/templates", label: "Templates", icon: FileStack },
   { to: "/settings", label: "Configurações", icon: Settings },
-];
+] as const;
+
+const patientNav = [
+  { to: "/my-plan", label: "Meu Plano", icon: LayoutDashboard },
+  { to: "/my-plan/settings", label: "Configurações", icon: Settings },
+] as const;
 
 function Crumbs() {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -108,13 +114,24 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
+  // Identity → determina qual nav exibir. Patient nunca pode ver nav de nutri.
+  const fetchIdentity = useServerFn(getMyIdentityState);
+  const { data: identity } = useQuery({
+    queryKey: ["identity-state"],
+    queryFn: () => fetchIdentity(),
+    staleTime: 60_000,
+    enabled: mounted,
+  });
+  const isPatient = identity?.role === "patient";
+  const nav = isPatient ? patientNav : nutritionistNav;
+
   // Badge de anamneses pendentes (silencioso para não-nutri: retorna 0).
   const fetchPending = useServerFn(getMyPendingAnamnesesCount);
   const { data: pending } = useQuery({
     queryKey: ["nav", "pending-anamneses"],
     queryFn: () => fetchPending(),
     staleTime: 30_000,
-    enabled: mounted,
+    enabled: mounted && !isPatient,
   });
 
   async function handleSignOut() {
