@@ -254,8 +254,8 @@ export const getAnamnesisForReview = createServerFn({ method: "POST" })
             birthDate: (patient.birth_date as string | null) ?? null,
           }
         : null,
-      rawAnswers: json.raw ?? {},
-      canonical: json.canonical ?? null,
+      rawAnswersJson,
+      canonicalJson,
     };
   });
 
