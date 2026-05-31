@@ -195,6 +195,14 @@ function Patients() {
           </table>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={() => setInviteOpen(true)}
+        className="md:hidden fixed bottom-4 right-4 z-30 bg-primary text-primary-foreground text-xs font-semibold py-3 px-4 flex items-center gap-2 rounded-full shadow-lg shadow-primary/25 hover:bg-primary/90"
+      >
+        <Share2 className="size-4" />
+        Convite Online
+      </button>
       <OnlineInviteDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
     </AppShell>
   );
