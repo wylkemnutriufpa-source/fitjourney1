@@ -10,23 +10,27 @@
 // 2. Sem inferência. Sem fallback silencioso. Campos ausentes = null.
 // 3. Estado degradado é EXPLÍCITO: `ready` indica se motores podem rodar.
 // 4. Zero IO. Zero React. Zero Supabase. Server fn faz o fetch e chama esta função.
+// 5. ClinicalContext NÃO carrega histórico. Apenas o estado atual. Timeline é
+//    projeção separada (read-only), nunca é fonte de cálculo (invariante #5).
 
 import type { Sex, ActivityLevel } from "@/lib/engine/types";
 import {
   resolveCurrentWeight,
   type WeightReading,
-  type ResolvedWeight,
 } from "./resolve-weight";
 import {
   resolveGoal,
   type ApprovedAnamnesisInput,
-  type ResolvedGoal,
+  type ClinicalGoal,
 } from "./resolve-goal";
+
+export type CurrentWeight = WeightReading;
+export type CurrentGoal = ClinicalGoal;
 
 export interface ClinicalContext {
   readonly patientId: string;
-  readonly weight: ResolvedWeight;
-  readonly goal: ResolvedGoal;
+  readonly currentWeight: CurrentWeight | null;
+  readonly currentGoal: CurrentGoal | null;
   readonly demographics: {
     readonly sex: Sex | null;
     readonly ageYears: number | null;
@@ -50,8 +54,8 @@ export interface BuildClinicalContextInput {
 export function buildClinicalContext(
   input: BuildClinicalContextInput,
 ): ClinicalContext {
-  const weight = resolveCurrentWeight(input.weightReadings);
-  const goal = resolveGoal(input.approvedAnamneses);
+  const currentWeight = resolveCurrentWeight(input.weightReadings).current;
+  const currentGoal = resolveGoal(input.approvedAnamneses).current;
 
   const latest =
     [...input.approvedAnamneses].sort(
@@ -70,8 +74,8 @@ export function buildClinicalContext(
   const missing: Array<
     "weight" | "goal" | "sex" | "ageYears" | "heightCm" | "activity"
   > = [];
-  if (!weight.current) missing.push("weight");
-  if (!goal.current) missing.push("goal");
+  if (!currentWeight) missing.push("weight");
+  if (!currentGoal) missing.push("goal");
   if (!demographics.sex) missing.push("sex");
   if (demographics.ageYears == null) missing.push("ageYears");
   if (demographics.heightCm == null) missing.push("heightCm");
@@ -79,8 +83,8 @@ export function buildClinicalContext(
 
   return {
     patientId: input.patientId,
-    weight,
-    goal,
+    currentWeight,
+    currentGoal,
     demographics,
     ready: missing.length === 0,
     missing,
