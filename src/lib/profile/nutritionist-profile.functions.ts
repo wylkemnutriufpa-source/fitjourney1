@@ -1,7 +1,6 @@
-// Nutritionist self profile — read & update.
-// Soberania: o profissional edita seus próprios dados (full_name, crn, email).
-// Escrita usa supabaseAdmin (service_role) — alinhado ao lockdown da Fase 2
-// onde o role authenticated não tem mais UPDATE direto em public.nutritionists.
+// Nutritionist self profile — read, upsert, referral code.
+// Soberania: o profissional edita seus próprios dados.
+// Escrita usa supabaseAdmin (service_role) — alinhado ao lockdown da Fase 2.
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -13,15 +12,19 @@ export interface MyNutritionistProfile {
   fullName: string;
   email: string;
   crn: string | null;
+  specialty: string | null;
+  phone: string | null;
 }
 
 export const getMyNutritionistProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<MyNutritionistProfile | null> => {
-    const { supabase, userId } = context;
-    const { data, error } = await supabase
+    const { userId } = context;
+    // Usa admin para enxergar mesmo perfis criados por outros caminhos
+    // (admin que ainda não tem row, fluxo de onboarding pendente, etc.).
+    const { data, error } = await supabaseAdmin
       .from("nutritionists")
-      .select("id, full_name, email, crn")
+      .select("id, full_name, email, crn, specialty, phone")
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -31,6 +34,8 @@ export const getMyNutritionistProfile = createServerFn({ method: "GET" })
       fullName: data.full_name,
       email: data.email,
       crn: data.crn,
+      specialty: data.specialty,
+      phone: data.phone,
     };
   });
 
@@ -44,6 +49,14 @@ const UpdateInput = z.object({
     .optional()
     .or(z.literal("").transform(() => undefined)),
   email: z.string().trim().email().max(255),
+  specialty: z.string().trim().max(120).optional().or(z.literal("").transform(() => undefined)),
+  phone: z
+    .string()
+    .trim()
+    .max(32)
+    .regex(/^[0-9+()\-\s]*$/, "Telefone inválido")
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
 });
 
 export const updateMyNutritionistProfile = createServerFn({ method: "POST" })
@@ -51,21 +64,97 @@ export const updateMyNutritionistProfile = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => UpdateInput.parse(input))
   .handler(async ({ data, context }): Promise<MyNutritionistProfile> => {
     const { userId } = context;
-    const { data: updated, error } = await supabaseAdmin
+
+    // Upsert por auth_user_id (constraint unique existe).
+    // Garante que admins/usuários sem row ainda consigam materializar o perfil.
+    const { data: upserted, error } = await supabaseAdmin
       .from("nutritionists")
-      .update({
-        full_name: data.fullName,
-        crn: data.crn ?? null,
-        email: data.email,
-      })
-      .eq("auth_user_id", userId)
-      .select("id, full_name, email, crn")
+      .upsert(
+        {
+          auth_user_id: userId,
+          full_name: data.fullName,
+          crn: data.crn ?? null,
+          email: data.email,
+          specialty: data.specialty ?? null,
+          phone: data.phone ?? null,
+        },
+        { onConflict: "auth_user_id" }
+      )
+      .select("id, full_name, email, crn, specialty, phone")
       .single();
-    if (error) throw new Error(`Failed to update profile: ${error.message}`);
+    if (error) throw new Error(`Failed to save profile: ${error.message}`);
     return {
-      id: updated.id,
-      fullName: updated.full_name,
-      email: updated.email,
-      crn: updated.crn,
+      id: upserted.id,
+      fullName: upserted.full_name,
+      email: upserted.email,
+      crn: upserted.crn,
+      specialty: upserted.specialty,
+      phone: upserted.phone,
     };
+  });
+
+// Gera (ou recupera) um código de convite ativo do nutricionista logado.
+// Usado para gerar a URL pública que o paciente usa no cadastro.
+export interface MyReferralCode {
+  code: string;
+  createdAt: string;
+}
+
+function generateCode(): string {
+  // 8 chars, alfanumérico maiúsculo, sem caracteres ambíguos.
+  const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let out = "";
+  for (let i = 0; i < 8; i++) {
+    out += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+  return out;
+}
+
+export const getOrCreateMyReferralCode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<MyReferralCode | null> => {
+    const { userId } = context;
+
+    // Garante que existe um nutritionist row para este auth user.
+    const { data: nutri, error: nutriErr } = await supabaseAdmin
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (nutriErr) throw new Error(nutriErr.message);
+    if (!nutri) return null;
+
+    // Tenta reaproveitar um código ativo existente.
+    const { data: existing, error: existingErr } = await supabaseAdmin
+      .from("referral_codes")
+      .select("code, created_at")
+      .eq("nutritionist_id", nutri.id)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (existingErr) throw new Error(existingErr.message);
+    if (existing) {
+      return { code: existing.code, createdAt: existing.created_at };
+    }
+
+    // Cria um novo código.
+    let lastErr: string | null = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = generateCode();
+      const { data: created, error: insertErr } = await supabaseAdmin
+        .from("referral_codes")
+        .insert({
+          code,
+          nutritionist_id: nutri.id,
+          status: "active",
+        })
+        .select("code, created_at")
+        .single();
+      if (!insertErr && created) {
+        return { code: created.code, createdAt: created.created_at };
+      }
+      lastErr = insertErr?.message ?? "unknown";
+    }
+    throw new Error(`Failed to create referral code: ${lastErr}`);
   });
