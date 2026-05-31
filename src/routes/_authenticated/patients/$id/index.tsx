@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { getPatient } from "@/lib/mock-data";
 import { NutritionTargetCard } from "@/components/NutritionTargetCard";
+import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { Edit3, FileText, ChevronRight, MessageSquareHeart } from "lucide-react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -209,6 +210,10 @@ function PatientProfile() {
                   : "maintain"
             }
           />
+        </section>
+
+        <section>
+          <SubscriptionEditor patientId={p.id} />
         </section>
       </div>
     </AppShell>

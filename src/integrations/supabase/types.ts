@@ -368,6 +368,60 @@ export type Database = {
         }
         Relationships: []
       }
+      patient_subscriptions: {
+        Row: {
+          created_at: string
+          currency: string
+          ends_at: string | null
+          id: string
+          notes: string | null
+          nutritionist_id: string
+          patient_id: string
+          payment_method:
+            | Database["public"]["Enums"]["subscription_payment_method"]
+            | null
+          plan_kind: Database["public"]["Enums"]["subscription_plan_kind"]
+          price_cents: number
+          starts_at: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          ends_at?: string | null
+          id?: string
+          notes?: string | null
+          nutritionist_id: string
+          patient_id: string
+          payment_method?:
+            | Database["public"]["Enums"]["subscription_payment_method"]
+            | null
+          plan_kind: Database["public"]["Enums"]["subscription_plan_kind"]
+          price_cents: number
+          starts_at: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          ends_at?: string | null
+          id?: string
+          notes?: string | null
+          nutritionist_id?: string
+          patient_id?: string
+          payment_method?:
+            | Database["public"]["Enums"]["subscription_payment_method"]
+            | null
+          plan_kind?: Database["public"]["Enums"]["subscription_plan_kind"]
+          price_cents?: number
+          starts_at?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       patients: {
         Row: {
           auth_user_id: string
@@ -668,6 +722,20 @@ export type Database = {
       food_source: "taco" | "ibge" | "custom"
       plan_status: "draft" | "published" | "archived"
       referral_code_status: "active" | "consumed" | "revoked" | "expired"
+      subscription_payment_method:
+        | "pix"
+        | "card"
+        | "cash"
+        | "transfer"
+        | "boleto"
+        | "other"
+      subscription_plan_kind:
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "annual"
+        | "custom"
+      subscription_status: "active" | "paused" | "expired" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -809,6 +877,22 @@ export const Constants = {
       food_source: ["taco", "ibge", "custom"],
       plan_status: ["draft", "published", "archived"],
       referral_code_status: ["active", "consumed", "revoked", "expired"],
+      subscription_payment_method: [
+        "pix",
+        "card",
+        "cash",
+        "transfer",
+        "boleto",
+        "other",
+      ],
+      subscription_plan_kind: [
+        "monthly",
+        "quarterly",
+        "semiannual",
+        "annual",
+        "custom",
+      ],
+      subscription_status: ["active", "paused", "expired", "cancelled"],
     },
   },
 } as const

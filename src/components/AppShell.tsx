@@ -14,6 +14,7 @@ import {
   X,
   ClipboardList,
   MessageSquareHeart,
+  DollarSign,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
@@ -28,6 +29,7 @@ const nutritionistNav = [
   { to: "/patients", label: "Pacientes", icon: Users },
   { to: "/anamneses", label: "Anamneses", icon: ClipboardList, badgeKey: "pending-anamneses" as const },
   { to: "/templates", label: "Templates", icon: FileStack },
+  { to: "/financeiro", label: "Financeiro", icon: DollarSign },
   { to: "/settings", label: "Configurações", icon: Settings },
 ] as const;
 
