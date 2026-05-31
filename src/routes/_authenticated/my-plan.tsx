@@ -63,6 +63,8 @@ function MyPlanPage() {
   }, []);
 
   const firstName = (profile?.fullName ?? "").trim().split(/\s+/)[0] ?? "";
+
+  if (isLoading) {
     return (
       <AppShell>
         <p className="text-sm text-muted-foreground">Carregando seu plano…</p>
