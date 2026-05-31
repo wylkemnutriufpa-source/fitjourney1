@@ -306,15 +306,16 @@ export const reviewAnamnesis = createServerFn({ method: "POST" })
       );
     }
 
-    const patch: Record<string, unknown> = {
+    const nowIso = new Date().toISOString();
+    const basePatch = {
       review_status: data.decision,
-      reviewed_at: new Date().toISOString(),
+      reviewed_at: nowIso,
       review_notes: data.notes ?? null,
     };
-    if (data.decision === "approved") {
-      patch.approved_by = userId;
-      patch.approved_at = new Date().toISOString();
-    }
+    const patch =
+      data.decision === "approved"
+        ? { ...basePatch, approved_by: userId, approved_at: nowIso }
+        : basePatch;
 
     const { error: upErr } = await supabase
       .from("anamneses")

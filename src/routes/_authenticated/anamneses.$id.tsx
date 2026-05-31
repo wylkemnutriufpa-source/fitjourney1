@@ -169,7 +169,7 @@ function AnamnesisDetailPage() {
               </h2>
               <div className="rounded-lg border border-border bg-muted/20 p-4 overflow-x-auto">
                 <pre className="text-xs leading-relaxed whitespace-pre-wrap break-words">
-                  {JSON.stringify(data.rawAnswers, null, 2)}
+                  {prettyJson(data.rawAnswersJson)}
                 </pre>
               </div>
             </section>
