@@ -1,0 +1,1 @@
+ALTER TABLE public.anamneses DROP CONSTRAINT IF EXISTS anamneses_review_status_chk;
