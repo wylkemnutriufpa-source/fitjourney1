@@ -36,6 +36,10 @@ function Settings() {
   });
 
   const [fullName, setFullName] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [crn, setCrn] = useState("");
   const [email, setEmail] = useState("");
   const [specialty, setSpecialty] = useState("");
@@ -45,6 +49,8 @@ function Settings() {
   useEffect(() => {
     if (profile) {
       setFullName(profile.fullName ?? "");
+      setDisplayName(profile.displayName ?? "");
+      setAvatarUrl(profile.avatarUrl ?? null);
       setCrn(profile.crn ?? "");
       setEmail(profile.email ?? "");
       setSpecialty(profile.specialty ?? "");
