@@ -78,6 +78,12 @@ function MyDashboardPage() {
     queryFn: () => fetchClinical(),
     staleTime: 30_000,
   });
+  const fetchSubscription = useServerFn(getMyActiveSubscription);
+  const { data: subscription, isLoading: subLoading } = useQuery({
+    queryKey: ["patient", "active-subscription"],
+    queryFn: () => fetchSubscription(),
+    staleTime: 30_000,
+  });
 
   const greeting = useMemo(() => {
     const now = new Date();
