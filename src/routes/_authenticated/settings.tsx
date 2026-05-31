@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, Copy, Link2, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   getMyNutritionistProfile,
   updateMyNutritionistProfile,
+  getOrCreateMyReferralCode,
 } from "@/lib/profile/nutritionist-profile.functions";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -18,9 +19,14 @@ export const Route = createFileRoute("/_authenticated/settings")({
 const inputCls =
   "w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary disabled:opacity-60";
 
+function onlyDigits(s: string) {
+  return s.replace(/\D+/g, "");
+}
+
 function Settings() {
   const fetchProfile = useServerFn(getMyNutritionistProfile);
   const updateProfile = useServerFn(updateMyNutritionistProfile);
+  const getReferral = useServerFn(getOrCreateMyReferralCode);
 
   const { data: profile, isLoading, refetch } = useQuery({
     queryKey: ["my-nutritionist-profile"],
@@ -31,19 +37,56 @@ function Settings() {
   const [fullName, setFullName] = useState("");
   const [crn, setCrn] = useState("");
   const [email, setEmail] = useState("");
+  const [specialty, setSpecialty] = useState("");
+  const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (profile) {
-      setFullName(profile.fullName);
+      setFullName(profile.fullName ?? "");
       setCrn(profile.crn ?? "");
-      setEmail(profile.email);
+      setEmail(profile.email ?? "");
+      setSpecialty(profile.specialty ?? "");
+      setPhone(profile.phone ?? "");
     }
   }, [profile]);
 
-  const [notify, setNotify] = useState(true);
-  const [reminders, setReminders] = useState(true);
-  const [weekly, setWeekly] = useState(false);
+  // Referral / invite link
+  const [referral, setReferral] = useState<{ code: string } | null>(null);
+  const [loadingRef, setLoadingRef] = useState(false);
+
+  async function loadReferral() {
+    setLoadingRef(true);
+    try {
+      const r = await getReferral();
+      setReferral(r);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao gerar link de convite");
+    } finally {
+      setLoadingRef(false);
+    }
+  }
+
+  // Tenta carregar/gerar quando o perfil estiver pronto.
+  useEffect(() => {
+    if (profile && !referral && !loadingRef) {
+      void loadReferral();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
+
+  const inviteUrl = useMemo(() => {
+    if (!referral) return "";
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "";
+    return `${origin}/signup/patient?code=${referral.code}`;
+  }, [referral]);
+
+  const waUrl = useMemo(() => {
+    const d = onlyDigits(phone);
+    if (!d) return "";
+    return `https://wa.me/${d}`;
+  }, [phone]);
 
   async function handleSave() {
     if (!fullName.trim() || !email.trim()) {
@@ -57,14 +100,27 @@ function Settings() {
           fullName: fullName.trim(),
           crn: crn.trim() || undefined,
           email: email.trim(),
+          specialty: specialty.trim() || undefined,
+          phone: phone.trim() || undefined,
         },
       });
       toast.success("Configurações salvas");
       await refetch();
+      if (!referral) void loadReferral();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao salvar");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function copy(text: string, label: string) {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`${label} copiado`);
+    } catch {
+      toast.error("Não foi possível copiar");
     }
   }
 
@@ -96,7 +152,7 @@ function Settings() {
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Carregando perfil…</p>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   Nome completo
@@ -120,7 +176,42 @@ function Settings() {
                   placeholder="CRN-3 12345"
                 />
               </div>
-              <div className="space-y-1.5 col-span-2">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Especialidade
+                </label>
+                <input
+                  className={inputCls}
+                  value={specialty}
+                  onChange={(e) => setSpecialty(e.target.value)}
+                  disabled={saving}
+                  placeholder="Esportiva, Clínica, Materno-infantil…"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Telefone / WhatsApp
+                </label>
+                <input
+                  className={inputCls}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  disabled={saving}
+                  placeholder="+55 11 99999-9999"
+                />
+                {waUrl && (
+                  <a
+                    href={waUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-[11px] text-primary hover:underline mt-1"
+                  >
+                    <MessageCircle className="size-3" />
+                    {waUrl}
+                  </a>
+                )}
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   Email
                 </label>
@@ -136,43 +227,54 @@ function Settings() {
           )}
         </section>
 
-        <section className="bg-surface border border-border rounded-lg p-6 space-y-3">
-          <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-            02 · Notificações
-          </h2>
-          <p className="text-xs text-muted-foreground -mt-1">
-            Preferências locais (ainda não persistidas).
-          </p>
-          {[
-            { l: "Notificações por email", d: "Novos resultados e atualizações", v: notify, set: setNotify },
-            { l: "Lembretes de consulta", d: "Avisar 24h antes de cada atendimento", v: reminders, set: setReminders },
-            { l: "Relatório semanal", d: "Resumo da base toda segunda às 08:00", v: weekly, set: setWeekly },
-          ].map((t) => (
-            <label
-              key={t.l}
-              className="flex items-center justify-between p-4 border border-border rounded-md bg-background cursor-pointer"
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
+              02 · Link público de convite
+            </h2>
+            <button
+              onClick={loadReferral}
+              disabled={loadingRef || !profile}
+              className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
-              <div>
-                <p className="text-sm font-medium">{t.l}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{t.d}</p>
+              {loadingRef ? "Gerando..." : "Atualizar"}
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground -mt-1">
+            Compartilhe este link com novos pacientes. Eles entram pelo link e ficam
+            vinculados automaticamente ao seu cadastro.
+          </p>
+          {!profile ? (
+            <p className="text-xs text-muted-foreground">
+              Salve seu perfil antes para liberar o link de convite.
+            </p>
+          ) : !referral ? (
+            <p className="text-xs text-muted-foreground">
+              {loadingRef ? "Gerando link…" : "Nenhum link disponível."}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 p-3 border border-border rounded-md bg-background">
+                <Link2 className="size-4 text-primary shrink-0" />
+                <code className="text-xs flex-1 truncate">{inviteUrl}</code>
+                <button
+                  onClick={() => copy(inviteUrl, "Link")}
+                  className="text-[10px] font-mono uppercase tracking-widest px-2 py-1 border border-border rounded hover:border-primary/40"
+                >
+                  <Copy className="size-3" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => t.set(!t.v)}
-                className={
-                  "relative w-11 h-6 rounded-full transition-colors " +
-                  (t.v ? "bg-primary" : "bg-border")
-                }
-              >
-                <span
-                  className={
-                    "absolute top-0.5 size-5 rounded-full bg-background transition-all " +
-                    (t.v ? "left-[22px]" : "left-0.5")
-                  }
-                />
-              </button>
-            </label>
-          ))}
+              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <span className="font-mono">Código: {referral.code}</span>
+                <button
+                  onClick={() => copy(referral.code, "Código")}
+                  className="underline hover:text-foreground"
+                >
+                  copiar código
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </AppShell>

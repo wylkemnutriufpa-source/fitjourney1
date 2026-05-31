@@ -8,8 +8,10 @@ import {
   ChevronRight,
   ShieldCheck,
   ArrowLeft,
+  Menu,
+  X,
 } from "lucide-react";
-import { type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 
 
@@ -33,11 +35,11 @@ function Crumbs() {
     diet: "Dieta",
   };
   return (
-    <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+    <div className="flex items-center gap-2 font-mono text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground min-w-0">
       {segs.map((s, i) => (
-        <span key={i} className="flex items-center gap-2">
-          {i > 0 && <ChevronRight className="size-3 opacity-50" />}
-          <span className={i === segs.length - 1 ? "text-foreground" : ""}>
+        <span key={i} className="flex items-center gap-2 min-w-0">
+          {i > 0 && <ChevronRight className="size-3 opacity-50 shrink-0" />}
+          <span className={"truncate " + (i === segs.length - 1 ? "text-foreground" : "")}>
             {labelMap[s] ?? s}
           </span>
         </span>
@@ -50,10 +52,8 @@ function BackButton() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const router = useRouter();
   const navigate = useNavigate();
-  // Esconde no dashboard (raiz) e na home pública.
   if (path === "/" || path === "/dashboard") return null;
   function goBack() {
-    // Se houver histórico no SPA, volta; senão sobe um nível.
     if (typeof window !== "undefined" && window.history.length > 1) {
       router.history.back();
       return;
@@ -68,7 +68,7 @@ function BackButton() {
       className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
     >
       <ArrowLeft className="size-3.5" />
-      Voltar
+      <span className="hidden sm:inline">Voltar</span>
     </button>
   );
 }
@@ -83,6 +83,20 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   const initials = email.slice(0, 2).toUpperCase();
   const displayName = email.split("@")[0];
 
+  // Sidebar: aberto por padrão em desktop, fechado em mobile.
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return window.innerWidth >= 768;
+  });
+
+  // Fecha sidebar automaticamente ao navegar em telas mobile.
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path]);
+
   async function handleSignOut() {
     await signOut();
     navigate({ to: "/" });
@@ -90,15 +104,38 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <aside className="fixed left-0 top-0 z-50 h-full w-64 border-r border-border bg-sidebar px-4 py-6 flex flex-col">
-        <Link to="/dashboard" className="flex items-center gap-3 px-2 mb-10">
-          <div className="size-8 bg-primary rounded-sm grid place-items-center">
-            <div className="size-4 border-2 border-background rotate-45" />
-          </div>
-          <span className="text-lg font-bold tracking-tight uppercase italic">
-            FitJourney
-          </span>
-        </Link>
+      {/* Backdrop mobile */}
+      {sidebarOpen && (
+        <button
+          aria-label="Fechar menu"
+          onClick={() => setSidebarOpen(false)}
+          className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        />
+      )}
+
+      <aside
+        className={
+          "fixed left-0 top-0 z-50 h-full w-64 border-r border-border bg-sidebar px-4 py-6 flex flex-col transition-transform duration-200 " +
+          (sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0 md:w-0 md:px-0 md:border-r-0 md:overflow-hidden")
+        }
+      >
+        <div className="flex items-center justify-between gap-2 px-2 mb-10">
+          <Link to="/dashboard" className="flex items-center gap-3">
+            <div className="size-8 bg-primary rounded-sm grid place-items-center">
+              <div className="size-4 border-2 border-background rotate-45" />
+            </div>
+            <span className="text-lg font-bold tracking-tight uppercase italic">
+              FitJourney
+            </span>
+          </Link>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            title="Recolher menu"
+            className="md:hidden p-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
 
         <nav className="space-y-1 flex-1">
           {nav.map((item) => {
@@ -131,16 +168,23 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         </button>
       </aside>
 
-      <div className="pl-64">
-        <header className="h-16 border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
-          <div className="flex items-center gap-3">
+      <div className={sidebarOpen ? "md:pl-64" : "md:pl-0"}>
+        <header className="h-16 border-b border-border flex items-center justify-between gap-3 px-4 sm:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <button
+              onClick={() => setSidebarOpen((v) => !v)}
+              title={sidebarOpen ? "Recolher menu" : "Expandir menu"}
+              className="p-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+            >
+              <Menu className="size-4" />
+            </button>
             <BackButton />
             <Crumbs />
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {header}
-            <div className="text-right">
+            <div className="text-right hidden sm:block">
               <p className="text-xs font-medium flex items-center gap-1.5 justify-end">
                 {displayName}
                 {isAdmin && (
@@ -150,16 +194,16 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                   </span>
                 )}
               </p>
-              <p className="text-[10px] text-muted-foreground font-mono uppercase">
+              <p className="text-[10px] text-muted-foreground font-mono uppercase truncate max-w-[200px]">
                 {email}
               </p>
             </div>
-            <div className="size-10 rounded-full bg-surface border border-border grid place-items-center text-xs font-mono">
+            <div className="size-9 sm:size-10 rounded-full bg-surface border border-border grid place-items-center text-xs font-mono shrink-0">
               {initials}
             </div>
           </div>
         </header>
-        <main className="p-8 max-w-7xl mx-auto">{children ?? <Outlet />}</main>
+        <main className="p-4 sm:p-8 max-w-7xl mx-auto">{children ?? <Outlet />}</main>
       </div>
     </div>
   );
