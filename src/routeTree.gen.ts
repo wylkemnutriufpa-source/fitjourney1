@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SignupPatientRouteImport } from './routes/signup/patient'
 import { Route as SignupNutritionistRouteImport } from './routes/signup/nutritionist'
 import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
 import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
@@ -30,6 +31,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupPatientRoute = SignupPatientRouteImport.update({
+  id: '/signup/patient',
+  path: '/signup/patient',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupNutritionistRoute = SignupNutritionistRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/templates': typeof AuthenticatedTemplatesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
+  '/signup/patient': typeof SignupPatientRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/templates': typeof AuthenticatedTemplatesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
+  '/signup/patient': typeof SignupPatientRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
+  '/signup/patient': typeof SignupPatientRoute
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/auth/check-email'
     | '/signup/nutritionist'
+    | '/signup/patient'
     | '/onboarding/nutritionist'
     | '/patients/new'
     | '/patients/'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/auth/check-email'
     | '/signup/nutritionist'
+    | '/signup/patient'
     | '/onboarding/nutritionist'
     | '/patients/new'
     | '/patients'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/_authenticated/templates'
     | '/auth/check-email'
     | '/signup/nutritionist'
+    | '/signup/patient'
     | '/_authenticated/onboarding/nutritionist'
     | '/_authenticated/patients/new'
     | '/_authenticated/patients/'
@@ -188,6 +200,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthCheckEmailRoute: typeof AuthCheckEmailRoute
   SignupNutritionistRoute: typeof SignupNutritionistRoute
+  SignupPatientRoute: typeof SignupPatientRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/patient': {
+      id: '/signup/patient'
+      path: '/signup/patient'
+      fullPath: '/signup/patient'
+      preLoaderRoute: typeof SignupPatientRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup/nutritionist': {
@@ -320,17 +340,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthCheckEmailRoute: AuthCheckEmailRoute,
   SignupNutritionistRoute: SignupNutritionistRoute,
+  SignupPatientRoute: SignupPatientRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
