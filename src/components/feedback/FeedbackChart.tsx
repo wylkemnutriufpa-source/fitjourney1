@@ -207,8 +207,8 @@ export function FeedbackChart({
               >
                 <defs>
                   <linearGradient id="weightFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
@@ -289,10 +289,10 @@ export function FeedbackChart({
                     yAxisId="weight"
                     type="monotone"
                     dataKey="weight"
-                    stroke="hsl(var(--primary))"
+                    stroke="var(--primary)"
                     strokeWidth={2.5}
                     fill="url(#weightFill)"
-                    dot={{ r: 3, fill: "hsl(var(--primary))" }}
+                    dot={{ r: 3, fill: "var(--primary)" }}
                     activeDot={{ r: 5 }}
                     isAnimationActive
                   />
