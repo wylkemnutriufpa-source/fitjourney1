@@ -39,14 +39,24 @@ function PatientProfile() {
   return (
     <AppShell
       header={
-        <Link
-          to="/patients/$id/diet"
-          params={{ id: p.id }}
-          className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
-        >
-          <FileText className="size-3.5" />
-          Montar Dieta
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/patients/$id/feedbacks"
+            params={{ id: p.id }}
+            className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+          >
+            <MessageSquareHeart className="size-3.5" />
+            Feedbacks
+          </Link>
+          <Link
+            to="/patients/$id/diet"
+            params={{ id: p.id }}
+            className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+          >
+            <FileText className="size-3.5" />
+            Montar Dieta
+          </Link>
+        </div>
       }
     >
       <div className="space-y-10">
