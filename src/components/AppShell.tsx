@@ -32,6 +32,7 @@ const nutritionistNav = [
 ] as const;
 
 const patientNav = [
+  { to: "/my-dashboard", label: "Início", icon: LayoutDashboard },
   { to: "/my-plan", label: "Meu Plano", icon: LayoutDashboard },
   { to: "/my-plan/feedback", label: "Feedback", icon: MessageSquareHeart, badgeKey: "feedback-pending" as const },
   { to: "/my-plan/settings", label: "Configurações", icon: Settings },
@@ -127,7 +128,11 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     staleTime: 60_000,
     enabled: mounted && !!user?.id,
   });
-  const isPatientRoute = path === "/my-plan" || path.startsWith("/my-plan/");
+  const isPatientRoute =
+    path === "/my-dashboard" ||
+    path.startsWith("/my-dashboard/") ||
+    path === "/my-plan" ||
+    path.startsWith("/my-plan/");
   const isPatient = identity?.role === "patient" || isPatientRoute;
   const nav = isPatient ? patientNav : nutritionistNav;
 

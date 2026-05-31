@@ -47,7 +47,7 @@ function PatientOnboardingPage() {
     setError(null);
     try {
       await submit({ data: { answers } });
-      navigate({ to: "/my-plan", replace: true });
+      navigate({ to: "/my-dashboard", replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha ao enviar anamnese.");
       setSubmitting(false);
