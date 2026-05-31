@@ -259,6 +259,7 @@ function PatientSettings() {
                 </p>
               </div>
             </div>
+            </>
           )}
         </section>
 
