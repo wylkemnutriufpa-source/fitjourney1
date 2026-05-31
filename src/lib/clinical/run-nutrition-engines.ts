@@ -21,7 +21,12 @@
 
 import { calcTMB, calcTDEE } from "@/lib/engine/tdee";
 import { calcMacroTarget } from "@/lib/engine/macros";
-import type { Goal, NutritionTargets } from "@/lib/engine/types";
+import type {
+  ActivityLevel,
+  Goal,
+  NutritionTargets,
+  Sex,
+} from "@/lib/engine/types";
 import type { GoalKind } from "./resolve-goal";
 import type { ClinicalContext } from "./context";
 
@@ -70,4 +75,41 @@ export function runNutritionEngines(
   const target = calcMacroTarget({ tdee, weightKg, goal: engineGoal });
 
   return { tmb, tdee, target, clinicalGoalKind, engineGoal };
+}
+
+// ---------------------------------------------------------------------------
+// Manual calculator path
+//
+// Cenários NÃO clínicos: calculadora do nutricionista, simulações "what-if",
+// pré-visualizações de template. Não há paciente real / ClinicalContext.
+// Mesmo assim, motores puros (calcTMB/calcTDEE/calcMacroTarget) NÃO devem ser
+// chamados diretamente pela aplicação — passam por aqui. Engine público
+// continua sendo "ClinicalContext-only" para fluxos clínicos.
+// ---------------------------------------------------------------------------
+
+export interface ManualEngineInput {
+  readonly sex: Sex;
+  readonly ageYears: number;
+  readonly weightKg: number;
+  readonly heightCm: number;
+  readonly activity: ActivityLevel;
+  readonly goal: Goal;
+}
+
+export function runNutritionEnginesManual(
+  input: ManualEngineInput,
+): NutritionTargets {
+  const tmb = calcTMB({
+    sex: input.sex,
+    weightKg: input.weightKg,
+    heightCm: input.heightCm,
+    ageYears: input.ageYears,
+  });
+  const tdee = calcTDEE(tmb, input.activity);
+  const target = calcMacroTarget({
+    tdee,
+    weightKg: input.weightKg,
+    goal: input.goal,
+  });
+  return { tmb, tdee, target };
 }

@@ -1,13 +1,15 @@
 // Phase 2 — Server fn de exposição controlada do motor.
-// Lê anamnese do paciente (RLS aplica como o nutricionista logado),
-// extrai inputs e retorna TMB/TDEE + macros alvo.
-// Sem persistência. Sem efeito colateral.
+// Adapter `runNutritionEnginesManual` é o ÚNICO ponto que chama os motores
+// puros (calcTMB/calcTDEE/calcMacroTarget). Esta server fn é a versão
+// "calculadora manual": recebe inputs explícitos do nutricionista, sem
+// envolver ClinicalContext (que é o caminho clínico real).
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { calcFromAnamnese } from "./tdee";
-import { calcMacroTarget } from "./macros";
+import {
+  runNutritionEnginesManual,
+} from "@/lib/clinical/run-nutrition-engines";
 import type {
   ActivityLevel,
   Goal,
@@ -37,16 +39,11 @@ const ManualInputSchema = z.object({
 
 export type ComputeTargetsInput = z.infer<typeof ManualInputSchema>;
 
-/**
- * Calcula alvos nutricionais a partir de dados manuais (anamnese parcial).
- * Versão 1: inputs explícitos. Versão 2 (futura): aceitar `patientId` e
- * resolver a partir da anamnese persistida.
- */
 export const computeNutritionTargets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ManualInputSchema.parse(input))
   .handler(async ({ data }): Promise<NutritionTargets> => {
-    const { tmb, tdee } = calcFromAnamnese({
+    return runNutritionEnginesManual({
       sex: data.sex as Sex,
       ageYears: data.ageYears,
       weightKg: data.weightKg,
@@ -54,10 +51,4 @@ export const computeNutritionTargets = createServerFn({ method: "POST" })
       activity: data.activity as ActivityLevel,
       goal: data.goal as Goal,
     });
-    const target = calcMacroTarget({
-      tdee,
-      weightKg: data.weightKg,
-      goal: data.goal as Goal,
-    });
-    return { tmb, tdee, target };
   });

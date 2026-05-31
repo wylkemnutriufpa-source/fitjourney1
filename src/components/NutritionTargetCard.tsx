@@ -5,12 +5,11 @@
 import { useMemo, useState } from "react";
 import { Calculator } from "lucide-react";
 import {
-  calcFromAnamnese,
-  calcMacroTarget,
   type ActivityLevel,
   type Goal,
   type Sex,
 } from "@/lib/engine";
+import { runNutritionEnginesManual } from "@/lib/clinical/run-nutrition-engines";
 
 interface Props {
   readonly sex: Sex;
@@ -52,7 +51,7 @@ export function NutritionTargetCard({
 
   const result = useMemo(() => {
     try {
-      const { tmb, tdee } = calcFromAnamnese({
+      const { tmb, tdee, target } = runNutritionEnginesManual({
         sex,
         ageYears,
         weightKg,
@@ -60,7 +59,6 @@ export function NutritionTargetCard({
         activity,
         goal,
       });
-      const target = calcMacroTarget({ tdee, weightKg, goal });
       return { tmb, tdee, target, error: null as string | null };
     } catch (e) {
       return {
