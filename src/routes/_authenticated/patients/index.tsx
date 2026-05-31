@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { patients, type Goal } from "@/lib/mock-data";
-import { Plus, Search, ArrowUpRight, FileText, Share2 } from "lucide-react";
+import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
+import { Plus, Search, ArrowUpRight, FileText, Share2, Loader2 } from "lucide-react";
 import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
@@ -10,20 +12,28 @@ export const Route = createFileRoute("/_authenticated/patients/")({
   component: Patients,
 });
 
-const goals: ("Todos" | Goal)[] = ["Todos", "Performance", "Hipertrofia", "Emagrecimento", "Manutenção"];
-
 function Patients() {
+  const fetchPatients = useServerFn(listMyPatientsForPlan);
+  const { data: patients = [], isLoading, error } = useQuery({
+    queryKey: ["patients-index"],
+    queryFn: () => fetchPatients(),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
   const [q, setQ] = useState("");
-  const [goal, setGoal] = useState<(typeof goals)[number]>("Todos");
   const [inviteOpen, setInviteOpen] = useState(false);
 
   const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
     return patients.filter((p) => {
-      const okQ = p.name.toLowerCase().includes(q.toLowerCase()) || p.sport.toLowerCase().includes(q.toLowerCase());
-      const okG = goal === "Todos" || p.goal === goal;
-      return okQ && okG;
+      if (!term) return true;
+      return (
+        p.fullName.toLowerCase().includes(term) ||
+        p.email.toLowerCase().includes(term) ||
+        (p.phone ?? "").toLowerCase().includes(term)
+      );
     });
-  }, [q, goal]);
+  }, [patients, q]);
 
   return (
     <AppShell
