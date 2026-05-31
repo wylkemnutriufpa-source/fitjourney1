@@ -158,7 +158,7 @@ function Patients() {
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 font-mono text-muted-foreground hidden lg:table-cell">
+                  <td className="p-4 font-mono text-muted-foreground hidden md:table-cell">
                     {p.phone ?? "Sem telefone"}
                   </td>
                   <td className="p-4 font-mono text-muted-foreground hidden lg:table-cell">
