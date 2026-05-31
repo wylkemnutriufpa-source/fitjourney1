@@ -12,6 +12,7 @@ export interface MyPatientProfile {
   phone: string | null;
   birthDate: string | null;
   heightCm: number | null;
+  avatarUrl: string | null;
 }
 
 export const getMyPatientProfile = createServerFn({ method: "POST" })
@@ -20,7 +21,7 @@ export const getMyPatientProfile = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("patients")
-      .select("id, full_name, email, phone, birth_date, height_cm")
+      .select("id, full_name, email, phone, birth_date, height_cm, avatar_url")
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -32,6 +33,7 @@ export const getMyPatientProfile = createServerFn({ method: "POST" })
       phone: data.phone ?? null,
       birthDate: data.birth_date ?? null,
       heightCm: data.height_cm != null ? Number(data.height_cm) : null,
+      avatarUrl: data.avatar_url ?? null,
     };
   });
 
