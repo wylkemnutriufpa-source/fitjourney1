@@ -16,30 +16,42 @@ export type Database = {
     Tables: {
       anamneses: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           data: Json
           id: string
           nutritionist_id: string | null
+          origin: string
           patient_id: string
           schema_version: number
+          status: string
           updated_at: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           data: Json
           id?: string
           nutritionist_id?: string | null
+          origin?: string
           patient_id: string
           schema_version?: number
+          status?: string
           updated_at?: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           data?: Json
           id?: string
           nutritionist_id?: string | null
+          origin?: string
           patient_id?: string
           schema_version?: number
+          status?: string
           updated_at?: string
         }
         Relationships: [
