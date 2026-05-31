@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { patients, type Goal } from "@/lib/mock-data";
-import { Plus, Search, ArrowUpRight, FileText } from "lucide-react";
+import { Plus, Search, ArrowUpRight, FileText, Share2 } from "lucide-react";
+import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
   head: () => ({ meta: [{ title: "Pacientes — FitJourney" }] }),
@@ -14,6 +15,7 @@ const goals: ("Todos" | Goal)[] = ["Todos", "Performance", "Hipertrofia", "Emagr
 function Patients() {
   const [q, setQ] = useState("");
   const [goal, setGoal] = useState<(typeof goals)[number]>("Todos");
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   const filtered = useMemo(() => {
     return patients.filter((p) => {
@@ -26,13 +28,23 @@ function Patients() {
   return (
     <AppShell
       header={
-        <Link
-          to="/patients/new"
-          className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
-        >
-          <Plus className="size-3.5" />
-          Adicionar Paciente
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setInviteOpen(true)}
+            className="bg-surface border border-border text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:border-primary hover:text-primary transition-colors"
+          >
+            <Share2 className="size-3.5" />
+            ONLINE
+          </button>
+          <Link
+            to="/patients/new"
+            className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+          >
+            <Plus className="size-3.5" />
+            Adicionar Paciente
+          </Link>
+        </div>
       }
     >
       <div className="space-y-8">
