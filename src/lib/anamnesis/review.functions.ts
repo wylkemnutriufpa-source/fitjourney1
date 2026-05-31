@@ -129,6 +129,30 @@ export const submitPatientAnamnesisUpdate = createServerFn({ method: "POST" })
 
 // ---------------- listAnamnesesForNutritionist ----------------
 
+// ---------------- getMyPendingAnamnesesCount ----------------
+// Safe para qualquer role. Pacientes / sem nutri vinculado → 0.
+// Usado pelo sidebar do nutricionista para o badge da fila.
+
+export const getMyPendingAnamnesesCount = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!nutri) return { pendingCount: 0 };
+    const { count } = await supabase
+      .from("anamneses")
+      .select("id", { count: "exact", head: true })
+      .eq("nutritionist_id", nutri.id)
+      .eq("review_status", "submitted");
+    return { pendingCount: count ?? 0 };
+  });
+
+// ---------------- listAnamnesesForNutritionist ----------------
+
 const ListInput = z.object({
   status: z.enum(["submitted", "needs_changes", "approved", "all"]).default("submitted"),
 });
