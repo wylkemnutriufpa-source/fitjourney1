@@ -319,9 +319,11 @@ export type Database = {
       }
       patient_feedbacks: {
         Row: {
+          abdomen_cm: number | null
           adherence_rating: string
           created_at: string
           height_cm_snapshot: number | null
+          hip_cm: number | null
           id: string
           notes: string | null
           nutritionist_id: string
@@ -329,12 +331,15 @@ export type Database = {
           photo_front_path: string | null
           photo_side_path: string | null
           result_rating: string | null
+          waist_cm: number | null
           weight_kg: number | null
         }
         Insert: {
+          abdomen_cm?: number | null
           adherence_rating: string
           created_at?: string
           height_cm_snapshot?: number | null
+          hip_cm?: number | null
           id?: string
           notes?: string | null
           nutritionist_id: string
@@ -342,12 +347,15 @@ export type Database = {
           photo_front_path?: string | null
           photo_side_path?: string | null
           result_rating?: string | null
+          waist_cm?: number | null
           weight_kg?: number | null
         }
         Update: {
+          abdomen_cm?: number | null
           adherence_rating?: string
           created_at?: string
           height_cm_snapshot?: number | null
+          hip_cm?: number | null
           id?: string
           notes?: string | null
           nutritionist_id?: string
@@ -355,6 +363,7 @@ export type Database = {
           photo_front_path?: string | null
           photo_side_path?: string | null
           result_rating?: string | null
+          waist_cm?: number | null
           weight_kg?: number | null
         }
         Relationships: []
