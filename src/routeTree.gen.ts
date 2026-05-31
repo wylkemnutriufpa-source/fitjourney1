@@ -20,6 +20,7 @@ import { Route as AuthenticatedMyPlanRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients/index'
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients/new'
+import { Route as AuthenticatedOnboardingPatientRouteImport } from './routes/_authenticated/onboarding/patient'
 import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './routes/_authenticated/onboarding/nutritionist'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
 import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
@@ -80,6 +81,12 @@ const AuthenticatedPatientsNewRoute =
     path: '/patients/new',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedOnboardingPatientRoute =
+  AuthenticatedOnboardingPatientRouteImport.update({
+    id: '/onboarding/patient',
+    path: '/onboarding/patient',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedOnboardingNutritionistRoute =
   AuthenticatedOnboardingNutritionistRouteImport.update({
     id: '/onboarding/nutritionist',
@@ -109,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
+  '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
@@ -124,6 +132,7 @@ export interface FileRoutesByTo {
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
+  '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
@@ -141,6 +150,7 @@ export interface FileRoutesById {
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
+  '/_authenticated/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
   '/_authenticated/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/onboarding/nutritionist'
+    | '/onboarding/patient'
     | '/patients/new'
     | '/patients/'
     | '/patients/$id/diet'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/onboarding/nutritionist'
+    | '/onboarding/patient'
     | '/patients/new'
     | '/patients'
     | '/patients/$id/diet'
@@ -189,6 +201,7 @@ export interface FileRouteTypes {
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/_authenticated/onboarding/nutritionist'
+    | '/_authenticated/onboarding/patient'
     | '/_authenticated/patients/new'
     | '/_authenticated/patients/'
     | '/_authenticated/patients/$id/diet'
@@ -282,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPatientsNewRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/onboarding/patient': {
+      id: '/_authenticated/onboarding/patient'
+      path: '/onboarding/patient'
+      fullPath: '/onboarding/patient'
+      preLoaderRoute: typeof AuthenticatedOnboardingPatientRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/onboarding/nutritionist': {
       id: '/_authenticated/onboarding/nutritionist'
       path: '/onboarding/nutritionist'
@@ -312,6 +332,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
   AuthenticatedOnboardingNutritionistRoute: typeof AuthenticatedOnboardingNutritionistRoute
+  AuthenticatedOnboardingPatientRoute: typeof AuthenticatedOnboardingPatientRoute
   AuthenticatedPatientsNewRoute: typeof AuthenticatedPatientsNewRoute
   AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
   AuthenticatedPatientsIdDietRoute: typeof AuthenticatedPatientsIdDietRoute
@@ -325,6 +346,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
   AuthenticatedOnboardingNutritionistRoute:
     AuthenticatedOnboardingNutritionistRoute,
+  AuthenticatedOnboardingPatientRoute: AuthenticatedOnboardingPatientRoute,
   AuthenticatedPatientsNewRoute: AuthenticatedPatientsNewRoute,
   AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
   AuthenticatedPatientsIdDietRoute: AuthenticatedPatientsIdDietRoute,
@@ -345,13 +367,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

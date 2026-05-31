@@ -1,169 +1,231 @@
 
-# Relatório de Impacto — Anamnese Clínica Adaptativa V2
+# Onboarding Paciente + Anamnese Clínica Adaptativa V2 — REVISÃO
 
-Escopo solicitado: introduzir uma 2ª via de captura de anamnese (paciente online via convite + nutricionista manual), convergindo num modelo canônico único (`CanonicalAnamnesis`) consumido pelos motores. NÃO substitui a anamnese manual existente.
-
-Status: **NENHUMA LINHA DE CÓDIGO SERÁ ESCRITA** até aprovação explícita (`APPROVED FOR EXECUTION`).
+Incorpora os 10 acréscimos. Marquei o que entra **AGORA (Fase 1)**, o que entra **como schema preparado (sem UI)** e o que fica **explicitamente para depois**.
 
 ---
 
-## 1. Mapeamento da estrutura atual
+## Decisões sobre os 10 pontos
 
-### 1.1. Tabela `public.anamneses` (já existe)
-- Colunas: `id, patient_id, nutritionist_id, schema_version (int, default 1), data (jsonb), created_at, updated_at`.
-- RLS: nutri lê/escreve/atualiza anamneses dos seus pacientes; paciente lê a própria. Sem DELETE.
-- **Hoje o campo `data` é jsonb livre** — não há schema canônico documentado. A rota `/patients/new` (mock) nem persiste anamnese real; só calcula TMB/GET em memória.
-
-### 1.2. Consumidores clínicos atuais (motores)
-Mapeados via `rg`:
-- `src/lib/engine/tdee.ts` → `calcFromAnamnese({sex, ageYears, weightKg, heightCm, activity, goal})` — função pura.
-- `src/lib/engine/engine.functions.ts` → `computeNutritionTargets` server fn. **Recebe inputs explícitos via Zod**, NÃO lê `anamneses.data`. Comentário diz "Versão 2 (futura): aceitar patientId".
-- `src/lib/engine/macros.ts` → `calcMacroTarget({tdee, weightKg, goal})`.
-- `src/lib/engine/matcher.ts` → consome `kcal/macros` já calculados, não anamnese crua.
-- `src/components/NutritionTargetCard.tsx` e `TemplateMatcherPanel.tsx` → consomem props já tipadas (`sex/ageYears/...`), não payload bruto.
-
-**Conclusão crítica:** hoje **nenhum motor lê `anamneses.data` diretamente**. Toda a cadeia já espera o shape canônico mínimo `{sex, ageYears, weightKg, heightCm, activity, goal}`. Isso facilita: introduzir `CanonicalAnamnesis` é formalizar um contrato que já existe de fato.
-
-### 1.3. UI atual de captura
-- `/patients/new` — formulário mock (não grava em `anamneses`), usa `calcTMB/calcGET` de `mock-data`.
-- `/patients/$id` — exibe `p.tmb/get/tdee` de `mock-data`, botão "Editar Anamnese" sem destino real.
-- Não existe formulário real persistindo em `public.anamneses` ainda.
-
-### 1.4. Convite/onboarding paciente
-- `referral_codes` tabela já existe + `getOrCreateMyReferralCode` em `nutritionist-profile.functions.ts`.
-- Link público gerado em `/settings`, **mas `/signup/patient?code=…` ainda NÃO existe.**
-- `/patients` (lista) ainda não tem botão "ONLINE" para abrir modal de convite por paciente.
-- `_authenticated.tsx` já tem patient gate redirecionando S3+role=patient para `/my-plan`. **Falta gate para anamnese ausente → forçar `/onboarding/patient`.**
+| # | Item | Decisão |
+|---|------|---------|
+| 1 | Versionamento de anamnese | **AGORA** — `version`, `supersedes_id`, `created_by` |
+| 2 | Consent ligado à anamnese | **AGORA** — `patient_consents.anamnesis_id` (nullable, vinculado no submit) |
+| 3 | Clinical flags derivadas | **AGORA** — derivadas no `to-canonical.ts`, persistidas em coluna gerada |
+| 4 | Completion score | **AGORA** — calculado no adapter, persistido |
+| 5 | Upload de exames | **Schema preparado** — `attachments: []` no canonical, sem UI |
+| 6 | Validade temporal de condições | **AGORA no schema** — `observed_at` em `ConditionSchema` (UI opcional) |
+| 7 | `onboarding_version` em vez de só `completed_at` | **AGORA** — ambas colunas |
+| 8 | Catálogo desacoplado | **AGORA estrutural** — `QuestionCatalog` como entidade tipada + fonte em arquivo, com `catalog_version` salvo na anamnese. Tabela `question_catalogs` fica para Fase 2 (sem refactor). |
+| 9 | Clinical Review Status | **AGORA** — máquina `draft → submitted → reviewed → approved` (renomeia `status` atual) |
+| 10 | Campos para IA | **Schema preparado** — `clinical_tags`, `risk_flags`, `sport_profile`, `nutrition_profile` no canonical, vazios |
+| Extra | WhatsApp no cadastro | **AGORA** — `patients.phone` (E.164) + campo no `/signup/patient` |
 
 ---
 
-## 2. Arquivos afetados
-
-### Criação
-- `src/lib/anamnesis/canonical.schema.ts` — Zod schema do `CanonicalAnamnesis` v1 (cobre os 8 domínios clínicos pedidos).
-- `src/lib/anamnesis/adapters/orbital-to-canonical.ts` — adapter determinístico (paciente online).
-- `src/lib/anamnesis/adapters/manual-to-canonical.ts` — adapter do form manual.
-- `src/lib/anamnesis/anamnesis.functions.ts` — server fns: `submitOnlineAnamnesis`, `submitManualAnamnesis`, `getCanonicalAnamnesis`, `approveAnamnesis`.
-- `src/lib/anamnesis/question-catalog.ts` — catálogo clínico novo (Question com `id/type/title/required/trigger/children[]/clinical_tags[]`), NÃO copia perguntas orbitais cegamente.
-- `src/components/anamnesis/AdaptiveAnamnesisRunner.tsx` — runner que usa a UI orbital (já no zip) como camada de apresentação, mas alimentada pelo novo catálogo.
-- `src/components/patients/OnlineInviteDialog.tsx` — modal "ONLINE" (link, WhatsApp, email, copiar, mensagem editável).
-- `src/lib/signup/patient-signup.functions.ts` — `validateReferralCode`, `consumeReferralCodeAndCreatePatient`.
-- `src/routes/signup/patient.tsx` — rota pública com `?code=…`.
-- `src/routes/_authenticated/onboarding/patient.tsx` — anamnese inicial do paciente recém-cadastrado.
-- `src/routes/_authenticated/patients/$id/anamnesis.tsx` — visualização/edição/aprovação pelo nutri.
-
-### Edição
-- `src/routes/_authenticated/patients/index.tsx` — adicionar botão "ONLINE" abrindo o dialog.
-- `src/routes/_authenticated.tsx` — adicionar gate: paciente sem anamnese aprovada → `/onboarding/patient`.
-- `src/lib/engine/engine.functions.ts` — adicionar overload que aceita `patientId` e resolve `CanonicalAnamnesis` (mantém overload manual atual, retrocompatível).
-- `src/components/NutritionTargetCard.tsx` / `TemplateMatcherPanel.tsx` — sem mudança de contrato (já consomem o shape canônico).
-- `src/routeTree.gen.ts` — auto-gerado.
-
-### NÃO tocar
-- `src/lib/engine/tdee.ts`, `macros.ts`, `matcher.ts`, `clinical-gate.ts` — motores puros permanecem intocados (consomem exatamente o que `CanonicalAnamnesis` exporta).
-- `src/lib/plans/*` — snapshot/publish intactos.
-- `src/lib/profile/nutritionist-profile.functions.ts` — referral code já existe.
-- RLS de `anamneses`, `plans`, `templates`, `patients` — sem mudança.
-
----
-
-## 3. Migrações necessárias
-
-**Migration única, sem destruir nada:**
+## 1. Migração consolidada (uma única migration)
 
 ```sql
--- 1. Versão do schema canônico
-ALTER TABLE public.anamneses
-  ADD COLUMN IF NOT EXISTS origin text
-    CHECK (origin IN ('manual','online','migrated')) DEFAULT 'manual',
-  ADD COLUMN IF NOT EXISTS status text
-    CHECK (status IN ('draft','submitted','approved')) DEFAULT 'draft',
-  ADD COLUMN IF NOT EXISTS approved_at timestamptz,
-  ADD COLUMN IF NOT EXISTS approved_by uuid;
+-- WhatsApp no cadastro
+ALTER TABLE public.patients ADD COLUMN phone text;
+ALTER TABLE public.patients ADD COLUMN onboarding_version integer;
+ALTER TABLE public.patients ADD COLUMN onboarding_completed_at timestamptz;
 
--- 2. Bump schema_version default para 2 (canônico) — linhas antigas ficam em 1
-ALTER TABLE public.anamneses ALTER COLUMN schema_version SET DEFAULT 2;
+-- Anamnese versionada
+ALTER TABLE public.anamneses ADD COLUMN version integer NOT NULL DEFAULT 1;
+ALTER TABLE public.anamneses ADD COLUMN supersedes_id uuid REFERENCES public.anamneses(id) ON DELETE RESTRICT;
+ALTER TABLE public.anamneses ADD COLUMN created_by uuid;                      -- auth.users.id (nutri ou paciente)
+ALTER TABLE public.anamneses ADD COLUMN catalog_version text;                 -- ex "clinical-v2.2026-05-31"
+ALTER TABLE public.anamneses ADD COLUMN completion_score smallint;            -- 0-100
+ALTER TABLE public.anamneses ADD COLUMN clinical_flags text[] NOT NULL DEFAULT '{}';
+ALTER TABLE public.anamneses ADD COLUMN review_status text NOT NULL DEFAULT 'draft'
+  CHECK (review_status IN ('draft','submitted','reviewed','approved'));
+ALTER TABLE public.anamneses ADD COLUMN submitted_at timestamptz;
+ALTER TABLE public.anamneses ADD COLUMN reviewed_at timestamptz;
+-- coluna 'status' antiga continua para compat; nova máquina vive em review_status.
+CREATE INDEX IF NOT EXISTS anamneses_patient_version_idx
+  ON public.anamneses (patient_id, version DESC);
+CREATE INDEX IF NOT EXISTS anamneses_clinical_flags_gin
+  ON public.anamneses USING gin (clinical_flags);
 
--- 3. Index para lookup por paciente + status
-CREATE INDEX IF NOT EXISTS idx_anamneses_patient_status
-  ON public.anamneses (patient_id, status);
+-- Consents
+CREATE TABLE public.patient_consents (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  patient_id uuid NOT NULL REFERENCES public.patients(id) ON DELETE RESTRICT,
+  anamnesis_id uuid REFERENCES public.anamneses(id) ON DELETE RESTRICT, -- vincula consent à versão da anamnese
+  consent_version text NOT NULL,
+  consent_type text NOT NULL,                  -- 'lgpd' | 'clinical_data'
+  accepted_at timestamptz NOT NULL DEFAULT now(),
+  ip_address inet,
+  user_agent text
+);
+GRANT SELECT, INSERT ON public.patient_consents TO authenticated;
+GRANT ALL ON public.patient_consents TO service_role;
+ALTER TABLE public.patient_consents ENABLE ROW LEVEL SECURITY;
+-- Policies: paciente insere/lê próprio; nutri lê de pacientes seus.
 ```
 
-**Sem `ON DELETE CASCADE`. Sem alteração de RLS.** Linhas antigas (`schema_version=1`) permanecem legíveis — parser legado preservado.
-
-`referral_codes` já existe e cobre o fluxo de convite. Sem nova tabela.
+Sem CASCADE. `RESTRICT` em tudo clínico. Histórico nunca é deletado.
 
 ---
 
-## 4. Riscos
+## 2. Schema canonical V3 (bump 2→3)
 
-| Risco | Severidade | Mitigação |
-|---|---|---|
-| Motor passar a ler `anamneses.data` e quebrar com row antiga `schema_version=1` | **Alto** | Server fn `getCanonicalAnamnesis` faz roteamento por `schema_version`: v1 → parser legado / null; v2 → canônico. Motor nunca acessa jsonb cru. |
-| Adapter orbital→canônico perder dado clínico | **Médio** | Salvar payload orbital cru em `data.raw_orbital` ao lado do canônico em `data.canonical`. Auditável e reversível. |
-| Convite consumir código duas vezes (race) | **Médio** | `consumeReferralCodeAndCreatePatient` em transação via `supabaseAdmin`, com `UPDATE referral_codes SET status='consumed' WHERE status='active'` e checagem de affected rows. |
-| Gate de anamnese bloquear paciente legítimo já cadastrado antes da V2 | **Alto** | Gate só dispara se NÃO existir nenhuma anamnese (`status IN ('submitted','approved')`) para `patient_id`. Pacientes antigos com anamnese manual em v1 contam como "submitted" (backfill via migration opcional). |
-| Duplicação de regras canônicas (frontend e backend) | **Médio** | Zod schema único em `src/lib/anamnesis/canonical.schema.ts` importado por ambos. |
-| UI orbital alimentar diretamente motor (violação arquitetural) | **Crítico** | Runner só chama `submitOnlineAnamnesis`. Motor só consome via `getCanonicalAnamnesis`. PR-check manual antes do merge. |
+```ts
+// canonical.schema.ts
+schemaVersion: 3
+catalogVersion: string                 // "clinical-v2.2026-05-31"
+origin: "manual" | "online" | "migrated"
+basics, digestive, metabolic, cardiovascular, medications, labs, sleep, physicalActivity
+// novo:
+attachments: Attachment[]              // vazio nesta fase
+clinicalTags: string[]                 // ex: ["diabetes_type2","high_training_volume"]
+riskFlags: string[]                    // ex: ["uncontrolled_hypertension"]
+sportProfile: { primary?, weeklyHours?, ... } | null
+nutritionProfile: { restrictions: string[], preferences: string[] } | null
+completionScore: number                // 0-100
+// ConditionSchema ganha:
+observedAt?: string
+updatedAt?: string
+```
 
----
-
-## 5. Plano de rollback
-
-1. **Migration**: `ALTER TABLE public.anamneses DROP COLUMN origin, DROP COLUMN status, DROP COLUMN approved_at, DROP COLUMN approved_by; ALTER TABLE ... ALTER COLUMN schema_version SET DEFAULT 1; DROP INDEX idx_anamneses_patient_status;` — não-destrutivo (data preservado).
-2. **Código**: remover diretório `src/lib/anamnesis/`, `src/components/anamnesis/`, rotas `signup/patient.tsx`, `onboarding/patient.tsx`, `patients/$id/anamnesis.tsx`. Reverter overload em `engine.functions.ts`. Reverter botão "ONLINE" e gate em `_authenticated.tsx`.
-3. **Dados**: zero perda — `anamneses.data` continua jsonb livre; rows v2 permanecem legíveis mesmo sem o novo código (apenas não são interpretadas).
-4. **Convites já consumidos**: `referral_codes.status='consumed'` permanece; pacientes criados permanecem (FK `SET NULL`-compatível, não-CASCADE).
-
----
-
-## 6. Checklist de não-regressão (matriz de impacto)
-
-### Planos
-- [x] Snapshot publicado segue imutável (trigger `plans_snapshot_immutable` intocado).
-- [x] PDF/Patient App não dependem de `anamneses` — renderizam só `plans.snapshot`. Sem regressão.
-
-### Templates
-- [x] Não tocados. `templates.content` intocado.
-
-### Referral/Convites
-- [x] `referral_codes` ganha apenas novo consumidor; estrutura intocada.
-- [x] Pacientes existentes (vinculados via `nutritionist_id`) preservados.
-
-### Onboarding/Anamneses
-- [x] Anamneses v1 legíveis via `schema_version=1` (parser legado retorna `null` canônico, força nutri a re-coletar; opção: backfill manual via UI de edição).
-- [x] Anamneses manuais futuras passam pelo mesmo adapter → canônico v2.
-
-### Auth
-- [x] FK `auth.users` em `patients.auth_user_id` permanece. `cleanup_orphan_auth_user` continua funcional.
-- [x] Novo paciente criado via `signup/patient` segue mesmo padrão de `phase2/signup.functions.ts`.
-
-### Dashboard / PDFs / Pagamentos
-- [x] Não tocados.
-
-### Invariantes
-- [x] Sem `ON DELETE CASCADE`.
-- [x] `plans.snapshot` imutável preservado.
-- [x] Templates não viram fonte de plano.
-- [x] Referral continua histórico.
-- [x] `schema_version` presente em `anamneses` desde sempre, agora explicitamente versionado.
-- [x] PDF é saída.
-- [x] Dashboard read-only.
-- [x] Renderers não recalculam — runner orbital só captura, adapter normaliza no SUBMIT (server-side), motor consome canônico.
-- [x] DAG: UI orbital → adapter → CanonicalAnamnesis → motor → snapshot. Sem ciclo.
+Parser V2 fica vivo (forward-compat reader). Tabela vazia hoje → zero risco de migração de dados.
 
 ---
 
-## 7. Plano de execução faseado (após aprovação)
+## 3. Catálogo desacoplado (`QuestionCatalog` como entidade)
 
-Vou pedir aprovação **uma fase por vez** para minimizar superfície de risco.
+```
+src/lib/anamnesis/v2/catalog/
+├── types.ts            (Question, Branch, Trigger, ClinicalTag, CatalogManifest)
+├── catalog.ts          (export const CATALOG: CatalogManifest — fonte hardcoded V1)
+├── catalog.version.ts  (export const CATALOG_VERSION = "clinical-v2.2026-05-31")
+└── loader.ts           (loadCatalog(version?) — hoje retorna CATALOG; futuro: lê de DB)
+```
 
-- **Fase 1 (P0):** Migration + `canonical.schema.ts` + `signup/patient` (rota pública + consumo de convite) + botão "ONLINE" + dialog.
-- **Fase 2 (P1):** Catálogo clínico + adapter manual + runner reaproveitando UI orbital + `/onboarding/patient` + gate em `_authenticated.tsx`.
-- **Fase 3 (P2):** Tela de revisão/aprovação pelo nutri (`/patients/$id/anamnesis`) + overload `computeNutritionTargets(patientId)` lendo `CanonicalAnamnesis`.
+Runner e adapter consomem **só** `loader.loadCatalog()`. Quando criarmos `question_catalogs` table, troca-se apenas o loader. **Anamnese sempre persiste `catalogVersion`** → toda resposta é reproduzível.
 
 ---
 
-## Aguardando
+## 4. Máquina de estado de revisão
 
-Responda **`APPROVED FOR EXECUTION FASE 1`** (ou outra) para eu começar a codar. Qualquer ajuste no escopo acima também é bem-vindo antes da aprovação.
+```
+draft       → paciente preenchendo / nutri rascunhando
+submitted   → paciente finalizou online (gera nova versão e supersedes anterior)
+reviewed    → nutri abriu e revisou
+approved    → vira "verdade clínica" → motores podem consumir
+```
+
+Regra dura: **motores leem apenas anamneses `approved`**, e sempre a `version` mais alta. Pré-aprovação = motor ignora.
+
+Nova anamnese (edição pós-aprovação) cria **nova row** com `version+1` e `supersedes_id = anterior.id`. Nada de UPDATE em row aprovada.
+
+---
+
+## 5. Clinical flags derivadas (no adapter, não no motor)
+
+`to-canonical.ts` roda regras puras determinísticas:
+
+```
+if digestive.conditions has "gastritis" → flags += "gastritis"
+if metabolic.conditions has "diabetes_type2" → flags += "diabetes", "diabetes_type2"
+if cardiovascular.conditions has "hypertension" && medications none → flags += "uncontrolled_hypertension"
+if physicalActivity.weeklyVolumeMinutes >= 600 → flags += "high_training_volume"
+if basics.sex == female && answers.pregnancy == true → flags += "pregnancy"
+```
+
+Persistido em `anamneses.clinical_flags` (GIN-indexed) → dashboards e filtros instantâneos sem ler JSONB.
+
+---
+
+## 6. Completion score
+
+Calculado no adapter:
+
+```
+score = 100 * (required_answered / required_total)
+      - 10 if no medications block answered when conditions exist
+      - 5  if no labs and clinical_flags suggests metabolic
+clamp 0..100
+```
+
+Persistido em `anamneses.completion_score`. UI do nutri mostra: "Anamnese 87% completa".
+
+---
+
+## 7. WhatsApp no cadastro
+
+- `/signup/patient` ganha campo **WhatsApp (obrigatório)** com máscara E.164 BR (`+55 11 9XXXX-XXXX`).
+- `consumeReferralCodeAndCreatePatient` recebe `phone`, valida regex E.164, persiste em `patients.phone`.
+- Settings do paciente permite editar.
+
+---
+
+## 8. Arquivos (novo + alterado)
+
+**Novos:**
+```
+src/lib/anamnesis/v2/
+├── catalog/{types,catalog,catalog.version,loader}.ts
+├── runner.ts + runner.test.ts
+├── to-canonical.ts            (gera flags + score + tags)
+├── to-canonical.test.ts
+└── components/{AnamnesisRunner,QuestionField,ProgressBar}.tsx
+
+src/lib/onboarding/
+├── consent.functions.ts
+└── onboarding.functions.ts    (cria anamnese v1 + consent vinculado + onboarding_version=1)
+
+src/lib/anamnesis/
+└── revisions.functions.ts     (createNewVersion: clona última, supersedes, version+1)
+
+src/routes/_authenticated/onboarding/patient.tsx
+```
+
+**Alterados:**
+- `canonical.schema.ts` → V3
+- `signup/patient.tsx` → +WhatsApp; redireciona pra `/onboarding/patient`
+- `signup/patient-signup.functions.ts` → aceita `phone`
+- `_authenticated.tsx` → guard: `role=patient && onboarding_version IS NULL → /onboarding/patient`
+- `phase2/identity.functions.ts` → DTO ganha `onboardingVersion`, `phone`
+
+**Não tocados:** `engine.functions.ts`, `tdee.ts`, `macros.ts`, `matcher.ts`, `clinical-gate.ts`, `patients/new.tsx`, planos, templates, PDFs, dashboard.
+
+---
+
+## 9. Matriz de impacto (delta sobre v1)
+
+- **Anamneses**: schema enriquecido, versionamento append-only, parser V2 segue vivo. Tabela vazia → zero migração de dados.
+- **Patients**: +3 colunas nullable. Nenhum código existente quebra.
+- **Auth/Referral**: intocados.
+- **Motores**: continuam recebendo inputs explícitos. Quando passarem a ler `anamneses`, filtro será `review_status='approved' ORDER BY version DESC LIMIT 1` — contrato já preparado.
+- **PDF/Dashboard/Plans/Templates**: intocados.
+
+Invariantes mantidos: zero CASCADE, RESTRICT em vínculos clínicos, snapshot de planos imutável, sem caminho paralelo de persistência.
+
+---
+
+## 10. O que NÃO entra na Fase 1 (explícito)
+
+- Tabela `question_catalogs` (admin edita perguntas via UI) — Fase 2. Hoje: catálogo em arquivo + `catalogVersion` versionada.
+- Upload de exames — schema preparado, sem UI.
+- Tela de revisão lado-a-lado online vs manual — Fase 2.
+- Migração de `patients/new.tsx` para o `AnamnesisRunner` único — Fase 2.
+- IA classificadora — campos prontos, modelo não.
+
+---
+
+## 11. Rollback
+
+```sql
+DROP TABLE public.patient_consents;
+ALTER TABLE public.anamneses DROP COLUMN version, supersedes_id, created_by,
+  catalog_version, completion_score, clinical_flags, review_status,
+  submitted_at, reviewed_at;
+ALTER TABLE public.patients DROP COLUMN phone, onboarding_version, onboarding_completed_at;
+```
++ `rm -rf src/lib/anamnesis/v2 src/lib/onboarding src/routes/_authenticated/onboarding/patient.tsx`
+
+---
+
+**Aguardando `APPROVED FOR EXECUTION` para começar pela migration.**

@@ -64,11 +64,15 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/dashboard", replace: true });
     }
 
-    // Patient gate: pacientes só acessam /my-plan.
+    // Patient gate: pacientes acessam /my-plan e /onboarding/patient.
     // Soberania: admin/nutricionista nunca caem aqui (admin retorna acima,
     // nutricionista tem role !== "patient").
     if (identity.state === "S3" && identity.role === "patient") {
-      const isPatientRoute = path === "/my-plan" || path.startsWith("/my-plan/");
+      const isPatientRoute =
+        path === "/my-plan" ||
+        path.startsWith("/my-plan/") ||
+        path === "/onboarding/patient" ||
+        path.startsWith("/onboarding/patient/");
       if (!isPatientRoute) {
         throw redirect({ to: "/my-plan", replace: true });
       }

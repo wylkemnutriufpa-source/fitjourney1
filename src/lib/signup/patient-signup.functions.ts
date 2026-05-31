@@ -69,6 +69,11 @@ const ConsumeInput = z.object({
   fullName: z.string().trim().min(1).max(255),
   email: z.string().trim().toLowerCase().email().max(255),
   password: z.string().min(8).max(128),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+?[1-9]\d{9,14}$/, "Telefone inválido (use formato internacional)")
+    .max(20),
 });
 
 export interface PatientSignupResult {
@@ -119,6 +124,7 @@ export const consumeReferralCodeAndCreatePatient = createServerFn({
         source_referral_code: data.code,
         full_name: data.fullName,
         email: data.email,
+        phone: data.phone,
       })
       .select("id")
       .single();

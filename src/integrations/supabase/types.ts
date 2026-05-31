@@ -18,41 +18,68 @@ export type Database = {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          catalog_version: string | null
+          clinical_flags: string[]
+          completion_score: number | null
           created_at: string
+          created_by: string | null
           data: Json
           id: string
           nutritionist_id: string | null
           origin: string
           patient_id: string
+          review_status: string
+          reviewed_at: string | null
           schema_version: number
           status: string
+          submitted_at: string | null
+          supersedes_id: string | null
           updated_at: string
+          version: number
         }
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          catalog_version?: string | null
+          clinical_flags?: string[]
+          completion_score?: number | null
           created_at?: string
+          created_by?: string | null
           data: Json
           id?: string
           nutritionist_id?: string | null
           origin?: string
           patient_id: string
+          review_status?: string
+          reviewed_at?: string | null
           schema_version?: number
           status?: string
+          submitted_at?: string | null
+          supersedes_id?: string | null
           updated_at?: string
+          version?: number
         }
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          catalog_version?: string | null
+          clinical_flags?: string[]
+          completion_score?: number | null
           created_at?: string
+          created_by?: string | null
           data?: Json
           id?: string
           nutritionist_id?: string | null
           origin?: string
           patient_id?: string
+          review_status?: string
+          reviewed_at?: string | null
           schema_version?: number
           status?: string
+          submitted_at?: string | null
+          supersedes_id?: string | null
           updated_at?: string
+          version?: number
         }
         Relationships: [
           {
@@ -67,6 +94,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anamneses_supersedes_id_fkey"
+            columns: ["supersedes_id"]
+            isOneToOne: false
+            referencedRelation: "anamneses"
             referencedColumns: ["id"]
           },
         ]
@@ -229,6 +263,54 @@ export type Database = {
         }
         Relationships: []
       }
+      patient_consents: {
+        Row: {
+          accepted_at: string
+          anamnesis_id: string | null
+          consent_type: string
+          consent_version: string
+          id: string
+          ip_address: unknown
+          patient_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          accepted_at?: string
+          anamnesis_id?: string | null
+          consent_type: string
+          consent_version: string
+          id?: string
+          ip_address?: unknown
+          patient_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          accepted_at?: string
+          anamnesis_id?: string | null
+          consent_type?: string
+          consent_version?: string
+          id?: string
+          ip_address?: unknown
+          patient_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_consents_anamnesis_id_fkey"
+            columns: ["anamnesis_id"]
+            isOneToOne: false
+            referencedRelation: "anamneses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_consents_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           auth_user_id: string
@@ -238,6 +320,9 @@ export type Database = {
           full_name: string
           id: string
           nutritionist_id: string | null
+          onboarding_completed_at: string | null
+          onboarding_version: number | null
+          phone: string | null
           source_referral_code: string | null
           updated_at: string
         }
@@ -249,6 +334,9 @@ export type Database = {
           full_name: string
           id?: string
           nutritionist_id?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_version?: number | null
+          phone?: string | null
           source_referral_code?: string | null
           updated_at?: string
         }
@@ -260,6 +348,9 @@ export type Database = {
           full_name?: string
           id?: string
           nutritionist_id?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_version?: number | null
+          phone?: string | null
           source_referral_code?: string | null
           updated_at?: string
         }
