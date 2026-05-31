@@ -64,6 +64,16 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/dashboard", replace: true });
     }
 
+    // Patient gate: pacientes só acessam /my-plan.
+    // Soberania: admin/nutricionista nunca caem aqui (admin retorna acima,
+    // nutricionista tem role !== "patient").
+    if (identity.state === "S3" && identity.role === "patient") {
+      const isPatientRoute = path === "/my-plan" || path.startsWith("/my-plan/");
+      if (!isPatientRoute) {
+        throw redirect({ to: "/my-plan", replace: true });
+      }
+    }
+
     return { identity };
   },
   component: () => <Outlet />,
