@@ -297,6 +297,8 @@ function translateCodeError(msg: string): string {
   if (msg.includes("CODE_EXPIRED")) return "Este convite expirou.";
   if (msg.includes("CODE_RACE_LOST"))
     return "Este convite foi consumido em outra aba. Solicite um novo.";
+  if (msg.includes("EMAIL_ALREADY_EXISTS_UNLINKED"))
+    return "Já existe uma conta com este email, mas ela não está vinculada a este convite. Entre com a senha original ou use outro email.";
   if (msg.toLowerCase().includes("already") && msg.toLowerCase().includes("registered"))
     return "Já existe uma conta com este email.";
   return msg;
