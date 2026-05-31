@@ -159,28 +159,26 @@ function collectConditions(answers: Answers, specs: ConditionSpec[]) {
 function collectMetabolic(answers: Answers) {
   const out: ReturnType<typeof collectConditions> = [];
   const now = new Date().toISOString();
+  const mk = (code: string) => ({
+    code,
+    diagnosedAt: undefined,
+    inTreatment: undefined,
+    symptoms: undefined,
+    observedAt: now,
+    updatedAt: now,
+  });
   const diabetes = answers["metabolic.diabetes"];
   if (typeof diabetes === "string" && diabetes !== "none") {
-    out.push({
-      code: diabetes === "pre" ? "pre_diabetes" : diabetes === "type1" ? "diabetes_type1" : "diabetes_type2",
-      observedAt: now,
-      updatedAt: now,
-    });
+    out.push(
+      mk(diabetes === "pre" ? "pre_diabetes" : diabetes === "type1" ? "diabetes_type1" : "diabetes_type2"),
+    );
   }
   const thyroid = answers["metabolic.thyroid"];
   if (typeof thyroid === "string" && thyroid !== "none") {
-    out.push({
-      code: thyroid === "hypo" ? "hypothyroidism" : "hyperthyroidism",
-      observedAt: now,
-      updatedAt: now,
-    });
+    out.push(mk(thyroid === "hypo" ? "hypothyroidism" : "hyperthyroidism"));
   }
-  if (answers["metabolic.sop"] === true) {
-    out.push({ code: "sop", observedAt: now, updatedAt: now });
-  }
-  if (answers["metabolic.insulinResistance"] === true) {
-    out.push({ code: "insulin_resistance", observedAt: now, updatedAt: now });
-  }
+  if (answers["metabolic.sop"] === true) out.push(mk("sop"));
+  if (answers["metabolic.insulinResistance"] === true) out.push(mk("insulin_resistance"));
   return out;
 }
 
