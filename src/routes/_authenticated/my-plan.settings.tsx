@@ -162,6 +162,42 @@ function PatientSettings() {
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Carregando…</p>
           ) : (
+            <>
+              <div className="flex items-center gap-4 pb-2">
+                <div className="relative size-20 rounded-full overflow-hidden border border-border bg-background grid place-items-center">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Foto de perfil" className="size-full object-cover" />
+                  ) : (
+                    <User className="size-8 text-muted-foreground" />
+                  )}
+                  {uploadingAvatar && (
+                    <div className="absolute inset-0 bg-background/70 grid place-items-center">
+                      <Loader2 className="size-5 animate-spin text-primary" />
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    className="inline-flex items-center gap-2 text-xs font-semibold py-2 px-3 rounded-md border border-border hover:border-primary hover:text-primary transition-colors disabled:opacity-60"
+                  >
+                    <Camera className="size-3.5" />
+                    {avatarUrl ? "Trocar foto" : "Adicionar foto"}
+                  </button>
+                  <p className="text-[10px] text-muted-foreground/70">
+                    JPG ou PNG, até 4MB.
+                  </p>
+                </div>
+              </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
