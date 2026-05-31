@@ -1,0 +1,281 @@
+// Server fns do módulo Feedback Clínico.
+// Toda escrita roda sob a sessão do paciente (RLS aplica).
+// Leitura cruzada (nutri lê feedbacks dos pacientes) também via RLS.
+
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const AdherenceEnum = z.enum([
+  "muito_dificil",
+  "dificil",
+  "neutro",
+  "facil",
+  "muito_facil",
+]);
+const ResultEnum = z.enum(["piores", "abaixo", "dentro", "acima"]);
+
+export type FeedbackDTO = {
+  id: string;
+  patientId: string;
+  nutritionistId: string;
+  weightKg: number | null;
+  heightCmSnapshot: number | null;
+  adherenceRating: z.infer<typeof AdherenceEnum>;
+  resultRating: z.infer<typeof ResultEnum> | null;
+  notes: string | null;
+  photoFrontPath: string | null;
+  photoSidePath: string | null;
+  createdAt: string;
+};
+
+function rowToDto(r: any): FeedbackDTO {
+  return {
+    id: r.id,
+    patientId: r.patient_id,
+    nutritionistId: r.nutritionist_id,
+    weightKg: r.weight_kg != null ? Number(r.weight_kg) : null,
+    heightCmSnapshot:
+      r.height_cm_snapshot != null ? Number(r.height_cm_snapshot) : null,
+    adherenceRating: r.adherence_rating,
+    resultRating: r.result_rating ?? null,
+    notes: r.notes ?? null,
+    photoFrontPath: r.photo_front_path ?? null,
+    photoSidePath: r.photo_side_path ?? null,
+    createdAt: r.created_at,
+  };
+}
+
+// ------------------------------------------------------------------
+// submitFeedback — paciente envia um novo registro (imutável).
+// Cliente DEVE gerar o id (UUID) antes pra poder fazer o upload de fotos
+// no path {patient_id}/{feedback_id}/{front|side}.jpg.
+// ------------------------------------------------------------------
+
+const SubmitInput = z.object({
+  id: z.string().uuid(),
+  weightKg: z
+    .number()
+    .min(20)
+    .max(400)
+    .optional()
+    .nullable(),
+  adherenceRating: AdherenceEnum,
+  resultRating: ResultEnum.optional().nullable(),
+  notes: z.string().trim().max(2000).optional().nullable(),
+  photoFrontPath: z.string().trim().max(512).optional().nullable(),
+  photoSidePath: z.string().trim().max(512).optional().nullable(),
+});
+
+export const submitFeedback = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => SubmitInput.parse(input))
+  .handler(async ({ data, context }): Promise<FeedbackDTO> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+
+    // Resolve patient + nutri vinculado + altura cadastrada (snapshot).
+    const { data: patient, error: pErr } = await supabase
+      .from("patients")
+      .select("id, nutritionist_id, height_cm")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (pErr) throw new Error(pErr.message);
+    if (!patient) throw new Error("PATIENT_NOT_FOUND");
+    if (!patient.nutritionist_id) {
+      throw new Error(
+        "Seu cadastro ainda não está vinculado a um nutricionista.",
+      );
+    }
+
+    const insertPayload = {
+      id: data.id,
+      patient_id: patient.id,
+      nutritionist_id: patient.nutritionist_id,
+      weight_kg: data.weightKg ?? null,
+      height_cm_snapshot: patient.height_cm ?? null,
+      adherence_rating: data.adherenceRating,
+      result_rating: data.resultRating ?? null,
+      notes: data.notes?.trim() || null,
+      photo_front_path: data.photoFrontPath || null,
+      photo_side_path: data.photoSidePath || null,
+    };
+
+    const { data: row, error } = await supabase
+      .from("patient_feedbacks")
+      .insert(insertPayload)
+      .select(
+        "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at",
+      )
+      .single();
+    if (error) throw new Error(error.message);
+    return rowToDto(row);
+  });
+
+// ------------------------------------------------------------------
+// listMyFeedbacks — paciente lê o próprio histórico
+// ------------------------------------------------------------------
+
+export const listMyFeedbacks = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<FeedbackDTO[]> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+    const { data: patient } = await supabase
+      .from("patients")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!patient) return [];
+    const { data, error } = await supabase
+      .from("patient_feedbacks")
+      .select(
+        "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at",
+      )
+      .eq("patient_id", patient.id)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(rowToDto);
+  });
+
+// ------------------------------------------------------------------
+// getMyFeedbackStatus — usado pelo sidebar do paciente pra badge "pendente"
+// ------------------------------------------------------------------
+
+export type MyFeedbackStatus = {
+  hasNutritionist: boolean;
+  frequencyDays: number;
+  lastFeedbackAt: string | null;
+  daysSinceLast: number | null;
+  isPending: boolean;
+  heightCm: number | null;
+};
+
+export const getMyFeedbackStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<MyFeedbackStatus> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+
+    const { data: patient } = await supabase
+      .from("patients")
+      .select("id, nutritionist_id, height_cm")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+
+    if (!patient || !patient.nutritionist_id) {
+      return {
+        hasNutritionist: false,
+        frequencyDays: 7,
+        lastFeedbackAt: null,
+        daysSinceLast: null,
+        isPending: false,
+        heightCm: patient?.height_cm ?? null,
+      };
+    }
+
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("feedback_frequency_days")
+      .eq("id", patient.nutritionist_id)
+      .maybeSingle();
+    const freq = Number(nutri?.feedback_frequency_days ?? 7);
+
+    const { data: last } = await supabase
+      .from("patient_feedbacks")
+      .select("created_at")
+      .eq("patient_id", patient.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const lastAt: string | null = last?.created_at ?? null;
+    let daysSince: number | null = null;
+    if (lastAt) {
+      const diffMs = Date.now() - new Date(lastAt).getTime();
+      daysSince = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    }
+    const isPending = daysSince === null ? true : daysSince >= freq;
+
+    return {
+      hasNutritionist: true,
+      frequencyDays: freq,
+      lastFeedbackAt: lastAt,
+      daysSinceLast: daysSince,
+      isPending,
+      heightCm: patient.height_cm ?? null,
+    };
+  });
+
+// ------------------------------------------------------------------
+// listPatientFeedbacks — nutri lê histórico de um paciente seu
+// ------------------------------------------------------------------
+
+const ListPatientInput = z.object({ patientId: z.string().uuid() });
+
+export const listPatientFeedbacks = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ListPatientInput.parse(input))
+  .handler(async ({ data, context }): Promise<FeedbackDTO[]> => {
+    const { supabase } = context as { supabase: any };
+    // RLS faz a checagem de ownership (nutri reads patient feedback).
+    const { data: rows, error } = await supabase
+      .from("patient_feedbacks")
+      .select(
+        "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at",
+      )
+      .eq("patient_id", data.patientId)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return (rows ?? []).map(rowToDto);
+  });
+
+// ------------------------------------------------------------------
+// Configuração da frequência de feedback (lado nutri)
+// ------------------------------------------------------------------
+
+export const getMyFeedbackFrequency = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ days: number } | null> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+    const { data, error } = await supabase
+      .from("nutritionists")
+      .select("feedback_frequency_days")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!data) return null;
+    return { days: Number(data.feedback_frequency_days ?? 7) };
+  });
+
+const SetFreqInput = z.object({ days: z.number().int().min(1).max(90) });
+
+export const setMyFeedbackFrequency = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => SetFreqInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+    const { error } = await supabase
+      .from("nutritionists")
+      .update({ feedback_frequency_days: data.days })
+      .eq("auth_user_id", userId);
+    if (error) throw new Error(error.message);
+    return { ok: true, days: data.days };
+  });
+
+// ------------------------------------------------------------------
+// getSignedPhotoUrl — usado por paciente e nutri pra visualizar foto
+// ------------------------------------------------------------------
+
+const SignInput = z.object({ path: z.string().min(1).max(512) });
+
+export const getSignedFeedbackPhotoUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => SignInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ url: string }> => {
+    const { supabase } = context as { supabase: any };
+    const { data: signed, error } = await supabase.storage
+      .from("feedback-photos")
+      .createSignedUrl(data.path, 60 * 10); // 10 min
+    if (error) throw new Error(error.message);
+    return { url: signed.signedUrl };
+  });

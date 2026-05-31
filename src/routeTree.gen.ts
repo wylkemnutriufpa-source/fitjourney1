@@ -25,8 +25,10 @@ import { Route as AuthenticatedOnboardingPatientRouteImport } from './routes/_au
 import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './routes/_authenticated/onboarding/nutritionist'
 import { Route as AuthenticatedMyPlanUpdateHealthProfileRouteImport } from './routes/_authenticated/my-plan.update-health-profile'
 import { Route as AuthenticatedMyPlanSettingsRouteImport } from './routes/_authenticated/my-plan.settings'
+import { Route as AuthenticatedMyPlanFeedbackRouteImport } from './routes/_authenticated/my-plan.feedback'
 import { Route as AuthenticatedAnamnesesIdRouteImport } from './routes/_authenticated/anamneses.$id'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
+import { Route as AuthenticatedPatientsIdFeedbacksRouteImport } from './routes/_authenticated/patients/$id/feedbacks'
 import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -115,6 +117,12 @@ const AuthenticatedMyPlanSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedMyPlanRoute,
   } as any)
+const AuthenticatedMyPlanFeedbackRoute =
+  AuthenticatedMyPlanFeedbackRouteImport.update({
+    id: '/feedback',
+    path: '/feedback',
+    getParentRoute: () => AuthenticatedMyPlanRoute,
+  } as any)
 const AuthenticatedAnamnesesIdRoute =
   AuthenticatedAnamnesesIdRouteImport.update({
     id: '/anamneses/$id',
@@ -125,6 +133,12 @@ const AuthenticatedPatientsIdIndexRoute =
   AuthenticatedPatientsIdIndexRouteImport.update({
     id: '/patients/$id/',
     path: '/patients/$id/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPatientsIdFeedbacksRoute =
+  AuthenticatedPatientsIdFeedbacksRouteImport.update({
+    id: '/patients/$id/feedbacks',
+    path: '/patients/$id/feedbacks',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedPatientsIdDietRoute =
@@ -144,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
+  '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
@@ -152,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
+  '/patients/$id/feedbacks': typeof AuthenticatedPatientsIdFeedbacksRoute
   '/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -164,6 +180,7 @@ export interface FileRoutesByTo {
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
+  '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
@@ -172,6 +189,7 @@ export interface FileRoutesByTo {
   '/anamneses': typeof AuthenticatedAnamnesesIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
+  '/patients/$id/feedbacks': typeof AuthenticatedPatientsIdFeedbacksRoute
   '/patients/$id': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRoutesById {
@@ -186,6 +204,7 @@ export interface FileRoutesById {
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/_authenticated/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
+  '/_authenticated/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/_authenticated/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/_authenticated/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
@@ -194,6 +213,7 @@ export interface FileRoutesById {
   '/_authenticated/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
   '/_authenticated/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
+  '/_authenticated/patients/$id/feedbacks': typeof AuthenticatedPatientsIdFeedbacksRoute
   '/_authenticated/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -208,6 +228,7 @@ export interface FileRouteTypes {
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/anamneses/$id'
+    | '/my-plan/feedback'
     | '/my-plan/settings'
     | '/my-plan/update-health-profile'
     | '/onboarding/nutritionist'
@@ -216,6 +237,7 @@ export interface FileRouteTypes {
     | '/anamneses/'
     | '/patients/'
     | '/patients/$id/diet'
+    | '/patients/$id/feedbacks'
     | '/patients/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -228,6 +250,7 @@ export interface FileRouteTypes {
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/anamneses/$id'
+    | '/my-plan/feedback'
     | '/my-plan/settings'
     | '/my-plan/update-health-profile'
     | '/onboarding/nutritionist'
@@ -236,6 +259,7 @@ export interface FileRouteTypes {
     | '/anamneses'
     | '/patients'
     | '/patients/$id/diet'
+    | '/patients/$id/feedbacks'
     | '/patients/$id'
   id:
     | '__root__'
@@ -249,6 +273,7 @@ export interface FileRouteTypes {
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/_authenticated/anamneses/$id'
+    | '/_authenticated/my-plan/feedback'
     | '/_authenticated/my-plan/settings'
     | '/_authenticated/my-plan/update-health-profile'
     | '/_authenticated/onboarding/nutritionist'
@@ -257,6 +282,7 @@ export interface FileRouteTypes {
     | '/_authenticated/anamneses/'
     | '/_authenticated/patients/'
     | '/_authenticated/patients/$id/diet'
+    | '/_authenticated/patients/$id/feedbacks'
     | '/_authenticated/patients/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -382,6 +408,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyPlanSettingsRouteImport
       parentRoute: typeof AuthenticatedMyPlanRoute
     }
+    '/_authenticated/my-plan/feedback': {
+      id: '/_authenticated/my-plan/feedback'
+      path: '/feedback'
+      fullPath: '/my-plan/feedback'
+      preLoaderRoute: typeof AuthenticatedMyPlanFeedbackRouteImport
+      parentRoute: typeof AuthenticatedMyPlanRoute
+    }
     '/_authenticated/anamneses/$id': {
       id: '/_authenticated/anamneses/$id'
       path: '/anamneses/$id'
@@ -396,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPatientsIdIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/patients/$id/feedbacks': {
+      id: '/_authenticated/patients/$id/feedbacks'
+      path: '/patients/$id/feedbacks'
+      fullPath: '/patients/$id/feedbacks'
+      preLoaderRoute: typeof AuthenticatedPatientsIdFeedbacksRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/patients/$id/diet': {
       id: '/_authenticated/patients/$id/diet'
       path: '/patients/$id/diet'
@@ -407,11 +447,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedMyPlanRouteChildren {
+  AuthenticatedMyPlanFeedbackRoute: typeof AuthenticatedMyPlanFeedbackRoute
   AuthenticatedMyPlanSettingsRoute: typeof AuthenticatedMyPlanSettingsRoute
   AuthenticatedMyPlanUpdateHealthProfileRoute: typeof AuthenticatedMyPlanUpdateHealthProfileRoute
 }
 
 const AuthenticatedMyPlanRouteChildren: AuthenticatedMyPlanRouteChildren = {
+  AuthenticatedMyPlanFeedbackRoute: AuthenticatedMyPlanFeedbackRoute,
   AuthenticatedMyPlanSettingsRoute: AuthenticatedMyPlanSettingsRoute,
   AuthenticatedMyPlanUpdateHealthProfileRoute:
     AuthenticatedMyPlanUpdateHealthProfileRoute,
@@ -432,6 +474,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAnamnesesIndexRoute: typeof AuthenticatedAnamnesesIndexRoute
   AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
   AuthenticatedPatientsIdDietRoute: typeof AuthenticatedPatientsIdDietRoute
+  AuthenticatedPatientsIdFeedbacksRoute: typeof AuthenticatedPatientsIdFeedbacksRoute
   AuthenticatedPatientsIdIndexRoute: typeof AuthenticatedPatientsIdIndexRoute
 }
 
@@ -448,6 +491,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAnamnesesIndexRoute: AuthenticatedAnamnesesIndexRoute,
   AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
   AuthenticatedPatientsIdDietRoute: AuthenticatedPatientsIdDietRoute,
+  AuthenticatedPatientsIdFeedbacksRoute: AuthenticatedPatientsIdFeedbacksRoute,
   AuthenticatedPatientsIdIndexRoute: AuthenticatedPatientsIdIndexRoute,
 }
 

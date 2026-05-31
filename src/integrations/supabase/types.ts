@@ -232,6 +232,7 @@ export type Database = {
           crn: string | null
           display_name: string | null
           email: string
+          feedback_frequency_days: number
           full_name: string
           id: string
           phone: string | null
@@ -245,6 +246,7 @@ export type Database = {
           crn?: string | null
           display_name?: string | null
           email: string
+          feedback_frequency_days?: number
           full_name: string
           id?: string
           phone?: string | null
@@ -258,6 +260,7 @@ export type Database = {
           crn?: string | null
           display_name?: string | null
           email?: string
+          feedback_frequency_days?: number
           full_name?: string
           id?: string
           phone?: string | null
@@ -314,6 +317,48 @@ export type Database = {
           },
         ]
       }
+      patient_feedbacks: {
+        Row: {
+          adherence_rating: string
+          created_at: string
+          height_cm_snapshot: number | null
+          id: string
+          notes: string | null
+          nutritionist_id: string
+          patient_id: string
+          photo_front_path: string | null
+          photo_side_path: string | null
+          result_rating: string | null
+          weight_kg: number | null
+        }
+        Insert: {
+          adherence_rating: string
+          created_at?: string
+          height_cm_snapshot?: number | null
+          id?: string
+          notes?: string | null
+          nutritionist_id: string
+          patient_id: string
+          photo_front_path?: string | null
+          photo_side_path?: string | null
+          result_rating?: string | null
+          weight_kg?: number | null
+        }
+        Update: {
+          adherence_rating?: string
+          created_at?: string
+          height_cm_snapshot?: number | null
+          id?: string
+          notes?: string | null
+          nutritionist_id?: string
+          patient_id?: string
+          photo_front_path?: string | null
+          photo_side_path?: string | null
+          result_rating?: string | null
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       patients: {
         Row: {
           auth_user_id: string
@@ -321,6 +366,7 @@ export type Database = {
           created_at: string
           email: string
           full_name: string
+          height_cm: number | null
           id: string
           nutritionist_id: string | null
           onboarding_completed_at: string | null
@@ -335,6 +381,7 @@ export type Database = {
           created_at?: string
           email: string
           full_name: string
+          height_cm?: number | null
           id?: string
           nutritionist_id?: string | null
           onboarding_completed_at?: string | null
@@ -349,6 +396,7 @@ export type Database = {
           created_at?: string
           email?: string
           full_name?: string
+          height_cm?: number | null
           id?: string
           nutritionist_id?: string | null
           onboarding_completed_at?: string | null
