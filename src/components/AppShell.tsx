@@ -139,6 +139,15 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     enabled: mounted && !isPatient,
   });
 
+  // Badge de feedback pendente (paciente).
+  const fetchFbStatus = useServerFn(getMyFeedbackStatus);
+  const { data: fbStatus } = useQuery({
+    queryKey: ["patient-feedback-status-nav"],
+    queryFn: () => fetchFbStatus(),
+    staleTime: 60_000,
+    enabled: mounted && isPatient,
+  });
+
   async function handleSignOut() {
     await signOut();
     navigate({ to: "/" });
