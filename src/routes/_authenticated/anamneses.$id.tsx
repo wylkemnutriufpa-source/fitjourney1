@@ -48,7 +48,11 @@ function AnamnesisDetailPage() {
     mutationFn: (decision: "approved" | "needs_changes") =>
       review({ data: { anamnesisId: id, decision, notes: notes || null } }),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["nutri", "anamneses"] });
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["nutri", "anamneses"] }),
+        qc.invalidateQueries({ queryKey: ["patients-index"] }),
+        qc.invalidateQueries({ queryKey: ["patient-detail"] }),
+      ]);
       navigate({ to: "/anamneses" });
     },
     onError: (e: Error) => setActionError(e.message),

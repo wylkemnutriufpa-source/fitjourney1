@@ -190,24 +190,14 @@ function Patients() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-1">
-                      {hasAnamnesis ? (
-                        <Link
-                          to="/anamneses"
-                          className="size-8 grid place-items-center rounded text-muted-foreground hover:text-foreground"
-                          title="Abrir fila de anamneses"
-                        >
-                          <FileText className="size-4" />
-                        </Link>
-                      ) : (
-                        <button
-                          type="button"
-                          disabled
-                          className="size-8 grid place-items-center rounded text-muted-foreground/50 cursor-not-allowed"
-                          title="Disponível após anamnese"
-                        >
-                          <FileText className="size-4" />
-                        </button>
-                      )}
+                      <Link
+                        to="/patients/$id"
+                        params={{ id: p.id }}
+                        className="size-8 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        title="Abrir perfil do paciente"
+                      >
+                        <FileText className="size-4" />
+                      </Link>
                     </div>
                   </td>
                 </tr>
