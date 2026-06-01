@@ -441,10 +441,14 @@ function TemplatesPage() {
               : null
           }
           onClose={() => setEditing(null)}
-          onSave={(t) => {
-            saveMine(t);
-            setEditing(null);
-            setTab("meus");
+          onSave={async (input) => {
+            try {
+              await saveMine(input);
+              setEditing(null);
+              setTab("meus");
+            } catch {
+              /* toast já tratou */
+            }
           }}
         />
       )}
