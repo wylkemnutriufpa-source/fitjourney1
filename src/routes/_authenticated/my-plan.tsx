@@ -418,9 +418,11 @@ function MealCard({
 function FoodItemReadonlyRow({
   item,
   foods,
+  mealKind,
 }: {
   item: any;
   foods: FoodDTO[] | undefined;
+  mealKind: MealKind;
 }) {
   const [open, setOpen] = useState(false);
   const match = useMemo(
@@ -430,39 +432,15 @@ function FoodItemReadonlyRow({
   const measures = match?.householdMeasures ?? [];
   const hasMeasures = measures.length > 0;
 
-  // Substituições equivalentes: mesmo scaleGroup, exceto o próprio alimento.
-  // Cálculo: gramas equivalentes = kcal do item / kcal_per_100g * 100.
   const itemKcal = Number.isFinite(item?.kcal) ? Number(item.kcal) : 0;
-  const substitutions = useMemo(() => {
-    if (!foods?.length || !match?.scaleGroup) return [];
-    return foods
-      .filter(
-        (f) =>
-          f.scaleGroup === match.scaleGroup &&
-          f.id !== match.id &&
-          f.kcalPer100g > 0,
-      )
-      .slice(0, 12)
-      .map((f) => {
-        const useGrams = f.unit === "g" || f.unit === "ml";
-        const grams = itemKcal > 0
-          ? Math.max(5, Math.round((itemKcal / f.kcalPer100g) * 100))
-          : Math.round(f.qty);
-        return {
-          id: f.id,
-          name: f.name,
-          unit: useGrams ? f.unit : f.unit,
-          qty: useGrams ? grams : f.qty,
-          kcal: useGrams
-            ? Math.round((f.kcalPer100g * grams) / 100)
-            : f.kcal,
-          defaultMeasure:
-            f.householdMeasures.find((m) => m.isDefault) ??
-            f.householdMeasures[0] ??
-            null,
-        };
-      });
-  }, [foods, match?.id, match?.scaleGroup, itemKcal]);
+
+  // Substituições CURADAS por contexto da refeição (3-4 opções coerentes).
+  // Não usa scaleGroup aberto para evitar trocas absurdas
+  // (ex.: arroz por pão no almoço, carne por feijão).
+  const substitutions = useMemo(
+    () => getSubstitutionsFor(item?.name ?? "", mealKind),
+    [item?.name, mealKind],
+  );
 
   return (
     <li className="border-b border-border/50 last:border-0">
