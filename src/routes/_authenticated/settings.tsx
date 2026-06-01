@@ -15,6 +15,7 @@ import {
   getMyFeedbackFrequency,
   setMyFeedbackFrequency,
 } from "@/lib/feedback/feedback.functions";
+import { publicUrl } from "@/lib/public-url";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações — FitJourney" }] }),
