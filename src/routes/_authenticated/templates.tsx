@@ -507,15 +507,18 @@ function TemplateEditor({
   original,
   isMine,
   existingMine,
+  patientContext,
   onClose,
   onSave,
 }: {
   original: PlannerTemplate;
   isMine: boolean;
   existingMine?: MyTemplate;
+  patientContext?: { id: string; name: string } | null;
   onClose: () => void;
   onSave: (t: MyTemplate) => void;
 }) {
+  const navigate = useNavigate();
   const [draft, setDraft] = useState<PlannerTemplate>(() => clonePlannerTemplate(original));
   const [name, setName] = useState(
     isMine ? original.name : `${original.name} (cópia)`,
