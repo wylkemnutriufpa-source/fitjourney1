@@ -192,18 +192,9 @@ function Patients() {
                     <div className="flex items-center justify-end gap-1">
                       {hasAnamnesis ? (
                         <Link
-                          to="/anamneses/$id"
-                          params={{ id: "" }}
-                          search={{} as never}
-                          // Quick view: usa rota da anamnese vinculada via paciente.
-                          // Atalho usa primeira anamnese pendente/aprovada.
+                          to="/anamneses"
                           className="size-8 grid place-items-center rounded text-muted-foreground hover:text-foreground"
-                          title="Abrir anamnese"
-                          onClick={(e) => {
-                            // Sem id direto aqui; redireciona para fila filtrando por paciente.
-                            e.preventDefault();
-                            window.location.href = `/anamneses`;
-                          }}
+                          title="Abrir fila de anamneses"
                         >
                           <FileText className="size-4" />
                         </Link>
