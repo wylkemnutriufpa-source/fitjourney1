@@ -32,7 +32,7 @@ function pickLandingRoute(identity: IdentityStateDTO): string {
 
 function Login() {
   const navigate = useNavigate();
-  const { signIn, session, loading } = useAuth();
+  const { signIn, signOut, session, loading } = useAuth();
   const [email, setEmail] = useState("wylkem.nutri.ufpa@gmail.com");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -47,19 +47,38 @@ function Login() {
     resolvingRef.current = false;
   }, [session?.user?.id]);
 
-  // Sessão pré-existente: resolve identidade no servidor antes de navegar,
-  // para garantir que paciente vai pra /my-dashboard e nutri pra /dashboard,
-  // sem flash de UI errada.
+  // Sessão pré-existente: resolve identidade no servidor antes de navegar.
+  // CRÍTICO: nunca usar fallback cego para /dashboard — paciente cairia no
+  // painel de nutri (bug histórico). Em falha persistente, desloga.
   useEffect(() => {
     if (!session || resolvedTarget || resolvingRef.current) return;
     resolvingRef.current = true;
-    getMyIdentityState()
-      .then((id) => setResolvedTarget(pickLandingRoute(id)))
-      .catch(() => setResolvedTarget("/dashboard"))
-      .finally(() => {
-        resolvingRef.current = false;
-      });
-  }, [session, resolvedTarget]);
+    let cancelled = false;
+    (async () => {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const id = await getMyIdentityState();
+          if (!cancelled) setResolvedTarget(pickLandingRoute(id));
+          return;
+        } catch (err) {
+          if (attempt === 2) {
+            console.error("[Login] identity resolve failed after retries:", err);
+            await signOut();
+            if (!cancelled) {
+              setError("Não foi possível validar seu perfil. Faça login novamente.");
+            }
+            return;
+          }
+          await new Promise((r) => setTimeout(r, 250 * (attempt + 1)));
+        }
+      }
+    })().finally(() => {
+      resolvingRef.current = false;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [session, resolvedTarget, signOut]);
 
   if (loading) return null;
   if (session) {
