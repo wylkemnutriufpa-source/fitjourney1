@@ -91,6 +91,20 @@ export const Route = createFileRoute("/_authenticated/templates")({
 
 type Tab = "biblioteca" | "meus";
 
+function friendlyPublishError(msg: string): string {
+  if (!msg) return "Falha ao publicar plano.";
+  if (msg.includes("CLINICAL_CONTEXT_INCOMPLETE")) {
+    return "Este paciente ainda não tem anamnese aprovada (ou faltam dados clínicos essenciais como sexo, idade, altura, peso ou nível de atividade). Aprove a anamnese antes de publicar o plano.";
+  }
+  if (msg.includes("CLINICAL_GATE_BLOCKED")) {
+    return "O plano não passou nas regras clínicas obrigatórias. Revise as refeições e tente novamente.";
+  }
+  if (msg.includes("Paciente não pertence")) {
+    return "Este paciente não está vinculado a você.";
+  }
+  return msg.replace(/^Error:\s*/i, "");
+}
+
 function normalizeTitle(s: string) {
   return s
     .normalize("NFD")
