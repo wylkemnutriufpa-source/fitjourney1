@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { imgFor } from "@/lib/food-images";
+import { emojiForFood } from "@/lib/food-emojis";
 import {
   detectMealKind,
   getSubstitutionsFor,
@@ -451,7 +452,7 @@ function FoodItemReadonlyRow({
             className="w-full flex items-center justify-between gap-3 py-1.5 text-left hover:bg-primary/5 rounded-sm px-1 -mx-1 transition-colors"
           >
             <span className="flex items-center gap-1.5 min-w-0">
-              <Scale className="size-3 text-primary/70 shrink-0" />
+              <span className="text-sm leading-none shrink-0" aria-hidden>{emojiForFood(item?.name)}</span>
               <span className="truncate">{item?.name ?? "—"}</span>
             </span>
             <span className="text-muted-foreground tabular-nums text-xs shrink-0">

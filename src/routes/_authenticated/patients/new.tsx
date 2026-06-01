@@ -141,39 +141,130 @@ function NewPatient() {
               </div>
             </section>
 
-            <section id="antropo" className="space-y-4">
-              <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-                02 · Antropometria
-              </h2>
-              <div className="grid grid-cols-3 gap-4">
-                <Field label="Peso (kg)">
-                  <input
-                    className={inputCls}
-                    type="number"
-                    value={weight}
-                    onChange={(e) => setWeight(+e.target.value)}
-                  />
-                </Field>
-                <Field label="Altura (cm)">
-                  <input
-                    className={inputCls}
-                    type="number"
-                    value={height}
-                    onChange={(e) => setHeight(+e.target.value)}
-                  />
-                </Field>
-                <Field label="% Gordura" hint="opcional, bioimpedância">
-                  <input className={inputCls} type="number" defaultValue={14} />
-                </Field>
-                <Field label="Circunf. Cintura (cm)">
-                  <input className={inputCls} type="number" defaultValue={82} />
-                </Field>
-                <Field label="Circunf. Quadril (cm)">
-                  <input className={inputCls} type="number" defaultValue={98} />
-                </Field>
-                <Field label="Massa Magra (kg)">
-                  <input className={inputCls} type="number" defaultValue={64} />
-                </Field>
+            <section id="antropo" className="space-y-6">
+              <div>
+                <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
+                  02 · Antropometria
+                </h2>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Todos os campos abaixo são <strong>opcionais</strong>. Preencha o que tiver disponível
+                  — o sistema funciona mesmo com avaliação física parcial ou ausente.
+                </p>
+              </div>
+
+              {/* Básico */}
+              <div className="space-y-3">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80">
+                  Básico
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Field label="Peso (kg)">
+                    <input
+                      className={inputCls}
+                      type="number"
+                      value={weight}
+                      onChange={(e) => setWeight(+e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Altura (cm)">
+                    <input
+                      className={inputCls}
+                      type="number"
+                      value={height}
+                      onChange={(e) => setHeight(+e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Data da avaliação" hint="opcional">
+                    <input className={inputCls} type="date" />
+                  </Field>
+                </div>
+              </div>
+
+              {/* Bioimpedância */}
+              <div className="space-y-3 border-t border-border/50 pt-5">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80">
+                  Bioimpedância (BIA) <span className="opacity-60">— opcional</span>
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Field label="% Gordura corporal"><input className={inputCls} type="number" step="0.1" placeholder="ex: 18.5" /></Field>
+                  <Field label="% Massa muscular"><input className={inputCls} type="number" step="0.1" placeholder="ex: 42.0" /></Field>
+                  <Field label="Massa magra (kg)"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Massa gorda (kg)"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Água corporal (%)"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Gordura visceral" hint="nível (1–30)"><input className={inputCls} type="number" /></Field>
+                  <Field label="TMB medida (kcal)" hint="se BIA fornece"><input className={inputCls} type="number" /></Field>
+                  <Field label="Idade metabólica"><input className={inputCls} type="number" /></Field>
+                  <Field label="Equipamento" hint="ex: InBody 270, Tanita">
+                    <input className={inputCls} type="text" />
+                  </Field>
+                </div>
+              </div>
+
+              {/* Perímetros (circunferências) */}
+              <div className="space-y-3 border-t border-border/50 pt-5">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80">
+                  Perímetros / Circunferências (cm) <span className="opacity-60">— opcional</span>
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Field label="Pescoço"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Tórax"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Cintura"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Abdômen"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Quadril"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Braço relaxado"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Braço contraído"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Antebraço"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Coxa proximal"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Coxa medial"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Panturrilha"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Punho"><input className={inputCls} type="number" step="0.1" /></Field>
+                </div>
+              </div>
+
+              {/* Dobras cutâneas + protocolo */}
+              <div className="space-y-3 border-t border-border/50 pt-5">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80">
+                  Dobras cutâneas (mm) <span className="opacity-60">— opcional</span>
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Field label="Protocolo">
+                    <select className={inputCls} defaultValue="">
+                      <option value="">— Selecione —</option>
+                      <option value="pollock-3h">Pollock 3 dobras (homens)</option>
+                      <option value="pollock-3m">Pollock 3 dobras (mulheres)</option>
+                      <option value="pollock-7">Pollock 7 dobras</option>
+                      <option value="jackson-pollock">Jackson & Pollock</option>
+                      <option value="petroski">Petroski (brasileiros)</option>
+                      <option value="guedes-3">Guedes 3 dobras</option>
+                      <option value="faulkner">Faulkner (4 dobras)</option>
+                      <option value="durnin-womersley">Durnin & Womersley</option>
+                      <option value="slaughter">Slaughter (crianças/adolesc.)</option>
+                    </select>
+                  </Field>
+                  <Field label="Avaliador / Equipamento" hint="ex: Cescorf, Sanny">
+                    <input className={inputCls} type="text" />
+                  </Field>
+                  <Field label="% Gordura calculada" hint="opcional, manual">
+                    <input className={inputCls} type="number" step="0.1" />
+                  </Field>
+
+                  <Field label="Tríceps"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Bíceps"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Subescapular"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Suprailíaca"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Supraespinal"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Abdominal"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Peitoral"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Axilar média"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Coxa"><input className={inputCls} type="number" step="0.1" /></Field>
+                  <Field label="Panturrilha medial"><input className={inputCls} type="number" step="0.1" /></Field>
+                </div>
+              </div>
+
+              <div className="border border-dashed border-amber-400/30 bg-amber-400/5 rounded-md p-3 text-[11px] text-muted-foreground">
+                Nenhum dos campos antropométricos é obrigatório. A ausência de avaliação física
+                <strong> jamais bloqueia</strong> cadastro, anamnese, plano ou publicação — só melhora a
+                precisão dos cálculos quando disponível.
               </div>
             </section>
 
