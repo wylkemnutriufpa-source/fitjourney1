@@ -730,6 +730,45 @@ export function createEmptyMeal(): PlannerMeal {
   };
 }
 
+/**
+ * Esqueleto vazio para o profissional montar um plano do zero.
+ * 4 refeições típicas (café, almoço, lanche, jantar) sem alimentos.
+ * Profissional adiciona itens — substituições equivalentes são injetadas
+ * automaticamente pelo editor via regras curadas.
+ */
+export function createEmptyTemplate(): PlannerTemplate {
+  function blank(time: string, label: string, hero: string): PlannerMeal {
+    return {
+      id: nextId("meal"),
+      time,
+      label,
+      heroKey: hero,
+      main: {
+        id: nextId("option"),
+        title: label,
+        imageKey: hero,
+        items: [],
+      },
+      equivalents: [],
+    };
+  }
+  const meals: PlannerMeal[] = [
+    blank("07:00", "Café da manhã", "iogurte-natural"),
+    blank("12:30", "Almoço", "frango-grelhado"),
+    blank("16:00", "Lanche da tarde", "iogurte-natural"),
+    blank("20:00", "Jantar", "frango-grelhado"),
+  ];
+  return {
+    id: `blank-${nextId("tpl")}`,
+    name: "Plano do zero",
+    category: "Esportivo",
+    description: "Plano elaborado do zero pelo profissional.",
+    tags: ["custom"],
+    kcal: 0,
+    meals,
+  };
+}
+
 export function normalizeStoredPlannerTemplate(template: unknown): PlannerTemplate | null {
   if (!template || typeof template !== "object") return null;
   try {
