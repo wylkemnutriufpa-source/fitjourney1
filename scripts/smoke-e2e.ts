@@ -218,7 +218,7 @@ async function run() {
 
   const { error: approveErr } = await admin
     .from("anamneses")
-    .update({ review_status: "approved", approved_by: created.nutriAuthId })
+    .update({ review_status: "approved", approved_by: created.nutriId })
     .eq("id", created.anamneseId);
   check("anamnese aprovada", !approveErr, approveErr?.message);
 
