@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 
 const STORAGE_KEY = "fj_intro_pending";
+const EVENT_NAME = "fj:play-intro";
 
 export function markIntroPending() {
   try {
@@ -10,35 +12,66 @@ export function markIntroPending() {
   }
 }
 
+export function playIntro() {
+  window.dispatchEvent(new CustomEvent(EVENT_NAME));
+}
+
 export function IntroOverlay() {
+  const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [textVisible, setTextVisible] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+  const manualRef = useRef(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     try {
       if (sessionStorage.getItem(STORAGE_KEY) === "1") {
         sessionStorage.removeItem(STORAGE_KEY);
+        manualRef.current = false;
         setShow(true);
       }
     } catch {
       // ignore
     }
+    const handler = () => {
+      manualRef.current = true;
+      setFadeOut(false);
+      setTextVisible(false);
+      setShow(true);
+    };
+    window.addEventListener(EVENT_NAME, handler);
+    return () => window.removeEventListener(EVENT_NAME, handler);
   }, []);
 
   useEffect(() => {
     if (!show) return;
     const t1 = window.setTimeout(() => setTextVisible(true), 600);
-    // Auto-close em 7s (vídeo tem ~8s); usuário pode pular
     const t2 = window.setTimeout(() => setFadeOut(true), 6500);
-    const t3 = window.setTimeout(() => setShow(false), 7200);
+    const t3 = window.setTimeout(() => finish(), 7200);
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.clearTimeout(t3);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
+
+  function finish() {
+    const wasManual = manualRef.current;
+    setShow(false);
+    setFadeOut(false);
+    setTextVisible(false);
+    manualRef.current = false;
+    if (wasManual) {
+      navigate({ to: "/dashboard" });
+    }
+  }
+
+  function close() {
+    setFadeOut(true);
+    window.setTimeout(() => finish(), 500);
+  }
 
   if (!show) return null;
 
@@ -47,10 +80,7 @@ export function IntroOverlay() {
       className={`fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden transition-opacity duration-700 ${
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
-      onClick={() => {
-        setFadeOut(true);
-        window.setTimeout(() => setShow(false), 500);
-      }}
+      onClick={close}
     >
       <video
         ref={videoRef}
@@ -91,12 +121,11 @@ export function IntroOverlay() {
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          setFadeOut(true);
-          window.setTimeout(() => setShow(false), 500);
+          close();
         }}
         className="absolute bottom-6 right-6 z-20 text-xs uppercase tracking-widest text-white/60 hover:text-white border border-white/20 hover:border-white/60 px-3 py-1.5 rounded-sm transition-colors"
       >
-        Pular
+        Fechar
       </button>
     </div>
   );
