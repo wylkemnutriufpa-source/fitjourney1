@@ -229,7 +229,7 @@ function Dashboard() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </Link>
 
           <div className="bg-surface border border-border rounded-lg p-6 space-y-4">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
