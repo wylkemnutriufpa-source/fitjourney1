@@ -224,3 +224,154 @@ export const getMyAdherenceAverage = createServerFn({ method: "GET" })
     const pct = Math.round(((avg - 1) / 4) * 100);
     return { pct, sampleSize: scores.length };
   });
+
+// ---------------------------------------------------------------------------
+// getMyAdherenceInsights — visão analítica para a tela /insights.
+// Retorna:
+//   - average { pct, sampleSize }
+//   - distribution: contagem por rating (muito_dificil..muito_facil)
+//   - perPatient: por paciente, média e nº de feedbacks (ordenado desc)
+//   - timeline: últimos 12 períodos semanais (média da semana)
+
+export type AdherenceInsights = {
+  average: AdherenceAverage;
+  distribution: Array<{ key: string; label: string; count: number }>;
+  perPatient: Array<{
+    patientId: string;
+    fullName: string;
+    pct: number;
+    sampleSize: number;
+  }>;
+  timeline: Array<{ weekStart: string; label: string; pct: number | null; sampleSize: number }>;
+};
+
+const ADHERENCE_LABELS: Record<string, string> = {
+  muito_dificil: "Muito difícil",
+  dificil: "Difícil",
+  neutro: "Neutro",
+  facil: "Fácil",
+  muito_facil: "Muito fácil",
+};
+
+export const getMyAdherenceInsights = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AdherenceInsights> => {
+    const { supabase, userId } = context;
+
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+
+    const empty: AdherenceInsights = {
+      average: { pct: null, sampleSize: 0 },
+      distribution: Object.keys(ADHERENCE_SCORE).map((k) => ({
+        key: k,
+        label: ADHERENCE_LABELS[k] ?? k,
+        count: 0,
+      })),
+      perPatient: [],
+      timeline: [],
+    };
+    if (!nutri) return empty;
+
+    const { data: rows } = await supabase
+      .from("patient_feedbacks")
+      .select("adherence_rating, patient_id, created_at")
+      .eq("nutritionist_id", nutri.id)
+      .order("created_at", { ascending: true });
+
+    if (!rows || rows.length === 0) return empty;
+
+    // Distribuição global
+    const distMap: Record<string, number> = {};
+    for (const k of Object.keys(ADHERENCE_SCORE)) distMap[k] = 0;
+    const scores: number[] = [];
+    const byPatient = new Map<string, number[]>();
+
+    for (const r of rows) {
+      const key = (r.adherence_rating ?? "") as string;
+      const s = ADHERENCE_SCORE[key];
+      if (typeof s !== "number") continue;
+      distMap[key] = (distMap[key] ?? 0) + 1;
+      scores.push(s);
+      const arr = byPatient.get(r.patient_id) ?? [];
+      arr.push(s);
+      byPatient.set(r.patient_id, arr);
+    }
+
+    const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+    const average: AdherenceAverage = {
+      pct: scores.length ? Math.round(((avg - 1) / 4) * 100) : null,
+      sampleSize: scores.length,
+    };
+
+    // Nomes dos pacientes
+    const patientIds = Array.from(byPatient.keys());
+    const namesMap = new Map<string, string>();
+    if (patientIds.length) {
+      const { data: pats } = await supabase
+        .from("patients")
+        .select("id, full_name")
+        .in("id", patientIds);
+      for (const p of pats ?? []) namesMap.set(p.id, p.full_name);
+    }
+
+    const perPatient = patientIds
+      .map((id) => {
+        const arr = byPatient.get(id) ?? [];
+        const a = arr.reduce((x, y) => x + y, 0) / arr.length;
+        return {
+          patientId: id,
+          fullName: namesMap.get(id) ?? "—",
+          pct: Math.round(((a - 1) / 4) * 100),
+          sampleSize: arr.length,
+        };
+      })
+      .sort((a, b) => b.pct - a.pct);
+
+    // Timeline semanal (últimas 12 semanas)
+    function startOfWeekISO(d: Date): string {
+      const dt = new Date(d);
+      const day = dt.getUTCDay(); // 0=Dom
+      const diff = (day + 6) % 7; // segunda como início
+      dt.setUTCDate(dt.getUTCDate() - diff);
+      dt.setUTCHours(0, 0, 0, 0);
+      return dt.toISOString().slice(0, 10);
+    }
+    const buckets = new Map<string, number[]>();
+    for (const r of rows) {
+      const s = ADHERENCE_SCORE[(r.adherence_rating ?? "") as string];
+      if (typeof s !== "number") continue;
+      const wk = startOfWeekISO(new Date(r.created_at));
+      const arr = buckets.get(wk) ?? [];
+      arr.push(s);
+      buckets.set(wk, arr);
+    }
+    const sortedWeeks = Array.from(buckets.keys()).sort();
+    const last12 = sortedWeeks.slice(-12);
+    const timeline = last12.map((wk) => {
+      const arr = buckets.get(wk) ?? [];
+      const a = arr.reduce((x, y) => x + y, 0) / arr.length;
+      const [y, m, d] = wk.split("-").map(Number);
+      const label = `${String(d).padStart(2, "0")}/${String(m).padStart(2, "0")}`;
+      return {
+        weekStart: wk,
+        label,
+        pct: arr.length ? Math.round(((a - 1) / 4) * 100) : null,
+        sampleSize: arr.length,
+      };
+    });
+
+    return {
+      average,
+      distribution: Object.keys(ADHERENCE_SCORE).map((k) => ({
+        key: k,
+        label: ADHERENCE_LABELS[k] ?? k,
+        count: distMap[k] ?? 0,
+      })),
+      perPatient,
+      timeline,
+    };
+  });

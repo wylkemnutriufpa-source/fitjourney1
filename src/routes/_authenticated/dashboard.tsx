@@ -164,7 +164,7 @@ function Dashboard() {
                 : "sem feedbacks"
             }
             icon={TrendingUp}
-            to="/financeiro"
+            to="/insights"
           />
           <Kpi label="Revisões Pendentes" value={pendingValue} hint="Ação hoje" icon={AlertCircle} accent to="/anamneses" />
         </section>
