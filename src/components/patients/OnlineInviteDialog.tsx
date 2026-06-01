@@ -3,6 +3,7 @@
 // Compartilhamento: copiar / WhatsApp / Email.
 
 import { useEffect, useMemo, useState } from "react";
+import { publicUrl } from "@/lib/public-url";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
