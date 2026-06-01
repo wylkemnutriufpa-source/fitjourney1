@@ -22,6 +22,11 @@ import {
 import { useMemo, useState } from "react";
 import { imgFor } from "@/lib/food-images";
 import {
+  detectMealKind,
+  getSubstitutionsFor,
+  type MealKind,
+} from "@/lib/plans/substitution-rules";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
