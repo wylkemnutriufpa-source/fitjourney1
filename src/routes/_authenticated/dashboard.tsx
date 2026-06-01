@@ -2,12 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { recentActivity } from "@/lib/mock-data";
 import { Plus, ArrowUpRight, TrendingUp, Users, Activity, AlertCircle } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { getMyNutritionistProfile } from "@/lib/profile/nutritionist-profile.functions";
 import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
+import { getMyWeeklyActivity } from "@/lib/dashboard/dashboard.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — FitJourney" }] }),
