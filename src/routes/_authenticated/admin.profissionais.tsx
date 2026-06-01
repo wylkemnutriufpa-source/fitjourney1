@@ -247,6 +247,7 @@ function SubscriptionDialog({
           phone: phone.trim() || null,
           crn: crn.trim() || null,
           specialty: specialty.trim() || null,
+          feedback_frequency_days: Math.max(1, Math.min(90, Math.round(feedbackFreq) || 7)),
         },
       });
       return upsert({ data: input });
