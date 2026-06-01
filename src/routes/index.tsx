@@ -33,7 +33,7 @@ function Login() {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(email, password, rememberMe);
     setSubmitting(false);
     if (error) {
       setError(error);
