@@ -71,6 +71,8 @@ function Dashboard() {
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const fetchPending = useServerFn(getMyPendingAnamnesesCount);
   const fetchWeekly = useServerFn(getMyWeeklyActivity);
+  const fetchGoals = useServerFn(getMyGoalDistribution);
+  const fetchAdherence = useServerFn(getMyAdherenceAverage);
 
   const { data: profile } = useQuery({
     queryKey: ["nutri-profile"],
@@ -92,6 +94,16 @@ function Dashboard() {
   const { data: weekly = [] } = useQuery({
     queryKey: ["nutri", "weekly-activity"],
     queryFn: () => fetchWeekly(),
+    staleTime: 60_000,
+  });
+  const { data: goals = [] } = useQuery({
+    queryKey: ["nutri", "goal-distribution"],
+    queryFn: () => fetchGoals(),
+    staleTime: 60_000,
+  });
+  const { data: adherence } = useQuery({
+    queryKey: ["nutri", "adherence-avg"],
+    queryFn: () => fetchAdherence(),
     staleTime: 60_000,
   });
 
