@@ -25,8 +25,10 @@ export type AdminNutritionistRow = {
   email: string;
   phone: string | null;
   crn: string | null;
+  feedback_frequency_days: number;
   created_at: string;
   patients_count: number;
+
   subscription: {
     id: string;
     plan_tier: NutriPlanTier;
