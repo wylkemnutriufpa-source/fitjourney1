@@ -26,7 +26,7 @@ import {
 } from "@/lib/template-data";
 import { TemplateMatcherPanel } from "@/components/TemplateMatcherPanel";
 
-import { imgFor } from "@/lib/food-images";
+import { imgFor, allFoodKeys, foodImages } from "@/lib/food-images";
 import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
 import { SendShareDialog } from "@/components/SendShareDialog";
 import { FoodPickerDialog } from "@/components/FoodPickerDialog";
