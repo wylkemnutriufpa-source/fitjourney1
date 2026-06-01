@@ -65,7 +65,7 @@ export type PatientPlanSummary = {
 };
 
 export type PatientPlanFull = PatientPlanSummary & {
-  snapshot: Record<string, unknown>;
+  snapshot: any;
 };
 
 import { z } from "zod";
