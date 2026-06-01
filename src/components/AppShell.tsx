@@ -22,6 +22,7 @@ import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { applyTheme, getStoredTheme } from "@/lib/patient/theme";
+import fjLogo from "@/assets/fitjourney-logo.png";
 
 
 const nutritionistNav = [
@@ -182,11 +183,13 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         }
       >
         <div className="flex items-center justify-between gap-2 px-2 mb-10">
-          <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="size-8 bg-primary rounded-sm grid place-items-center">
-              <div className="size-4 border-2 border-background rotate-45" />
-            </div>
-            <span className="text-lg font-bold tracking-tight uppercase italic">
+          <Link to="/dashboard" className="flex items-center gap-2.5">
+            <img
+              src={fjLogo}
+              alt="FitJourney"
+              className="size-9 rounded-md object-cover ring-1 ring-primary/30 shadow-[0_0_20px_-8px_oklch(0.62_0.16_155/0.6)]"
+            />
+            <span className="fj-wordmark text-xl leading-none">
               FitJourney
             </span>
           </Link>

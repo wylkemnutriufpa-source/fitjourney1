@@ -13,6 +13,8 @@ export interface MyPatientProfile {
   birthDate: string | null;
   heightCm: number | null;
   avatarUrl: string | null;
+  sourceLegacyId: string | null;
+  hasAnamnesis: boolean;
 }
 
 export const getMyPatientProfile = createServerFn({ method: "POST" })
@@ -21,11 +23,17 @@ export const getMyPatientProfile = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("patients")
-      .select("id, full_name, email, phone, birth_date, height_cm, avatar_url")
+      .select("id, full_name, email, phone, birth_date, height_cm, avatar_url, source_legacy_id")
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!data) throw new Error("PATIENT_NOT_FOUND");
+
+    const { count } = await supabase
+      .from("anamneses")
+      .select("id", { count: "exact", head: true })
+      .eq("patient_id", data.id);
+
     return {
       id: data.id,
       fullName: data.full_name,
@@ -34,6 +42,8 @@ export const getMyPatientProfile = createServerFn({ method: "POST" })
       birthDate: data.birth_date ?? null,
       heightCm: data.height_cm != null ? Number(data.height_cm) : null,
       avatarUrl: data.avatar_url ?? null,
+      sourceLegacyId: data.source_legacy_id ?? null,
+      hasAnamnesis: (count ?? 0) > 0,
     };
   });
 
