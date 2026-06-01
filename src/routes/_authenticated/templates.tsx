@@ -40,12 +40,14 @@ import {
   createEmptyMeal,
   createEmptyFoodItem,
   createEmptyMealOption,
+  createEmptyTemplate,
   templateKcal,
   type PlannerTemplate,
   type PlannerMeal,
   type PlannerMealOption,
   type PlannerFoodItem,
 } from "@/lib/meal-planner";
+import { detectMealKind, getSubstitutionsFor } from "@/lib/plans/substitution-rules";
 import {
   Plus,
   Save,
@@ -72,16 +74,77 @@ import { publishPlanToPatient, type PatientLite } from "@/lib/plans/plans.functi
 
 export const Route = createFileRoute("/_authenticated/templates")({
   head: () => ({ meta: [{ title: "Templates — FitJourney" }] }),
+  validateSearch: (search: Record<string, unknown>): { blank?: number } => ({
+    blank: search.blank === "1" || search.blank === 1 ? 1 : undefined,
+  }),
   component: TemplatesPage,
 });
 
 type Tab = "biblioteca" | "meus";
 
+function normalizeTitle(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/**
+ * Gera opções equivalentes automáticas para a refeição a partir do alimento
+ * recém adicionado, usando o motor curado de substituições. Evita duplicar
+ * opções já existentes (comparando títulos normalizados) e o próprio item.
+ */
+function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): PlannerMealOption[] {
+  const kind = detectMealKind(meal.label, meal.time);
+  const subs = getSubstitutionsFor(food.name, kind, food.kcal || 0);
+  if (subs.length === 0) return [];
+  const taken = new Set<string>([
+    normalizeTitle(food.name),
+    ...meal.equivalents.map((e) => normalizeTitle(e.title)),
+    ...meal.equivalents.flatMap((e) => e.items.map((i) => normalizeTitle(i.name))),
+  ]);
+  const out: PlannerMealOption[] = [];
+  for (const s of subs) {
+    const key = normalizeTitle(s.name);
+    if (taken.has(key)) continue;
+    taken.add(key);
+    out.push(
+      createEmptyMealOption({
+        title: s.name,
+        imageKey: meal.main.imageKey || meal.heroKey || "iogurte-natural",
+        items: [
+          createEmptyFoodItem({
+            foodKey: food.foodKey,
+            name: s.name,
+            qty: s.qty,
+            unit: s.unit,
+            kcal: s.kcal ?? 0,
+            scaleGroup: food.scaleGroup,
+          }),
+        ],
+      }),
+    );
+  }
+  return out;
+}
+
 function TemplatesPage() {
+  const search = Route.useSearch();
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
   const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: MyTemplate } | null>(null);
   const { list: myList, save: saveMine, remove: removeMine } = useMyTemplates();
+
+  // Entrada "?blank=1" abre direto o editor com esqueleto vazio.
+  const blankHandled = useRef(false);
+  useEffect(() => {
+    if (search.blank === 1 && !blankHandled.current && !editing) {
+      blankHandled.current = true;
+      setEditing({ tpl: createEmptyTemplate(), isMine: false });
+    }
+  }, [search.blank, editing]);
 
   const filteredSystem = useMemo(
     () =>
@@ -102,10 +165,16 @@ function TemplatesPage() {
             <h1 className="text-3xl font-bold tracking-tight">Templates de Dieta</h1>
             <p className="text-sm text-muted-foreground max-w-2xl">
               Clique em uma refeição para abrir o canvas: cada alimento aparece desacoplado
-              (pão, ovo, café…) com sua gramatura e kcal. Alterar a quantidade do principal
-              escala todas as substituições proporcionalmente.
+              (pão, ovo, café…) com sua gramatura e kcal. Ao adicionar um alimento, opções
+              equivalentes coerentes com a refeição entram automaticamente.
             </p>
           </div>
+          <Button
+            onClick={() => setEditing({ tpl: createEmptyTemplate(), isMine: false })}
+            className="gap-1.5"
+          >
+            <Plus className="size-3.5" /> Plano do zero
+          </Button>
         </div>
 
         {/* Tabs */}
@@ -121,6 +190,7 @@ function TemplatesPage() {
             <span className="text-[10px] font-mono opacity-60">{myList.length}</span>
           </TabBtn>
         </div>
+
 
         {tab === "biblioteca" && (
           <>
@@ -680,7 +750,15 @@ function MealEditor({
   }
 
   function addMainItemFromCatalog(food: PlannerFoodItem) {
-    updateMainOption((o) => ({ ...o, items: [...o.items, food] }));
+    onChange((m) => {
+      const nextMain = { ...m.main, items: [...m.main.items, food] };
+      const auto = buildAutoEquivalents(m, food);
+      return {
+        ...m,
+        main: nextMain,
+        equivalents: [...m.equivalents, ...auto],
+      };
+    });
   }
 
   function removeMainItem(itemId: string) {
