@@ -22,6 +22,7 @@ import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { applyTheme, getStoredTheme } from "@/lib/patient/theme";
+import { supabase } from "@/integrations/supabase/client";
 import fjLogo from "@/assets/fitjourney-logo.png";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
 
@@ -110,6 +111,31 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   const email = user?.email ?? "";
   const initials = email.slice(0, 2).toUpperCase();
   const displayName = email.split("@")[0];
+
+  const isPatientArea =
+    path === "/my-dashboard" ||
+    path.startsWith("/my-dashboard/") ||
+    path === "/my-plan" ||
+    path.startsWith("/my-plan/") ||
+    path.startsWith("/onboarding/patient");
+
+  const avatarQuery = useQuery({
+    queryKey: ["app-shell-avatar", user?.id, isPatientArea],
+    enabled: !!user?.id,
+    staleTime: 60_000,
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const table = isPatientArea ? "patients" : "nutritionists";
+      const { data } = await supabase
+        .from(table)
+        .select("avatar_url")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+      return (data?.avatar_url as string | null) ?? null;
+    },
+  });
+  const avatarUrl = avatarQuery.data ?? null;
+  const settingsHref = isPatientArea ? "/my-plan/settings" : "/settings";
 
   // Sidebar: começa sempre aberto (SSR e client) para evitar hydration mismatch.
   // Fecha em mobile após o mount via useEffect.
@@ -311,9 +337,18 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 {email}
               </p>
             </div>
-            <div className="size-9 sm:size-10 rounded-full bg-surface border border-border grid place-items-center text-xs font-mono shrink-0">
-              {initials}
-            </div>
+            <button
+              type="button"
+              onClick={() => navigate({ to: settingsHref })}
+              title="Abrir configurações"
+              className="size-9 sm:size-10 rounded-full bg-surface border border-border overflow-hidden grid place-items-center text-xs font-mono shrink-0 hover:border-primary/60 transition-colors"
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="size-full object-cover" />
+              ) : (
+                <span>{initials}</span>
+              )}
+            </button>
           </div>
         </header>
         <main className="p-4 sm:p-8 max-w-7xl mx-auto">{children ?? <Outlet />}</main>
