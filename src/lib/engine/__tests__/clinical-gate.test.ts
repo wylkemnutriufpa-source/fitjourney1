@@ -24,6 +24,8 @@ describe("validatePlan", () => {
     });
     expect(r.blocked).toBe(false);
     expect(r.issues.length).toBe(0);
+    expect(r.blockers.length).toBe(0);
+    expect(r.warnings.length).toBe(0);
   });
 
   it("bloqueia proteína > 2.5 g/kg", () => {
