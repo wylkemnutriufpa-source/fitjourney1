@@ -401,6 +401,7 @@ export type Database = {
           notes: string | null
           nutritionist_id: string
           patient_id: string
+          photo_back_path: string | null
           photo_front_path: string | null
           photo_side_path: string | null
           result_rating: string | null
@@ -417,6 +418,7 @@ export type Database = {
           notes?: string | null
           nutritionist_id: string
           patient_id: string
+          photo_back_path?: string | null
           photo_front_path?: string | null
           photo_side_path?: string | null
           result_rating?: string | null
@@ -433,6 +435,7 @@ export type Database = {
           notes?: string | null
           nutritionist_id?: string
           patient_id?: string
+          photo_back_path?: string | null
           photo_front_path?: string | null
           photo_side_path?: string | null
           result_rating?: string | null

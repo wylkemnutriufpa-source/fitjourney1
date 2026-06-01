@@ -29,11 +29,12 @@ export type FeedbackDTO = {
   notes: string | null;
   photoFrontPath: string | null;
   photoSidePath: string | null;
+  photoBackPath: string | null;
   createdAt: string;
 };
 
 const SELECT_COLS =
-  "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, waist_cm, abdomen_cm, hip_cm, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, created_at";
+  "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, waist_cm, abdomen_cm, hip_cm, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, photo_back_path, created_at";
 
 function rowToDto(r: any): FeedbackDTO {
   return {
@@ -51,6 +52,7 @@ function rowToDto(r: any): FeedbackDTO {
     notes: r.notes ?? null,
     photoFrontPath: r.photo_front_path ?? null,
     photoSidePath: r.photo_side_path ?? null,
+    photoBackPath: r.photo_back_path ?? null,
     createdAt: r.created_at,
   };
 }
@@ -72,6 +74,7 @@ const SubmitInput = z.object({
   notes: z.string().trim().max(2000).optional().nullable(),
   photoFrontPath: z.string().trim().max(512).optional().nullable(),
   photoSidePath: z.string().trim().max(512).optional().nullable(),
+  photoBackPath: z.string().trim().max(512).optional().nullable(),
 });
 
 export const submitFeedback = createServerFn({ method: "POST" })
@@ -108,6 +111,7 @@ export const submitFeedback = createServerFn({ method: "POST" })
       notes: data.notes?.trim() || null,
       photo_front_path: data.photoFrontPath || null,
       photo_side_path: data.photoSidePath || null,
+      photo_back_path: data.photoBackPath || null,
     };
 
     const { data: row, error } = await supabase

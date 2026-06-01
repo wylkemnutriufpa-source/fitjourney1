@@ -169,7 +169,7 @@
   }
 }
 
-/* Wordmark "FitJourney" — premium: verde+dourado, sem itálico, com contorno. */
+/* Wordmark "FitJourney" — premium: dourado luminoso com toque esmeralda. */
 .fj-wordmark {
   font-family: var(--font-display);
   font-weight: 700;
@@ -177,20 +177,20 @@
   letter-spacing: 0.02em;
   background: linear-gradient(
     135deg,
-    var(--gold) 0%,
-    oklch(0.92 0.12 92) 28%,
-    oklch(0.78 0.15 145) 62%,
-    var(--primary) 100%
+    oklch(0.95 0.13 92) 0%,
+    var(--gold) 32%,
+    oklch(0.88 0.14 95) 58%,
+    oklch(0.82 0.16 140) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  -webkit-text-stroke: 1.2px oklch(0.18 0.04 150 / 0.85);
+  -webkit-text-stroke: 0.6px oklch(0.45 0.08 145 / 0.55);
   paint-order: stroke fill;
   filter:
-    drop-shadow(0 1px 0 oklch(0 0 0 / 0.5))
-    drop-shadow(0 0 18px oklch(0.62 0.16 155 / 0.45))
-    drop-shadow(0 0 36px oklch(0.78 0.14 88 / 0.25));
+    drop-shadow(0 1px 0 oklch(0 0 0 / 0.35))
+    drop-shadow(0 0 14px oklch(0.85 0.14 92 / 0.55))
+    drop-shadow(0 0 28px oklch(0.78 0.14 88 / 0.3));
 }
 
 /* ============================================================
@@ -244,6 +244,12 @@
 .fj-logo-orbit-3 {
   animation-duration: 4.5s;
   inset: -12%;
+}
+.fj-logo-orbit-4 {
+  animation-duration: 7.5s;
+  animation-direction: reverse;
+  inset: -26%;
+  transform: rotate(45deg);
 }
 
 @keyframes fj-logo-spin {

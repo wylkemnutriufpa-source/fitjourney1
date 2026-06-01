@@ -99,9 +99,11 @@ function FeedbackPage() {
   const [notes, setNotes] = useState<string>("");
   const [photoFront, setPhotoFront] = useState<File | null>(null);
   const [photoSide, setPhotoSide] = useState<File | null>(null);
+  const [photoBack, setPhotoBack] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const frontInputRef = useRef<HTMLInputElement>(null);
   const sideInputRef = useRef<HTMLInputElement>(null);
+  const backInputRef = useRef<HTMLInputElement>(null);
 
   function parseOptionalCm(s: string): number | null {
     const t = s.trim().replace(",", ".");
@@ -140,6 +142,7 @@ function FeedbackPage() {
       setUploading(true);
       let frontPath: string | null = null;
       let sidePath: string | null = null;
+      let backPath: string | null = null;
       try {
         if (photoFront) {
           frontPath = `${pRow.id}/${feedbackId}/front.jpg`;
@@ -161,6 +164,16 @@ function FeedbackPage() {
             });
           if (error) throw new Error(`Foto lateral: ${error.message}`);
         }
+        if (photoBack) {
+          backPath = `${pRow.id}/${feedbackId}/back.jpg`;
+          const { error } = await supabase.storage
+            .from("feedback-photos")
+            .upload(backPath, photoBack, {
+              upsert: false,
+              contentType: photoBack.type || "image/jpeg",
+            });
+          if (error) throw new Error(`Foto costas: ${error.message}`);
+        }
       } finally {
         setUploading(false);
       }
@@ -177,6 +190,7 @@ function FeedbackPage() {
           notes: notes.trim() || undefined,
           photoFrontPath: frontPath ?? undefined,
           photoSidePath: sidePath ?? undefined,
+          photoBackPath: backPath ?? undefined,
         },
       });
     },
@@ -191,6 +205,7 @@ function FeedbackPage() {
       setNotes("");
       setPhotoFront(null);
       setPhotoSide(null);
+      setPhotoBack(null);
       qc.invalidateQueries({ queryKey: ["my-feedbacks"] });
       qc.invalidateQueries({ queryKey: ["my-feedback-status"] });
       qc.invalidateQueries({ queryKey: ["patient-feedback-status-nav"] });
@@ -420,9 +435,9 @@ function FeedbackPage() {
                 04 · Fotos
               </h2>
               <p className="text-[11px] text-muted-foreground -mt-1">
-                Opcional. Frontal e lateral. Só você e seu nutricionista veem.
+                Opcional. Frontal, lateral e costas. Só você e seu nutricionista veem.
               </p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <PhotoSlot
                   label="Frontal"
                   file={photoFront}
@@ -434,6 +449,12 @@ function FeedbackPage() {
                   file={photoSide}
                   onSelect={(f) => setPhotoSide(validateFile(f))}
                   inputRef={sideInputRef}
+                />
+                <PhotoSlot
+                  label="Costas"
+                  file={photoBack}
+                  onSelect={(f) => setPhotoBack(validateFile(f))}
+                  inputRef={backInputRef}
                 />
               </div>
             </section>
@@ -539,9 +560,9 @@ function FeedbackPage() {
                       <Field
                         label="Fotos"
                         value={
-                          [f.photoFrontPath, f.photoSidePath].filter(Boolean)
+                          [f.photoFrontPath, f.photoSidePath, f.photoBackPath].filter(Boolean)
                             .length > 0
-                            ? `${[f.photoFrontPath, f.photoSidePath].filter(Boolean).length}`
+                            ? `${[f.photoFrontPath, f.photoSidePath, f.photoBackPath].filter(Boolean).length}`
                             : "—"
                         }
                       />
@@ -551,13 +572,16 @@ function FeedbackPage() {
                         {f.notes}
                       </p>
                     )}
-                    {(f.photoFrontPath || f.photoSidePath) && (
-                      <div className="flex gap-2 pt-1">
+                    {(f.photoFrontPath || f.photoSidePath || f.photoBackPath) && (
+                      <div className="flex gap-2 pt-1 flex-wrap">
                         {f.photoFrontPath && (
                           <PhotoThumb path={f.photoFrontPath} label="Frontal" />
                         )}
                         {f.photoSidePath && (
                           <PhotoThumb path={f.photoSidePath} label="Lateral" />
+                        )}
+                        {f.photoBackPath && (
+                          <PhotoThumb path={f.photoBackPath} label="Costas" />
                         )}
                       </div>
                     )}
