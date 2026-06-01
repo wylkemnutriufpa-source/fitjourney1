@@ -387,6 +387,11 @@ function TemplatesPage() {
           original={editing.tpl}
           isMine={editing.isMine}
           existingMine={editing.mine}
+          patientContext={
+            search.patientId
+              ? { id: search.patientId, name: search.patientName ?? "este paciente" }
+              : null
+          }
           onClose={() => setEditing(null)}
           onSave={(t) => {
             saveMine(t);
