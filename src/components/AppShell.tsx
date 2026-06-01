@@ -254,6 +254,9 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
               <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
                 <span className="fj-logo-particle" />
               </span>
+              <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
+                <span className="fj-logo-particle fj-logo-particle-gold" />
+              </span>
               <img
                 src={fjLogo}
                 alt="FitJourney"
