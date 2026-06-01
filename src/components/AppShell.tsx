@@ -337,9 +337,18 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 {email}
               </p>
             </div>
-            <div className="size-9 sm:size-10 rounded-full bg-surface border border-border grid place-items-center text-xs font-mono shrink-0">
-              {initials}
-            </div>
+            <button
+              type="button"
+              onClick={() => navigate({ to: settingsHref })}
+              title="Abrir configurações"
+              className="size-9 sm:size-10 rounded-full bg-surface border border-border overflow-hidden grid place-items-center text-xs font-mono shrink-0 hover:border-primary/60 transition-colors"
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="size-full object-cover" />
+              ) : (
+                <span>{initials}</span>
+              )}
+            </button>
           </div>
         </header>
         <main className="p-4 sm:p-8 max-w-7xl mx-auto">{children ?? <Outlet />}</main>
