@@ -1,10 +1,30 @@
 // Plans — server fns para listar pacientes do nutri logado e publicar plano.
 // Snapshot é congelado no momento do insert (V3). RLS do banco protege tudo.
+//
+// PIPELINE DE PUBLICAÇÃO (A1+A2):
+//   1. Carrega ClinicalContext server-side (peso por recência + anamnese
+//      aprovada mais recente).
+//   2. Bloqueia se ctx.calculable === false (CLINICAL_CONTEXT_INCOMPLETE).
+//   3. Roda motores nutricionais (TMB+TDEE+Macros) a partir do contexto.
+//   4. Deriva totais diários do snapshot e roda clinical-gate.
+//   5. Bloqueia se gate.blockers.length > 0 (CLINICAL_GATE_BLOCKED).
+//   6. Anexa snapshot.clinicalAudit (contexto+motor+warnings+versões)
+//      antes de persistir. Snapshot fica imutável após published_at.
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { validateSnapshot } from "./snapshot.schema";
+import { validateSnapshot, type ClinicalAudit } from "./snapshot.schema";
+import { buildClinicalContext, type ClinicalContext } from "@/lib/clinical/context";
+import type { ApprovedAnamnesisInput } from "@/lib/clinical/resolve-goal";
+import type { WeightReading } from "@/lib/clinical/resolve-weight";
+import {
+  CanonicalAnamnesisSchema,
+  type CanonicalAnamnesis,
+} from "@/lib/anamnesis/canonical.schema";
+import { runNutritionEngines } from "@/lib/clinical/run-nutrition-engines";
+import { validatePlan, type DailyTotals, type FoodOccurrence } from "@/lib/engine/clinical-gate";
+import { ENGINE_VERSION, GATE_VERSION } from "@/lib/engine/version";
 
 export type AnamnesisStatusLite =
   | "approved"
