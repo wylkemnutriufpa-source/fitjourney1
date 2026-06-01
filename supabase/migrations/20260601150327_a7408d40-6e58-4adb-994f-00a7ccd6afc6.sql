@@ -1,0 +1,1 @@
+CREATE POLICY "admins update all nutritionists" ON public.nutritionists FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'admin'::app_role)) WITH CHECK (public.has_role(auth.uid(), 'admin'::app_role));
