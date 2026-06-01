@@ -113,8 +113,9 @@ export function validatePlan(input: GateInput): GateResult {
     });
   }
 
-  const blocked = issues.some((i) => i.severity === "error");
-  return { issues, blocked };
+  const blockers = issues.filter((i) => i.severity === "error");
+  const warnings = issues.filter((i) => i.severity === "warning");
+  return { issues, blockers, warnings, blocked: blockers.length > 0 };
 }
 
 function averageMacros(
