@@ -266,8 +266,49 @@ function TemplatesPage() {
   const search = Route.useSearch();
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
-  const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: MyTemplate } | null>(null);
-  const { list: myList, save: saveMine, remove: removeMine } = useMyTemplates();
+  const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: StoredTemplate } | null>(null);
+
+  const qc = useQueryClient();
+  const listFn = useServerFn(listMyTemplates);
+  const saveFn = useServerFn(saveMyTemplate);
+  const deleteFn = useServerFn(deleteMyTemplate);
+  const { data: myList = [] } = useQuery({
+    queryKey: ["my-templates"],
+    queryFn: () => listFn(),
+  });
+  const removeMine = useCallback(
+    async (id: string) => {
+      try {
+        await deleteFn({ data: { id } });
+        await qc.invalidateQueries({ queryKey: ["my-templates"] });
+        toast.success("Template removido.");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Falha ao remover.");
+      }
+    },
+    [deleteFn, qc],
+  );
+  const saveMine = useCallback(
+    async (input: {
+      id?: string;
+      name: string;
+      basedOn: string;
+      finalidade?: string;
+      observacoes?: string;
+      template: PlannerTemplate;
+    }) => {
+      try {
+        await saveFn({ data: input });
+        await qc.invalidateQueries({ queryKey: ["my-templates"] });
+        toast.success("Template salvo em Meus Templates.");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Falha ao salvar.");
+        throw e;
+      }
+    },
+    [saveFn, qc],
+  );
+
 
   // Entrada "?blank=1" abre direto o editor com esqueleto vazio.
   const blankHandled = useRef(false);
