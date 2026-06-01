@@ -71,6 +71,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
     }
     const countByNutri = new Map<string, number>();
     for (const p of pats ?? []) {
+      if (!p.nutritionist_id) continue;
       countByNutri.set(p.nutritionist_id, (countByNutri.get(p.nutritionist_id) ?? 0) + 1);
     }
 
