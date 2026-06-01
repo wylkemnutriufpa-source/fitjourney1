@@ -618,17 +618,19 @@ function TemplateEditor({
   }
 
   function save() {
-    const toSave: MyTemplate = {
+    const finalTemplate: PlannerTemplate = {
       ...draft,
-      id: isMine ? draft.id : `mine-${Date.now()}`,
       name: name.trim() || draft.name,
       orientacoes: orientacoes.trim() || undefined,
+    };
+    onSave({
+      id: isMine ? draft.id : undefined,
+      name: finalTemplate.name,
       basedOn: isMine ? (existingMine?.basedOn ?? original.id) : original.id,
-      savedAt: new Date().toISOString(),
       finalidade: finalidade.trim() || undefined,
       observacoes: observacoes.trim() || undefined,
-    };
-    onSave(toSave);
+      template: finalTemplate,
+    });
   }
 
   const totalKcal = draft.kcal;
