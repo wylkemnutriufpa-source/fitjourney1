@@ -74,8 +74,10 @@ import { publishPlanToPatient, type PatientLite } from "@/lib/plans/plans.functi
 
 export const Route = createFileRoute("/_authenticated/templates")({
   head: () => ({ meta: [{ title: "Templates — FitJourney" }] }),
-  validateSearch: (search: Record<string, unknown>): { blank?: number } => ({
+  validateSearch: (search: Record<string, unknown>): { blank?: number; patientId?: string; patientName?: string } => ({
     blank: search.blank === "1" || search.blank === 1 ? 1 : undefined,
+    patientId: typeof search.patientId === "string" ? search.patientId : undefined,
+    patientName: typeof search.patientName === "string" ? search.patientName : undefined,
   }),
   component: TemplatesPage,
 });
