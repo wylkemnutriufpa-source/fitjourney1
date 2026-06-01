@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { calcTMB } from "@/lib/engine/tdee";
-import { Calculator, Save, Activity } from "lucide-react";
+import { Calculator, Save, Activity, ChevronDown } from "lucide-react";
 
 type Goal = "Performance" | "Hipertrofia" | "Emagrecimento" | "Manutenção";
 
@@ -10,6 +10,44 @@ export const Route = createFileRoute("/_authenticated/patients/new")({
   head: () => ({ meta: [{ title: "Nova Anamnese — FitJourney" }] }),
   component: NewPatient,
 });
+
+function CollapsibleSection({
+  id,
+  index,
+  title,
+  open,
+  onToggle,
+  children,
+}: {
+  id: string;
+  index: number;
+  title: string;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <section id={id} className="border border-border rounded-lg bg-surface/40 overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-accent/30 transition-colors"
+      >
+        <h2 className="text-sm font-mono uppercase tracking-widest text-primary text-left">
+          {String(index).padStart(2, "0")} · {title}
+        </h2>
+        <ChevronDown
+          className={
+            "size-4 text-muted-foreground transition-transform duration-200 " +
+            (open ? "rotate-180" : "")
+          }
+        />
+      </button>
+      {open && <div className="px-5 pb-6 pt-2 space-y-6 border-t border-border/60">{children}</div>}
+    </section>
+  );
+}
 
 const sections = [
   { id: "pessoais", label: "Dados Pessoais" },
