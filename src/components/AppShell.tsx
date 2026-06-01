@@ -136,7 +136,10 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     path === "/my-plan" ||
     path.startsWith("/my-plan/");
   const isPatient = identity?.role === "patient" || isPatientRoute;
-  const nav = isPatient ? patientNav : nutritionistNav;
+  const baseNav = isPatient ? patientNav : nutritionistNav;
+  const nav = !isPatient && isAdmin
+    ? ([...baseNav, { to: "/admin/profissionais", label: "Admin", icon: ShieldCheck }] as const)
+    : baseNav;
 
   // Badge de anamneses pendentes (silencioso para não-nutri: retorna 0).
   const fetchPending = useServerFn(getMyPendingAnamnesesCount);
