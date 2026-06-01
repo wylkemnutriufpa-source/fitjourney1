@@ -21,12 +21,12 @@ export const Route = createFileRoute("/")({
 function pickLandingRoute(identity: IdentityStateDTO): string {
   if (identity.appRoles.includes("admin")) return "/dashboard";
   if (identity.state === "S1") return "/auth/check-email";
-  if (identity.state === "S2") return "/onboarding/nutritionist";
   if (identity.role === "patient") {
     return identity.patient?.onboardingCompletedAt
       ? "/my-dashboard"
       : "/onboarding/patient";
   }
+  if (identity.state === "S2") return "/onboarding/nutritionist";
   return "/dashboard";
 }
 
@@ -41,6 +41,11 @@ function Login() {
   const [error, setError] = useState<string | null>(null);
   const [resolvedTarget, setResolvedTarget] = useState<string | null>(null);
   const resolvingRef = useRef(false);
+
+  useEffect(() => {
+    setResolvedTarget(null);
+    resolvingRef.current = false;
+  }, [session?.user?.id]);
 
   // Sessão pré-existente: resolve identidade no servidor antes de navegar,
   // para garantir que paciente vai pra /my-dashboard e nutri pra /dashboard,
@@ -75,8 +80,9 @@ function Login() {
     try {
       const identity = await getMyIdentityState();
       navigate({ to: pickLandingRoute(identity) });
-    } catch {
-      navigate({ to: "/dashboard" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Não foi possível validar seu perfil.";
+      setError(message);
     } finally {
       setSubmitting(false);
     }
