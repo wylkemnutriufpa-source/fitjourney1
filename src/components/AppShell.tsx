@@ -191,11 +191,23 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
             className="flex items-center gap-3 group focus:outline-none"
             title="Reproduzir intro"
           >
-            <img
-              src={fjLogo}
-              alt="FitJourney"
-              className="size-14 object-contain transition-transform duration-300 group-hover:scale-105"
-            />
+            <span className="fj-logo-aura relative inline-flex items-center justify-center size-14 shrink-0">
+              <span className="fj-logo-pulse" aria-hidden />
+              <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
+                <span className="fj-logo-particle" />
+              </span>
+              <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
+                <span className="fj-logo-particle fj-logo-particle-gold" />
+              </span>
+              <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
+                <span className="fj-logo-particle" />
+              </span>
+              <img
+                src={fjLogo}
+                alt="FitJourney"
+                className="relative z-10 size-14 object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            </span>
             <span className="fj-wordmark text-2xl leading-none">
               FitJourney
             </span>

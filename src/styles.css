@@ -186,3 +186,87 @@
   color: transparent;
   text-shadow: 0 1px 0 oklch(0 0 0 / 0.15);
 }
+
+/* ============================================================
+   Logo aura — luz pulsante + partículas orbitais (esmeralda/dourado)
+   ============================================================ */
+.fj-logo-aura {
+  /* Reserva área para a órbita externa sem afetar o layout do header */
+  filter: drop-shadow(0 0 6px oklch(0.62 0.16 155 / 0.35));
+}
+
+.fj-logo-pulse {
+  position: absolute;
+  inset: -18%;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at center,
+    oklch(0.62 0.16 155 / 0.55) 0%,
+    oklch(0.62 0.16 155 / 0.18) 38%,
+    transparent 70%
+  );
+  filter: blur(6px);
+  animation: fj-logo-pulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes fj-logo-pulse {
+  0%, 100% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+.fj-logo-orbit {
+  position: absolute;
+  inset: -22%;
+  border-radius: 9999px;
+  pointer-events: none;
+  animation: fj-logo-spin linear infinite;
+}
+
+.fj-logo-orbit-1 { animation-duration: 6s; }
+.fj-logo-orbit-2 {
+  animation-duration: 9s;
+  animation-direction: reverse;
+  inset: -32%;
+}
+.fj-logo-orbit-3 {
+  animation-duration: 4.5s;
+  inset: -12%;
+}
+
+@keyframes fj-logo-spin {
+  to { transform: rotate(360deg); }
+}
+
+.fj-logo-particle {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 9999px;
+  background: oklch(0.78 0.16 155);
+  box-shadow:
+    0 0 8px oklch(0.78 0.16 155 / 0.9),
+    0 0 16px oklch(0.62 0.16 155 / 0.6);
+  animation: fj-logo-particle-glow 1.8s ease-in-out infinite;
+}
+
+.fj-logo-particle-gold {
+  background: var(--gold, oklch(0.82 0.13 88));
+  box-shadow:
+    0 0 8px oklch(0.85 0.14 88 / 0.9),
+    0 0 16px oklch(0.75 0.13 80 / 0.6);
+}
+
+@keyframes fj-logo-particle-glow {
+  0%, 100% { opacity: 0.7; transform: scale(0.85); }
+  50%      { opacity: 1;   transform: scale(1.25); }
+}
