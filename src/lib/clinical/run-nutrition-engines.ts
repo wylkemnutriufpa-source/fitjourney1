@@ -59,7 +59,10 @@ export interface NutritionEnginesOutput extends NutritionTargets {
 export function runNutritionEngines(
   ctx: ClinicalContext,
 ): NutritionEnginesOutput | null {
-  if (!ctx.ready) return null;
+  // Bloqueia em `calculable`, não em `ready`. Campos adicionais que entrarem
+  // no contexto no futuro (waistCm, bodyFat...) afetam `ready` mas NÃO devem
+  // impedir cálculo. Invariante #9.
+  if (!ctx.calculable) return null;
 
   // ready=true ⇒ todos os campos abaixo são não-nulos.
   const weightKg = ctx.currentWeight!.weightKg;
