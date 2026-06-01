@@ -17,6 +17,7 @@ import {
   ClipboardList,
   Loader2,
   CheckCircle2,
+  Eye,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
