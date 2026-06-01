@@ -289,29 +289,40 @@ function PatientProfile() {
                     : `${publishedPlans.length} planos publicados`}
                 </h3>
               </div>
+              <Link
+                to="/patients/$id/diet"
+                params={{ id: p.id }}
+                className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+              >
+                <Eye className="size-3.5" />
+                Visualizar
+              </Link>
             </div>
             <ul className="space-y-2">
               {publishedPlans.slice(0, 5).map((plan, idx) => (
-                <li
-                  key={plan.id}
-                  className="flex items-center justify-between text-xs border border-border rounded-md px-3 py-2"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono text-muted-foreground">
-                      {formatDate(plan.publishedAt)}
-                    </span>
-                    {idx === 0 && (
-                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono uppercase">
-                        atual
+                <li key={plan.id}>
+                  <Link
+                    to="/patients/$id/diet"
+                    params={{ id: p.id }}
+                    className="flex items-center justify-between text-xs border border-border rounded-md px-3 py-2 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-muted-foreground">
+                        {formatDate(plan.publishedAt)}
                       </span>
-                    )}
-                    <span className="text-muted-foreground">
-                      v{plan.schemaVersion}
+                      {idx === 0 && (
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono uppercase">
+                          atual
+                        </span>
+                      )}
+                      <span className="text-muted-foreground">
+                        v{plan.schemaVersion}
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      {plan.id.slice(0, 8)}
                     </span>
-                  </div>
-                  <span className="font-mono text-[10px] text-muted-foreground">
-                    {plan.id.slice(0, 8)}
-                  </span>
+                  </Link>
                 </li>
               ))}
             </ul>
