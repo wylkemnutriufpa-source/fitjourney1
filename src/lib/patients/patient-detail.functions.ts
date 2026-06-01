@@ -4,6 +4,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 
 export interface PatientDetail {
   id: string;
@@ -59,7 +60,7 @@ export const getPatientForNutritionist = createServerFn({ method: "POST" })
       phone: p.phone ?? null,
       birthDate: p.birth_date ?? null,
       heightCm: p.height_cm != null ? Number(p.height_cm) : null,
-      avatarUrl: p.avatar_url ?? null,
+      avatarUrl: await createAvatarSignedUrl(supabase, p.avatar_url),
       createdAt: p.created_at,
       anamnesis: chosen
         ? {
