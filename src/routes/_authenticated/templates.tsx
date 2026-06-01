@@ -682,7 +682,15 @@ function MealEditor({
   }
 
   function addMainItemFromCatalog(food: PlannerFoodItem) {
-    updateMainOption((o) => ({ ...o, items: [...o.items, food] }));
+    onChange((m) => {
+      const nextMain = { ...m.main, items: [...m.main.items, food] };
+      const auto = buildAutoEquivalents(m, food);
+      return {
+        ...m,
+        main: nextMain,
+        equivalents: [...m.equivalents, ...auto],
+      };
+    });
   }
 
   function removeMainItem(itemId: string) {
