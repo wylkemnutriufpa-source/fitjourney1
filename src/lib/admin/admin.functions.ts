@@ -58,7 +58,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
     const [{ data: subs }, { data: pats }] = await Promise.all([
       supabase
         .from("nutritionist_subscriptions")
-        .select("id, nutritionist_id, monthly_price_cents, currency, status, payment_method, starts_at, ends_at, notes")
+        .select("id, nutritionist_id, plan_tier, monthly_price_cents, currency, status, payment_method, starts_at, ends_at, notes")
         .in("nutritionist_id", ids),
       supabase
         .from("patients")
@@ -86,6 +86,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
         subscription: s
           ? {
               id: s.id,
+              plan_tier: (s.plan_tier ?? "basic") as NutriPlanTier,
               monthly_price_cents: s.monthly_price_cents,
               currency: s.currency,
               status: s.status,
@@ -101,6 +102,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
 
 const UpsertSubInput = z.object({
   nutritionist_id: z.string().uuid(),
+  plan_tier: z.enum(["basic", "pro"]).default("basic"),
   monthly_price_cents: z.number().int().min(0).max(100_000_00),
   status: z.enum(["active", "paused", "expired", "cancelled"]).default("active"),
   payment_method: z
