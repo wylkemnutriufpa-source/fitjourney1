@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate, Link, Navigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { getMyIdentityState, type IdentityStateDTO } from "@/lib/phase2/identity.functions";
 import fjLogo from "@/assets/fitjourney-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -14,6 +15,21 @@ export const Route = createFileRoute("/")({
   component: Login,
 });
 
+// Resolve a rota de destino correta a partir da identidade (server-side).
+// Evita flash de UI de nutri para usuário paciente (e vice-versa) entre
+// signIn e o redirect do guard `_authenticated`.
+function pickLandingRoute(identity: IdentityStateDTO): string {
+  if (identity.appRoles.includes("admin")) return "/dashboard";
+  if (identity.state === "S1") return "/auth/check-email";
+  if (identity.state === "S2") return "/onboarding/nutritionist";
+  if (identity.role === "patient") {
+    return identity.patient?.onboardingCompletedAt
+      ? "/my-dashboard"
+      : "/onboarding/patient";
+  }
+  return "/dashboard";
+}
+
 function Login() {
   const navigate = useNavigate();
   const { signIn, session, loading } = useAuth();
@@ -23,23 +39,47 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [resolvedTarget, setResolvedTarget] = useState<string | null>(null);
+  const resolvingRef = useRef(false);
+
+  // Sessão pré-existente: resolve identidade no servidor antes de navegar,
+  // para garantir que paciente vai pra /my-dashboard e nutri pra /dashboard,
+  // sem flash de UI errada.
+  useEffect(() => {
+    if (!session || resolvedTarget || resolvingRef.current) return;
+    resolvingRef.current = true;
+    getMyIdentityState()
+      .then((id) => setResolvedTarget(pickLandingRoute(id)))
+      .catch(() => setResolvedTarget("/dashboard"))
+      .finally(() => {
+        resolvingRef.current = false;
+      });
+  }, [session, resolvedTarget]);
 
   if (loading) return null;
-  // Redirect declarativo (sem useEffect) — evita reagir a mudanças de
-  // referência de `session` (TOKEN_REFRESHED no iframe causava loop).
-  if (session) return <Navigate to="/dashboard" replace />;
+  if (session) {
+    if (!resolvedTarget) return null; // aguarda resolução; sem flash
+    return <Navigate to={resolvedTarget} replace />;
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
     const { error } = await signIn(email, password, rememberMe);
-    setSubmitting(false);
     if (error) {
+      setSubmitting(false);
       setError(error);
       return;
     }
-    navigate({ to: "/dashboard" });
+    try {
+      const identity = await getMyIdentityState();
+      navigate({ to: pickLandingRoute(identity) });
+    } catch {
+      navigate({ to: "/dashboard" });
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
