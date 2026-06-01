@@ -114,9 +114,7 @@ function Settings() {
 
   const inviteUrl = useMemo(() => {
     if (!referral) return "";
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : "";
-    return `${origin}/signup/patient?code=${referral.code}`;
+    return publicUrl(`/signup/patient?code=${referral.code}`);
   }, [referral]);
 
   const waUrl = useMemo(() => {
