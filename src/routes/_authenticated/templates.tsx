@@ -1001,6 +1001,41 @@ function TemplateEditor({
 
         </DialogContent>
       </Dialog>
+
+      {/* Confirmação quando paciente não tem anamnese aprovada.
+          Substitui a antiga trava por uma decisão consciente do nutri. */}
+      <Dialog
+        open={!!missingAnamneseFor}
+        onOpenChange={(o) => !o && setMissingAnamneseFor(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Paciente sem anamnese aprovada</DialogTitle>
+            <DialogDescription>
+              <strong>{missingAnamneseFor?.patientName}</strong> ainda não tem
+              uma anamnese aprovada — sem ela, o motor clínico não recalcula
+              TMB/TDEE/macros e o gate de segurança fica indisponível. O
+              snapshot do template será publicado como está. Aplicar mesmo assim?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMissingAnamneseFor(null)} disabled={applyBusy}>
+              Não, cancelar
+            </Button>
+            <Button
+              disabled={applyBusy}
+              onClick={() => {
+                if (!missingAnamneseFor) return;
+                doPublish(missingAnamneseFor.patientId, missingAnamneseFor.patientName, {
+                  overrideMissingClinical: true,
+                });
+              }}
+            >
+              {applyBusy ? "Publicando..." : "Sim, aplicar mesmo assim"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
