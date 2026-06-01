@@ -274,11 +274,18 @@ function SubscriptionDialog({
       toast.error("Nome obrigatório");
       return;
     }
-    const cents = Math.round(parseFloat(priceBrl.replace(",", ".")) * 100);
-    if (!Number.isFinite(cents) || cents < 0) {
+    if (!email.trim()) {
+      toast.error("Email obrigatório");
+      return;
+    }
+    // Preço vazio → 0 (permite salvar dados do profissional mesmo sem definir mensalidade)
+    const raw = priceBrl.trim().replace(",", ".");
+    const parsed = raw === "" ? 0 : parseFloat(raw);
+    if (!Number.isFinite(parsed) || parsed < 0) {
       toast.error("Valor inválido");
       return;
     }
+    const cents = Math.round(parsed * 100);
     mut.mutate({
       nutritionist_id: nutri.id,
       plan_tier: planTier,
