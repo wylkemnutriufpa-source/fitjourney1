@@ -70,15 +70,23 @@ function Crumbs() {
 
 function BackButton() {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const router = useRouter();
   const navigate = useNavigate();
-  if (path === "/" || path === "/dashboard") return null;
+  // Esconde nas raízes de cada persona (nutri e paciente).
+  if (
+    path === "/" ||
+    path === "/dashboard" ||
+    path === "/my-dashboard" ||
+    path === "/my-plan"
+  ) {
+    return null;
+  }
   function goBack() {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.history.back();
-      return;
-    }
-    const parent = path.split("/").slice(0, -1).join("/") || "/dashboard";
+    // Determinístico: sobe para a rota pai dentro do app.
+    // NÃO usar router.history.back() — ele pode sair do app shell
+    // (login, intro, landing antiga) e quebrar a continuidade visual.
+    const segs = path.split("/").filter(Boolean);
+    segs.pop();
+    const parent = segs.length > 0 ? "/" + segs.join("/") : "/dashboard";
     navigate({ to: parent });
   }
   return (
