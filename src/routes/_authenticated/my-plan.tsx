@@ -577,7 +577,12 @@ function EquivalentsButton({
         </p>
         <div className="space-y-3 pt-2">
           {equivalents.map((eq, i) => (
-            <EquivalentCard key={eq?.id ?? i} option={eq} foods={foods} />
+            <EquivalentCard
+              key={eq?.id ?? i}
+              option={eq}
+              foods={foods}
+              mealKind={mealKind}
+            />
           ))}
         </div>
       </DialogContent>
@@ -588,9 +593,11 @@ function EquivalentsButton({
 function EquivalentCard({
   option,
   foods,
+  mealKind,
 }: {
   option: any;
   foods: FoodDTO[] | undefined;
+  mealKind: MealKind;
 }) {
   const items: any[] = Array.isArray(option?.items) ? option.items : [];
   const imgUrl = imgFor(option?.imageKey || "");
@@ -622,7 +629,12 @@ function EquivalentCard({
           </div>
           <ul className="text-xs space-y-0.5">
             {items.map((it, i) => (
-              <FoodItemReadonlyRow key={it?.id ?? i} item={it} foods={foods} />
+              <FoodItemReadonlyRow
+                key={it?.id ?? i}
+                item={it}
+                foods={foods}
+                mealKind={mealKind}
+              />
             ))}
           </ul>
           {option?.recipe && (
