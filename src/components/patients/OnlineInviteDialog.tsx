@@ -3,6 +3,7 @@
 // Compartilhamento: copiar / WhatsApp / Email.
 
 import { useEffect, useMemo, useState } from "react";
+import { publicUrl } from "@/lib/public-url";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -49,9 +50,7 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
 
   const inviteUrl = useMemo(() => {
     if (!code) return "";
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : "";
-    return `${origin}/signup/patient?code=${code}`;
+    return publicUrl(`/signup/patient?code=${code}`);
   }, [code]);
 
   useEffect(() => {

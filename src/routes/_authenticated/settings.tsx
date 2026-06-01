@@ -15,6 +15,7 @@ import {
   getMyFeedbackFrequency,
   setMyFeedbackFrequency,
 } from "@/lib/feedback/feedback.functions";
+import { publicUrl } from "@/lib/public-url";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações — FitJourney" }] }),
@@ -114,9 +115,7 @@ function Settings() {
 
   const inviteUrl = useMemo(() => {
     if (!referral) return "";
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : "";
-    return `${origin}/signup/patient?code=${referral.code}`;
+    return publicUrl(`/signup/patient?code=${referral.code}`);
   }, [referral]);
 
   const waUrl = useMemo(() => {
