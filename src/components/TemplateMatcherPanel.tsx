@@ -63,7 +63,7 @@ export function TemplateMatcherPanel({
   readonly onPickTemplate?: (templateId: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [patient, setPatient] = useState<Patient | null>(null);
+  const [patient, setPatient] = useState<PatientLite | null>(null);
   const [kcal, setKcal] = useState<number>(defaultKcal ?? 2200);
   const [proteinG, setProteinG] = useState<number>(defaultProtein ?? 140);
   const [carbG, setCarbG] = useState<number>(defaultCarb ?? 260);
@@ -71,19 +71,38 @@ export function TemplateMatcherPanel({
   const [meals, setMeals] = useState<number>(5);
   const [constraints, setConstraints] = useState<Set<Constraint>>(new Set());
 
-  // Quando um paciente é selecionado, recalcula alvo determinístico
-  // via engine (Mifflin + macros por kg) e pré-popula os campos.
+  // ClinicalContext do paciente selecionado (RLS-aware).
+  const fetchContext = useServerFn(getClinicalContext);
+  const ctxQuery = useQuery({
+    queryKey: ["clinical-context", patient?.id],
+    queryFn: () =>
+      patient ? fetchContext({ data: { patientId: patient.id } }) : null,
+    enabled: !!patient,
+    staleTime: 60_000,
+  });
+  const ctx = ctxQuery.data ?? null;
+
+  // Quando o contexto chega e é calculable, recalcula alvo determinístico
+  // via engine puro e pré-popula os campos. NUNCA inventa dado faltante.
   useEffect(() => {
-    if (!patient) return;
+    if (!ctx || !ctx.calculable) return;
+    const { demographics, currentWeight, currentGoal } = ctx;
+    if (
+      !demographics.sex ||
+      demographics.ageYears == null ||
+      demographics.heightCm == null ||
+      !demographics.activity ||
+      !currentWeight ||
+      !currentGoal
+    ) return;
     try {
-      const goal = patientGoalToEngine(patient.goal);
       const { target } = runNutritionEnginesManual({
-        sex: patient.sex === "M" ? "male" : "female",
-        ageYears: patient.age,
-        weightKg: patient.weightKg,
-        heightCm: patient.heightCm,
-        activity: "moderate",
-        goal,
+        sex: demographics.sex,
+        ageYears: demographics.ageYears,
+        weightKg: currentWeight.weightKg,
+        heightCm: demographics.heightCm,
+        activity: demographics.activity,
+        goal: clinicalGoalToEngine(currentGoal.kind),
       });
       setKcal(target.kcal);
       setProteinG(target.proteinG);
@@ -92,7 +111,7 @@ export function TemplateMatcherPanel({
     } catch {
       // ignora — mantém valores atuais
     }
-  }, [patient]);
+  }, [ctx]);
 
   const ranked = useMemo<MatchResult[]>(() => {
     const metas = systemTemplates.map(toMeta);
