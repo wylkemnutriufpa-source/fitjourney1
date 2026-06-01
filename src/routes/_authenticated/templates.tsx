@@ -92,7 +92,28 @@ export const Route = createFileRoute("/_authenticated/templates")({
   component: TemplatesPage,
 });
 
-type Tab = "biblioteca" | "meus";
+type Tab = "biblioteca" | "meus" | "pilotos";
+
+/** Pilotos / Testes — templates em validação arquitetural. NÃO entram em produção. */
+const pilotosCatalog: Array<{
+  id: string;
+  name: string;
+  description: string;
+  tags: string[];
+  kcal: number;
+  previewRoute: string;
+  badge: string;
+}> = [
+  {
+    id: espHipertrofiaV2Piloto.id,
+    name: espHipertrofiaV2Piloto.name,
+    description: espHipertrofiaV2Piloto.description,
+    tags: espHipertrofiaV2Piloto.tags,
+    kcal: espHipertrofiaV2Piloto.kcal,
+    previewRoute: "/my-plan-v2-preview",
+    badge: "V2 — Item Soberano",
+  },
+];
 
 function friendlyPublishError(msg: string): string {
   if (!msg) return "Falha ao publicar plano.";
