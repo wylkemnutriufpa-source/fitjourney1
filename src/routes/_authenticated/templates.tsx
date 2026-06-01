@@ -757,22 +757,85 @@ function TemplateEditor({
 
         <DialogFooter className="px-6 py-4 border-t border-border sticky bottom-0 bg-background">
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setApplyDone(null);
-              setApplyPatient(null);
-              setApplyOpen(true);
-            }}
-          >
-            <Send className="size-4" /> Aplicar a paciente
-          </Button>
-          <Button onClick={save}>
+          {patientContext ? (
+            <Button
+              disabled={applyBusy}
+              onClick={async () => {
+                setApplyBusy(true);
+                setApplyError(null);
+                try {
+                  await publishPlan({
+                    data: {
+                      patientId: patientContext.id,
+                      snapshot: JSON.parse(JSON.stringify(currentForShare)),
+                    },
+                  });
+                  setApplyDone(patientContext.name);
+                } catch (e: any) {
+                  setApplyError(e?.message ?? "Falha ao publicar plano.");
+                  setApplyBusy(false);
+                }
+              }}
+            >
+              <Send className="size-4" />
+              {applyBusy ? "Salvando…" : `Salvar plano para ${patientContext.name}`}
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setApplyDone(null);
+                setApplyPatient(null);
+                setApplyOpen(true);
+              }}
+            >
+              <Send className="size-4" /> Aplicar a paciente
+            </Button>
+          )}
+          <Button onClick={save} variant={patientContext ? "outline" : "default"}>
             {isMine ? <Save className="size-4" /> : <Copy className="size-4" />}
             {isMine ? "Salvar alterações" : "Salvar em Meus Templates"}
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Confirmação pós-publicação direta para o paciente do contexto */}
+      <Dialog
+        open={!!patientContext && !!applyDone}
+        onOpenChange={(o) => {
+          if (!o) {
+            setApplyDone(null);
+            setApplyBusy(false);
+            onClose();
+            if (patientContext) {
+              navigate({ to: "/patients/$id", params: { id: patientContext.id } });
+            }
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Plano publicado</DialogTitle>
+            <DialogDescription>
+              Snapshot congelado e disponível para <strong>{applyDone}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setApplyDone(null);
+                setApplyBusy(false);
+                onClose();
+                if (patientContext) {
+                  navigate({ to: "/patients/$id", params: { id: patientContext.id } });
+                }
+              }}
+            >
+              Voltar ao perfil
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <SendShareDialog
         open={shareOpen}
