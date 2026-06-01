@@ -86,6 +86,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "anamneses_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anamneses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "anamneses_nutritionist_id_fkey"
             columns: ["nutritionist_id"]
             isOneToOne: false
@@ -366,7 +380,22 @@ export type Database = {
           waist_cm?: number | null
           weight_kg?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "patient_feedbacks_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_feedbacks_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       patient_subscriptions: {
         Row: {
@@ -420,7 +449,22 @@ export type Database = {
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "patient_subscriptions_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_subscriptions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       patients: {
         Row: {
