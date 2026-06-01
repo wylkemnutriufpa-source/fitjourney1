@@ -260,9 +260,10 @@ function scaleOption(raw: RawOption, targetKcal: number): SubOption {
       kcal: raw.refKcal || undefined,
     };
   }
-  // Clamp do fator para evitar valores absurdos (0.3x–3x).
+  // Clamp do fator: 0.6x–1.4x. Evita absurdos do tipo "peixe 130g vira carne 180g"
+  // quando o alimento principal tem densidade calórica muito diferente da referência.
   const rawFactor = targetKcal / raw.refKcal;
-  const factor = Math.min(3, Math.max(0.3, rawFactor));
+  const factor = Math.min(1.4, Math.max(0.6, rawFactor));
   const scaledQty = roundQty(raw.unit, raw.qty * factor);
   const scaledKcal = Math.round(raw.refKcal * (scaledQty / raw.qty));
   return {
