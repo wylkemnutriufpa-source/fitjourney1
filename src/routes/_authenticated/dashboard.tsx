@@ -224,32 +224,43 @@ function Dashboard() {
             </Link>
           </div>
           <div className="bg-surface border border-border rounded-lg overflow-hidden">
-            {recent.map((p, i) => (
-              <Link
-                key={p.id}
-                to="/patients/$id"
-                params={{ id: p.id }}
-                className={
-                  "flex items-center gap-4 p-4 hover:bg-accent/40 transition-colors " +
-                  (i < recent.length - 1 ? "border-b border-border" : "")
-                }
-              >
-                <div className="size-10 rounded-full bg-background border border-border grid place-items-center text-xs font-mono">
-                  {p.initials}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{p.name}</p>
-                  <p className="text-xs text-muted-foreground font-mono">{p.sport}</p>
-                </div>
-                <span className="text-[10px] font-mono uppercase px-2 py-1 rounded bg-background border border-border">
-                  {p.goal}
-                </span>
-                <span className="text-xs font-mono text-muted-foreground hidden md:block">
-                  {p.tdee} kcal
-                </span>
-                <ArrowUpRight className="size-4 text-muted-foreground" />
-              </Link>
-            ))}
+            {recent.length === 0 && (
+              <div className="p-6 text-xs font-mono text-muted-foreground">
+                Nenhum paciente cadastrado ainda.
+              </div>
+            )}
+            {recent.map((p, i) => {
+              const initials =
+                p.fullName
+                  .trim()
+                  .split(/\s+/)
+                  .slice(0, 2)
+                  .map((part) => part[0]?.toUpperCase() ?? "")
+                  .join("") || "P";
+              return (
+                <Link
+                  key={p.id}
+                  to="/patients/$id"
+                  params={{ id: p.id }}
+                  className={
+                    "flex items-center gap-4 p-4 hover:bg-accent/40 transition-colors " +
+                    (i < recent.length - 1 ? "border-b border-border" : "")
+                  }
+                >
+                  <div className="size-10 rounded-full bg-background border border-border grid place-items-center text-xs font-mono">
+                    {initials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{p.fullName}</p>
+                    <p className="text-xs text-muted-foreground font-mono truncate">{p.email}</p>
+                  </div>
+                  <span className="text-[10px] font-mono uppercase px-2 py-1 rounded bg-background border border-border">
+                    {p.anamnesisStatus === "approved" ? "aprovada" : p.anamnesisStatus}
+                  </span>
+                  <ArrowUpRight className="size-4 text-muted-foreground" />
+                </Link>
+              );
+            })}
           </div>
         </section>
       </div>
