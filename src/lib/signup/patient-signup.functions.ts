@@ -6,6 +6,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 
 // ---------- validateReferralCode ----------
 const ValidateInput = z.object({
@@ -55,7 +56,7 @@ export const validateReferralCode = createServerFn({ method: "POST" })
       ok: true,
       nutritionistId: nutri.id,
       nutritionistName: nutri.display_name?.trim() || nutri.full_name,
-      nutritionistAvatarUrl: nutri.avatar_url,
+      nutritionistAvatarUrl: await createAvatarSignedUrl(supabaseAdmin, nutri.avatar_url),
       nutritionistSpecialty: nutri.specialty,
     };
   });
