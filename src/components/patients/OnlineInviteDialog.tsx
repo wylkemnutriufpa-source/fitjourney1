@@ -49,9 +49,7 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
 
   const inviteUrl = useMemo(() => {
     if (!code) return "";
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : "";
-    return `${origin}/signup/patient?code=${code}`;
+    return publicUrl(`/signup/patient?code=${code}`);
   }, [code]);
 
   useEffect(() => {
