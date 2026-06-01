@@ -9,7 +9,7 @@
 //
 // Invariantes (ver skill fitjourney-clinical-invariants):
 // - Motor só consome ClinicalContext (via este adapter).
-// - Zero inferência. Zero default silencioso. ctx.ready=false ⇒ retorna null.
+// - Zero inferência. Zero default silencioso. ctx.calculable=false ⇒ retorna null.
 // - Mapeamento GoalKind clínico → Goal do motor é EXPLÍCITO e auditável:
 //     cut         → cut
 //     bulk        → bulk
