@@ -378,3 +378,45 @@ export function deriveFoodOccurrencesFromSnapshot(
     weeklyCount: v.count,
   }));
 }
+
+// ─────────────────────────────────────────────────────────────────
+// Lista planos publicados de um paciente (visão do nutri).
+// ─────────────────────────────────────────────────────────────────
+export type PublishedPlanLite = {
+  id: string;
+  publishedAt: string;
+  schemaVersion: number;
+  sourceTemplateId: string | null;
+};
+
+export const listPublishedPlansForPatient = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ patientId: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }): Promise<PublishedPlanLite[]> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+
+    // confere que o paciente pertence ao nutri logado
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!nutri) return [];
+
+    const { data: rows, error } = await supabase
+      .from("plans")
+      .select("id, published_at, schema_version, source_template_id")
+      .eq("patient_id", data.patientId)
+      .eq("nutritionist_id", nutri.id)
+      .eq("status", "published")
+      .not("published_at", "is", null)
+      .order("published_at", { ascending: false });
+    if (error) throw new Error(error.message);
+
+    return (rows ?? []).map((r: any) => ({
+      id: r.id,
+      publishedAt: r.published_at,
+      schemaVersion: r.schema_version,
+      sourceTemplateId: r.source_template_id,
+    }));
+  });

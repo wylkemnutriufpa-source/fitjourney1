@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
+import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
 import {
   ArrowLeft,
   FileText,
@@ -15,6 +16,7 @@ import {
   Ruler,
   ClipboardList,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
@@ -72,10 +74,17 @@ function PatientProfile() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const fetchDetail = useServerFn(getPatientForNutritionist);
+  const fetchPlans = useServerFn(listPublishedPlansForPatient);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient-detail", id],
     queryFn: () => fetchDetail({ data: { patientId: id } }),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const { data: publishedPlans } = useQuery({
+    queryKey: ["patient-published-plans", id],
+    queryFn: () => fetchPlans({ data: { patientId: id } }),
     staleTime: 0,
     refetchOnMount: "always",
   });
@@ -251,6 +260,53 @@ function PatientProfile() {
             ao perfil do paciente em uma próxima sprint.
           </p>
         </section>
+
+        {/* Plano vigente publicado */}
+        {publishedPlans && publishedPlans.length > 0 && (
+          <section className="bg-surface border border-emerald-500/30 rounded-lg p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-emerald-400">
+                  Plano vigente
+                </p>
+                <h3 className="text-lg font-semibold mt-1 flex items-center gap-2">
+                  <CheckCircle2 className="size-5 text-emerald-400" />
+                  {publishedPlans.length === 1
+                    ? "1 plano publicado"
+                    : `${publishedPlans.length} planos publicados`}
+                </h3>
+              </div>
+            </div>
+            <ul className="space-y-2">
+              {publishedPlans.slice(0, 5).map((plan, idx) => (
+                <li
+                  key={plan.id}
+                  className="flex items-center justify-between text-xs border border-border rounded-md px-3 py-2"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-muted-foreground">
+                      {formatDate(plan.publishedAt)}
+                    </span>
+                    {idx === 0 && (
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono uppercase">
+                        atual
+                      </span>
+                    )}
+                    <span className="text-muted-foreground">
+                      v{plan.schemaVersion}
+                    </span>
+                  </div>
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {plan.id.slice(0, 8)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-[11px] text-muted-foreground">
+              O paciente já visualiza este plano no app. Publique um novo plano abaixo para substituí-lo.
+            </p>
+          </section>
+        )}
 
         {/* Elaboração do plano */}
         <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
