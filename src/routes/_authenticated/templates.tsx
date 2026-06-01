@@ -991,24 +991,7 @@ function TemplateEditor({
                 <Button variant="outline" onClick={() => setApplyOpen(false)}>Cancelar</Button>
                 <Button
                   disabled={!applyPatient || applyBusy}
-                  onClick={async () => {
-                    if (!applyPatient) return;
-                    setApplyBusy(true);
-                    setApplyError(null);
-                    try {
-                      await publishPlan({
-                        data: {
-                          patientId: applyPatient.id,
-                          snapshot: JSON.parse(JSON.stringify(currentForShare)),
-                        },
-                      });
-                      setApplyDone(applyPatient.fullName);
-                    } catch (e: any) {
-                      setApplyError(e?.message ?? "Falha ao publicar plano.");
-                    } finally {
-                      setApplyBusy(false);
-                    }
-                  }}
+                  onClick={() => applyPatient && doPublish(applyPatient.id, applyPatient.fullName)}
                 >
                   <Send className="size-4" /> {applyBusy ? "Publicando..." : "Publicar plano"}
                 </Button>
