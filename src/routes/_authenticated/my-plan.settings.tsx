@@ -287,6 +287,12 @@ function PatientSettings() {
           </p>
         </section>
       </div>
+      <AvatarCropDialog
+        file={pendingFile}
+        open={!!pendingFile}
+        onClose={() => setPendingFile(null)}
+        onConfirm={handleCroppedUpload}
+      />
     </AppShell>
   );
 }
