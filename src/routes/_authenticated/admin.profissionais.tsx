@@ -231,6 +231,7 @@ function SubscriptionDialog({
   const [phone, setPhone] = useState(nutri.phone ?? "");
   const [crn, setCrn] = useState(nutri.crn ?? "");
   const [specialty, setSpecialty] = useState<string>("");
+  const [feedbackFreq, setFeedbackFreq] = useState<number>(nutri.feedback_frequency_days ?? 7);
 
   const upsert = useServerFn(upsertProfessionalSubscription);
   const updateNutri = useServerFn(adminUpdateNutritionist);
