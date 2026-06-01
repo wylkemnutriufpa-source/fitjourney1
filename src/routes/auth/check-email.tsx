@@ -35,7 +35,7 @@ function CheckEmailPage() {
           </p>
         </div>
         <Link
-          to="/"
+          to="/app"
           className="inline-flex items-center justify-center w-full bg-primary text-primary-foreground rounded-md py-3 text-sm font-semibold hover:bg-primary/90 transition-colors"
         >
           Ir para login
