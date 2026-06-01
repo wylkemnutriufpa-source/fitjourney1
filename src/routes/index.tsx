@@ -32,7 +32,7 @@ function pickLandingRoute(identity: IdentityStateDTO): string {
 
 function Login() {
   const navigate = useNavigate();
-  const { signIn, signOut, session, loading } = useAuth();
+  const { signIn, session, loading } = useAuth();
   const [email, setEmail] = useState("wylkem.nutri.ufpa@gmail.com");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
