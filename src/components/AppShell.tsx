@@ -22,6 +22,7 @@ import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { applyTheme, getStoredTheme } from "@/lib/patient/theme";
+import fjLogo from "@/assets/fitjourney-logo.png";
 
 
 const nutritionistNav = [
