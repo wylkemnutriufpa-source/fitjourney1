@@ -1,7 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState, useRef, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import {
+  listMyTemplates,
+  saveMyTemplate,
+  deleteMyTemplate,
+  type StoredTemplate,
+} from "@/lib/templates/templates.functions";
+import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { AppShell } from "@/components/AppShell";
