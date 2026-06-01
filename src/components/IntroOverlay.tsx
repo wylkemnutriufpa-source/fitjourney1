@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { getMyIdentityState, type IdentityStateDTO } from "@/lib/phase2/identity.functions";
 
 const STORAGE_KEY = "fj_intro_pending";
 const EVENT_NAME = "fj:play-intro";
@@ -14,6 +15,16 @@ export function markIntroPending() {
 
 export function playIntro() {
   window.dispatchEvent(new CustomEvent(EVENT_NAME));
+}
+
+function pickLandingRoute(identity: IdentityStateDTO): "/dashboard" | "/my-dashboard" | "/onboarding/patient" | "/onboarding/nutritionist" | "/auth/check-email" {
+  if (identity.appRoles.includes("admin")) return "/dashboard";
+  if (identity.state === "S1") return "/auth/check-email";
+  if (identity.role === "patient") {
+    return identity.patient?.onboardingCompletedAt ? "/my-dashboard" : "/onboarding/patient";
+  }
+  if (identity.state === "S2") return "/onboarding/nutritionist";
+  return "/dashboard";
 }
 
 export function IntroOverlay() {
@@ -57,14 +68,19 @@ export function IntroOverlay() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
 
-  function finish() {
+  async function finish() {
     const wasManual = manualRef.current;
     setShow(false);
     setFadeOut(false);
     setTextVisible(false);
     manualRef.current = false;
     if (wasManual) {
-      navigate({ to: "/dashboard" });
+      try {
+        const identity = await getMyIdentityState();
+        navigate({ to: pickLandingRoute(identity) });
+      } catch {
+        navigate({ to: "/" });
+      }
     }
   }
 
