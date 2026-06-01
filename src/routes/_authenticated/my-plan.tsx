@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { imgFor } from "@/lib/food-images";
+import { emojiForFood } from "@/lib/food-emojis";
 import {
   detectMealKind,
   getSubstitutionsFor,
