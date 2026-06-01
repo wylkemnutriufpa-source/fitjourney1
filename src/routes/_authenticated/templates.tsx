@@ -610,7 +610,42 @@ function TemplateEditor({
   const [applyDone, setApplyDone] = useState<string | null>(null);
   const [applyBusy, setApplyBusy] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
+  // Quando publish falha por falta de anamnese, abrimos confirm dialog
+  // com os dados pendentes (patientId + nome) para retentar com override.
+  const [missingAnamneseFor, setMissingAnamneseFor] = useState<
+    { patientId: string; patientName: string } | null
+  >(null);
   const publishPlan = useServerFn(publishPlanToPatient);
+
+  async function doPublish(
+    patientId: string,
+    patientName: string,
+    opts?: { overrideMissingClinical?: boolean },
+  ) {
+    setApplyBusy(true);
+    setApplyError(null);
+    try {
+      await publishPlan({
+        data: {
+          patientId,
+          snapshot: JSON.parse(JSON.stringify(currentForShare)),
+          overrideMissingClinical: opts?.overrideMissingClinical || undefined,
+        },
+      });
+      setApplyDone(patientName);
+      setMissingAnamneseFor(null);
+    } catch (e: any) {
+      const msg = e?.message ?? "Falha ao publicar plano.";
+      if (msg.includes("CLINICAL_CONTEXT_INCOMPLETE") && !opts?.overrideMissingClinical) {
+        // Trava virou confirmação: pergunta se nutri quer publicar mesmo assim.
+        setMissingAnamneseFor({ patientId, patientName });
+      } else {
+        setApplyError(msg);
+      }
+    } finally {
+      setApplyBusy(false);
+    }
+  }
 
   function setMeals(updater: (meals: PlannerMeal[]) => PlannerMeal[]) {
     setDraft((d) => {
@@ -840,23 +875,7 @@ function TemplateEditor({
           {patientContext ? (
             <Button
               disabled={applyBusy}
-              onClick={async () => {
-                setApplyBusy(true);
-                setApplyError(null);
-                try {
-                  await publishPlan({
-                    data: {
-                      patientId: patientContext.id,
-                      snapshot: JSON.parse(JSON.stringify(currentForShare)),
-                    },
-                  });
-                  setApplyDone(patientContext.name);
-                } catch (e: any) {
-                  setApplyError(e?.message ?? "Falha ao publicar plano.");
-                } finally {
-                  setApplyBusy(false);
-                }
-              }}
+              onClick={() => doPublish(patientContext.id, patientContext.name)}
             >
               <Send className="size-4" />
               {applyBusy ? "Salvando…" : `Salvar plano para ${patientContext.name}`}
@@ -972,24 +991,7 @@ function TemplateEditor({
                 <Button variant="outline" onClick={() => setApplyOpen(false)}>Cancelar</Button>
                 <Button
                   disabled={!applyPatient || applyBusy}
-                  onClick={async () => {
-                    if (!applyPatient) return;
-                    setApplyBusy(true);
-                    setApplyError(null);
-                    try {
-                      await publishPlan({
-                        data: {
-                          patientId: applyPatient.id,
-                          snapshot: JSON.parse(JSON.stringify(currentForShare)),
-                        },
-                      });
-                      setApplyDone(applyPatient.fullName);
-                    } catch (e: any) {
-                      setApplyError(e?.message ?? "Falha ao publicar plano.");
-                    } finally {
-                      setApplyBusy(false);
-                    }
-                  }}
+                  onClick={() => applyPatient && doPublish(applyPatient.id, applyPatient.fullName)}
                 >
                   <Send className="size-4" /> {applyBusy ? "Publicando..." : "Publicar plano"}
                 </Button>
@@ -997,6 +999,41 @@ function TemplateEditor({
             )}
           </DialogFooter>
 
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmação quando paciente não tem anamnese aprovada.
+          Substitui a antiga trava por uma decisão consciente do nutri. */}
+      <Dialog
+        open={!!missingAnamneseFor}
+        onOpenChange={(o) => !o && setMissingAnamneseFor(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Paciente sem anamnese aprovada</DialogTitle>
+            <DialogDescription>
+              <strong>{missingAnamneseFor?.patientName}</strong> ainda não tem
+              uma anamnese aprovada — sem ela, o motor clínico não recalcula
+              TMB/TDEE/macros e o gate de segurança fica indisponível. O
+              snapshot do template será publicado como está. Aplicar mesmo assim?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMissingAnamneseFor(null)} disabled={applyBusy}>
+              Não, cancelar
+            </Button>
+            <Button
+              disabled={applyBusy}
+              onClick={() => {
+                if (!missingAnamneseFor) return;
+                doPublish(missingAnamneseFor.patientId, missingAnamneseFor.patientName, {
+                  overrideMissingClinical: true,
+                });
+              }}
+            >
+              {applyBusy ? "Publicando..." : "Sim, aplicar mesmo assim"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </Dialog>
