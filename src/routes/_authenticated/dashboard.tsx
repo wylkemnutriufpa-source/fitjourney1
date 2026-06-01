@@ -1,8 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { patients, recentActivity } from "@/lib/mock-data";
+import { recentActivity } from "@/lib/mock-data";
 import { Plus, ArrowUpRight, TrendingUp, Users, Activity, AlertCircle } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { getMyNutritionistProfile } from "@/lib/profile/nutritionist-profile.functions";
+import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
+import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — FitJourney" }] }),
@@ -58,7 +63,37 @@ function Kpi({
 }
 
 function Dashboard() {
-  const recent = patients.slice(0, 5);
+  const fetchProfile = useServerFn(getMyNutritionistProfile);
+  const fetchPatients = useServerFn(listMyPatientsForPlan);
+  const fetchPending = useServerFn(getMyPendingAnamnesesCount);
+
+  const { data: profile } = useQuery({
+    queryKey: ["nutri-profile"],
+    queryFn: () => fetchProfile(),
+    staleTime: 60_000,
+  });
+  const { data: patientsList = [] } = useQuery({
+    queryKey: ["patients-index"],
+    queryFn: () => fetchPatients(),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const { data: pending } = useQuery({
+    queryKey: ["nutri", "pending-count"],
+    queryFn: () => fetchPending(),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+
+  const recent = patientsList.slice(0, 5);
+  const totalPatients = patientsList.length;
+  const approvedCount = patientsList.filter((p) => p.anamnesisStatus === "approved").length;
+  const greetingName =
+    profile?.displayName?.trim() ||
+    profile?.fullName?.split(" ")[0] ||
+    "profissional";
+  const pendingValue = String(pending?.pendingCount ?? 0).padStart(2, "0");
+
   return (
     <AppShell
       header={
@@ -74,16 +109,21 @@ function Dashboard() {
       <div className="space-y-10">
         <section className="space-y-2">
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-            Bom dia, Dr. Marco
+            Olá, {greetingName}
           </p>
           <h1 className="text-3xl font-bold tracking-tight">Visão Geral</h1>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Kpi label="Total Pacientes" value="142" hint="+12% vs mês passado" icon={Users} />
-          <Kpi label="Dietas Ativas" value="89" hint="62% da base" icon={Activity} />
-          <Kpi label="Adesão Média" value="94%" hint="Peak performance" icon={TrendingUp} />
-          <Kpi label="Revisões Pendentes" value="07" hint="Ação hoje" icon={AlertCircle} accent />
+          <Kpi label="Total Pacientes" value={String(totalPatients)} hint="base ativa" icon={Users} />
+          <Kpi
+            label="Anamneses aprovadas"
+            value={String(approvedCount)}
+            hint={totalPatients > 0 ? `${Math.round((approvedCount / totalPatients) * 100)}% da base` : "—"}
+            icon={Activity}
+          />
+          <Kpi label="Adesão Média" value="—" hint="em breve" icon={TrendingUp} />
+          <Kpi label="Revisões Pendentes" value={pendingValue} hint="Ação hoje" icon={AlertCircle} accent />
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -184,32 +224,43 @@ function Dashboard() {
             </Link>
           </div>
           <div className="bg-surface border border-border rounded-lg overflow-hidden">
-            {recent.map((p, i) => (
-              <Link
-                key={p.id}
-                to="/patients/$id"
-                params={{ id: p.id }}
-                className={
-                  "flex items-center gap-4 p-4 hover:bg-accent/40 transition-colors " +
-                  (i < recent.length - 1 ? "border-b border-border" : "")
-                }
-              >
-                <div className="size-10 rounded-full bg-background border border-border grid place-items-center text-xs font-mono">
-                  {p.initials}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{p.name}</p>
-                  <p className="text-xs text-muted-foreground font-mono">{p.sport}</p>
-                </div>
-                <span className="text-[10px] font-mono uppercase px-2 py-1 rounded bg-background border border-border">
-                  {p.goal}
-                </span>
-                <span className="text-xs font-mono text-muted-foreground hidden md:block">
-                  {p.tdee} kcal
-                </span>
-                <ArrowUpRight className="size-4 text-muted-foreground" />
-              </Link>
-            ))}
+            {recent.length === 0 && (
+              <div className="p-6 text-xs font-mono text-muted-foreground">
+                Nenhum paciente cadastrado ainda.
+              </div>
+            )}
+            {recent.map((p, i) => {
+              const initials =
+                p.fullName
+                  .trim()
+                  .split(/\s+/)
+                  .slice(0, 2)
+                  .map((part) => part[0]?.toUpperCase() ?? "")
+                  .join("") || "P";
+              return (
+                <Link
+                  key={p.id}
+                  to="/patients/$id"
+                  params={{ id: p.id }}
+                  className={
+                    "flex items-center gap-4 p-4 hover:bg-accent/40 transition-colors " +
+                    (i < recent.length - 1 ? "border-b border-border" : "")
+                  }
+                >
+                  <div className="size-10 rounded-full bg-background border border-border grid place-items-center text-xs font-mono">
+                    {initials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{p.fullName}</p>
+                    <p className="text-xs text-muted-foreground font-mono truncate">{p.email}</p>
+                  </div>
+                  <span className="text-[10px] font-mono uppercase px-2 py-1 rounded bg-background border border-border">
+                    {p.anamnesisStatus === "approved" ? "aprovada" : p.anamnesisStatus}
+                  </span>
+                  <ArrowUpRight className="size-4 text-muted-foreground" />
+                </Link>
+              );
+            })}
           </div>
         </section>
       </div>

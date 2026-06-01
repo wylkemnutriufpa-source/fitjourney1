@@ -1,54 +1,137 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { getPatient } from "@/lib/mock-data";
-import { NutritionTargetCard } from "@/components/NutritionTargetCard";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
-import { Edit3, FileText, ChevronRight, MessageSquareHeart, Sparkles } from "lucide-react";
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
+import {
+  ArrowLeft,
+  FileText,
+  Sparkles,
+  Activity,
+  Mail,
+  Phone,
+  Calendar,
+  Ruler,
+  ClipboardList,
+  Loader2,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
   head: () => ({ meta: [{ title: "Perfil do paciente — FitJourney" }] }),
-  loader: ({ params }) => {
-    const patient = getPatient(params.id);
-    if (!patient) throw notFound();
-    return { patient };
-  },
   component: PatientProfile,
 });
 
-function Metric({ label, value, unit, accent }: { label: string; value: number; unit: string; accent?: boolean }) {
+function initialsFromName(name: string): string {
   return (
-    <div
-      className={
-        "p-6 rounded-lg border space-y-3 " +
-        (accent ? "bg-primary/10 border-primary/30" : "bg-surface border-border")
-      }
-    >
-      <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-        {label}
-      </p>
-      <p className={"text-4xl font-bold tracking-tighter " + (accent ? "text-primary" : "")}>
-        {value.toLocaleString("pt-BR")} <span className="text-sm text-muted-foreground font-mono">{unit}</span>
-      </p>
-    </div>
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? "")
+      .join("") || "P"
   );
 }
 
+function formatDate(value: string | null): string {
+  if (!value) return "—";
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function ageFromBirth(birth: string | null): number | null {
+  if (!birth) return null;
+  const b = new Date(birth);
+  if (Number.isNaN(b.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - b.getFullYear();
+  const m = now.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
+  return age;
+}
+
+function statusMeta(status: string | undefined) {
+  switch (status) {
+    case "approved":
+      return { label: "Anamnese aprovada", cls: "text-emerald-400", dot: "bg-emerald-400" };
+    case "submitted":
+      return { label: "Anamnese pendente", cls: "text-primary", dot: "bg-primary" };
+    case "needs_changes":
+      return { label: "Requer ajustes", cls: "text-amber-400", dot: "bg-amber-400" };
+    case "draft":
+      return { label: "Rascunho em andamento", cls: "text-muted-foreground", dot: "bg-muted-foreground" };
+    default:
+      return { label: "Aguardando anamnese", cls: "text-amber-400", dot: "bg-amber-400" };
+  }
+}
+
 function PatientProfile() {
-  const { patient: p } = Route.useLoaderData();
+  const { id } = Route.useParams();
+  const navigate = useNavigate();
+  const fetchDetail = useServerFn(getPatientForNutritionist);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["patient-detail", id],
+    queryFn: () => fetchDetail({ data: { patientId: id } }),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+
+  if (isLoading) {
+    return (
+      <AppShell>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" /> Carregando paciente…
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <AppShell>
+        <div className="space-y-4">
+          <p className="text-sm text-destructive">
+            {(error as Error | undefined)?.message ?? "Paciente não encontrado."}
+          </p>
+          <Link to="/patients" className="text-xs font-mono uppercase text-primary hover:underline">
+            ← Voltar para pacientes
+          </Link>
+        </div>
+      </AppShell>
+    );
+  }
+
+  const p = data;
+  const age = ageFromBirth(p.birthDate);
+  const st = statusMeta(p.anamnesis?.reviewStatus);
+  const hasApprovedAnamnesis = p.anamnesis?.reviewStatus === "approved";
 
   return (
     <AppShell
       header={
         <div className="flex items-center gap-2">
-          <Link
-            to="/patients/$id/feedbacks"
-            params={{ id: p.id }}
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/patients" })}
             className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
           >
-            <MessageSquareHeart className="size-3.5" />
-            Feedbacks
-          </Link>
+            <ArrowLeft className="size-3.5" />
+            Pacientes
+          </button>
+          {p.anamnesis && (
+            <Link
+              to="/anamneses/$id"
+              params={{ id: p.anamnesis.id }}
+              className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+            >
+              <ClipboardList className="size-3.5" />
+              Ver anamnese
+            </Link>
+          )}
           <Link
             to="/templates"
             search={{ blank: 1 }}
@@ -62,165 +145,149 @@ function PatientProfile() {
             className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
           >
             <FileText className="size-3.5" />
-            Usar template
+            Elaborar plano
           </Link>
         </div>
       }
     >
       <div className="space-y-10">
-        <div className="flex items-end justify-between border-b border-border pb-6">
+        {/* Header */}
+        <div className="flex items-end justify-between border-b border-border pb-6 gap-6 flex-wrap">
           <div className="flex items-center gap-5">
-            <div className="size-16 rounded-full bg-surface border border-border grid place-items-center text-lg font-mono">
-              {p.initials}
-            </div>
+            {p.avatarUrl ? (
+              <img
+                src={p.avatarUrl}
+                alt={p.fullName}
+                className="size-16 rounded-full object-cover border border-border"
+              />
+            ) : (
+              <div className="size-16 rounded-full bg-surface border border-border grid place-items-center text-lg font-mono">
+                {initialsFromName(p.fullName)}
+              </div>
+            )}
             <div className="space-y-1">
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                {p.sport} · {p.age} anos · {p.sex} · {p.heightCm}cm · {p.weightKg}kg
+                Paciente desde {formatDate(p.createdAt)}
               </p>
-              <h1 className="text-3xl font-bold tracking-tight">{p.name}</h1>
-              <div className="flex items-center gap-2 pt-1">
-                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-background border border-border">
-                  {p.goal}
-                </span>
+              <h1 className="text-3xl font-bold tracking-tight">{p.fullName}</h1>
+              <div className="flex items-center gap-2 pt-1 flex-wrap">
                 <span
                   className={
-                    "inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " +
-                    (p.status === "Ativo" ? "text-emerald-400" : "text-amber-400")
+                    "inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " + st.cls
                   }
                 >
-                  <span
-                    className={
-                      "size-1.5 rounded-full " +
-                      (p.status === "Ativo" ? "bg-emerald-400" : "bg-amber-400")
-                    }
-                  />
-                  {p.status}
+                  <span className={"size-1.5 rounded-full " + st.dot} />
+                  {st.label}
                 </span>
+                {p.anamnesis && (
+                  <span className="text-[10px] font-mono uppercase text-muted-foreground">
+                    · v{p.anamnesis.version}
+                  </span>
+                )}
               </div>
             </div>
           </div>
-          <button className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground border border-border rounded-md px-3 py-2 flex items-center gap-2">
-            <Edit3 className="size-3.5" />
-            Editar Anamnese
-          </button>
         </div>
 
-        <section className="space-y-4">
-          <h2 className="text-sm font-mono uppercase tracking-widest text-muted-foreground">
-            Métricas Metabólicas
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Metric label="TMB (Basal)" value={p.tmb} unit="kcal" />
-            <Metric label="GET (Gasto Total)" value={p.get} unit="kcal" />
-            <Metric label="TDEE (Alvo)" value={p.tdee} unit="kcal" accent />
-          </div>
-        </section>
-
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-surface border border-border rounded-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                  Evolução do Peso
-                </p>
-                <h3 className="text-lg font-semibold mt-1">Últimas 6 semanas</h3>
-              </div>
-            </div>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={p.progress}>
-                  <XAxis dataKey="week" stroke="oklch(0.68 0.02 240)" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis stroke="oklch(0.68 0.02 240)" fontSize={11} tickLine={false} axisLine={false} domain={["dataMin - 1", "dataMax + 1"]} />
-                  <Tooltip
-                    contentStyle={{
-                      background: "oklch(0.21 0.013 240)",
-                      border: "1px solid oklch(0.30 0.012 240)",
-                      borderRadius: 8,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="weight"
-                    stroke="oklch(0.72 0.17 230)"
-                    strokeWidth={2.5}
-                    dot={{ fill: "oklch(0.72 0.17 230)", r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className="bg-surface border border-border rounded-lg p-6 space-y-3">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Histórico de Dietas
-            </p>
-            {[
-              { name: "Endurance High-Carb v2", date: "20 Mai", active: true },
-              { name: "Hipertrofia Fase 2", date: "12 Abr" },
-              { name: "Manutenção Off-season", date: "01 Mar" },
-            ].map((d) => (
-              <Link
-                key={d.name}
-                to="/patients/$id/diet"
-                params={{ id: p.id }}
-                className="flex items-center justify-between p-3 rounded border border-border bg-background hover:border-primary/40 transition-colors"
-              >
-                <div>
-                  <p className="text-sm font-medium flex items-center gap-2">
-                    {d.name}
-                    {d.active && (
-                      <span className="text-[9px] font-mono uppercase text-primary border border-primary/40 rounded px-1.5 py-0.5">
-                        ativa
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-[10px] font-mono uppercase text-muted-foreground">{d.date}</p>
-                </div>
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </Link>
-            ))}
-          </div>
-        </section>
-
+        {/* Dados básicos / contato */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-surface border border-border rounded-lg p-6 space-y-3">
+          <div className="bg-surface border border-border rounded-lg p-6 space-y-4">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Dados Clínicos
+              Contato
             </p>
-            <dl className="text-sm space-y-2">
-              {[
-                ["Alergias", "Lactose (leve)"],
-                ["Restrições", "Nenhuma"],
-                ["Suplementos", "Whey, creatina, ômega-3"],
-                ["Volume semanal", "12h"],
-                ["Horário treino", "06:00 - 08:00"],
-              ].map(([k, v]) => (
-                <div key={k} className="flex justify-between border-b border-border last:border-0 py-1.5">
-                  <dt className="text-muted-foreground font-mono text-xs uppercase">{k}</dt>
-                  <dd>{v}</dd>
-                </div>
-              ))}
+            <dl className="text-sm space-y-3">
+              <div className="flex items-center gap-3">
+                <Mail className="size-4 text-muted-foreground" />
+                <span className="font-mono text-xs">{p.email}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone className="size-4 text-muted-foreground" />
+                <span className="font-mono text-xs">{p.phone ?? "—"}</span>
+              </div>
             </dl>
           </div>
 
-          <NutritionTargetCard
-            sex={p.sex === "M" ? "male" : "female"}
-            ageYears={p.age}
-            weightKg={p.weightKg}
-            heightCm={p.heightCm}
-            defaultGoal={
-              p.goal === "Emagrecimento"
-                ? "cut"
-                : p.goal === "Hipertrofia"
-                  ? "bulk"
-                  : "maintain"
-            }
-          />
+          <div className="bg-surface border border-border rounded-lg p-6 space-y-4">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Dados básicos
+            </p>
+            <dl className="text-sm space-y-3">
+              <div className="flex items-center gap-3">
+                <Calendar className="size-4 text-muted-foreground" />
+                <span className="font-mono text-xs">
+                  Nascimento: {formatDate(p.birthDate)}
+                  {age != null && <span className="text-muted-foreground"> · {age} anos</span>}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Ruler className="size-4 text-muted-foreground" />
+                <span className="font-mono text-xs">
+                  Altura: {p.heightCm != null ? `${p.heightCm} cm` : "—"}
+                </span>
+              </div>
+            </dl>
+          </div>
         </section>
 
+        {/* Plano contratado */}
         <section>
           <SubscriptionEditor patientId={p.id} />
+        </section>
+
+        {/* Avaliação física — placeholder soberano */}
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Avaliação física
+              </p>
+              <h3 className="text-lg font-semibold mt-1">Em breve</h3>
+            </div>
+            <Activity className="size-5 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            O módulo de avaliação física (composição corporal, perímetros, dobras) será integrado
+            ao perfil do paciente em uma próxima sprint.
+          </p>
+        </section>
+
+        {/* Elaboração do plano */}
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Elaboração do plano alimentar
+              </p>
+              <h3 className="text-lg font-semibold mt-1">
+                {hasApprovedAnamnesis
+                  ? "Pronto para elaborar"
+                  : "Aguardando anamnese aprovada"}
+              </h3>
+            </div>
+            <FileText className="size-5 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {hasApprovedAnamnesis
+              ? "A anamnese clínica foi aprovada. Você pode escolher um template homologado ou montar do zero."
+              : "Aprove a anamnese do paciente antes de elaborar o plano alimentar."}
+          </p>
+          <div className="flex flex-wrap gap-2 pt-2">
+            <Link
+              to="/templates"
+              className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+            >
+              <FileText className="size-3.5" />
+              Usar template
+            </Link>
+            <Link
+              to="/templates"
+              search={{ blank: 1 }}
+              className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+            >
+              <Sparkles className="size-3.5" />
+              Montar do zero
+            </Link>
+          </div>
         </section>
       </div>
     </AppShell>
