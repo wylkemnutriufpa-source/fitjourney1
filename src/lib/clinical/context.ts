@@ -98,9 +98,7 @@ export function buildClinicalContext(
     sourceAnamnesisId: latest?.id ?? null,
   };
 
-  const missing: Array<
-    "weight" | "goal" | "sex" | "ageYears" | "heightCm" | "activity"
-  > = [];
+  const missing: MissingField[] = [];
   if (!currentWeight) missing.push("weight");
   if (!currentGoal) missing.push("goal");
   if (!demographics.sex) missing.push("sex");
@@ -108,12 +106,30 @@ export function buildClinicalContext(
   if (demographics.heightCm == null) missing.push("heightCm");
   if (!demographics.activity) missing.push("activity");
 
+  // Hoje calculable == ready. Conforme novos campos forem ao contexto,
+  // eles entram em missing (afetando ready) mas NÃO em missingForCalc.
+  const CALC_FIELDS = new Set<CalcField>([
+    "weight",
+    "goal",
+    "sex",
+    "ageYears",
+    "heightCm",
+    "activity",
+  ]);
+  const missingForCalc = missing.filter((m): m is CalcField => CALC_FIELDS.has(m as CalcField));
+
   return {
     patientId: input.patientId,
     currentWeight,
     currentGoal,
     demographics,
     ready: missing.length === 0,
+    calculable: missingForCalc.length === 0,
     missing,
+    missingForCalc,
   };
 }
+
+// Re-export BuildClinicalContextInput shape consumers may rely on.
+export type { BuildClinicalContextInput as _BuildClinicalContextInput };
+
