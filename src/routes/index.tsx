@@ -48,7 +48,7 @@ function Login() {
           <img
             src={fjLogo}
             alt="FitJourney"
-            className="size-10 rounded-md object-cover ring-1 ring-primary/30 shadow-[0_0_24px_-8px_oklch(0.62_0.16_155/0.7)]"
+            className="size-10 object-contain"
           />
           <span className="fj-wordmark text-2xl leading-none">FitJourney</span>
         </div>

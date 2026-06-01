@@ -187,7 +187,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
             <img
               src={fjLogo}
               alt="FitJourney"
-              className="size-9 rounded-md object-cover ring-1 ring-primary/30 shadow-[0_0_20px_-8px_oklch(0.62_0.16_155/0.6)]"
+              className="size-9 object-contain"
             />
             <span className="fj-wordmark text-xl leading-none">
               FitJourney
