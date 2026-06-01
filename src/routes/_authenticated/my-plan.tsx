@@ -438,8 +438,8 @@ function FoodItemReadonlyRow({
   // Não usa scaleGroup aberto para evitar trocas absurdas
   // (ex.: arroz por pão no almoço, carne por feijão).
   const substitutions = useMemo(
-    () => getSubstitutionsFor(item?.name ?? "", mealKind),
-    [item?.name, mealKind],
+    () => getSubstitutionsFor(item?.name ?? "", mealKind, itemKcal),
+    [item?.name, mealKind, itemKcal],
   );
 
   return (
@@ -519,6 +519,7 @@ function FoodItemReadonlyRow({
                       <span className="font-medium truncate">{s.name}</span>
                       <span className="font-mono text-[10px] text-muted-foreground tabular-nums shrink-0">
                         {s.qty} {s.unit}
+                        {s.kcal ? ` · ${s.kcal} kcal` : ""}
                       </span>
                     </div>
                     {s.note && (
