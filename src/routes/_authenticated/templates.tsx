@@ -131,10 +131,20 @@ function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): Planner
 }
 
 function TemplatesPage() {
+  const search = Route.useSearch();
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
   const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: MyTemplate } | null>(null);
   const { list: myList, save: saveMine, remove: removeMine } = useMyTemplates();
+
+  // Entrada "?blank=1" abre direto o editor com esqueleto vazio.
+  const blankHandled = useRef(false);
+  useEffect(() => {
+    if (search.blank === 1 && !blankHandled.current && !editing) {
+      blankHandled.current = true;
+      setEditing({ tpl: createEmptyTemplate(), isMine: false });
+    }
+  }, [search.blank, editing]);
 
   const filteredSystem = useMemo(
     () =>
@@ -155,10 +165,16 @@ function TemplatesPage() {
             <h1 className="text-3xl font-bold tracking-tight">Templates de Dieta</h1>
             <p className="text-sm text-muted-foreground max-w-2xl">
               Clique em uma refeição para abrir o canvas: cada alimento aparece desacoplado
-              (pão, ovo, café…) com sua gramatura e kcal. Alterar a quantidade do principal
-              escala todas as substituições proporcionalmente.
+              (pão, ovo, café…) com sua gramatura e kcal. Ao adicionar um alimento, opções
+              equivalentes coerentes com a refeição entram automaticamente.
             </p>
           </div>
+          <Button
+            onClick={() => setEditing({ tpl: createEmptyTemplate(), isMine: false })}
+            className="gap-1.5"
+          >
+            <Plus className="size-3.5" /> Plano do zero
+          </Button>
         </div>
 
         {/* Tabs */}
@@ -174,6 +190,7 @@ function TemplatesPage() {
             <span className="text-[10px] font-mono opacity-60">{myList.length}</span>
           </TabBtn>
         </div>
+
 
         {tab === "biblioteca" && (
           <>
