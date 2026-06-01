@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
+import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
 import {
   ArrowLeft,
   FileText,
@@ -15,6 +16,7 @@ import {
   Ruler,
   ClipboardList,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
