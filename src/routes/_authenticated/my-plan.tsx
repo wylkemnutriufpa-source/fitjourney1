@@ -539,7 +539,6 @@ function FoodItemReadonlyRow({
               das indicadas para preservar o equilíbrio do plano.
             </p>
           </section>
-          </section>
         </DialogContent>
       </Dialog>
     </li>
