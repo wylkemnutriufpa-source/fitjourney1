@@ -817,6 +817,11 @@ function TemplateEditor({
         </div>
 
         <DialogFooter className="px-6 py-4 border-t border-border sticky bottom-0 bg-background">
+          {patientContext && applyError && (
+            <div className="w-full mb-2 text-[11px] text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
+              {friendlyPublishError(applyError)}
+            </div>
+          )}
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
           {patientContext ? (
             <Button
@@ -834,6 +839,7 @@ function TemplateEditor({
                   setApplyDone(patientContext.name);
                 } catch (e: any) {
                   setApplyError(e?.message ?? "Falha ao publicar plano.");
+                } finally {
                   setApplyBusy(false);
                 }
               }}
