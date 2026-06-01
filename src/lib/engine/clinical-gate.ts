@@ -36,12 +36,13 @@ export function validatePlan(input: GateInput): GateResult {
   const { weightKg, tdee, target, dailyTotals, foodOccurrences } = input;
 
   if (dailyTotals.length === 0) {
-    issues.push({
+    const onlyIssue: GateIssue = {
       code: "NO_DAILY_TOTALS",
       severity: "error",
       message: "Snapshot sem totais diários — não é possível validar.",
-    });
-    return { issues, blocked: true };
+    };
+    issues.push(onlyIssue);
+    return { issues, blockers: [onlyIssue], warnings: [], blocked: true };
   }
 
   // --- 1. Proteína > 2.5 g/kg ---
