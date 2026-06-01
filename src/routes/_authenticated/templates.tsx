@@ -91,6 +91,36 @@ function normalizeTitle(s: string) {
     .trim();
 }
 
+function slugifyName(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/**
+ * Tenta inferir a melhor chave de imagem para um alimento recém-adicionado.
+ * Estratégia: foodKey exato → slug do nome → primeira chave do banco que contenha
+ * uma palavra significativa do nome.
+ */
+function deriveImageKeyForFood(food: PlannerFoodItem): string | undefined {
+  if (food.foodKey && foodImages[food.foodKey]) return food.foodKey;
+  const slug = slugifyName(food.name);
+  if (slug && foodImages[slug]) return slug;
+  // tenta prefixo do slug
+  const match = allFoodKeys.find((k) => k.startsWith(slug));
+  if (match) return match;
+  // fallback por palavra principal
+  const words = slug.split("-").filter((w) => w.length >= 4);
+  for (const w of words) {
+    const m = allFoodKeys.find((k) => k.includes(w));
+    if (m) return m;
+  }
+  return undefined;
+}
+
 /**
  * Gera opções equivalentes automáticas para a refeição a partir do alimento
  * recém adicionado, usando o motor curado de substituições. Evita duplicar
@@ -110,13 +140,18 @@ function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): Planner
     const key = normalizeTitle(s.name);
     if (taken.has(key)) continue;
     taken.add(key);
+    const subImage = deriveImageKeyForFood({
+      ...food,
+      name: s.name,
+      foodKey: slugifyName(s.name),
+    }) ?? meal.main.imageKey ?? meal.heroKey ?? "iogurte-natural";
     out.push(
       createEmptyMealOption({
         title: s.name,
-        imageKey: meal.main.imageKey || meal.heroKey || "iogurte-natural",
+        imageKey: subImage,
         items: [
           createEmptyFoodItem({
-            foodKey: food.foodKey,
+            foodKey: slugifyName(s.name) || food.foodKey,
             name: s.name,
             qty: s.qty,
             unit: s.unit,
@@ -129,6 +164,75 @@ function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): Planner
   }
   return out;
 }
+
+function MealImagePickerDialog({
+  open,
+  onOpenChange,
+  value,
+  onPick,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  value?: string;
+  onPick: (key: string) => void;
+}) {
+  const [q, setQ] = useState("");
+  const filtered = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    if (!t) return allFoodKeys;
+    return allFoodKeys.filter((k) => k.includes(t));
+  }, [q]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Escolher imagem da refeição</DialogTitle>
+          <DialogDescription>
+            Selecione uma imagem do banco para representar esta refeição. A primeira escolhida
+            ao adicionar alimentos é automática — clique aqui para sobrescrever.
+          </DialogDescription>
+        </DialogHeader>
+        <Input
+          placeholder="Buscar (ex: frango, pao, salada)..."
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          autoFocus
+        />
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mt-2">
+          {filtered.map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => {
+                onPick(k);
+                onOpenChange(false);
+              }}
+              className={
+                "relative aspect-square rounded-md overflow-hidden border-2 transition-colors " +
+                (k === value
+                  ? "border-primary"
+                  : "border-transparent hover:border-primary/50")
+              }
+              title={k}
+            >
+              <img src={imgFor(k)} alt={k} className="w-full h-full object-cover" loading="lazy" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent text-white text-[9px] font-mono px-1 py-1 truncate text-left">
+                {k.replace(/-/g, " ")}
+              </div>
+            </button>
+          ))}
+          {filtered.length === 0 && (
+            <p className="col-span-full text-xs text-muted-foreground italic text-center py-8">
+              Nenhuma imagem encontrada.
+            </p>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 function TemplatesPage() {
   const search = Route.useSearch();
