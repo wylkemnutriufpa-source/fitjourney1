@@ -27,6 +27,23 @@ import {
 export type CurrentWeight = WeightReading;
 export type CurrentGoal = ClinicalGoal;
 
+export type MissingField =
+  | "weight"
+  | "goal"
+  | "sex"
+  | "ageYears"
+  | "heightCm"
+  | "activity";
+
+/**
+ * Campos exigidos para `calculable=true`. Subset MÍNIMO necessário para
+ * rodar TMB+TDEE+Macros. Campos adicionais que vierem ao ClinicalContext
+ * no futuro (waistCm, bodyFatPercent, leanMassKg, ...) NÃO entram aqui —
+ * eles afetam apenas `ready`. Isso garante que adicionar telemetria ao
+ * contexto nunca passe a bloquear publicação por engano (invariante #9).
+ */
+export type CalcField = MissingField;
+
 export interface ClinicalContext {
   readonly patientId: string;
   readonly currentWeight: CurrentWeight | null;
@@ -38,11 +55,21 @@ export interface ClinicalContext {
     readonly activity: ActivityLevel | null;
     readonly sourceAnamnesisId: string | null;
   };
-  /** true quando há peso atual + meta atual + demografia suficiente para motores. */
+  /**
+   * Contexto 100% completo. Hoje coincide com `calculable`; vai divergir
+   * quando novos campos (waistCm, bodyFatPercent, ...) forem adicionados
+   * ao contexto. Use APENAS para UI/auditoria — nunca como critério de
+   * bloqueio de publicação.
+   */
   readonly ready: boolean;
-  readonly missing: ReadonlyArray<
-    "weight" | "goal" | "sex" | "ageYears" | "heightCm" | "activity"
-  >;
+  /**
+   * Motores podem rodar (TMB+TDEE+Macros). É o ÚNICO critério válido
+   * para bloquear publicação clínica.
+   */
+  readonly calculable: boolean;
+  readonly missing: ReadonlyArray<MissingField>;
+  /** Subset de `missing` restrito a campos exigidos para `calculable`. */
+  readonly missingForCalc: ReadonlyArray<CalcField>;
 }
 
 export interface BuildClinicalContextInput {
@@ -71,9 +98,7 @@ export function buildClinicalContext(
     sourceAnamnesisId: latest?.id ?? null,
   };
 
-  const missing: Array<
-    "weight" | "goal" | "sex" | "ageYears" | "heightCm" | "activity"
-  > = [];
+  const missing: MissingField[] = [];
   if (!currentWeight) missing.push("weight");
   if (!currentGoal) missing.push("goal");
   if (!demographics.sex) missing.push("sex");
@@ -81,12 +106,30 @@ export function buildClinicalContext(
   if (demographics.heightCm == null) missing.push("heightCm");
   if (!demographics.activity) missing.push("activity");
 
+  // Hoje calculable == ready. Conforme novos campos forem ao contexto,
+  // eles entram em missing (afetando ready) mas NÃO em missingForCalc.
+  const CALC_FIELDS = new Set<CalcField>([
+    "weight",
+    "goal",
+    "sex",
+    "ageYears",
+    "heightCm",
+    "activity",
+  ]);
+  const missingForCalc = missing.filter((m): m is CalcField => CALC_FIELDS.has(m as CalcField));
+
   return {
     patientId: input.patientId,
     currentWeight,
     currentGoal,
     demographics,
     ready: missing.length === 0,
+    calculable: missingForCalc.length === 0,
     missing,
+    missingForCalc,
   };
 }
+
+// Re-export BuildClinicalContextInput shape consumers may rely on.
+export type { BuildClinicalContextInput as _BuildClinicalContextInput };
+

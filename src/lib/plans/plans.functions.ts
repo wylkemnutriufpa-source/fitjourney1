@@ -1,10 +1,30 @@
 // Plans — server fns para listar pacientes do nutri logado e publicar plano.
 // Snapshot é congelado no momento do insert (V3). RLS do banco protege tudo.
+//
+// PIPELINE DE PUBLICAÇÃO (A1+A2):
+//   1. Carrega ClinicalContext server-side (peso por recência + anamnese
+//      aprovada mais recente).
+//   2. Bloqueia se ctx.calculable === false (CLINICAL_CONTEXT_INCOMPLETE).
+//   3. Roda motores nutricionais (TMB+TDEE+Macros) a partir do contexto.
+//   4. Deriva totais diários do snapshot e roda clinical-gate.
+//   5. Bloqueia se gate.blockers.length > 0 (CLINICAL_GATE_BLOCKED).
+//   6. Anexa snapshot.clinicalAudit (contexto+motor+warnings+versões)
+//      antes de persistir. Snapshot fica imutável após published_at.
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { validateSnapshot } from "./snapshot.schema";
+import { validateSnapshot, type ClinicalAudit } from "./snapshot.schema";
+import { buildClinicalContext, type ClinicalContext } from "@/lib/clinical/context";
+import type { ApprovedAnamnesisInput } from "@/lib/clinical/resolve-goal";
+import type { WeightReading } from "@/lib/clinical/resolve-weight";
+import {
+  CanonicalAnamnesisSchema,
+  type CanonicalAnamnesis,
+} from "@/lib/anamnesis/canonical.schema";
+import { runNutritionEngines } from "@/lib/clinical/run-nutrition-engines";
+import { validatePlan, type DailyTotals, type FoodOccurrence } from "@/lib/engine/clinical-gate";
+import { ENGINE_VERSION, GATE_VERSION } from "@/lib/engine/version";
 
 export type AnamnesisStatusLite =
   | "approved"
@@ -117,19 +137,101 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     if (pErr) throw new Error(pErr.message);
     if (!pat) throw new Error("Paciente não pertence a você.");
 
-    // Gate clínico server-side: VALIDA mas NÃO bloqueia.
-    // O profissional é a fonte da verdade clínica. O servidor só anota
-    // warnings em snapshot.clinical_review como auditoria. Publicação
-    // sempre passa, mesmo com avisos.
+    // ---- 1) ClinicalContext server-side (verdade clínica) ----
+    const ctx = await loadClinicalContext(supabase, data.patientId);
+
+    // ---- 2) Bloqueia se ausência de dados ESSENCIAIS para o motor.
+    // Campos adicionais (waistCm, bodyFat...) que afetem ctx.ready mas não
+    // ctx.calculable NÃO bloqueiam — invariante #9.
+    if (!ctx.calculable) {
+      throw new Error(
+        `CLINICAL_CONTEXT_INCOMPLETE: missing=[${ctx.missingForCalc.join(",")}]`,
+      );
+    }
+
+    // ---- 3) Motor determinístico (TMB+TDEE+Macros) ----
+    const engineOut = runNutritionEngines(ctx);
+    if (!engineOut) {
+      // Defesa: ctx.calculable === true ⇒ engineOut nunca é null.
+      throw new Error("CLINICAL_CONTEXT_INCOMPLETE: engines returned null");
+    }
+
+    // ---- 4) Estrutura do snapshot (warn-only) ----
     const { snapshot, review } = validateSnapshot(data.snapshot);
-    const snapshotWithReview = { ...snapshot, clinical_review: review };
+
+    // ---- 5) Gate clínico — bloqueia APENAS em blockers (severity=error).
+    // Warnings (monotonia, etc.) NÃO impedem publicação — entram em
+    // snapshot.clinicalAudit.gateWarnings.
+    const dailyTotals = deriveDailyTotalsFromSnapshot(snapshot);
+    const foodOccurrences = deriveFoodOccurrencesFromSnapshot(snapshot);
+    const gate = validatePlan({
+      weightKg: ctx.currentWeight!.weightKg,
+      tdee: engineOut.tdee,
+      target: engineOut.target,
+      dailyTotals,
+      foodOccurrences,
+    });
+    if (gate.blockers.length > 0) {
+      throw new Error(
+        `CLINICAL_GATE_BLOCKED: ${gate.blockers.map((b) => b.code).join(",")}`,
+      );
+    }
+
+    // ---- 6) Auditoria clínica imutável anexada ao snapshot ----
+    const publishedAt = new Date().toISOString();
+    const clinicalAudit: ClinicalAudit = {
+      clinicalContextSnapshot: {
+        currentWeight: ctx.currentWeight
+          ? {
+              weightKg: ctx.currentWeight.weightKg,
+              observedAt: ctx.currentWeight.measuredAt,
+              source: ctx.currentWeight.source,
+              sourceId: ctx.currentWeight.sourceId,
+            }
+          : null,
+        currentGoal: ctx.currentGoal
+          ? {
+              kind: ctx.currentGoal.kind,
+              sourceAnamnesisId: ctx.currentGoal.sourceAnamnesisId,
+            }
+          : null,
+        demographics: {
+          sex: ctx.demographics.sex,
+          ageYears: ctx.demographics.ageYears,
+          heightCm: ctx.demographics.heightCm,
+          activity: ctx.demographics.activity,
+          sourceAnamnesisId: ctx.demographics.sourceAnamnesisId,
+        },
+        calculable: true,
+      },
+      engineOutput: {
+        tmb: engineOut.tmb,
+        tdee: engineOut.tdee,
+        target: engineOut.target,
+        clinicalGoalKind: engineOut.clinicalGoalKind,
+        engineGoal: engineOut.engineGoal,
+      },
+      gateWarnings: gate.warnings.map((w) => ({
+        code: w.code,
+        message: w.message,
+      })),
+      engineVersion: ENGINE_VERSION,
+      gateVersion: GATE_VERSION,
+      publishedAt,
+    };
+
+    const snapshotWithAudit = {
+      ...snapshot,
+      clinical_review: review,
+      clinicalAudit,
+    };
 
     const insertRow: Record<string, any> = {
       patient_id: data.patientId,
       nutritionist_id: nutri.id,
       schema_version: 3,
       status: "published",
-      snapshot: snapshotWithReview,
+      snapshot: snapshotWithAudit,
     };
     if (data.sourceTemplateId) insertRow.source_template_id = data.sourceTemplateId;
 
@@ -142,3 +244,137 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
 
     return { id: plan.id, publishedAt: plan.published_at };
   });
+
+// ---------------------------------------------------------------------------
+// Helpers internos — loadClinicalContext + derivações do snapshot.
+// ---------------------------------------------------------------------------
+
+/**
+ * Carrega ClinicalContext do paciente usando o supabase autenticado do nutri.
+ * Mesma lógica de `context.functions.ts#getClinicalContext`, replicada aqui
+ * para evitar dependência cruzada server-fn → server-fn.
+ */
+async function loadClinicalContext(
+  supabase: any,
+  patientId: string,
+): Promise<ClinicalContext> {
+  const [anamnesesRes, feedbacksRes] = await Promise.all([
+    supabase
+      .from("anamneses")
+      .select("id, approved_at, data")
+      .eq("patient_id", patientId)
+      .eq("review_status", "approved")
+      .not("approved_at", "is", null)
+      .order("approved_at", { ascending: false }),
+    supabase
+      .from("patient_feedbacks")
+      .select("id, created_at, weight_kg")
+      .eq("patient_id", patientId)
+      .not("weight_kg", "is", null)
+      .order("created_at", { ascending: false }),
+  ]);
+  if (anamnesesRes.error) throw new Error(anamnesesRes.error.message);
+  if (feedbacksRes.error) throw new Error(feedbacksRes.error.message);
+
+  const approvedAnamneses: ApprovedAnamnesisInput[] = [];
+  for (const row of anamnesesRes.data ?? []) {
+    if (!row.approved_at) continue;
+    const canonical = extractCanonical(row.data);
+    if (!canonical) continue;
+    approvedAnamneses.push({
+      id: row.id,
+      approvedAt: row.approved_at,
+      canonical: { basics: canonical.basics },
+    });
+  }
+
+  const weightReadings: WeightReading[] = [];
+  for (const f of feedbacksRes.data ?? []) {
+    if (f.weight_kg == null) continue;
+    weightReadings.push({
+      source: "feedback",
+      weightKg: Number(f.weight_kg),
+      measuredAt: f.created_at,
+      sourceId: f.id,
+    });
+  }
+  for (const a of approvedAnamneses) {
+    const w = a.canonical.basics?.weightKg;
+    if (typeof w === "number" && w > 0) {
+      weightReadings.push({
+        source: "anamnesis",
+        weightKg: w,
+        measuredAt: a.approvedAt,
+        sourceId: a.id,
+      });
+    }
+  }
+
+  return buildClinicalContext({ patientId, weightReadings, approvedAnamneses });
+}
+
+function extractCanonical(raw: unknown): CanonicalAnamnesis | null {
+  if (!raw || typeof raw !== "object") return null;
+  const envelope = raw as { canonical?: unknown };
+  const parsed = CanonicalAnamnesisSchema.safeParse(envelope.canonical);
+  return parsed.success ? parsed.data : null;
+}
+
+/**
+ * Deriva totais diários do snapshot. Snapshot V3 atual representa UM dia
+ * (lista única de refeições). Macros por item ainda não fazem parte do
+ * schema, portanto somamos APENAS kcal — regras do gate baseadas em
+ * proteína/macros operam com 0 (não disparam falso positivo nem
+ * bloqueiam). Quando o snapshot evoluir para carregar macros por item,
+ * basta enriquecer aqui.
+ */
+export function deriveDailyTotalsFromSnapshot(
+  snapshot: Record<string, unknown>,
+): DailyTotals[] {
+  const meals: any[] = Array.isArray((snapshot as any).meals)
+    ? ((snapshot as any).meals as any[])
+    : [];
+  if (meals.length === 0) return [];
+
+  let kcal = 0;
+  let proteinG = 0;
+  let carbG = 0;
+  let fatG = 0;
+  for (const m of meals) {
+    const items: any[] = Array.isArray(m?.main?.items) ? m.main.items : [];
+    for (const it of items) {
+      if (Number.isFinite(it?.kcal)) kcal += Number(it.kcal);
+      if (Number.isFinite(it?.proteinG)) proteinG += Number(it.proteinG);
+      if (Number.isFinite(it?.carbG)) carbG += Number(it.carbG);
+      if (Number.isFinite(it?.fatG)) fatG += Number(it.fatG);
+    }
+  }
+  return [{ dayLabel: "dia", kcal, proteinG, carbG, fatG }];
+}
+
+export function deriveFoodOccurrencesFromSnapshot(
+  snapshot: Record<string, unknown>,
+): FoodOccurrence[] {
+  const meals: any[] = Array.isArray((snapshot as any).meals)
+    ? ((snapshot as any).meals as any[])
+    : [];
+  const counter = new Map<string, { displayName: string; count: number }>();
+  for (const m of meals) {
+    const items: any[] = Array.isArray(m?.main?.items) ? m.main.items : [];
+    for (const it of items) {
+      const key = typeof it?.foodKey === "string" ? it.foodKey : null;
+      if (!key) continue;
+      const cur = counter.get(key) ?? {
+        displayName: typeof it?.name === "string" ? it.name : key,
+        count: 0,
+      };
+      cur.count += 1;
+      counter.set(key, cur);
+    }
+  }
+  return Array.from(counter, ([foodKey, v]) => ({
+    foodKey,
+    displayName: v.displayName,
+    weeklyCount: v.count,
+  }));
+}

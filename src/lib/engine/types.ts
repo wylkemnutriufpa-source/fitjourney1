@@ -71,6 +71,12 @@ export interface GateIssue {
 }
 
 export interface GateResult {
+  /** Todos os issues (blockers ∪ warnings) — retrocompat. */
   readonly issues: ReadonlyArray<GateIssue>;
+  /** Subset de `issues` com severity='error' — impedem publicação. */
+  readonly blockers: ReadonlyArray<GateIssue>;
+  /** Subset de `issues` com severity='warning' — NUNCA impedem publicação. */
+  readonly warnings: ReadonlyArray<GateIssue>;
+  /** Sempre igual a `blockers.length > 0`. */
   readonly blocked: boolean;
 }

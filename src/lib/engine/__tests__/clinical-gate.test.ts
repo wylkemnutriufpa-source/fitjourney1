@@ -24,6 +24,8 @@ describe("validatePlan", () => {
     });
     expect(r.blocked).toBe(false);
     expect(r.issues.length).toBe(0);
+    expect(r.blockers.length).toBe(0);
+    expect(r.warnings.length).toBe(0);
   });
 
   it("bloqueia proteína > 2.5 g/kg", () => {
@@ -75,7 +77,8 @@ describe("validatePlan", () => {
         { foodKey: "arroz_branco", displayName: "Arroz branco", weeklyCount: 6 },
       ],
     });
-    expect(r.issues.some((i) => i.code === "FOOD_MONOTONY")).toBe(true);
+    expect(r.warnings.some((i) => i.code === "FOOD_MONOTONY")).toBe(true);
+    expect(r.blockers.length).toBe(0);
     expect(r.blocked).toBe(false);
   });
 
@@ -88,6 +91,7 @@ describe("validatePlan", () => {
       foodOccurrences: [],
     });
     expect(r.blocked).toBe(true);
-    expect(r.issues[0].code).toBe("NO_DAILY_TOTALS");
+    expect(r.blockers.length).toBe(1);
+    expect(r.blockers[0].code).toBe("NO_DAILY_TOTALS");
   });
 });

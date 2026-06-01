@@ -9,7 +9,7 @@
 //
 // Invariantes (ver skill fitjourney-clinical-invariants):
 // - Motor só consome ClinicalContext (via este adapter).
-// - Zero inferência. Zero default silencioso. ctx.ready=false ⇒ retorna null.
+// - Zero inferência. Zero default silencioso. ctx.calculable=false ⇒ retorna null.
 // - Mapeamento GoalKind clínico → Goal do motor é EXPLÍCITO e auditável:
 //     cut         → cut
 //     bulk        → bulk
@@ -59,9 +59,12 @@ export interface NutritionEnginesOutput extends NutritionTargets {
 export function runNutritionEngines(
   ctx: ClinicalContext,
 ): NutritionEnginesOutput | null {
-  if (!ctx.ready) return null;
+  // Bloqueia em `calculable`, não em `ready`. Campos adicionais que entrarem
+  // no contexto no futuro (waistCm, bodyFat...) afetam `ready` mas NÃO devem
+  // impedir cálculo. Invariante #9.
+  if (!ctx.calculable) return null;
 
-  // ready=true ⇒ todos os campos abaixo são não-nulos.
+  // calculable=true ⇒ todos os campos abaixo são não-nulos.
   const weightKg = ctx.currentWeight!.weightKg;
   const sex = ctx.demographics.sex!;
   const ageYears = ctx.demographics.ageYears!;
