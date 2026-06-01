@@ -23,6 +23,7 @@ import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { applyTheme, getStoredTheme } from "@/lib/patient/theme";
 import fjLogo from "@/assets/fitjourney-logo.png";
+import { ExpirationBanner } from "@/components/ExpirationBanner";
 
 
 const nutritionistNav = [
@@ -272,6 +273,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
       </aside>
 
       <div className={sidebarOpen ? "md:pl-64" : "md:pl-0"}>
+        <ExpirationBanner />
         <header className="h-16 border-b border-border flex items-center justify-between gap-3 px-4 sm:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
