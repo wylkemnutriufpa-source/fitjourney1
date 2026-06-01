@@ -957,7 +957,9 @@ function TemplateEditor({
                 Snapshot atual (com suas edições) é congelado no banco como plano publicado. Imutável após publicar.
               </p>
               {applyError && (
-                <p className="text-[11px] text-destructive">{applyError}</p>
+                <p className="text-[11px] text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
+                  {friendlyPublishError(applyError)}
+                </p>
               )}
             </div>
           )}
