@@ -26,7 +26,7 @@ import {
 } from "@/lib/template-data";
 import { TemplateMatcherPanel } from "@/components/TemplateMatcherPanel";
 
-import { imgFor } from "@/lib/food-images";
+import { imgFor, allFoodKeys, foodImages } from "@/lib/food-images";
 import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
 import { SendShareDialog } from "@/components/SendShareDialog";
 import { FoodPickerDialog } from "@/components/FoodPickerDialog";
@@ -91,6 +91,36 @@ function normalizeTitle(s: string) {
     .trim();
 }
 
+function slugifyName(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/**
+ * Tenta inferir a melhor chave de imagem para um alimento recém-adicionado.
+ * Estratégia: foodKey exato → slug do nome → primeira chave do banco que contenha
+ * uma palavra significativa do nome.
+ */
+function deriveImageKeyForFood(food: PlannerFoodItem): string | undefined {
+  if (food.foodKey && foodImages[food.foodKey]) return food.foodKey;
+  const slug = slugifyName(food.name);
+  if (slug && foodImages[slug]) return slug;
+  // tenta prefixo do slug
+  const match = allFoodKeys.find((k) => k.startsWith(slug));
+  if (match) return match;
+  // fallback por palavra principal
+  const words = slug.split("-").filter((w) => w.length >= 4);
+  for (const w of words) {
+    const m = allFoodKeys.find((k) => k.includes(w));
+    if (m) return m;
+  }
+  return undefined;
+}
+
 /**
  * Gera opções equivalentes automáticas para a refeição a partir do alimento
  * recém adicionado, usando o motor curado de substituições. Evita duplicar
@@ -110,13 +140,18 @@ function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): Planner
     const key = normalizeTitle(s.name);
     if (taken.has(key)) continue;
     taken.add(key);
+    const subImage = deriveImageKeyForFood({
+      ...food,
+      name: s.name,
+      foodKey: slugifyName(s.name),
+    }) ?? meal.main.imageKey ?? meal.heroKey ?? "iogurte-natural";
     out.push(
       createEmptyMealOption({
         title: s.name,
-        imageKey: meal.main.imageKey || meal.heroKey || "iogurte-natural",
+        imageKey: subImage,
         items: [
           createEmptyFoodItem({
-            foodKey: food.foodKey,
+            foodKey: slugifyName(s.name) || food.foodKey,
             name: s.name,
             qty: s.qty,
             unit: s.unit,
@@ -129,6 +164,75 @@ function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): Planner
   }
   return out;
 }
+
+function MealImagePickerDialog({
+  open,
+  onOpenChange,
+  value,
+  onPick,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  value?: string;
+  onPick: (key: string) => void;
+}) {
+  const [q, setQ] = useState("");
+  const filtered = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    if (!t) return allFoodKeys;
+    return allFoodKeys.filter((k) => k.includes(t));
+  }, [q]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Escolher imagem da refeição</DialogTitle>
+          <DialogDescription>
+            Selecione uma imagem do banco para representar esta refeição. A primeira escolhida
+            ao adicionar alimentos é automática — clique aqui para sobrescrever.
+          </DialogDescription>
+        </DialogHeader>
+        <Input
+          placeholder="Buscar (ex: frango, pao, salada)..."
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          autoFocus
+        />
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mt-2">
+          {filtered.map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => {
+                onPick(k);
+                onOpenChange(false);
+              }}
+              className={
+                "relative aspect-square rounded-md overflow-hidden border-2 transition-colors " +
+                (k === value
+                  ? "border-primary"
+                  : "border-transparent hover:border-primary/50")
+              }
+              title={k}
+            >
+              <img src={imgFor(k)} alt={k} className="w-full h-full object-cover" loading="lazy" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent text-white text-[9px] font-mono px-1 py-1 truncate text-left">
+                {k.replace(/-/g, " ")}
+              </div>
+            </button>
+          ))}
+          {filtered.length === 0 && (
+            <p className="col-span-full text-xs text-muted-foreground italic text-center py-8">
+              Nenhuma imagem encontrada.
+            </p>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 function TemplatesPage() {
   const search = Route.useSearch();
@@ -740,6 +844,7 @@ function MealEditor({
   const heroUrl = imgFor(meal.heroKey || meal.main.imageKey);
   const kcal = mealKcalFromOption(meal.main);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [imagePickerOpen, setImagePickerOpen] = useState(false);
 
   function changeMainItem(itemId: string, updater: (i: PlannerFoodItem) => PlannerFoodItem) {
     onChange((m) => updateMainItemWithScaling(m, itemId, updater));
@@ -751,14 +856,40 @@ function MealEditor({
 
   function addMainItemFromCatalog(food: PlannerFoodItem) {
     onChange((m) => {
-      const nextMain = { ...m.main, items: [...m.main.items, food] };
-      const auto = buildAutoEquivalents(m, food);
+      const isFirst = m.main.items.length === 0;
+      let heroKey = m.heroKey;
+      let mainImage = m.main.imageKey;
+      // Auto-imagem soberana: primeiro alimento define a imagem, a menos que o
+      // profissional tenha travado manualmente uma escolha via o banco de imagens.
+      if (isFirst && !m.heroLocked) {
+        const derived = deriveImageKeyForFood(food);
+        if (derived) {
+          heroKey = derived;
+          mainImage = derived;
+        }
+      }
+      const nextMain = { ...m.main, imageKey: mainImage, items: [...m.main.items, food] };
+      // Auto-injeção de equivalentes só dispara no primeiro alimento da refeição.
+      // Alimentos seguintes entram apenas na opção principal — sem amontoar substituições.
+      const auto = isFirst
+        ? buildAutoEquivalents({ ...m, main: nextMain, heroKey }, food)
+        : [];
       return {
         ...m,
+        heroKey,
         main: nextMain,
         equivalents: [...m.equivalents, ...auto],
       };
     });
+  }
+
+  function pickHeroImage(imageKey: string) {
+    onChange((m) => ({
+      ...m,
+      heroKey: imageKey,
+      heroLocked: true,
+      main: { ...m.main, imageKey },
+    }));
   }
 
   function removeMainItem(itemId: string) {
@@ -789,7 +920,12 @@ function MealEditor({
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-background">
       <div className="grid grid-cols-[140px_1fr] gap-0">
-        <div className="relative aspect-square bg-muted">
+        <button
+          type="button"
+          onClick={() => setImagePickerOpen(true)}
+          className="relative aspect-square bg-muted group/img"
+          title="Trocar imagem da refeição"
+        >
           {heroUrl ? (
             <img src={heroUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
           ) : (
@@ -797,10 +933,19 @@ function MealEditor({
               <ImageOff className="size-6" />
             </div>
           )}
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-            <p className="text-white text-[10px] font-mono">{kcal} kcal</p>
+          <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/40 transition-colors grid place-items-center opacity-0 group-hover/img:opacity-100">
+            <span className="text-white text-[10px] font-mono uppercase tracking-widest border border-white/60 rounded px-2 py-1">
+              Trocar imagem
+            </span>
           </div>
-        </div>
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-left">
+            <p className="text-white text-[10px] font-mono">{kcal} kcal</p>
+            {meal.heroLocked && (
+              <p className="text-white/70 text-[9px] font-mono">manual</p>
+            )}
+          </div>
+        </button>
+
 
         <div className="p-3 space-y-3">
           <div className="flex items-center gap-2">
@@ -912,6 +1057,12 @@ function MealEditor({
             }),
           )
         }
+      />
+      <MealImagePickerDialog
+        open={imagePickerOpen}
+        onOpenChange={setImagePickerOpen}
+        value={meal.heroKey || meal.main.imageKey}
+        onPick={pickHeroImage}
       />
     </div>
   );
