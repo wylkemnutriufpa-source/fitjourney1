@@ -560,9 +560,9 @@ function FeedbackPage() {
                       <Field
                         label="Fotos"
                         value={
-                          [f.photoFrontPath, f.photoSidePath].filter(Boolean)
+                          [f.photoFrontPath, f.photoSidePath, f.photoBackPath].filter(Boolean)
                             .length > 0
-                            ? `${[f.photoFrontPath, f.photoSidePath].filter(Boolean).length}`
+                            ? `${[f.photoFrontPath, f.photoSidePath, f.photoBackPath].filter(Boolean).length}`
                             : "—"
                         }
                       />
@@ -572,13 +572,16 @@ function FeedbackPage() {
                         {f.notes}
                       </p>
                     )}
-                    {(f.photoFrontPath || f.photoSidePath) && (
-                      <div className="flex gap-2 pt-1">
+                    {(f.photoFrontPath || f.photoSidePath || f.photoBackPath) && (
+                      <div className="flex gap-2 pt-1 flex-wrap">
                         {f.photoFrontPath && (
                           <PhotoThumb path={f.photoFrontPath} label="Frontal" />
                         )}
                         {f.photoSidePath && (
                           <PhotoThumb path={f.photoSidePath} label="Lateral" />
+                        )}
+                        {f.photoBackPath && (
+                          <PhotoThumb path={f.photoBackPath} label="Costas" />
                         )}
                       </div>
                     )}
