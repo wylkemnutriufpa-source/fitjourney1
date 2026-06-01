@@ -321,6 +321,7 @@ function MealCard({
     : [];
   const heroUrl = imgFor(meal?.heroKey || main?.imageKey || "");
   const kcal = mealKcal(main);
+  const mealKind: MealKind = detectMealKind(meal?.label, meal?.time);
 
   return (
     <article className="space-y-2">
