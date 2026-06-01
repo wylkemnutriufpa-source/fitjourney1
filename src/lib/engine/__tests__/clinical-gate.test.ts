@@ -91,6 +91,7 @@ describe("validatePlan", () => {
       foodOccurrences: [],
     });
     expect(r.blocked).toBe(true);
-    expect(r.issues[0].code).toBe("NO_DAILY_TOTALS");
+    expect(r.blockers.length).toBe(1);
+    expect(r.blockers[0].code).toBe("NO_DAILY_TOTALS");
   });
 });
