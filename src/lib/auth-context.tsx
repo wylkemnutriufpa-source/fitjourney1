@@ -64,6 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function signIn(email: string, password: string) {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: error.message };
+    try {
+      sessionStorage.setItem("fj_intro_pending", "1");
+    } catch {
+      // ignore
+    }
     return {};
   }
 
