@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link, Navigate } from "@tanstack/react-ro
 import { useState } from "react";
 import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import fjLogo from "@/assets/fitjourney-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -44,10 +45,12 @@ function Login() {
     <div className="min-h-screen grid lg:grid-cols-2 bg-background text-foreground">
       <div className="hidden lg:flex flex-col justify-between p-12 bg-sidebar border-r border-border relative overflow-hidden">
         <div className="flex items-center gap-3">
-          <div className="size-8 bg-primary rounded-sm grid place-items-center">
-            <div className="size-4 border-2 border-background rotate-45" />
-          </div>
-          <span className="text-lg font-bold tracking-tight uppercase italic">FitJourney</span>
+          <img
+            src={fjLogo}
+            alt="FitJourney"
+            className="size-10 rounded-md object-cover ring-1 ring-primary/30 shadow-[0_0_24px_-8px_oklch(0.62_0.16_155/0.7)]"
+          />
+          <span className="fj-wordmark text-2xl leading-none">FitJourney</span>
         </div>
 
         <div className="space-y-6 relative z-10">
