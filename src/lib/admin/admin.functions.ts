@@ -208,6 +208,7 @@ const UpdateNutriInput = z.object({
   phone: z.string().trim().max(32).regex(/^[0-9+()\-\s]*$/, "Telefone inválido").nullable().optional(),
   crn: z.string().trim().max(64).regex(/^[A-Za-z0-9\-\/\. ]*$/, "CRN inválido").nullable().optional(),
   specialty: z.string().trim().max(120).nullable().optional(),
+  feedback_frequency_days: z.number().int().min(1).max(90).optional(),
 });
 
 export const adminUpdateNutritionist = createServerFn({ method: "POST" })
@@ -216,15 +217,19 @@ export const adminUpdateNutritionist = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertAdmin(supabase, userId);
+    const patch: Record<string, unknown> = {
+      full_name: data.full_name,
+      email: data.email,
+      phone: data.phone ?? null,
+      crn: data.crn ?? null,
+      specialty: data.specialty ?? null,
+    };
+    if (typeof data.feedback_frequency_days === "number") {
+      patch.feedback_frequency_days = data.feedback_frequency_days;
+    }
     const { data: updated, error } = await supabase
       .from("nutritionists")
-      .update({
-        full_name: data.full_name,
-        email: data.email,
-        phone: data.phone ?? null,
-        crn: data.crn ?? null,
-        specialty: data.specialty ?? null,
-      })
+      .update(patch)
       .eq("id", data.nutritionist_id)
       .select("id");
     if (error) throw new Error(error.message);
