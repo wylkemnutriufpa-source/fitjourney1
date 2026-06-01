@@ -214,7 +214,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
   async function handleSignOut() {
     await signOut();
-    navigate({ to: "/" });
+    navigate({ to: "/app" });
   }
 
   return (
