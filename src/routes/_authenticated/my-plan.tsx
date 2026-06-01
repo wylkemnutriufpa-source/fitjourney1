@@ -549,10 +549,12 @@ function EquivalentsButton({
   mealLabel,
   equivalents,
   foods,
+  mealKind,
 }: {
   mealLabel: string;
   equivalents: any[];
   foods: FoodDTO[] | undefined;
+  mealKind: MealKind;
 }) {
   const [open, setOpen] = useState(false);
   return (
