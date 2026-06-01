@@ -50,7 +50,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
 
     const { data: nutris, error } = await supabase
       .from("nutritionists")
-      .select("id, full_name, email, phone, crn, created_at")
+      .select("id, full_name, email, phone, crn, feedback_frequency_days, created_at")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
