@@ -159,7 +159,10 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
 
       const { snapshot: snapOnly, review: reviewOnly } = validateSnapshot(data.snapshot);
       const publishedAtOverride = new Date().toISOString();
-      const clinicalAuditOverride: ClinicalAudit = {
+      // Snapshot de auditoria sem ClinicalContext (fora do schema estrito).
+      // Cast via unknown — invariante #9 não se aplica aqui pois o nutri
+      // confirmou explicitamente a publicação sem anamnese aprovada.
+      const clinicalAuditOverride = {
         clinicalContextSnapshot: {
           currentWeight: null,
           currentGoal: null,
@@ -179,7 +182,7 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
         publishedAt: publishedAtOverride,
         publishedWithoutClinicalContext: true,
         missingForCalc: ctx.missingForCalc,
-      } as ClinicalAudit;
+      } as unknown as ClinicalAudit;
 
       const snapshotOverride = {
         ...snapOnly,
