@@ -53,12 +53,13 @@ describe("mapGoalKindToEngineGoal", () => {
 });
 
 describe("runNutritionEngines", () => {
-  it("retorna null quando ctx não está pronto", () => {
+  it("retorna null quando ctx não é calculable", () => {
     const ctx = buildClinicalContext({
       patientId: "p",
       weightReadings: [],
       approvedAnamneses: [],
     });
+    expect(ctx.calculable).toBe(false);
     expect(runNutritionEngines(ctx)).toBeNull();
   });
 
