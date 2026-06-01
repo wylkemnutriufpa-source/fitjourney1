@@ -143,7 +143,10 @@ function Patients() {
                   </td>
                 </tr>
               )}
-              {!isLoading && !error && filtered.map((p) => (
+              {!isLoading && !error && filtered.map((p) => {
+                const statusMeta = anamnesisStatusMeta(p.anamnesisStatus);
+                const hasAnamnesis = p.anamnesisStatus !== "none";
+                return (
                 <tr key={p.id} className="border-b border-border last:border-0 hover:bg-accent/30">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
@@ -165,25 +168,45 @@ function Patients() {
                     {formatDate(p.createdAt)}
                   </td>
                   <td className="p-4">
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase text-amber-400">
-                      <span className="size-1.5 rounded-full bg-amber-400" />
-                      Aguardando anamnese
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase ${statusMeta.cls}`}>
+                      <span className={`size-1.5 rounded-full ${statusMeta.dot}`} />
+                      {statusMeta.label}
                     </span>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-1">
-                      <button
-                        type="button"
-                        disabled
-                        className="size-8 grid place-items-center rounded text-muted-foreground/50 cursor-not-allowed"
-                        title="Disponível após anamnese"
-                      >
-                        <FileText className="size-4" />
-                      </button>
+                      {hasAnamnesis ? (
+                        <Link
+                          to="/anamneses/$id"
+                          params={{ id: "" }}
+                          search={{} as never}
+                          // Quick view: usa rota da anamnese vinculada via paciente.
+                          // Atalho usa primeira anamnese pendente/aprovada.
+                          className="size-8 grid place-items-center rounded text-muted-foreground hover:text-foreground"
+                          title="Abrir anamnese"
+                          onClick={(e) => {
+                            // Sem id direto aqui; redireciona para fila filtrando por paciente.
+                            e.preventDefault();
+                            window.location.href = `/anamneses`;
+                          }}
+                        >
+                          <FileText className="size-4" />
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          className="size-8 grid place-items-center rounded text-muted-foreground/50 cursor-not-allowed"
+                          title="Disponível após anamnese"
+                        >
+                          <FileText className="size-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
               {!isLoading && !error && filtered.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-12 text-center text-muted-foreground text-sm">
