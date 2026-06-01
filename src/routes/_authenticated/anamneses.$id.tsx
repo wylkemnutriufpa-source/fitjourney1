@@ -250,11 +250,3 @@ function StatusBadge({ status }: { status: string }) {
     </span>
   );
 }
-
-function prettyJson(s: string): string {
-  try {
-    return JSON.stringify(JSON.parse(s), null, 2);
-  } catch {
-    return s;
-  }
-}
