@@ -115,10 +115,19 @@ function ProfessionalsPage() {
               return (
                 <tr key={n.id} className="border-t border-border hover:bg-accent/30">
                   <td className="px-4 py-2">
-                    <div className="font-medium">{n.full_name}</div>
+                    <button
+                      type="button"
+                      onClick={() => setEditing(n)}
+                      className="text-left font-medium hover:text-primary hover:underline"
+                    >
+                      {n.full_name}
+                    </button>
                     <div className="text-xs text-muted-foreground">{n.email}</div>
+                    {n.phone && <div className="text-[11px] text-muted-foreground">{n.phone}</div>}
+                    {n.crn && <div className="text-[11px] text-muted-foreground">CRN: {n.crn}</div>}
                   </td>
                   <td className="px-4 py-2">{n.patients_count}</td>
+
                   <td className="px-4 py-2">
                     {sub ? (
                       <span
