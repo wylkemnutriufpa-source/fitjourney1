@@ -29,6 +29,21 @@ function formatDate(value: string): string {
   }).format(new Date(value));
 }
 
+function anamnesisStatusMeta(status: string): { label: string; cls: string; dot: string } {
+  switch (status) {
+    case "approved":
+      return { label: "Anamnese aprovada", cls: "text-emerald-400", dot: "bg-emerald-400" };
+    case "submitted":
+      return { label: "Anamnese pendente", cls: "text-primary", dot: "bg-primary" };
+    case "needs_changes":
+      return { label: "Requer ajustes", cls: "text-amber-400", dot: "bg-amber-400" };
+    case "draft":
+      return { label: "Rascunho em andamento", cls: "text-muted-foreground", dot: "bg-muted-foreground" };
+    default:
+      return { label: "Aguardando anamnese", cls: "text-amber-400", dot: "bg-amber-400" };
+  }
+}
+
 function Patients() {
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const { data: patients = [], isLoading, error } = useQuery({
@@ -143,7 +158,10 @@ function Patients() {
                   </td>
                 </tr>
               )}
-              {!isLoading && !error && filtered.map((p) => (
+              {!isLoading && !error && filtered.map((p) => {
+                const statusMeta = anamnesisStatusMeta(p.anamnesisStatus);
+                const hasAnamnesis = p.anamnesisStatus !== "none";
+                return (
                 <tr key={p.id} className="border-b border-border last:border-0 hover:bg-accent/30">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
@@ -165,25 +183,36 @@ function Patients() {
                     {formatDate(p.createdAt)}
                   </td>
                   <td className="p-4">
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase text-amber-400">
-                      <span className="size-1.5 rounded-full bg-amber-400" />
-                      Aguardando anamnese
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase ${statusMeta.cls}`}>
+                      <span className={`size-1.5 rounded-full ${statusMeta.dot}`} />
+                      {statusMeta.label}
                     </span>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-1">
-                      <button
-                        type="button"
-                        disabled
-                        className="size-8 grid place-items-center rounded text-muted-foreground/50 cursor-not-allowed"
-                        title="Disponível após anamnese"
-                      >
-                        <FileText className="size-4" />
-                      </button>
+                      {hasAnamnesis ? (
+                        <Link
+                          to="/anamneses"
+                          className="size-8 grid place-items-center rounded text-muted-foreground hover:text-foreground"
+                          title="Abrir fila de anamneses"
+                        >
+                          <FileText className="size-4" />
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          className="size-8 grid place-items-center rounded text-muted-foreground/50 cursor-not-allowed"
+                          title="Disponível após anamnese"
+                        >
+                          <FileText className="size-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
               {!isLoading && !error && filtered.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-12 text-center text-muted-foreground text-sm">

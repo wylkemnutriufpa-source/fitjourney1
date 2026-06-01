@@ -6,12 +6,21 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { validateSnapshot } from "./snapshot.schema";
 
+export type AnamnesisStatusLite =
+  | "approved"
+  | "submitted"
+  | "needs_changes"
+  | "draft"
+  | "none";
+
 export type PatientLite = {
   id: string;
   fullName: string;
   email: string;
   phone: string | null;
   createdAt: string;
+  anamnesisStatus: AnamnesisStatusLite;
+  anamnesisUpdatedAt: string | null;
 };
 
 export const listMyPatientsForPlan = createServerFn({ method: "GET" })
@@ -34,13 +43,42 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
       .order("full_name", { ascending: true });
     if (error) throw new Error(error.message);
 
-    return (data ?? []).map((p: any) => ({
-      id: p.id,
-      fullName: p.full_name,
-      email: p.email,
-      phone: p.phone ?? null,
-      createdAt: p.created_at,
-    }));
+    const patients = data ?? [];
+    if (patients.length === 0) return [];
+
+    const patientIds = patients.map((p: any) => p.id);
+    const { data: anamneses, error: aErr } = await supabase
+      .from("anamneses")
+      .select("patient_id, review_status, updated_at, approved_at")
+      .in("patient_id", patientIds)
+      .order("updated_at", { ascending: false });
+    if (aErr) throw new Error(aErr.message);
+
+    // Anamnese mais relevante por paciente: aprovada vence; senão a mais recente.
+    const byPatient = new Map<string, { status: AnamnesisStatusLite; updatedAt: string }>();
+    for (const a of anamneses ?? []) {
+      const status = (a.review_status ?? "draft") as AnamnesisStatusLite;
+      const updatedAt = a.approved_at ?? a.updated_at;
+      const existing = byPatient.get(a.patient_id);
+      if (!existing) {
+        byPatient.set(a.patient_id, { status, updatedAt });
+      } else if (existing.status !== "approved" && status === "approved") {
+        byPatient.set(a.patient_id, { status, updatedAt });
+      }
+    }
+
+    return patients.map((p: any) => {
+      const info = byPatient.get(p.id);
+      return {
+        id: p.id,
+        fullName: p.full_name,
+        email: p.email,
+        phone: p.phone ?? null,
+        createdAt: p.created_at,
+        anamnesisStatus: info?.status ?? "none",
+        anamnesisUpdatedAt: info?.updatedAt ?? null,
+      };
+    });
   });
 
 const PublishInput = z.object({
