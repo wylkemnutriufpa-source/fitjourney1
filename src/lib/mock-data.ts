@@ -357,15 +357,6 @@ export const templates: DietTemplate[] = [
   },
 ];
 
-export const recentActivity = [
-  { day: "Seg", consultations: 4, newDiets: 2 },
-  { day: "Ter", consultations: 6, newDiets: 3 },
-  { day: "Qua", consultations: 3, newDiets: 1 },
-  { day: "Qui", consultations: 8, newDiets: 4 },
-  { day: "Sex", consultations: 5, newDiets: 3 },
-  { day: "Sáb", consultations: 2, newDiets: 1 },
-  { day: "Dom", consultations: 0, newDiets: 0 },
-];
 
 // Mifflin-St Jeor
 export function calcTMB(sex: "M" | "F", weightKg: number, heightCm: number, age: number) {
