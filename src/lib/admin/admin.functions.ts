@@ -197,3 +197,33 @@ export const listAllPatients = createServerFn({ method: "POST" })
       nutritionist_name: p.nutritionist_id ? nameByNutri.get(p.nutritionist_id) ?? null : null,
     }));
   });
+
+const UpdateNutriInput = z.object({
+  nutritionist_id: z.string().uuid(),
+  full_name: z.string().trim().min(1).max(255),
+  email: z.string().trim().email().max(255),
+  phone: z.string().trim().max(32).regex(/^[0-9+()\-\s]*$/, "Telefone inválido").nullable().optional(),
+  crn: z.string().trim().max(64).regex(/^[A-Za-z0-9\-\/\. ]*$/, "CRN inválido").nullable().optional(),
+  specialty: z.string().trim().max(120).nullable().optional(),
+});
+
+export const adminUpdateNutritionist = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => UpdateNutriInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertAdmin(supabase, userId);
+    const { error } = await supabase
+      .from("nutritionists")
+      .update({
+        full_name: data.full_name,
+        email: data.email,
+        phone: data.phone ?? null,
+        crn: data.crn ?? null,
+        specialty: data.specialty ?? null,
+      })
+      .eq("id", data.nutritionist_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
