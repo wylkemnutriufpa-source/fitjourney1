@@ -213,7 +213,7 @@ export const adminUpdateNutritionist = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertAdmin(supabase, userId);
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from("nutritionists")
       .update({
         full_name: data.full_name,
@@ -222,8 +222,12 @@ export const adminUpdateNutritionist = createServerFn({ method: "POST" })
         crn: data.crn ?? null,
         specialty: data.specialty ?? null,
       })
-      .eq("id", data.nutritionist_id);
+      .eq("id", data.nutritionist_id)
+      .select("id");
     if (error) throw new Error(error.message);
+    if (!updated || updated.length === 0) {
+      throw new Error("Sem permissão para atualizar este profissional (ou registro não encontrado).");
+    }
     return { ok: true };
   });
 
