@@ -175,8 +175,11 @@ function Settings() {
         .from("avatars")
         .upload(path, file, { upsert: true, cacheControl: "3600" });
       if (upErr) throw upErr;
-      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
-      setAvatarUrl(pub.publicUrl);
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(path, 60 * 60);
+      if (signErr) throw signErr;
+      setAvatarUrl(signed.signedUrl);
       toast.success("Foto carregada — clique em Salvar para confirmar");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Falha no upload");

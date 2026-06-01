@@ -4,6 +4,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createAvatarSignedUrl, getAvatarStoragePath, isAvatarStorageReference } from "@/lib/profile/avatar-storage";
 
 export interface MyPatientProfile {
   id: string;
@@ -41,7 +42,7 @@ export const getMyPatientProfile = createServerFn({ method: "POST" })
       phone: data.phone ?? null,
       birthDate: data.birth_date ?? null,
       heightCm: data.height_cm != null ? Number(data.height_cm) : null,
-      avatarUrl: data.avatar_url ?? null,
+      avatarUrl: await createAvatarSignedUrl(supabase, data.avatar_url),
       sourceLegacyId: data.source_legacy_id ?? null,
       hasAnamnesis: (count ?? 0) > 0,
     };
@@ -63,7 +64,7 @@ const UpdateInput = z.object({
   fullName: z.string().trim().min(1).max(120).optional(),
   phone: PhoneSchema.optional(),
   heightCm: z.number().min(80).max(260).nullable().optional(),
-  avatarUrl: z.string().url().max(1024).nullable().optional(),
+  avatarUrl: z.string().trim().max(1024).refine(isAvatarStorageReference, "Avatar inválido").nullable().optional(),
 });
 
 export const updateMyPatientProfile = createServerFn({ method: "POST" })
@@ -80,7 +81,7 @@ export const updateMyPatientProfile = createServerFn({ method: "POST" })
     if (data.fullName !== undefined) patch.full_name = data.fullName;
     if (data.phone !== undefined) patch.phone = data.phone === "" ? null : data.phone;
     if (data.heightCm !== undefined) patch.height_cm = data.heightCm;
-    if (data.avatarUrl !== undefined) patch.avatar_url = data.avatarUrl;
+    if (data.avatarUrl !== undefined) patch.avatar_url = data.avatarUrl ? getAvatarStoragePath(data.avatarUrl) : null;
 
     if (Object.keys(patch).length === 0) {
       return { ok: true };

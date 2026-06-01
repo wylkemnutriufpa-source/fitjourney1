@@ -87,9 +87,12 @@ function PatientSettings() {
         .from("avatars")
         .upload(path, blob, { upsert: true, cacheControl: "3600", contentType: "image/jpeg" });
       if (upErr) throw upErr;
-      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
-      setAvatarUrl(pub.publicUrl);
-      await updateProfile({ data: { avatarUrl: pub.publicUrl } });
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(path, 60 * 60);
+      if (signErr) throw signErr;
+      setAvatarUrl(signed.signedUrl);
+      await updateProfile({ data: { avatarUrl: signed.signedUrl } });
       await refetch();
       toast.success("Foto atualizada");
     } catch (err) {
