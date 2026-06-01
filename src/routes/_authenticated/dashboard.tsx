@@ -145,7 +145,16 @@ function Dashboard() {
             hint={totalPatients > 0 ? `${Math.round((approvedCount / totalPatients) * 100)}% da base` : "—"}
             icon={Activity}
           />
-          <Kpi label="Adesão Média" value="—" hint="em breve" icon={TrendingUp} />
+          <Kpi
+            label="Adesão Média"
+            value={adherence?.pct != null ? `${adherence.pct}%` : "—"}
+            hint={
+              adherence?.sampleSize
+                ? `${adherence.sampleSize} feedback${adherence.sampleSize > 1 ? "s" : ""}`
+                : "sem feedbacks"
+            }
+            icon={TrendingUp}
+          />
           <Kpi label="Revisões Pendentes" value={pendingValue} hint="Ação hoje" icon={AlertCircle} accent />
         </section>
 
