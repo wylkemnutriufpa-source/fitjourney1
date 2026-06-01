@@ -183,16 +183,23 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         }
       >
         <div className="flex items-center justify-between gap-2 px-2 mb-10">
-          <Link to="/dashboard" className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              import("@/components/IntroOverlay").then((m) => m.playIntro());
+            }}
+            className="flex items-center gap-3 group focus:outline-none"
+            title="Reproduzir intro"
+          >
             <img
               src={fjLogo}
               alt="FitJourney"
-              className="size-9 object-contain"
+              className="size-14 object-contain transition-transform duration-300 group-hover:scale-105"
             />
-            <span className="fj-wordmark text-xl leading-none">
+            <span className="fj-wordmark text-2xl leading-none">
               FitJourney
             </span>
-          </Link>
+          </button>
           <button
             onClick={() => setSidebarOpen(false)}
             title="Recolher menu"
