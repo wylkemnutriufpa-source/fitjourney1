@@ -480,6 +480,7 @@ export type Database = {
           onboarding_completed_at: string | null
           onboarding_version: number | null
           phone: string | null
+          source_legacy_id: string | null
           source_referral_code: string | null
           updated_at: string
         }
@@ -496,6 +497,7 @@ export type Database = {
           onboarding_completed_at?: string | null
           onboarding_version?: number | null
           phone?: string | null
+          source_legacy_id?: string | null
           source_referral_code?: string | null
           updated_at?: string
         }
@@ -512,6 +514,7 @@ export type Database = {
           onboarding_completed_at?: string | null
           onboarding_version?: number | null
           phone?: string | null
+          source_legacy_id?: string | null
           source_referral_code?: string | null
           updated_at?: string
         }
