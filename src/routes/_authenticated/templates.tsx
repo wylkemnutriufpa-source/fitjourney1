@@ -1490,13 +1490,15 @@ function EquivalentOptionEditor({
     onChange((o) => ({ ...o, items: o.items.filter((i) => i.id !== id) }));
   }
 
+  const [imagePickerOpen, setImagePickerOpen] = useState(false);
+
   return (
     <div className="border border-border rounded-md bg-muted/20 overflow-hidden">
       <div className="flex items-center gap-2 p-1.5">
         <button
-          onClick={() => setExpanded((v) => !v)}
-          className="size-9 rounded bg-muted overflow-hidden flex-shrink-0"
-          title={expanded ? "Recolher" : "Expandir"}
+          onClick={() => setImagePickerOpen(true)}
+          className="size-9 rounded bg-muted overflow-hidden flex-shrink-0 relative group/eqimg"
+          title="Trocar imagem desta opção"
         >
           {img ? (
             <img src={img} alt="" className="w-full h-full object-cover" />
@@ -1505,6 +1507,14 @@ function EquivalentOptionEditor({
               <ImageOff className="size-3" />
             </div>
           )}
+          <div className="absolute inset-0 bg-black/0 group-hover/eqimg:bg-black/50 transition-colors" />
+        </button>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="text-muted-foreground hover:text-foreground p-1"
+          title={expanded ? "Recolher" : "Expandir"}
+        >
+          {expanded ? "−" : "+"}
         </button>
         <Input
           value={option.title}
@@ -1559,6 +1569,12 @@ function EquivalentOptionEditor({
             }),
           )
         }
+      />
+      <MealImagePickerDialog
+        open={imagePickerOpen}
+        onOpenChange={setImagePickerOpen}
+        value={option.imageKey}
+        onPick={(key) => onChange((o) => ({ ...o, imageKey: key }))}
       />
     </div>
   );
