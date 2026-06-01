@@ -222,10 +222,11 @@ const DINNER: RuleBucket[] = [
     ],
   },
   {
-    match: /\b(frango|carne|peixe|tilapia|patinho|ovo|omelete|atum)\b/,
+    match: /\b(frango|carne|peixe|tilapia|patinho|alcatra|coxao|bife|file|peito|lombo|atum|salmao|ovo|omelete)\b/,
     options: [
-      { name: "Frango desfiado / grelhado",       qty: 100, unit: "g",       refKcal: 165 },
-      { name: "Peixe grelhado",                   qty: 120, unit: "g",       refKcal: 160 },
+      { name: "Frango grelhado / desfiado",       qty: 120, unit: "g",       refKcal: 200, note: "1 filé" },
+      { name: "Peixe grelhado (tilápia/merluza)", qty: 130, unit: "g",       refKcal: 175, note: "1 filé" },
+      { name: "Carne magra (patinho/alcatra)",    qty: 110, unit: "g",       refKcal: 200, note: "1 bife" },
       { name: "Ovos mexidos / omelete",           qty: 2,   unit: "unid",    refKcal: 140 },
       { name: "Atum em conserva (água)",          qty: 1,   unit: "lata pequena", refKcal: 150, note: "≈ 120 g" },
     ],
