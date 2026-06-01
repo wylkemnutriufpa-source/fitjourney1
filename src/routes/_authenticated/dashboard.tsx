@@ -2,12 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { recentActivity } from "@/lib/mock-data";
 import { Plus, ArrowUpRight, TrendingUp, Users, Activity, AlertCircle } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { getMyNutritionistProfile } from "@/lib/profile/nutritionist-profile.functions";
 import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
+import { getMyWeeklyActivity } from "@/lib/dashboard/dashboard.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — FitJourney" }] }),
@@ -66,6 +66,7 @@ function Dashboard() {
   const fetchProfile = useServerFn(getMyNutritionistProfile);
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const fetchPending = useServerFn(getMyPendingAnamnesesCount);
+  const fetchWeekly = useServerFn(getMyWeeklyActivity);
 
   const { data: profile } = useQuery({
     queryKey: ["nutri-profile"],
@@ -84,6 +85,12 @@ function Dashboard() {
     staleTime: 0,
     refetchOnMount: "always",
   });
+  const { data: weekly = [] } = useQuery({
+    queryKey: ["nutri", "weekly-activity"],
+    queryFn: () => fetchWeekly(),
+    staleTime: 60_000,
+  });
+
 
   const recent = patientsList.slice(0, 5);
   const totalPatients = patientsList.length;
@@ -148,7 +155,7 @@ function Dashboard() {
             </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={recentActivity}>
+                <AreaChart data={weekly}>
                   <defs>
                     <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
                       <stop offset="0%" stopColor="oklch(0.72 0.17 230)" stopOpacity={0.4} />
