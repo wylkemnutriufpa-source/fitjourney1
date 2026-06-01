@@ -435,9 +435,9 @@ function FeedbackPage() {
                 04 · Fotos
               </h2>
               <p className="text-[11px] text-muted-foreground -mt-1">
-                Opcional. Frontal e lateral. Só você e seu nutricionista veem.
+                Opcional. Frontal, lateral e costas. Só você e seu nutricionista veem.
               </p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <PhotoSlot
                   label="Frontal"
                   file={photoFront}
@@ -449,6 +449,12 @@ function FeedbackPage() {
                   file={photoSide}
                   onSelect={(f) => setPhotoSide(validateFile(f))}
                   inputRef={sideInputRef}
+                />
+                <PhotoSlot
+                  label="Costas"
+                  file={photoBack}
+                  onSelect={(f) => setPhotoBack(validateFile(f))}
+                  inputRef={backInputRef}
                 />
               </div>
             </section>
