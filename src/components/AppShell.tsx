@@ -27,6 +27,11 @@ import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 import fjLogo from "@/assets/fitjourney-logo.png";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
 
+// Cache module-level do estado do sidebar — sobrevive a remounts do AppShell.
+let __sidebarOpenCache: boolean | null = null;
+
+
+
 
 const nutritionistNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -138,14 +143,25 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   const avatarUrl = avatarQuery.data ?? null;
   const settingsHref = isPatientArea ? "/my-plan/settings" : "/settings";
 
-  // Sidebar: começa sempre aberto (SSR e client) para evitar hydration mismatch.
-  // Fecha em mobile após o mount via useEffect.
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+  // Sidebar: cache module-level evita que cada remount do AppShell (cada rota
+  // envolve <AppShell>) reabra o menu em mobile causando flash "expande/retrai"
+  // que o usuário percebia como "não trocou de tela".
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(
+    () => __sidebarOpenCache ?? true,
+  );
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    __sidebarOpenCache = sidebarOpen;
+  }, [sidebarOpen]);
+
+  useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
+    if (
+      typeof window !== "undefined" &&
+      window.innerWidth < 768 &&
+      __sidebarOpenCache === null
+    ) {
       setSidebarOpen(false);
     }
     applyTheme(getStoredTheme());
@@ -272,6 +288,12 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
               <Link
                 key={item.to}
                 to={item.to}
+                onClick={() => {
+                  if (typeof window !== "undefined" && window.innerWidth < 768) {
+                    setSidebarOpen(false);
+                    __sidebarOpenCache = false;
+                  }
+                }}
                 className={
                   "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors " +
                   (active

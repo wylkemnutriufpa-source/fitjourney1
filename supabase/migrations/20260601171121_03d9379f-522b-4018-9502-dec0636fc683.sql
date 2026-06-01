@@ -1,0 +1,1 @@
+ALTER TABLE public.patient_feedbacks ADD COLUMN IF NOT EXISTS photo_back_path text;
