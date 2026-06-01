@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { calcTMB, calcGET, type Goal } from "@/lib/mock-data";
+import { calcTMB } from "@/lib/engine/tdee";
 import { Calculator, Save, Activity } from "lucide-react";
+
+type Goal = "Performance" | "Hipertrofia" | "Emagrecimento" | "Manutenção";
 
 export const Route = createFileRoute("/_authenticated/patients/new")({
   head: () => ({ meta: [{ title: "Nova Anamnese — FitJourney" }] }),
