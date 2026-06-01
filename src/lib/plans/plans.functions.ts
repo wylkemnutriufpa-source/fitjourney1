@@ -146,13 +146,63 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     // ---- 1) ClinicalContext server-side (verdade clínica) ----
     const ctx = await loadClinicalContext(supabase, data.patientId);
 
-    // ---- 2) Bloqueia se ausência de dados ESSENCIAIS para o motor.
-    // Campos adicionais (waistCm, bodyFat...) que afetem ctx.ready mas não
-    // ctx.calculable NÃO bloqueiam — invariante #9.
+    // ---- 2) Caso especial: paciente sem dados clínicos suficientes.
+    // Sem `overrideMissingClinical`, mantém comportamento original (bloqueia).
+    // Com override=true, pula motor + gate e salva snapshot como está,
+    // marcando auditoria com publishedWithoutClinicalContext.
     if (!ctx.calculable) {
-      throw new Error(
-        `CLINICAL_CONTEXT_INCOMPLETE: missing=[${ctx.missingForCalc.join(",")}]`,
-      );
+      if (!data.overrideMissingClinical) {
+        throw new Error(
+          `CLINICAL_CONTEXT_INCOMPLETE: missing=[${ctx.missingForCalc.join(",")}]`,
+        );
+      }
+
+      const { snapshot: snapOnly, review: reviewOnly } = validateSnapshot(data.snapshot);
+      const publishedAtOverride = new Date().toISOString();
+      const clinicalAuditOverride: ClinicalAudit = {
+        clinicalContextSnapshot: {
+          currentWeight: null,
+          currentGoal: null,
+          demographics: {
+            sex: ctx.demographics.sex,
+            ageYears: ctx.demographics.ageYears,
+            heightCm: ctx.demographics.heightCm,
+            activity: ctx.demographics.activity,
+            sourceAnamnesisId: ctx.demographics.sourceAnamnesisId,
+          },
+          calculable: false,
+        },
+        engineOutput: null,
+        gateWarnings: [],
+        engineVersion: ENGINE_VERSION,
+        gateVersion: GATE_VERSION,
+        publishedAt: publishedAtOverride,
+        publishedWithoutClinicalContext: true,
+        missingForCalc: ctx.missingForCalc,
+      } as ClinicalAudit;
+
+      const snapshotOverride = {
+        ...snapOnly,
+        clinical_review: reviewOnly,
+        clinicalAudit: clinicalAuditOverride,
+      };
+
+      const insertRowOverride: Record<string, any> = {
+        patient_id: data.patientId,
+        nutritionist_id: nutri.id,
+        schema_version: 3,
+        status: "published",
+        snapshot: snapshotOverride,
+      };
+      if (data.sourceTemplateId) insertRowOverride.source_template_id = data.sourceTemplateId;
+
+      const { data: planOv, error: errOv } = await supabase
+        .from("plans")
+        .insert(insertRowOverride)
+        .select("id, published_at")
+        .single();
+      if (errOv) throw new Error(errOv.message);
+      return { id: planOv.id, publishedAt: planOv.published_at };
     }
 
     // ---- 3) Motor determinístico (TMB+TDEE+Macros) ----
