@@ -22,6 +22,11 @@ import {
 import { useMemo, useState } from "react";
 import { imgFor } from "@/lib/food-images";
 import {
+  detectMealKind,
+  getSubstitutionsFor,
+  type MealKind,
+} from "@/lib/plans/substitution-rules";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -316,6 +321,7 @@ function MealCard({
     : [];
   const heroUrl = imgFor(meal?.heroKey || main?.imageKey || "");
   const kcal = mealKcal(main);
+  const mealKind: MealKind = detectMealKind(meal?.label, meal?.time);
 
   return (
     <article className="space-y-2">
@@ -362,7 +368,12 @@ function MealCard({
           <div className="p-3 space-y-2.5">
             <ul className="text-sm space-y-1">
               {items.map((it, i) => (
-                <FoodItemReadonlyRow key={it?.id ?? i} item={it} foods={foods} />
+                <FoodItemReadonlyRow
+                  key={it?.id ?? i}
+                  item={it}
+                  foods={foods}
+                  mealKind={mealKind}
+                />
               ))}
               {items.length === 0 && (
                 <li className="text-xs text-muted-foreground italic">
@@ -388,11 +399,13 @@ function MealCard({
             )}
 
             {/* Substituições / equivalentes em modal */}
+            {/* Substituições da REFEIÇÃO INTEIRA (montagens equivalentes) */}
             {equivalents.length > 0 && (
               <EquivalentsButton
                 mealLabel={meal?.label ?? `Refeição ${index + 1}`}
                 equivalents={equivalents}
                 foods={foods}
+                mealKind={mealKind}
               />
             )}
           </div>
@@ -405,9 +418,11 @@ function MealCard({
 function FoodItemReadonlyRow({
   item,
   foods,
+  mealKind,
 }: {
   item: any;
   foods: FoodDTO[] | undefined;
+  mealKind: MealKind;
 }) {
   const [open, setOpen] = useState(false);
   const match = useMemo(
@@ -417,39 +432,15 @@ function FoodItemReadonlyRow({
   const measures = match?.householdMeasures ?? [];
   const hasMeasures = measures.length > 0;
 
-  // Substituições equivalentes: mesmo scaleGroup, exceto o próprio alimento.
-  // Cálculo: gramas equivalentes = kcal do item / kcal_per_100g * 100.
   const itemKcal = Number.isFinite(item?.kcal) ? Number(item.kcal) : 0;
-  const substitutions = useMemo(() => {
-    if (!foods?.length || !match?.scaleGroup) return [];
-    return foods
-      .filter(
-        (f) =>
-          f.scaleGroup === match.scaleGroup &&
-          f.id !== match.id &&
-          f.kcalPer100g > 0,
-      )
-      .slice(0, 12)
-      .map((f) => {
-        const useGrams = f.unit === "g" || f.unit === "ml";
-        const grams = itemKcal > 0
-          ? Math.max(5, Math.round((itemKcal / f.kcalPer100g) * 100))
-          : Math.round(f.qty);
-        return {
-          id: f.id,
-          name: f.name,
-          unit: useGrams ? f.unit : f.unit,
-          qty: useGrams ? grams : f.qty,
-          kcal: useGrams
-            ? Math.round((f.kcalPer100g * grams) / 100)
-            : f.kcal,
-          defaultMeasure:
-            f.householdMeasures.find((m) => m.isDefault) ??
-            f.householdMeasures[0] ??
-            null,
-        };
-      });
-  }, [foods, match?.id, match?.scaleGroup, itemKcal]);
+
+  // Substituições CURADAS por contexto da refeição (3-4 opções coerentes).
+  // Não usa scaleGroup aberto para evitar trocas absurdas
+  // (ex.: arroz por pão no almoço, carne por feijão).
+  const substitutions = useMemo(
+    () => getSubstitutionsFor(item?.name ?? "", mealKind),
+    [item?.name, mealKind],
+  );
 
   return (
     <li className="border-b border-border/50 last:border-0">
@@ -519,21 +510,20 @@ function FoodItemReadonlyRow({
             </div>
             {substitutions.length > 0 ? (
               <div className="space-y-1">
-                {substitutions.map((s) => (
+                {substitutions.map((s, i) => (
                   <div
-                    key={s.id}
+                    key={`${s.name}-${i}`}
                     className="text-xs border border-border rounded px-2 py-1.5"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-medium truncate">{s.name}</span>
                       <span className="font-mono text-[10px] text-muted-foreground tabular-nums shrink-0">
-                        {s.qty} {s.unit} · {s.kcal} kcal
+                        {s.qty} {s.unit}
                       </span>
                     </div>
-                    {s.defaultMeasure && (
+                    {s.note && (
                       <p className="text-[10px] text-muted-foreground mt-0.5">
-                        ≈ {s.defaultMeasure.measureName} (
-                        {s.defaultMeasure.gramsEquivalent} g)
+                        {s.note}
                       </p>
                     )}
                   </div>
@@ -541,12 +531,12 @@ function FoodItemReadonlyRow({
               </div>
             ) : (
               <p className="text-[11px] text-muted-foreground italic">
-                Sem substituições equivalentes cadastradas para este alimento.
+                Sem substituições sugeridas para este alimento neste momento da refeição.
               </p>
             )}
             <p className="text-[10px] text-muted-foreground pt-1 leading-relaxed">
-              Você pode trocar este alimento por qualquer um da lista mantendo
-              o mesmo valor calórico aproximado.
+              Opções coerentes para esta refeição. Mantenha quantidades próximas
+              das indicadas para preservar o equilíbrio do plano.
             </p>
           </section>
         </DialogContent>
@@ -559,10 +549,12 @@ function EquivalentsButton({
   mealLabel,
   equivalents,
   foods,
+  mealKind,
 }: {
   mealLabel: string;
   equivalents: any[];
   foods: FoodDTO[] | undefined;
+  mealKind: MealKind;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -585,7 +577,12 @@ function EquivalentsButton({
         </p>
         <div className="space-y-3 pt-2">
           {equivalents.map((eq, i) => (
-            <EquivalentCard key={eq?.id ?? i} option={eq} foods={foods} />
+            <EquivalentCard
+              key={eq?.id ?? i}
+              option={eq}
+              foods={foods}
+              mealKind={mealKind}
+            />
           ))}
         </div>
       </DialogContent>
@@ -596,9 +593,11 @@ function EquivalentsButton({
 function EquivalentCard({
   option,
   foods,
+  mealKind,
 }: {
   option: any;
   foods: FoodDTO[] | undefined;
+  mealKind: MealKind;
 }) {
   const items: any[] = Array.isArray(option?.items) ? option.items : [];
   const imgUrl = imgFor(option?.imageKey || "");
@@ -630,7 +629,12 @@ function EquivalentCard({
           </div>
           <ul className="text-xs space-y-0.5">
             {items.map((it, i) => (
-              <FoodItemReadonlyRow key={it?.id ?? i} item={it} foods={foods} />
+              <FoodItemReadonlyRow
+                key={it?.id ?? i}
+                item={it}
+                foods={foods}
+                mealKind={mealKind}
+              />
             ))}
           </ul>
           {option?.recipe && (
