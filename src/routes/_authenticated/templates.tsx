@@ -875,23 +875,7 @@ function TemplateEditor({
           {patientContext ? (
             <Button
               disabled={applyBusy}
-              onClick={async () => {
-                setApplyBusy(true);
-                setApplyError(null);
-                try {
-                  await publishPlan({
-                    data: {
-                      patientId: patientContext.id,
-                      snapshot: JSON.parse(JSON.stringify(currentForShare)),
-                    },
-                  });
-                  setApplyDone(patientContext.name);
-                } catch (e: any) {
-                  setApplyError(e?.message ?? "Falha ao publicar plano.");
-                } finally {
-                  setApplyBusy(false);
-                }
-              }}
+              onClick={() => doPublish(patientContext.id, patientContext.name)}
             >
               <Send className="size-4" />
               {applyBusy ? "Salvando…" : `Salvar plano para ${patientContext.name}`}
