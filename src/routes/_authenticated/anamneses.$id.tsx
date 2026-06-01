@@ -21,6 +21,7 @@ import {
   reviewAnamnesis,
 } from "@/lib/anamnesis/review.functions";
 import { describeFlag } from "@/lib/anamnesis/v2/alerts.catalog";
+import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
 
 export const Route = createFileRoute("/_authenticated/anamneses/$id")({
   head: () => ({ meta: [{ title: "Revisão clínica — FitJourney" }] }),
@@ -167,11 +168,7 @@ function AnamnesisDetailPage() {
               <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
                 Respostas do paciente
               </h2>
-              <div className="rounded-lg border border-border bg-muted/20 p-4 overflow-x-auto">
-                <pre className="text-xs leading-relaxed whitespace-pre-wrap break-words">
-                  {prettyJson(data.rawAnswersJson)}
-                </pre>
-              </div>
+              <AnamnesisAnswersView rawJson={data.rawAnswersJson} />
             </section>
           </div>
 
@@ -252,12 +249,4 @@ function StatusBadge({ status }: { status: string }) {
       {s.label}
     </span>
   );
-}
-
-function prettyJson(s: string): string {
-  try {
-    return JSON.stringify(JSON.parse(s), null, 2);
-  } catch {
-    return s;
-  }
 }
