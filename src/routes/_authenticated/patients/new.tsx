@@ -99,6 +99,23 @@ function NewPatient() {
   const [factor, setFactor] = useState(1.55);
   const [goal, setGoal] = useState<Goal>("Performance");
   const [adjust, setAdjust] = useState(0);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
+    Object.fromEntries(sections.map((s) => [s.id, true])),
+  );
+  const toggleSection = (id: string) =>
+    setOpenSections((p) => ({ ...p, [id]: !p[id] }));
+
+  // Sidebar anchors: expand target section if collapsed
+  useEffect(() => {
+    const onHash = () => {
+      const id = window.location.hash.replace("#", "");
+      if (id && sections.some((s) => s.id === id)) {
+        setOpenSections((p) => ({ ...p, [id]: true }));
+      }
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
 
   const tmb = calcTMB({ sex: sex === "M" ? "male" : "female", weightKg: weight, heightCm: height, ageYears: age });
   const get = Math.round(tmb * factor);
