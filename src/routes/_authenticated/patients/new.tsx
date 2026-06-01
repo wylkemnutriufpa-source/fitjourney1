@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { calcTMB } from "@/lib/engine/tdee";
-import { Calculator, Save, Activity } from "lucide-react";
+import { Calculator, Save, Activity, ChevronDown } from "lucide-react";
 
 type Goal = "Performance" | "Hipertrofia" | "Emagrecimento" | "Manutenção";
 
@@ -10,6 +10,44 @@ export const Route = createFileRoute("/_authenticated/patients/new")({
   head: () => ({ meta: [{ title: "Nova Anamnese — FitJourney" }] }),
   component: NewPatient,
 });
+
+function CollapsibleSection({
+  id,
+  index,
+  title,
+  open,
+  onToggle,
+  children,
+}: {
+  id: string;
+  index: number;
+  title: string;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <section id={id} className="border border-border rounded-lg bg-surface/40 overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-accent/30 transition-colors"
+      >
+        <h2 className="text-sm font-mono uppercase tracking-widest text-primary text-left">
+          {String(index).padStart(2, "0")} · {title}
+        </h2>
+        <ChevronDown
+          className={
+            "size-4 text-muted-foreground transition-transform duration-200 " +
+            (open ? "rotate-180" : "")
+          }
+        />
+      </button>
+      {open && <div className="px-5 pb-6 pt-2 space-y-6 border-t border-border/60">{children}</div>}
+    </section>
+  );
+}
 
 const sections = [
   { id: "pessoais", label: "Dados Pessoais" },
@@ -61,6 +99,23 @@ function NewPatient() {
   const [factor, setFactor] = useState(1.55);
   const [goal, setGoal] = useState<Goal>("Performance");
   const [adjust, setAdjust] = useState(0);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
+    Object.fromEntries(sections.map((s) => [s.id, true])),
+  );
+  const toggleSection = (id: string) =>
+    setOpenSections((p) => ({ ...p, [id]: !p[id] }));
+
+  // Sidebar anchors: expand target section if collapsed
+  useEffect(() => {
+    const onHash = () => {
+      const id = window.location.hash.replace("#", "");
+      if (id && sections.some((s) => s.id === id)) {
+        setOpenSections((p) => ({ ...p, [id]: true }));
+      }
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
 
   const tmb = calcTMB({ sex: sex === "M" ? "male" : "female", weightKg: weight, heightCm: height, ageYears: age });
   const get = Math.round(tmb * factor);
@@ -102,10 +157,7 @@ function NewPatient() {
           </aside>
 
           <div className="space-y-10">
-            <section id="pessoais" className="space-y-4">
-              <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-                01 · Dados Pessoais
-              </h2>
+            <CollapsibleSection id="pessoais" index={1} title="Dados Pessoais" open={openSections["pessoais"]} onToggle={() => toggleSection("pessoais")}>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Nome completo">
                   <input className={inputCls} defaultValue="Ricardo G. Mendes" />
@@ -141,18 +193,13 @@ function NewPatient() {
                   </div>
                 </Field>
               </div>
-            </section>
+            </CollapsibleSection>
 
-            <section id="antropo" className="space-y-6">
-              <div>
-                <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-                  02 · Antropometria
-                </h2>
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  Todos os campos abaixo são <strong>opcionais</strong>. Preencha o que tiver disponível
-                  — o sistema funciona mesmo com avaliação física parcial ou ausente.
-                </p>
-              </div>
+            <CollapsibleSection id="antropo" index={2} title="Antropometria" open={openSections["antropo"]} onToggle={() => toggleSection("antropo")}>
+              <p className="text-[11px] text-muted-foreground">
+                Todos os campos abaixo são <strong>opcionais</strong>. Preencha o que tiver disponível
+                — o sistema funciona mesmo com avaliação física parcial ou ausente.
+              </p>
 
               {/* Básico */}
               <div className="space-y-3">
@@ -268,12 +315,9 @@ function NewPatient() {
                 <strong> jamais bloqueia</strong> cadastro, anamnese, plano ou publicação — só melhora a
                 precisão dos cálculos quando disponível.
               </div>
-            </section>
+            </CollapsibleSection>
 
-            <section id="esporte" className="space-y-4">
-              <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-                03 · Dados Esportivos
-              </h2>
+            <CollapsibleSection id="esporte" index={3} title="Dados Esportivos" open={openSections["esporte"]} onToggle={() => toggleSection("esporte")}>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Modalidade Principal">
                   <input className={inputCls} defaultValue="Triathlon" />
@@ -335,12 +379,9 @@ function NewPatient() {
                   />
                 </Field>
               </div>
-            </section>
+            </CollapsibleSection>
 
-            <section id="rotina" className="space-y-4">
-              <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-                04 · Preferências & Horários
-              </h2>
+            <CollapsibleSection id="rotina" index={4} title="Preferências & Horários" open={openSections["rotina"]} onToggle={() => toggleSection("rotina")}>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Horário do Treino">
                   <input className={inputCls} defaultValue="06:00 - 08:00" />
@@ -358,12 +399,9 @@ function NewPatient() {
                   <textarea className={inputCls + " min-h-[80px]"} defaultValue="Beterraba, fígado" />
                 </Field>
               </div>
-            </section>
+            </CollapsibleSection>
 
-            <section id="saude" className="space-y-4">
-              <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
-                05 · Alergias & Histórico
-              </h2>
+            <CollapsibleSection id="saude" index={5} title="Alergias & Histórico" open={openSections["saude"]} onToggle={() => toggleSection("saude")}>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Alergias">
                   <input className={inputCls} defaultValue="Lactose (leve)" />
@@ -384,7 +422,7 @@ function NewPatient() {
                   />
                 </Field>
               </div>
-            </section>
+            </CollapsibleSection>
           </div>
 
           <aside className="space-y-4">
