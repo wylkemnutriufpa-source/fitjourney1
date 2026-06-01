@@ -7,7 +7,11 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { getMyNutritionistProfile } from "@/lib/profile/nutritionist-profile.functions";
 import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
-import { getMyWeeklyActivity } from "@/lib/dashboard/dashboard.functions";
+import {
+  getMyWeeklyActivity,
+  getMyGoalDistribution,
+  getMyAdherenceAverage,
+} from "@/lib/dashboard/dashboard.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — FitJourney" }] }),
@@ -67,6 +71,8 @@ function Dashboard() {
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const fetchPending = useServerFn(getMyPendingAnamnesesCount);
   const fetchWeekly = useServerFn(getMyWeeklyActivity);
+  const fetchGoals = useServerFn(getMyGoalDistribution);
+  const fetchAdherence = useServerFn(getMyAdherenceAverage);
 
   const { data: profile } = useQuery({
     queryKey: ["nutri-profile"],
@@ -88,6 +94,16 @@ function Dashboard() {
   const { data: weekly = [] } = useQuery({
     queryKey: ["nutri", "weekly-activity"],
     queryFn: () => fetchWeekly(),
+    staleTime: 60_000,
+  });
+  const { data: goals = [] } = useQuery({
+    queryKey: ["nutri", "goal-distribution"],
+    queryFn: () => fetchGoals(),
+    staleTime: 60_000,
+  });
+  const { data: adherence } = useQuery({
+    queryKey: ["nutri", "adherence-avg"],
+    queryFn: () => fetchAdherence(),
     staleTime: 60_000,
   });
 
@@ -129,7 +145,16 @@ function Dashboard() {
             hint={totalPatients > 0 ? `${Math.round((approvedCount / totalPatients) * 100)}% da base` : "—"}
             icon={Activity}
           />
-          <Kpi label="Adesão Média" value="—" hint="em breve" icon={TrendingUp} />
+          <Kpi
+            label="Adesão Média"
+            value={adherence?.pct != null ? `${adherence.pct}%` : "—"}
+            hint={
+              adherence?.sampleSize
+                ? `${adherence.sampleSize} feedback${adherence.sampleSize > 1 ? "s" : ""}`
+                : "sem feedbacks"
+            }
+            icon={TrendingUp}
+          />
           <Kpi label="Revisões Pendentes" value={pendingValue} hint="Ação hoje" icon={AlertCircle} accent />
         </section>
 
@@ -196,24 +221,42 @@ function Dashboard() {
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Distribuição por Objetivo
             </p>
-            {[
-              { label: "Performance", pct: 38, color: "bg-primary" },
-              { label: "Hipertrofia", pct: 28, color: "bg-emerald-400" },
-              { label: "Emagrecimento", pct: 22, color: "bg-amber-400" },
-              { label: "Manutenção", pct: 12, color: "bg-fuchsia-400" },
-            ].map((o) => (
-              <div key={o.label} className="space-y-1.5">
-                <div className="flex justify-between text-xs">
-                  <span>{o.label}</span>
-                  <span className="font-mono text-muted-foreground">{o.pct}%</span>
+            {(() => {
+              const COLORS: Record<string, string> = {
+                performance: "bg-primary",
+                bulk: "bg-emerald-400",
+                cut: "bg-amber-400",
+                maintain: "bg-fuchsia-400",
+                health: "bg-sky-400",
+              };
+              const hasAny = goals.some((g) => g.count > 0);
+              if (!hasAny) {
+                return (
+                  <p className="text-xs font-mono text-muted-foreground">
+                    Sem anamneses aprovadas ainda.
+                  </p>
+                );
+              }
+              return goals.map((g) => (
+                <div key={g.key} className="space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span>{g.label}</span>
+                    <span className="font-mono text-muted-foreground">
+                      {g.count} · {g.pct}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-background rounded-full overflow-hidden">
+                    <div
+                      className={(COLORS[g.key] ?? "bg-muted") + " h-full rounded-full"}
+                      style={{ width: `${g.pct}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-1.5 bg-background rounded-full overflow-hidden">
-                  <div className={o.color + " h-full rounded-full"} style={{ width: `${o.pct}%` }} />
-                </div>
-              </div>
-            ))}
+              ));
+            })()}
           </div>
         </section>
+
 
         <section>
           <div className="flex items-center justify-between mb-4">

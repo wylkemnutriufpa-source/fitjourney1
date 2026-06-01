@@ -4,18 +4,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Sparkles, Target, ChevronDown, ChevronUp } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { matchTemplates } from "@/lib/engine";
 import { runNutritionEnginesManual } from "@/lib/clinical/run-nutrition-engines";
 import type { TemplateMeta, MatchResult, Goal as EngineGoal } from "@/lib/engine";
 import { templates as systemTemplates } from "@/lib/template-data";
-import { PatientPicker } from "./PatientPicker";
-import type { Patient } from "@/lib/mock-data";
+import { RealPatientPicker } from "./RealPatientPicker";
+import type { PatientLite } from "@/lib/plans/plans.functions";
+import { getClinicalContext } from "@/lib/clinical/context.functions";
 
 const KCAL_TOLERANCE = 0.15; // ±15% se template não declarar range explícito
 
-function patientGoalToEngine(goal: Patient["goal"]): EngineGoal {
-  if (goal === "Emagrecimento") return "cut";
-  if (goal === "Hipertrofia") return "bulk";
+function clinicalGoalToEngine(kind: string | undefined): EngineGoal {
+  if (kind === "cut") return "cut";
+  if (kind === "bulk") return "bulk";
+  // performance / health / maintain → manutenção como neutro determinístico
   return "maintain";
 }
 
@@ -59,7 +63,7 @@ export function TemplateMatcherPanel({
   readonly onPickTemplate?: (templateId: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [patient, setPatient] = useState<Patient | null>(null);
+  const [patient, setPatient] = useState<PatientLite | null>(null);
   const [kcal, setKcal] = useState<number>(defaultKcal ?? 2200);
   const [proteinG, setProteinG] = useState<number>(defaultProtein ?? 140);
   const [carbG, setCarbG] = useState<number>(defaultCarb ?? 260);
@@ -67,19 +71,38 @@ export function TemplateMatcherPanel({
   const [meals, setMeals] = useState<number>(5);
   const [constraints, setConstraints] = useState<Set<Constraint>>(new Set());
 
-  // Quando um paciente é selecionado, recalcula alvo determinístico
-  // via engine (Mifflin + macros por kg) e pré-popula os campos.
+  // ClinicalContext do paciente selecionado (RLS-aware).
+  const fetchContext = useServerFn(getClinicalContext);
+  const ctxQuery = useQuery({
+    queryKey: ["clinical-context", patient?.id],
+    queryFn: () =>
+      patient ? fetchContext({ data: { patientId: patient.id } }) : null,
+    enabled: !!patient,
+    staleTime: 60_000,
+  });
+  const ctx = ctxQuery.data ?? null;
+
+  // Quando o contexto chega e é calculable, recalcula alvo determinístico
+  // via engine puro e pré-popula os campos. NUNCA inventa dado faltante.
   useEffect(() => {
-    if (!patient) return;
+    if (!ctx || !ctx.calculable) return;
+    const { demographics, currentWeight, currentGoal } = ctx;
+    if (
+      !demographics.sex ||
+      demographics.ageYears == null ||
+      demographics.heightCm == null ||
+      !demographics.activity ||
+      !currentWeight ||
+      !currentGoal
+    ) return;
     try {
-      const goal = patientGoalToEngine(patient.goal);
       const { target } = runNutritionEnginesManual({
-        sex: patient.sex === "M" ? "male" : "female",
-        ageYears: patient.age,
-        weightKg: patient.weightKg,
-        heightCm: patient.heightCm,
-        activity: "moderate",
-        goal,
+        sex: demographics.sex,
+        ageYears: demographics.ageYears,
+        weightKg: currentWeight.weightKg,
+        heightCm: demographics.heightCm,
+        activity: demographics.activity,
+        goal: clinicalGoalToEngine(currentGoal.kind),
       });
       setKcal(target.kcal);
       setProteinG(target.proteinG);
@@ -88,7 +111,7 @@ export function TemplateMatcherPanel({
     } catch {
       // ignora — mantém valores atuais
     }
-  }, [patient]);
+  }, [ctx]);
 
   const ranked = useMemo<MatchResult[]>(() => {
     const metas = systemTemplates.map(toMeta);
@@ -135,10 +158,18 @@ export function TemplateMatcherPanel({
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Paciente (opcional · auto-preenche alvo)
             </p>
-            <PatientPicker value={patient} onChange={setPatient} />
-            {patient && (
+            <RealPatientPicker value={patient} onChange={setPatient} />
+            {patient && ctx && !ctx.calculable && (
+              <p className="text-[10px] font-mono text-amber-400/90">
+                Anamnese de {patient.fullName} incompleta para cálculo
+                (faltando: {ctx.missingForCalc.join(", ") || "—"}). Preencha os
+                campos manualmente.
+              </p>
+            )}
+            {patient && ctx?.calculable && (
               <p className="text-[10px] font-mono text-primary/80">
-                Alvo recalculado pelo motor a partir da anamnese de {patient.name}.
+                Alvo recalculado pelo motor a partir da anamnese aprovada de{" "}
+                {patient.fullName}.
               </p>
             )}
           </div>
