@@ -120,10 +120,12 @@ function PatientProfile() {
   const st = statusMeta(p.anamnesis?.reviewStatus);
   const hasApprovedAnamnesis = p.anamnesis?.reviewStatus === "approved";
 
+  const hasPublishedPlan = (publishedPlans?.length ?? 0) > 0;
+
   return (
     <AppShell
       header={
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             type="button"
             onClick={() => navigate({ to: "/patients" })}
@@ -142,6 +144,16 @@ function PatientProfile() {
               Ver anamnese
             </Link>
           )}
+          {hasPublishedPlan && (
+            <Link
+              to="/patients/$id/diet"
+              params={{ id: p.id }}
+              className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+            >
+              <Eye className="size-3.5" />
+              Ver plano vigente
+            </Link>
+          )}
           <Link
             to="/templates"
             search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
@@ -156,7 +168,7 @@ function PatientProfile() {
             className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
           >
             <FileText className="size-3.5" />
-            Elaborar plano
+            {hasPublishedPlan ? "Novo plano" : "Elaborar plano"}
           </Link>
         </div>
       }
