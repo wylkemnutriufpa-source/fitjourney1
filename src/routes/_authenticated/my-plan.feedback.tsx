@@ -99,9 +99,11 @@ function FeedbackPage() {
   const [notes, setNotes] = useState<string>("");
   const [photoFront, setPhotoFront] = useState<File | null>(null);
   const [photoSide, setPhotoSide] = useState<File | null>(null);
+  const [photoBack, setPhotoBack] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const frontInputRef = useRef<HTMLInputElement>(null);
   const sideInputRef = useRef<HTMLInputElement>(null);
+  const backInputRef = useRef<HTMLInputElement>(null);
 
   function parseOptionalCm(s: string): number | null {
     const t = s.trim().replace(",", ".");
@@ -140,6 +142,7 @@ function FeedbackPage() {
       setUploading(true);
       let frontPath: string | null = null;
       let sidePath: string | null = null;
+      let backPath: string | null = null;
       try {
         if (photoFront) {
           frontPath = `${pRow.id}/${feedbackId}/front.jpg`;
@@ -161,6 +164,16 @@ function FeedbackPage() {
             });
           if (error) throw new Error(`Foto lateral: ${error.message}`);
         }
+        if (photoBack) {
+          backPath = `${pRow.id}/${feedbackId}/back.jpg`;
+          const { error } = await supabase.storage
+            .from("feedback-photos")
+            .upload(backPath, photoBack, {
+              upsert: false,
+              contentType: photoBack.type || "image/jpeg",
+            });
+          if (error) throw new Error(`Foto costas: ${error.message}`);
+        }
       } finally {
         setUploading(false);
       }
@@ -177,6 +190,7 @@ function FeedbackPage() {
           notes: notes.trim() || undefined,
           photoFrontPath: frontPath ?? undefined,
           photoSidePath: sidePath ?? undefined,
+          photoBackPath: backPath ?? undefined,
         },
       });
     },
@@ -191,6 +205,7 @@ function FeedbackPage() {
       setNotes("");
       setPhotoFront(null);
       setPhotoSide(null);
+      setPhotoBack(null);
       qc.invalidateQueries({ queryKey: ["my-feedbacks"] });
       qc.invalidateQueries({ queryKey: ["my-feedback-status"] });
       qc.invalidateQueries({ queryKey: ["patient-feedback-status-nav"] });
