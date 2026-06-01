@@ -237,6 +237,8 @@ function SubscriptionDialog({
   const updateNutri = useServerFn(adminUpdateNutritionist);
   const qc = useQueryClient();
 
+  const hasExistingSub = !!sub;
+
   const mut = useMutation({
     mutationFn: async (input: any) => {
       await updateNutri({
@@ -250,15 +252,21 @@ function SubscriptionDialog({
           feedback_frequency_days: Math.max(1, Math.min(90, Math.round(feedbackFreq) || 7)),
         },
       });
-      return upsert({ data: input });
+      // Só cria/atualiza assinatura se já existir uma OU se admin definiu um valor > 0.
+      // Evita criar assinatura "fantasma" R$ 0 ao editar apenas dados cadastrais.
+      if (hasExistingSub || input.monthly_price_cents > 0) {
+        return upsert({ data: input });
+      }
+      return { id: null, updated: false };
     },
     onSuccess: () => {
-      toast.success("Dados e assinatura salvos");
+      toast.success(hasExistingSub ? "Dados e assinatura salvos" : "Dados salvos");
       qc.invalidateQueries({ queryKey: ["admin", "professionals"] });
       onSaved();
     },
     onError: (e: any) => toast.error(e?.message ?? "Erro ao salvar"),
   });
+
 
   // Auto-calcula vencimento (1 mês após início) quando admin não definiu manualmente
   const suggestedEnd = useMemo(() => {
