@@ -7,7 +7,11 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { getMyNutritionistProfile } from "@/lib/profile/nutritionist-profile.functions";
 import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
-import { getMyWeeklyActivity } from "@/lib/dashboard/dashboard.functions";
+import {
+  getMyWeeklyActivity,
+  getMyGoalDistribution,
+  getMyAdherenceAverage,
+} from "@/lib/dashboard/dashboard.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — FitJourney" }] }),
