@@ -1058,6 +1058,12 @@ function MealEditor({
           )
         }
       />
+      <MealImagePickerDialog
+        open={imagePickerOpen}
+        onOpenChange={setImagePickerOpen}
+        value={meal.heroKey || meal.main.imageKey}
+        onPick={pickHeroImage}
+      />
     </div>
   );
 }
