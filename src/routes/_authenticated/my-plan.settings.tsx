@@ -55,7 +55,7 @@ function PatientSettings() {
     if (data) {
       setFullName(data.fullName ?? "");
       setPhone(data.phone ?? "");
-      setHeightCm(data.heightCm != null ? String(data.heightCm) : "");
+      
       setAvatarUrl(data.avatarUrl ?? null);
     }
   }, [data]);
