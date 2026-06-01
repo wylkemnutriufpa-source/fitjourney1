@@ -29,6 +29,21 @@ function formatDate(value: string): string {
   }).format(new Date(value));
 }
 
+function anamnesisStatusMeta(status: string): { label: string; cls: string; dot: string } {
+  switch (status) {
+    case "approved":
+      return { label: "Anamnese aprovada", cls: "text-emerald-400", dot: "bg-emerald-400" };
+    case "submitted":
+      return { label: "Anamnese pendente", cls: "text-primary", dot: "bg-primary" };
+    case "needs_changes":
+      return { label: "Requer ajustes", cls: "text-amber-400", dot: "bg-amber-400" };
+    case "draft":
+      return { label: "Rascunho em andamento", cls: "text-muted-foreground", dot: "bg-muted-foreground" };
+    default:
+      return { label: "Aguardando anamnese", cls: "text-amber-400", dot: "bg-amber-400" };
+  }
+}
+
 function Patients() {
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const { data: patients = [], isLoading, error } = useQuery({
