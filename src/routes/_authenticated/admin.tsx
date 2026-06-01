@@ -4,8 +4,11 @@ import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: ({ context, location }) => {
+    // SSR: parent _authenticated guard retorna cedo no servidor (sem identity).
+    // Não podemos validar admin aqui sem identity — deixamos o client revalidar.
+    if (typeof window === "undefined") return;
     const identity = (context as any)?.identity;
-    if (!identity?.appRoles?.includes("admin")) {
+    if (identity && !identity.appRoles?.includes("admin")) {
       throw redirect({ to: "/dashboard" });
     }
     if (location.pathname === "/admin") {
