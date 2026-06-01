@@ -67,7 +67,7 @@ function PatientPlanPage() {
     refetchOnMount: "always",
   });
 
-  const patientName = detail?.patient?.full_name ?? "Paciente";
+  const patientName = detail?.fullName ?? "Paciente";
 
   function publishNew() {
     navigate({
