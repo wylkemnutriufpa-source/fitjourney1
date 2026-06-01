@@ -109,17 +109,33 @@ function deriveImageKeyForFood(food: PlannerFoodItem): string | undefined {
   if (food.foodKey && foodImages[food.foodKey]) return food.foodKey;
   const slug = slugifyName(food.name);
   if (slug && foodImages[slug]) return slug;
-  // tenta prefixo do slug
-  const match = allFoodKeys.find((k) => k.startsWith(slug));
-  if (match) return match;
-  // fallback por palavra principal
-  const words = slug.split("-").filter((w) => w.length >= 4);
-  for (const w of words) {
-    const m = allFoodKeys.find((k) => k.includes(w));
-    if (m) return m;
+  if (slug) {
+    // 1) prefixo exato do slug completo
+    const pref = allFoodKeys.find((k) => k.startsWith(slug));
+    if (pref) return pref;
+    const words = slug.split("-").filter((w) => w.length >= 3 && !STOP.has(w));
+    // 2) cobertura múltipla: chave que contenha o maior nº de palavras significativas
+    let best: { key: string; score: number } | null = null;
+    for (const k of allFoodKeys) {
+      let score = 0;
+      for (const w of words) if (k.includes(w)) score++;
+      if (score > 0 && (!best || score > best.score)) best = { key: k, score };
+    }
+    if (best) return best.key;
+    // 3) prefixo da primeira palavra significativa
+    for (const w of words) {
+      const m = allFoodKeys.find((k) => k.startsWith(w));
+      if (m) return m;
+    }
   }
   return undefined;
 }
+
+const STOP = new Set([
+  "de", "do", "da", "com", "sem", "ou", "e", "em", "no", "na",
+  "uma", "um", "pouco", "muito", "natural", "integral", "branco",
+  "branca", "magro", "magra", "light", "diet", "fresco", "fresca",
+]);
 
 /**
  * Gera opções equivalentes automáticas para a refeição a partir do alimento
@@ -140,15 +156,18 @@ function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): Planner
     const key = normalizeTitle(s.name);
     if (taken.has(key)) continue;
     taken.add(key);
+    // Cada substituta tenta sua própria imagem (sem herdar a hero da principal,
+    // o que tornava todas visualmente iguais). Se não houver match, fica sem
+    // imagem e o profissional pode escolher manualmente pelo banco.
     const subImage = deriveImageKeyForFood({
       ...food,
       name: s.name,
       foodKey: slugifyName(s.name),
-    }) ?? meal.main.imageKey ?? meal.heroKey ?? "iogurte-natural";
+    });
     out.push(
       createEmptyMealOption({
         title: s.name,
-        imageKey: subImage,
+        imageKey: subImage ?? "",
         items: [
           createEmptyFoodItem({
             foodKey: slugifyName(s.name) || food.foodKey,
@@ -1471,13 +1490,15 @@ function EquivalentOptionEditor({
     onChange((o) => ({ ...o, items: o.items.filter((i) => i.id !== id) }));
   }
 
+  const [imagePickerOpen, setImagePickerOpen] = useState(false);
+
   return (
     <div className="border border-border rounded-md bg-muted/20 overflow-hidden">
       <div className="flex items-center gap-2 p-1.5">
         <button
-          onClick={() => setExpanded((v) => !v)}
-          className="size-9 rounded bg-muted overflow-hidden flex-shrink-0"
-          title={expanded ? "Recolher" : "Expandir"}
+          onClick={() => setImagePickerOpen(true)}
+          className="size-9 rounded bg-muted overflow-hidden flex-shrink-0 relative group/eqimg"
+          title="Trocar imagem desta opção"
         >
           {img ? (
             <img src={img} alt="" className="w-full h-full object-cover" />
@@ -1486,6 +1507,14 @@ function EquivalentOptionEditor({
               <ImageOff className="size-3" />
             </div>
           )}
+          <div className="absolute inset-0 bg-black/0 group-hover/eqimg:bg-black/50 transition-colors" />
+        </button>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="text-muted-foreground hover:text-foreground p-1"
+          title={expanded ? "Recolher" : "Expandir"}
+        >
+          {expanded ? "−" : "+"}
         </button>
         <Input
           value={option.title}
@@ -1540,6 +1569,12 @@ function EquivalentOptionEditor({
             }),
           )
         }
+      />
+      <MealImagePickerDialog
+        open={imagePickerOpen}
+        onOpenChange={setImagePickerOpen}
+        value={option.imageKey}
+        onPick={(key) => onChange((o) => ({ ...o, imageKey: key }))}
       />
     </div>
   );
