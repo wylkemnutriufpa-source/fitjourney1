@@ -137,9 +137,9 @@ function Login() {
             Performance / Nutrition / Lab
           </p>
           <h1 className="text-5xl font-bold tracking-tighter leading-[0.95]">
-            Dieta cirúrgica.
+            Anamnese clínica.
             <br />
-            <span className="italic text-muted-foreground">Anamnese clínica.</span>
+            <span className="italic text-muted-foreground">Plano cirúrgico.</span>
           </h1>
           <p className="text-sm text-muted-foreground max-w-md">
             Métricas metabólicas calculadas em segundos, templates editáveis e
