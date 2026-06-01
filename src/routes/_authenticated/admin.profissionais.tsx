@@ -5,9 +5,12 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   listProfessionals,
   upsertProfessionalSubscription,
+  adminUpdateNutritionist,
   type AdminNutritionistRow,
   type NutriPlanTier,
 } from "@/lib/admin/admin.functions";
+import { Pencil } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -112,10 +115,19 @@ function ProfessionalsPage() {
               return (
                 <tr key={n.id} className="border-t border-border hover:bg-accent/30">
                   <td className="px-4 py-2">
-                    <div className="font-medium">{n.full_name}</div>
+                    <button
+                      type="button"
+                      onClick={() => setEditing(n)}
+                      className="text-left font-medium hover:text-primary hover:underline"
+                    >
+                      {n.full_name}
+                    </button>
                     <div className="text-xs text-muted-foreground">{n.email}</div>
+                    {n.phone && <div className="text-[11px] text-muted-foreground">{n.phone}</div>}
+                    {n.crn && <div className="text-[11px] text-muted-foreground">CRN: {n.crn}</div>}
                   </td>
                   <td className="px-4 py-2">{n.patients_count}</td>
+
                   <td className="px-4 py-2">
                     {sub ? (
                       <span
@@ -152,9 +164,11 @@ function ProfessionalsPage() {
                   </td>
                   <td className="px-4 py-2 text-right">
                     <Button size="sm" variant="outline" onClick={() => setEditing(n)}>
-                      {sub ? "Editar" : "Definir"}
+                      <Pencil className="h-3.5 w-3.5 mr-1" />
+                      Editar
                     </Button>
                   </td>
+
                 </tr>
               );
             })}
@@ -211,12 +225,33 @@ function SubscriptionDialog({
   const [endsAt, setEndsAt] = useState<string>(toDateInput(sub?.ends_at));
   const [notes, setNotes] = useState(sub?.notes ?? "");
 
+  // Dados do profissional
+  const [fullName, setFullName] = useState(nutri.full_name);
+  const [email, setEmail] = useState(nutri.email);
+  const [phone, setPhone] = useState(nutri.phone ?? "");
+  const [crn, setCrn] = useState(nutri.crn ?? "");
+  const [specialty, setSpecialty] = useState<string>("");
+
   const upsert = useServerFn(upsertProfessionalSubscription);
+  const updateNutri = useServerFn(adminUpdateNutritionist);
   const qc = useQueryClient();
+
   const mut = useMutation({
-    mutationFn: (input: any) => upsert({ data: input }),
+    mutationFn: async (input: any) => {
+      await updateNutri({
+        data: {
+          nutritionist_id: nutri.id,
+          full_name: fullName.trim(),
+          email: email.trim(),
+          phone: phone.trim() || null,
+          crn: crn.trim() || null,
+          specialty: specialty.trim() || null,
+        },
+      });
+      return upsert({ data: input });
+    },
     onSuccess: () => {
-      toast.success("Assinatura salva");
+      toast.success("Dados e assinatura salvos");
       qc.invalidateQueries({ queryKey: ["admin", "professionals"] });
       onSaved();
     },
@@ -233,6 +268,10 @@ function SubscriptionDialog({
   }, [startsAt, endsAt]);
 
   function submit() {
+    if (!fullName.trim()) {
+      toast.error("Nome obrigatório");
+      return;
+    }
     const cents = Math.round(parseFloat(priceBrl.replace(",", ".")) * 100);
     if (!Number.isFinite(cents) || cents < 0) {
       toast.error("Valor inválido");
@@ -252,11 +291,45 @@ function SubscriptionDialog({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Assinatura — {nutri.full_name}</DialogTitle>
+          <DialogTitle>Editar profissional — {nutri.full_name}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-5">
+          <div className="space-y-3">
+            <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              Dados do profissional
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Nome completo</Label>
+                <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              </div>
+              <div>
+                <Label>Email</Label>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div>
+                <Label>Telefone</Label>
+                <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+              </div>
+              <div>
+                <Label>CRN</Label>
+                <Input value={crn} onChange={(e) => setCrn(e.target.value)} />
+              </div>
+              <div className="col-span-2">
+                <Label>Especialidade</Label>
+                <Input value={specialty} onChange={(e) => setSpecialty(e.target.value)} />
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-border" />
+
+          <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            Plano e assinatura
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Plano contratado</Label>
