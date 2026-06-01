@@ -155,7 +155,7 @@ function Dashboard() {
             </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={recentActivity}>
+                <AreaChart data={weekly}>
                   <defs>
                     <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
                       <stop offset="0%" stopColor="oklch(0.72 0.17 230)" stopOpacity={0.4} />
