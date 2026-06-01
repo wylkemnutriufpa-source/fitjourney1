@@ -66,6 +66,7 @@ function Dashboard() {
   const fetchProfile = useServerFn(getMyNutritionistProfile);
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const fetchPending = useServerFn(getMyPendingAnamnesesCount);
+  const fetchWeekly = useServerFn(getMyWeeklyActivity);
 
   const { data: profile } = useQuery({
     queryKey: ["nutri-profile"],
