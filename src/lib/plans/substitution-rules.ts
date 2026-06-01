@@ -279,6 +279,38 @@ function scaleOption(raw: RawOption, targetKcal: number): SubOption {
  * (kcal do alimento principal). Se targetKcal = 0, devolve a porção de
  * referência da regra.
  */
+// Ordem de fallback por refeição (quando o alimento não casa com nenhuma
+// regra do bucket principal, varremos outros buckets equivalentes).
+const FALLBACK_ORDER: Record<MealKind, MealKind[]> = {
+  breakfast: ["breakfast", "snack", "dinner", "lunch"],
+  lunch: ["lunch", "dinner", "snack", "breakfast"],
+  dinner: ["dinner", "lunch", "snack", "breakfast"],
+  snack: ["snack", "breakfast", "dinner", "lunch"],
+  other: ["lunch", "dinner", "breakfast", "snack"],
+};
+
+function tryBucket(
+  rules: RuleBucket[],
+  itemNorm: string,
+  targetKcal: number,
+): SubOption[] | null {
+  for (const rule of rules) {
+    if (rule.match.test(itemNorm)) {
+      return rule.options
+        .filter((o) => norm(o.name) !== itemNorm)
+        .slice(0, 4)
+        .map((o) => scaleOption(o, targetKcal));
+    }
+  }
+  return null;
+}
+
+/**
+ * Retorna 3-4 substituições coerentes para o alimento. Sempre tenta o bucket
+ * da refeição primeiro; se nenhum padrão casar, faz fallback varrendo os
+ * demais buckets em ordem semântica (definida em FALLBACK_ORDER), para
+ * garantir que toda refeição receba sugestões equivalentes.
+ */
 export function getSubstitutionsFor(
   itemName: string,
   mealKind: MealKind,
@@ -286,24 +318,12 @@ export function getSubstitutionsFor(
 ): SubOption[] {
   if (!itemName) return [];
   const n = norm(itemName);
-  const bucket = BUCKETS[mealKind] ?? [];
-  for (const rule of bucket) {
-    if (rule.match.test(n)) {
-      return rule.options
-        .filter((o) => norm(o.name) !== n)
-        .slice(0, 4)
-        .map((o) => scaleOption(o, targetKcal));
-    }
+  for (const kind of FALLBACK_ORDER[mealKind] ?? FALLBACK_ORDER.other) {
+    const hit = tryBucket(BUCKETS[kind] ?? [], n, targetKcal);
+    if (hit && hit.length > 0) return hit;
   }
-  if (mealKind !== "snack") {
-    for (const rule of SNACK_OR_FRUIT) {
-      if (rule.match.test(n)) {
-        return rule.options
-          .filter((o) => norm(o.name) !== n)
-          .slice(0, 4)
-          .map((o) => scaleOption(o, targetKcal));
-      }
-    }
-  }
-  return [];
+  // Último recurso: devolve as 3 primeiras opções do bucket da refeição
+  // (escaladas), para nunca deixar a refeição sem substituições.
+  const primary = BUCKETS[mealKind]?.[0]?.options ?? SNACK_OR_FRUIT[0].options;
+  return primary.slice(0, 3).map((o) => scaleOption(o, targetKcal));
 }
