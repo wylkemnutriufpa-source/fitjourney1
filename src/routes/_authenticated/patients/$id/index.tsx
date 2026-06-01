@@ -74,10 +74,17 @@ function PatientProfile() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const fetchDetail = useServerFn(getPatientForNutritionist);
+  const fetchPlans = useServerFn(listPublishedPlansForPatient);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient-detail", id],
     queryFn: () => fetchDetail({ data: { patientId: id } }),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const { data: publishedPlans } = useQuery({
+    queryKey: ["patient-published-plans", id],
+    queryFn: () => fetchPlans({ data: { patientId: id } }),
     staleTime: 0,
     refetchOnMount: "always",
   });
