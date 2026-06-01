@@ -4,7 +4,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { createAvatarSignedUrl, isAvatarStorageReference } from "@/lib/profile/avatar-storage";
+import { createAvatarSignedUrl, getAvatarStoragePath, isAvatarStorageReference } from "@/lib/profile/avatar-storage";
 
 export interface MyPatientProfile {
   id: string;
@@ -81,7 +81,7 @@ export const updateMyPatientProfile = createServerFn({ method: "POST" })
     if (data.fullName !== undefined) patch.full_name = data.fullName;
     if (data.phone !== undefined) patch.phone = data.phone === "" ? null : data.phone;
     if (data.heightCm !== undefined) patch.height_cm = data.heightCm;
-    if (data.avatarUrl !== undefined) patch.avatar_url = data.avatarUrl;
+    if (data.avatarUrl !== undefined) patch.avatar_url = data.avatarUrl ? getAvatarStoragePath(data.avatarUrl) : null;
 
     if (Object.keys(patch).length === 0) {
       return { ok: true };
