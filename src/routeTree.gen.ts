@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SignupPatientRouteImport } from './routes/signup/patient'
 import { Route as SignupNutritionistRouteImport } from './routes/signup/nutritionist'
 import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
+import { Route as AuthenticatedTemplatesV2EditorPreviewRouteImport } from './routes/_authenticated/templates-v2-editor-preview'
 import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedMyPlanV2PreviewRouteImport } from './routes/_authenticated/my-plan-v2-preview'
@@ -68,6 +69,12 @@ const AuthCheckEmailRoute = AuthCheckEmailRouteImport.update({
   path: '/auth/check-email',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTemplatesV2EditorPreviewRoute =
+  AuthenticatedTemplatesV2EditorPreviewRouteImport.update({
+    id: '/templates-v2-editor-preview',
+    path: '/templates-v2-editor-preview',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTemplatesRoute = AuthenticatedTemplatesRouteImport.update({
   id: '/templates',
   path: '/templates',
@@ -212,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
+  '/templates-v2-editor-preview': typeof AuthenticatedTemplatesV2EditorPreviewRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
@@ -242,6 +250,7 @@ export interface FileRoutesByTo {
   '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
+  '/templates-v2-editor-preview': typeof AuthenticatedTemplatesV2EditorPreviewRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
@@ -274,6 +283,7 @@ export interface FileRoutesById {
   '/_authenticated/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
+  '/_authenticated/templates-v2-editor-preview': typeof AuthenticatedTemplatesV2EditorPreviewRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
@@ -306,6 +316,7 @@ export interface FileRouteTypes {
     | '/my-plan-v2-preview'
     | '/settings'
     | '/templates'
+    | '/templates-v2-editor-preview'
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/my-plan-v2-preview'
     | '/settings'
     | '/templates'
+    | '/templates-v2-editor-preview'
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
@@ -367,6 +379,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-plan-v2-preview'
     | '/_authenticated/settings'
     | '/_authenticated/templates'
+    | '/_authenticated/templates-v2-editor-preview'
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
@@ -438,6 +451,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/check-email'
       preLoaderRoute: typeof AuthCheckEmailRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/templates-v2-editor-preview': {
+      id: '/_authenticated/templates-v2-editor-preview'
+      path: '/templates-v2-editor-preview'
+      fullPath: '/templates-v2-editor-preview'
+      preLoaderRoute: typeof AuthenticatedTemplatesV2EditorPreviewRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/templates': {
       id: '/_authenticated/templates'
@@ -642,6 +662,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMyPlanV2PreviewRoute: typeof AuthenticatedMyPlanV2PreviewRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
+  AuthenticatedTemplatesV2EditorPreviewRoute: typeof AuthenticatedTemplatesV2EditorPreviewRoute
   AuthenticatedAnamnesesIdRoute: typeof AuthenticatedAnamnesesIdRoute
   AuthenticatedOnboardingNutritionistRoute: typeof AuthenticatedOnboardingNutritionistRoute
   AuthenticatedOnboardingPatientRoute: typeof AuthenticatedOnboardingPatientRoute
@@ -663,6 +684,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMyPlanV2PreviewRoute: AuthenticatedMyPlanV2PreviewRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
+  AuthenticatedTemplatesV2EditorPreviewRoute:
+    AuthenticatedTemplatesV2EditorPreviewRoute,
   AuthenticatedAnamnesesIdRoute: AuthenticatedAnamnesesIdRoute,
   AuthenticatedOnboardingNutritionistRoute:
     AuthenticatedOnboardingNutritionistRoute,
