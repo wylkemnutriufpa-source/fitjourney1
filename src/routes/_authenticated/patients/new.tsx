@@ -62,8 +62,8 @@ function NewPatient() {
   const [goal, setGoal] = useState<Goal>("Performance");
   const [adjust, setAdjust] = useState(0);
 
-  const tmb = calcTMB(sex, weight, height, age);
-  const get = calcGET(tmb, factor);
+  const tmb = calcTMB({ sex: sex === "M" ? "male" : "female", weightKg: weight, heightCm: height, ageYears: age });
+  const get = Math.round(tmb * factor);
   const tdee = get + adjust;
 
   return (
