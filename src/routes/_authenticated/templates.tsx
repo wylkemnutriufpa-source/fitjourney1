@@ -74,9 +74,12 @@ import {
   ChevronDown,
   Send,
   CheckCircle2,
+  FlaskConical,
+  ExternalLink,
 } from "lucide-react";
 import { RealPatientPicker } from "@/components/RealPatientPicker";
 import { publishPlanToPatient, type PatientLite } from "@/lib/plans/plans.functions";
+import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
