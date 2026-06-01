@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -74,8 +74,10 @@ import { publishPlanToPatient, type PatientLite } from "@/lib/plans/plans.functi
 
 export const Route = createFileRoute("/_authenticated/templates")({
   head: () => ({ meta: [{ title: "Templates — FitJourney" }] }),
-  validateSearch: (search: Record<string, unknown>): { blank?: number } => ({
+  validateSearch: (search: Record<string, unknown>): { blank?: number; patientId?: string; patientName?: string } => ({
     blank: search.blank === "1" || search.blank === 1 ? 1 : undefined,
+    patientId: typeof search.patientId === "string" ? search.patientId : undefined,
+    patientName: typeof search.patientName === "string" ? search.patientName : undefined,
   }),
   component: TemplatesPage,
 });
@@ -385,6 +387,11 @@ function TemplatesPage() {
           original={editing.tpl}
           isMine={editing.isMine}
           existingMine={editing.mine}
+          patientContext={
+            search.patientId
+              ? { id: search.patientId, name: search.patientName ?? "este paciente" }
+              : null
+          }
           onClose={() => setEditing(null)}
           onSave={(t) => {
             saveMine(t);
@@ -500,15 +507,18 @@ function TemplateEditor({
   original,
   isMine,
   existingMine,
+  patientContext,
   onClose,
   onSave,
 }: {
   original: PlannerTemplate;
   isMine: boolean;
   existingMine?: MyTemplate;
+  patientContext?: { id: string; name: string } | null;
   onClose: () => void;
   onSave: (t: MyTemplate) => void;
 }) {
+  const navigate = useNavigate();
   const [draft, setDraft] = useState<PlannerTemplate>(() => clonePlannerTemplate(original));
   const [name, setName] = useState(
     isMine ? original.name : `${original.name} (cópia)`,
@@ -747,22 +757,85 @@ function TemplateEditor({
 
         <DialogFooter className="px-6 py-4 border-t border-border sticky bottom-0 bg-background">
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setApplyDone(null);
-              setApplyPatient(null);
-              setApplyOpen(true);
-            }}
-          >
-            <Send className="size-4" /> Aplicar a paciente
-          </Button>
-          <Button onClick={save}>
+          {patientContext ? (
+            <Button
+              disabled={applyBusy}
+              onClick={async () => {
+                setApplyBusy(true);
+                setApplyError(null);
+                try {
+                  await publishPlan({
+                    data: {
+                      patientId: patientContext.id,
+                      snapshot: JSON.parse(JSON.stringify(currentForShare)),
+                    },
+                  });
+                  setApplyDone(patientContext.name);
+                } catch (e: any) {
+                  setApplyError(e?.message ?? "Falha ao publicar plano.");
+                  setApplyBusy(false);
+                }
+              }}
+            >
+              <Send className="size-4" />
+              {applyBusy ? "Salvando…" : `Salvar plano para ${patientContext.name}`}
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setApplyDone(null);
+                setApplyPatient(null);
+                setApplyOpen(true);
+              }}
+            >
+              <Send className="size-4" /> Aplicar a paciente
+            </Button>
+          )}
+          <Button onClick={save} variant={patientContext ? "outline" : "default"}>
             {isMine ? <Save className="size-4" /> : <Copy className="size-4" />}
             {isMine ? "Salvar alterações" : "Salvar em Meus Templates"}
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Confirmação pós-publicação direta para o paciente do contexto */}
+      <Dialog
+        open={!!patientContext && !!applyDone}
+        onOpenChange={(o) => {
+          if (!o) {
+            setApplyDone(null);
+            setApplyBusy(false);
+            onClose();
+            if (patientContext) {
+              navigate({ to: "/patients/$id", params: { id: patientContext.id } });
+            }
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Plano publicado</DialogTitle>
+            <DialogDescription>
+              Snapshot congelado e disponível para <strong>{applyDone}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setApplyDone(null);
+                setApplyBusy(false);
+                onClose();
+                if (patientContext) {
+                  navigate({ to: "/patients/$id", params: { id: patientContext.id } });
+                }
+              }}
+            >
+              Voltar ao perfil
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <SendShareDialog
         open={shareOpen}
