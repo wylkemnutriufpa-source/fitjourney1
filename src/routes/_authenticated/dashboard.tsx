@@ -31,7 +31,7 @@ function Kpi({
   hint?: string;
   accent?: boolean;
   icon: typeof Users;
-  to?: "/patients" | "/anamneses" | "/financeiro";
+  to?: "/patients" | "/anamneses" | "/financeiro" | "/insights";
 }) {
   const inner = (
     <>
