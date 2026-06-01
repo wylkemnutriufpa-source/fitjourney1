@@ -237,6 +237,8 @@ function SubscriptionDialog({
   const updateNutri = useServerFn(adminUpdateNutritionist);
   const qc = useQueryClient();
 
+  const hasExistingSub = !!sub;
+
   const mut = useMutation({
     mutationFn: async (input: any) => {
       await updateNutri({
@@ -250,15 +252,21 @@ function SubscriptionDialog({
           feedback_frequency_days: Math.max(1, Math.min(90, Math.round(feedbackFreq) || 7)),
         },
       });
-      return upsert({ data: input });
+      // Só cria/atualiza assinatura se já existir uma OU se admin definiu um valor > 0.
+      // Evita criar assinatura "fantasma" R$ 0 ao editar apenas dados cadastrais.
+      if (hasExistingSub || input.monthly_price_cents > 0) {
+        return upsert({ data: input });
+      }
+      return { id: null, updated: false };
     },
     onSuccess: () => {
-      toast.success("Dados e assinatura salvos");
+      toast.success(hasExistingSub ? "Dados e assinatura salvos" : "Dados salvos");
       qc.invalidateQueries({ queryKey: ["admin", "professionals"] });
       onSaved();
     },
     onError: (e: any) => toast.error(e?.message ?? "Erro ao salvar"),
   });
+
 
   // Auto-calcula vencimento (1 mês após início) quando admin não definiu manualmente
   const suggestedEnd = useMemo(() => {
@@ -274,11 +282,18 @@ function SubscriptionDialog({
       toast.error("Nome obrigatório");
       return;
     }
-    const cents = Math.round(parseFloat(priceBrl.replace(",", ".")) * 100);
-    if (!Number.isFinite(cents) || cents < 0) {
+    if (!email.trim()) {
+      toast.error("Email obrigatório");
+      return;
+    }
+    // Preço vazio → 0 (permite salvar dados do profissional mesmo sem definir mensalidade)
+    const raw = priceBrl.trim().replace(",", ".");
+    const parsed = raw === "" ? 0 : parseFloat(raw);
+    if (!Number.isFinite(parsed) || parsed < 0) {
       toast.error("Valor inválido");
       return;
     }
+    const cents = Math.round(parsed * 100);
     mut.mutate({
       nutritionist_id: nutri.id,
       plan_tier: planTier,
