@@ -77,7 +77,8 @@ describe("validatePlan", () => {
         { foodKey: "arroz_branco", displayName: "Arroz branco", weeklyCount: 6 },
       ],
     });
-    expect(r.issues.some((i) => i.code === "FOOD_MONOTONY")).toBe(true);
+    expect(r.warnings.some((i) => i.code === "FOOD_MONOTONY")).toBe(true);
+    expect(r.blockers.length).toBe(0);
     expect(r.blocked).toBe(false);
   });
 
