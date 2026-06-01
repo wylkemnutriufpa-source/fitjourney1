@@ -108,12 +108,27 @@ function Login() {
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background text-foreground">
       <div className="hidden lg:flex flex-col justify-between p-12 bg-sidebar border-r border-border relative overflow-hidden">
-        <div className="flex items-center gap-3">
-          <img
-            src={fjLogo}
-            alt="FitJourney"
-            className="size-10 object-contain"
-          />
+        <div className="flex items-center gap-3 relative z-10">
+          <span className="fj-logo-aura relative inline-flex items-center justify-center size-10 shrink-0">
+            <span className="fj-logo-pulse" aria-hidden />
+            <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
+              <span className="fj-logo-particle" />
+            </span>
+            <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
+              <span className="fj-logo-particle fj-logo-particle-gold" />
+            </span>
+            <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
+              <span className="fj-logo-particle" />
+            </span>
+            <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
+              <span className="fj-logo-particle fj-logo-particle-gold" />
+            </span>
+            <img
+              src={fjLogo}
+              alt="FitJourney"
+              className="relative z-10 size-10 object-contain"
+            />
+          </span>
           <span className="fj-wordmark text-2xl leading-none">FitJourney</span>
         </div>
 
@@ -122,9 +137,9 @@ function Login() {
             Performance / Nutrition / Lab
           </p>
           <h1 className="text-5xl font-bold tracking-tighter leading-[0.95]">
-            Anamnese clínica.
+            Dieta cirúrgica.
             <br />
-            <span className="italic text-muted-foreground">Dieta cirúrgica.</span>
+            <span className="italic text-muted-foreground">Anamnese clínica.</span>
           </h1>
           <p className="text-sm text-muted-foreground max-w-md">
             Métricas metabólicas calculadas em segundos, templates editáveis e
@@ -132,22 +147,45 @@ function Login() {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 relative z-10">
-          {[
-            { k: "TMB", v: "Mifflin-St Jeor" },
-            { k: "GET", v: "Fator atividade" },
-            { k: "TDEE", v: "Objetivo final" },
-          ].map((m) => (
-            <div key={m.k} className="border border-border rounded-md p-3 bg-surface/60">
+        <div className="relative z-10 space-y-4">
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { k: "TMB", v: "Mifflin-St Jeor", hint: "kcal basais" },
+              { k: "GET", v: "Fator atividade", hint: "kcal × PAL" },
+              { k: "TDEE", v: "Objetivo final", hint: "déficit / superávit" },
+            ].map((m) => (
+              <div
+                key={m.k}
+                className="group relative border border-border/80 rounded-lg p-3 bg-gradient-to-br from-surface/80 to-surface/30 backdrop-blur-sm hover:border-primary/50 transition-colors overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <p className="relative text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+                  {m.v}
+                </p>
+                <p className="relative text-lg font-bold font-mono mt-1 bg-gradient-to-br from-foreground to-primary bg-clip-text text-transparent">
+                  {m.k}
+                </p>
+                <p className="relative text-[9px] font-mono text-muted-foreground/70 mt-0.5">
+                  {m.hint}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between border-t border-border/60 pt-4">
+            <div className="flex items-center gap-2">
+              <span className="size-1.5 rounded-full bg-primary animate-pulse" />
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                {m.v}
+                Sistema soberano · v3
               </p>
-              <p className="text-lg font-bold font-mono mt-1">{m.k}</p>
             </div>
-          ))}
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+              Snapshot imutável
+            </p>
+          </div>
         </div>
 
         <div className="absolute -bottom-32 -right-32 size-96 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute -top-24 -left-24 size-72 rounded-full bg-[var(--gold)]/5 blur-3xl" />
       </div>
 
       <div className="flex items-center justify-center p-8">
