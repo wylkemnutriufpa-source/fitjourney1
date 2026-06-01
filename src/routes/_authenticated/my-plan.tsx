@@ -399,11 +399,13 @@ function MealCard({
             )}
 
             {/* Substituições / equivalentes em modal */}
+            {/* Substituições da REFEIÇÃO INTEIRA (montagens equivalentes) */}
             {equivalents.length > 0 && (
               <EquivalentsButton
                 mealLabel={meal?.label ?? `Refeição ${index + 1}`}
                 equivalents={equivalents}
                 foods={foods}
+                mealKind={mealKind}
               />
             )}
           </div>
