@@ -610,7 +610,42 @@ function TemplateEditor({
   const [applyDone, setApplyDone] = useState<string | null>(null);
   const [applyBusy, setApplyBusy] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
+  // Quando publish falha por falta de anamnese, abrimos confirm dialog
+  // com os dados pendentes (patientId + nome) para retentar com override.
+  const [missingAnamneseFor, setMissingAnamneseFor] = useState<
+    { patientId: string; patientName: string } | null
+  >(null);
   const publishPlan = useServerFn(publishPlanToPatient);
+
+  async function doPublish(
+    patientId: string,
+    patientName: string,
+    opts?: { overrideMissingClinical?: boolean },
+  ) {
+    setApplyBusy(true);
+    setApplyError(null);
+    try {
+      await publishPlan({
+        data: {
+          patientId,
+          snapshot: JSON.parse(JSON.stringify(currentForShare)),
+          overrideMissingClinical: opts?.overrideMissingClinical || undefined,
+        },
+      });
+      setApplyDone(patientName);
+      setMissingAnamneseFor(null);
+    } catch (e: any) {
+      const msg = e?.message ?? "Falha ao publicar plano.";
+      if (msg.includes("CLINICAL_CONTEXT_INCOMPLETE") && !opts?.overrideMissingClinical) {
+        // Trava virou confirmação: pergunta se nutri quer publicar mesmo assim.
+        setMissingAnamneseFor({ patientId, patientName });
+      } else {
+        setApplyError(msg);
+      }
+    } finally {
+      setApplyBusy(false);
+    }
+  }
 
   function setMeals(updater: (meals: PlannerMeal[]) => PlannerMeal[]) {
     setDraft((d) => {
