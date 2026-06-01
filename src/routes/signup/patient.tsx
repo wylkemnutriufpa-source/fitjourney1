@@ -282,7 +282,7 @@ function PatientSignupPage() {
 
         <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60 text-center">
           Já tem conta?{" "}
-          <Link to="/" className="text-primary hover:underline">
+          <Link to="/app" className="text-primary hover:underline">
             Entrar
           </Link>
         </p>
