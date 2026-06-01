@@ -400,6 +400,11 @@ function TemplatesPage() {
             Meus Templates
             <span className="text-[10px] font-mono opacity-60">{myList.length}</span>
           </TabBtn>
+          <TabBtn active={tab === "pilotos"} onClick={() => setTab("pilotos")}>
+            <FlaskConical className="size-3.5" />
+            Pilotos / Testes
+            <span className="text-[10px] font-mono opacity-60">{pilotosCatalog.length}</span>
+          </TabBtn>
         </div>
 
 
