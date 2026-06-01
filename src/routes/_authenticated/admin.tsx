@@ -3,10 +3,13 @@ import { AppShell } from "@/components/AppShell";
 import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  beforeLoad: ({ context }) => {
+  beforeLoad: ({ context, location }) => {
     const identity = (context as any)?.identity;
     if (!identity?.appRoles?.includes("admin")) {
       throw redirect({ to: "/dashboard" });
+    }
+    if (location.pathname === "/admin") {
+      throw redirect({ to: "/admin/profissionais" });
     }
   },
   component: AdminLayout,
