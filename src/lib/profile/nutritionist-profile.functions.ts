@@ -6,7 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { createAvatarSignedUrl, isAvatarStorageReference } from "@/lib/profile/avatar-storage";
+import { createAvatarSignedUrl, getAvatarStoragePath, isAvatarStorageReference } from "@/lib/profile/avatar-storage";
 
 export interface MyNutritionistProfile {
   id: string;
@@ -88,7 +88,7 @@ export const updateMyNutritionistProfile = createServerFn({ method: "POST" })
           auth_user_id: userId,
           full_name: data.fullName,
           display_name: data.displayName ?? null,
-          avatar_url: data.avatarUrl ?? null,
+          avatar_url: data.avatarUrl ? getAvatarStoragePath(data.avatarUrl) : null,
           crn: data.crn ?? null,
           email: data.email,
           specialty: data.specialty ?? null,
