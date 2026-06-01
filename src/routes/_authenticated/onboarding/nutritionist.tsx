@@ -45,7 +45,7 @@ function OnboardingNutritionistPage() {
 
   async function handleSignOut() {
     await signOut();
-    navigate({ to: "/" });
+    navigate({ to: "/app" });
   }
 
   return (
