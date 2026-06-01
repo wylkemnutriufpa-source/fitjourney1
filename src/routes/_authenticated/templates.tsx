@@ -40,12 +40,14 @@ import {
   createEmptyMeal,
   createEmptyFoodItem,
   createEmptyMealOption,
+  createEmptyTemplate,
   templateKcal,
   type PlannerTemplate,
   type PlannerMeal,
   type PlannerMealOption,
   type PlannerFoodItem,
 } from "@/lib/meal-planner";
+import { detectMealKind, getSubstitutionsFor } from "@/lib/plans/substitution-rules";
 import {
   Plus,
   Save,
