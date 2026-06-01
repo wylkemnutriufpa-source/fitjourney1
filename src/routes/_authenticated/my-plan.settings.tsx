@@ -14,6 +14,7 @@ import {
 } from "@/lib/profile/patient-profile.functions";
 import { getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 import { supabase } from "@/integrations/supabase/client";
+import { AvatarCropDialog } from "@/components/AvatarCropDialog";
 
 export const Route = createFileRoute("/_authenticated/my-plan/settings")({
   head: () => ({ meta: [{ title: "Minha conta — FitJourney" }] }),
