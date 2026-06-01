@@ -25,8 +25,10 @@ export type AdminNutritionistRow = {
   email: string;
   phone: string | null;
   crn: string | null;
+  feedback_frequency_days: number;
   created_at: string;
   patients_count: number;
+
   subscription: {
     id: string;
     plan_tier: NutriPlanTier;
@@ -48,7 +50,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
 
     const { data: nutris, error } = await supabase
       .from("nutritionists")
-      .select("id, full_name, email, phone, crn, created_at")
+      .select("id, full_name, email, phone, crn, feedback_frequency_days, created_at")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
@@ -82,6 +84,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
       const s = subByNutri.get(n.id);
       return {
         ...n,
+        feedback_frequency_days: Number(n.feedback_frequency_days ?? 7),
         patients_count: countByNutri.get(n.id) ?? 0,
         subscription: s
           ? {
@@ -205,6 +208,7 @@ const UpdateNutriInput = z.object({
   phone: z.string().trim().max(32).regex(/^[0-9+()\-\s]*$/, "Telefone inválido").nullable().optional(),
   crn: z.string().trim().max(64).regex(/^[A-Za-z0-9\-\/\. ]*$/, "CRN inválido").nullable().optional(),
   specialty: z.string().trim().max(120).nullable().optional(),
+  feedback_frequency_days: z.number().int().min(1).max(90).optional(),
 });
 
 export const adminUpdateNutritionist = createServerFn({ method: "POST" })
@@ -213,15 +217,26 @@ export const adminUpdateNutritionist = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertAdmin(supabase, userId);
+    const patch: {
+      full_name: string;
+      email: string;
+      phone: string | null;
+      crn: string | null;
+      specialty: string | null;
+      feedback_frequency_days?: number;
+    } = {
+      full_name: data.full_name,
+      email: data.email,
+      phone: data.phone ?? null,
+      crn: data.crn ?? null,
+      specialty: data.specialty ?? null,
+    };
+    if (typeof data.feedback_frequency_days === "number") {
+      patch.feedback_frequency_days = data.feedback_frequency_days;
+    }
     const { data: updated, error } = await supabase
       .from("nutritionists")
-      .update({
-        full_name: data.full_name,
-        email: data.email,
-        phone: data.phone ?? null,
-        crn: data.crn ?? null,
-        specialty: data.specialty ?? null,
-      })
+      .update(patch)
       .eq("id", data.nutritionist_id)
       .select("id");
     if (error) throw new Error(error.message);

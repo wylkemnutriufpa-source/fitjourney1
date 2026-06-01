@@ -231,6 +231,7 @@ function SubscriptionDialog({
   const [phone, setPhone] = useState(nutri.phone ?? "");
   const [crn, setCrn] = useState(nutri.crn ?? "");
   const [specialty, setSpecialty] = useState<string>("");
+  const [feedbackFreq, setFeedbackFreq] = useState<number>(nutri.feedback_frequency_days ?? 7);
 
   const upsert = useServerFn(upsertProfessionalSubscription);
   const updateNutri = useServerFn(adminUpdateNutritionist);
@@ -246,6 +247,7 @@ function SubscriptionDialog({
           phone: phone.trim() || null,
           crn: crn.trim() || null,
           specialty: specialty.trim() || null,
+          feedback_frequency_days: Math.max(1, Math.min(90, Math.round(feedbackFreq) || 7)),
         },
       });
       return upsert({ data: input });
@@ -320,6 +322,22 @@ function SubscriptionDialog({
               <div className="col-span-2">
                 <Label>Especialidade</Label>
                 <Input value={specialty} onChange={(e) => setSpecialty(e.target.value)} />
+              </div>
+              <div className="col-span-2">
+                <Label>Frequência de feedback (dias)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={90}
+                  step={1}
+                  value={feedbackFreq}
+                  onChange={(e) =>
+                    setFeedbackFreq(Math.max(1, Math.min(90, Number(e.target.value) || 1)))
+                  }
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  De quantos em quantos dias os pacientes deste profissional devem registrar feedback.
+                </p>
               </div>
             </div>
           </div>
