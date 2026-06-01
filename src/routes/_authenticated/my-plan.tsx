@@ -510,21 +510,20 @@ function FoodItemReadonlyRow({
             </div>
             {substitutions.length > 0 ? (
               <div className="space-y-1">
-                {substitutions.map((s) => (
+                {substitutions.map((s, i) => (
                   <div
-                    key={s.id}
+                    key={`${s.name}-${i}`}
                     className="text-xs border border-border rounded px-2 py-1.5"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-medium truncate">{s.name}</span>
                       <span className="font-mono text-[10px] text-muted-foreground tabular-nums shrink-0">
-                        {s.qty} {s.unit} · {s.kcal} kcal
+                        {s.qty} {s.unit}
                       </span>
                     </div>
-                    {s.defaultMeasure && (
+                    {s.note && (
                       <p className="text-[10px] text-muted-foreground mt-0.5">
-                        ≈ {s.defaultMeasure.measureName} (
-                        {s.defaultMeasure.gramsEquivalent} g)
+                        {s.note}
                       </p>
                     )}
                   </div>
@@ -532,13 +531,14 @@ function FoodItemReadonlyRow({
               </div>
             ) : (
               <p className="text-[11px] text-muted-foreground italic">
-                Sem substituições equivalentes cadastradas para este alimento.
+                Sem substituições sugeridas para este alimento neste momento da refeição.
               </p>
             )}
             <p className="text-[10px] text-muted-foreground pt-1 leading-relaxed">
-              Você pode trocar este alimento por qualquer um da lista mantendo
-              o mesmo valor calórico aproximado.
+              Opções coerentes para esta refeição. Mantenha quantidades próximas
+              das indicadas para preservar o equilíbrio do plano.
             </p>
+          </section>
           </section>
         </DialogContent>
       </Dialog>
