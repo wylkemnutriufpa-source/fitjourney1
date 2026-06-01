@@ -24,22 +24,17 @@ function Kpi({
   hint,
   accent,
   icon: Icon,
+  to,
 }: {
   label: string;
   value: string;
   hint?: string;
   accent?: boolean;
   icon: typeof Users;
+  to?: "/patients" | "/anamneses" | "/financeiro";
 }) {
-  return (
-    <div
-      className={
-        "p-5 rounded-lg border space-y-2 " +
-        (accent
-          ? "bg-primary text-primary-foreground border-primary"
-          : "bg-surface border-border")
-      }
-    >
+  const inner = (
+    <>
       <div className="flex items-center justify-between">
         <p
           className={
@@ -62,8 +57,22 @@ function Kpi({
           {hint}
         </p>
       )}
-    </div>
+    </>
   );
+  const cls =
+    "p-5 rounded-lg border space-y-2 transition-colors " +
+    (accent
+      ? "bg-primary text-primary-foreground border-primary "
+      : "bg-surface border-border ") +
+    (to ? (accent ? "hover:bg-primary/90 cursor-pointer" : "hover:border-primary/50 hover:bg-accent/30 cursor-pointer") : "");
+  if (to) {
+    return (
+      <Link to={to} className={cls + " block focus:outline-none focus:ring-2 focus:ring-primary/40"}>
+        {inner}
+      </Link>
+    );
+  }
+  return <div className={cls}>{inner}</div>;
 }
 
 function Dashboard() {
@@ -138,12 +147,13 @@ function Dashboard() {
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Kpi label="Total Pacientes" value={String(totalPatients)} hint="base ativa" icon={Users} />
+          <Kpi label="Total Pacientes" value={String(totalPatients)} hint="base ativa" icon={Users} to="/patients" />
           <Kpi
             label="Anamneses aprovadas"
             value={String(approvedCount)}
             hint={totalPatients > 0 ? `${Math.round((approvedCount / totalPatients) * 100)}% da base` : "—"}
             icon={Activity}
+            to="/patients"
           />
           <Kpi
             label="Adesão Média"
@@ -154,12 +164,16 @@ function Dashboard() {
                 : "sem feedbacks"
             }
             icon={TrendingUp}
+            to="/financeiro"
           />
-          <Kpi label="Revisões Pendentes" value={pendingValue} hint="Ação hoje" icon={AlertCircle} accent />
+          <Kpi label="Revisões Pendentes" value={pendingValue} hint="Ação hoje" icon={AlertCircle} accent to="/anamneses" />
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-surface border border-border rounded-lg p-6">
+          <Link
+            to="/financeiro"
+            className="lg:col-span-2 bg-surface border border-border rounded-lg p-6 block hover:border-primary/40 transition-colors group"
+          >
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -215,7 +229,7 @@ function Dashboard() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </Link>
 
           <div className="bg-surface border border-border rounded-lg p-6 space-y-4">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">

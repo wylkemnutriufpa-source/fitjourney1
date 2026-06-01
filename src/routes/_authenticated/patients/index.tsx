@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -45,6 +45,7 @@ function anamnesisStatusMeta(status: string): { label: string; cls: string; dot:
 }
 
 function Patients() {
+  const navigate = useNavigate();
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const { data: patients = [], isLoading, error } = useQuery({
     queryKey: ["patients-index"],
@@ -161,19 +162,30 @@ function Patients() {
               {!isLoading && !error && filtered.map((p) => {
                 const statusMeta = anamnesisStatusMeta(p.anamnesisStatus);
                 return (
-                <tr key={p.id} className="border-b border-border last:border-0 hover:bg-accent/30">
+                <tr
+                  key={p.id}
+                  onClick={() => navigate({ to: "/patients/$id", params: { id: p.id } })}
+                  className="border-b border-border last:border-0 hover:bg-accent/30 cursor-pointer"
+                >
                   <td className="p-4">
-                    <div className="flex items-center gap-3">
+                    <Link
+                      to="/patients/$id"
+                      params={{ id: p.id }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-3 group"
+                    >
                       <div className="size-9 rounded-full bg-background border border-border grid place-items-center text-[10px] font-mono">
                         {initialsFromName(p.fullName)}
                       </div>
                       <div>
-                        <p className="font-medium">{p.fullName}</p>
+                        <p className="font-medium group-hover:text-primary transition-colors">
+                          {p.fullName}
+                        </p>
                         <p className="text-xs text-muted-foreground font-mono">
                           {p.email}
                         </p>
                       </div>
-                    </div>
+                    </Link>
                   </td>
                   <td className="p-4 font-mono text-muted-foreground hidden md:table-cell">
                     {p.phone ?? "Sem telefone"}
@@ -187,7 +199,7 @@ function Patients() {
                       {statusMeta.label}
                     </span>
                   </td>
-                  <td className="p-4">
+                  <td className="p-4" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1">
                       <Link
                         to="/patients/$id"

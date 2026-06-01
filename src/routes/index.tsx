@@ -89,6 +89,19 @@ function Login() {
 
       <div className="flex items-center justify-center p-8">
         <form onSubmit={submit} className="w-full max-w-sm space-y-7">
+          <div className="lg:hidden flex flex-col items-center gap-3 -mt-2 mb-2">
+            <span className="fj-logo-aura relative inline-flex items-center justify-center size-16 shrink-0">
+              <span className="fj-logo-pulse" aria-hidden />
+              <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
+                <span className="fj-logo-particle" />
+              </span>
+              <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
+                <span className="fj-logo-particle fj-logo-particle-gold" />
+              </span>
+              <img src={fjLogo} alt="FitJourney" className="relative z-10 size-16 object-contain" />
+            </span>
+            <span className="fj-wordmark text-xl leading-none">FitJourney</span>
+          </div>
           <div>
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Acesso

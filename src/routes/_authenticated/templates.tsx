@@ -91,6 +91,20 @@ export const Route = createFileRoute("/_authenticated/templates")({
 
 type Tab = "biblioteca" | "meus";
 
+function friendlyPublishError(msg: string): string {
+  if (!msg) return "Falha ao publicar plano.";
+  if (msg.includes("CLINICAL_CONTEXT_INCOMPLETE")) {
+    return "Este paciente ainda não tem anamnese aprovada (ou faltam dados clínicos essenciais como sexo, idade, altura, peso ou nível de atividade). Aprove a anamnese antes de publicar o plano.";
+  }
+  if (msg.includes("CLINICAL_GATE_BLOCKED")) {
+    return "O plano não passou nas regras clínicas obrigatórias. Revise as refeições e tente novamente.";
+  }
+  if (msg.includes("Paciente não pertence")) {
+    return "Este paciente não está vinculado a você.";
+  }
+  return msg.replace(/^Error:\s*/i, "");
+}
+
 function normalizeTitle(s: string) {
   return s
     .normalize("NFD")
@@ -817,6 +831,11 @@ function TemplateEditor({
         </div>
 
         <DialogFooter className="px-6 py-4 border-t border-border sticky bottom-0 bg-background">
+          {patientContext && applyError && (
+            <div className="w-full mb-2 text-[11px] text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
+              {friendlyPublishError(applyError)}
+            </div>
+          )}
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
           {patientContext ? (
             <Button
@@ -834,6 +853,7 @@ function TemplateEditor({
                   setApplyDone(patientContext.name);
                 } catch (e: any) {
                   setApplyError(e?.message ?? "Falha ao publicar plano.");
+                } finally {
                   setApplyBusy(false);
                 }
               }}
@@ -937,7 +957,9 @@ function TemplateEditor({
                 Snapshot atual (com suas edições) é congelado no banco como plano publicado. Imutável após publicar.
               </p>
               {applyError && (
-                <p className="text-[11px] text-destructive">{applyError}</p>
+                <p className="text-[11px] text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
+                  {friendlyPublishError(applyError)}
+                </p>
               )}
             </div>
           )}
