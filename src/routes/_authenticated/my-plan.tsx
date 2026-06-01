@@ -519,6 +519,7 @@ function FoodItemReadonlyRow({
                       <span className="font-medium truncate">{s.name}</span>
                       <span className="font-mono text-[10px] text-muted-foreground tabular-nums shrink-0">
                         {s.qty} {s.unit}
+                        {s.kcal ? ` · ${s.kcal} kcal` : ""}
                       </span>
                     </div>
                     {s.note && (
