@@ -23,6 +23,7 @@ import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { applyTheme, getStoredTheme } from "@/lib/patient/theme";
 import { supabase } from "@/integrations/supabase/client";
+import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 import fjLogo from "@/assets/fitjourney-logo.png";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
 
@@ -131,7 +132,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         .select("avatar_url")
         .eq("auth_user_id", user.id)
         .maybeSingle();
-      return (data?.avatar_url as string | null) ?? null;
+      return createAvatarSignedUrl(supabase, (data?.avatar_url as string | null) ?? null);
     },
   });
   const avatarUrl = avatarQuery.data ?? null;
