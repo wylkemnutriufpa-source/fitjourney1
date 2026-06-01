@@ -471,7 +471,31 @@ function TemplatesPage() {
             ))}
           </div>
         )}
+
+        {tab === "pilotos" && (
+          <div className="space-y-4">
+            <div className="border border-amber-500/40 bg-amber-500/5 rounded-lg p-4 flex gap-3">
+              <FlaskConical className="size-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                  Área isolada de prova de conceito
+                </p>
+                <p className="text-xs text-amber-900/80 dark:text-amber-200/80 max-w-3xl">
+                  Templates aqui validam novas arquiteturas (ex.: V2 — item soberano) sem
+                  afetar a Biblioteca do Sistema nem os planos publicados. Não são editáveis
+                  pelo editor de produção. Use apenas para validação visual.
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {pilotosCatalog.map((p) => (
+                <PilotCard key={p.id} pilot={p} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
 
       {editing && (
         <TemplateEditor
