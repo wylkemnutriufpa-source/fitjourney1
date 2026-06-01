@@ -164,9 +164,11 @@ function ProfessionalsPage() {
                   </td>
                   <td className="px-4 py-2 text-right">
                     <Button size="sm" variant="outline" onClick={() => setEditing(n)}>
-                      {sub ? "Editar" : "Definir"}
+                      <Pencil className="h-3.5 w-3.5 mr-1" />
+                      Editar
                     </Button>
                   </td>
+
                 </tr>
               );
             })}
