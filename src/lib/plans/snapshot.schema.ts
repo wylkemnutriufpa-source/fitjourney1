@@ -51,12 +51,77 @@ const PlannerMealSchema = z
   })
   .passthrough();
 
+// ---------- Auditoria clínica anexada ao snapshot ----------
+//
+// Bloco OPCIONAL no schema (planos antigos não têm). Quando presente,
+// representa o estado clínico que alimentou os motores no momento da
+// publicação. É imutável (snapshot inteiro é imutável após published_at)
+// e responde por:
+//   - "qual peso foi usado?"
+//   - "qual goal?"
+//   - "qual motor e qual gate?"
+//   - "quais warnings o gate emitiu (sem bloquear)?"
+
+export const ClinicalAuditSchema = z
+  .object({
+    clinicalContextSnapshot: z.object({
+      currentWeight: z
+        .object({
+          weightKg: z.number(),
+          observedAt: z.string(),
+          source: z.enum(["anamnesis", "feedback", "physical_assessment"]),
+          sourceId: z.string(),
+        })
+        .nullable(),
+      currentGoal: z
+        .object({
+          kind: z.string(),
+          sourceAnamnesisId: z.string(),
+        })
+        .nullable(),
+      demographics: z.object({
+        sex: z.string().nullable(),
+        ageYears: z.number().nullable(),
+        heightCm: z.number().nullable(),
+        activity: z.string().nullable(),
+        sourceAnamnesisId: z.string().nullable(),
+      }),
+      // Snapshot publicado: sempre calculável (publish bloqueia se false).
+      calculable: z.literal(true),
+    }),
+    engineOutput: z.object({
+      tmb: z.number(),
+      tdee: z.number(),
+      target: z.object({
+        kcal: z.number(),
+        proteinG: z.number(),
+        carbG: z.number(),
+        fatG: z.number(),
+      }),
+      clinicalGoalKind: z.string(),
+      engineGoal: z.string(),
+    }),
+    gateWarnings: z.array(
+      z.object({
+        code: z.string(),
+        message: z.string(),
+      }),
+    ),
+    engineVersion: z.string(),
+    gateVersion: z.string(),
+    publishedAt: z.string(),
+  })
+  .passthrough();
+
+export type ClinicalAudit = z.infer<typeof ClinicalAuditSchema>;
+
 export const SnapshotV3Schema = z
   .object({
     id: z.string().min(1),
     name: z.string().min(1),
     kcal: z.number().nonnegative(),
     meals: z.array(PlannerMealSchema).min(1),
+    clinicalAudit: ClinicalAuditSchema.optional(),
   })
   .passthrough();
 
