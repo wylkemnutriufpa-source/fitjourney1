@@ -5,6 +5,7 @@
 import { createFileRoute, Outlet, redirect, isRedirect } from "@tanstack/react-router";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { IntroOverlay } from "@/components/IntroOverlay";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
