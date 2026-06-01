@@ -18,6 +18,7 @@ import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedMyPlanRouteImport } from './routes/_authenticated/my-plan'
 import { Route as AuthenticatedMyDashboardRouteImport } from './routes/_authenticated/my-dashboard'
+import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -81,6 +82,11 @@ const AuthenticatedMyDashboardRoute =
     path: '/my-dashboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
   id: '/financeiro',
   path: '/financeiro',
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
@@ -213,6 +220,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
@@ -242,6 +250,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
+  '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/_authenticated/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/financeiro'
+    | '/insights'
     | '/my-dashboard'
     | '/my-plan'
     | '/settings'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/financeiro'
+    | '/insights'
     | '/my-dashboard'
     | '/my-plan'
     | '/settings'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro'
+    | '/_authenticated/insights'
     | '/_authenticated/my-dashboard'
     | '/_authenticated/my-plan'
     | '/_authenticated/settings'
@@ -420,6 +432,13 @@ declare module '@tanstack/react-router' {
       path: '/my-dashboard'
       fullPath: '/my-dashboard'
       preLoaderRoute: typeof AuthenticatedMyDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/insights': {
+      id: '/_authenticated/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof AuthenticatedInsightsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/financeiro': {
@@ -577,6 +596,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
+  AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedMyDashboardRoute: typeof AuthenticatedMyDashboardRoute
   AuthenticatedMyPlanRoute: typeof AuthenticatedMyPlanRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -596,6 +616,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
+  AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedMyDashboardRoute: AuthenticatedMyDashboardRoute,
   AuthenticatedMyPlanRoute: AuthenticatedMyPlanRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
