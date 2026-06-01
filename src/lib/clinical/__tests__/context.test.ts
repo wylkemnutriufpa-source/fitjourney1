@@ -23,13 +23,14 @@ const mkAnamnese = (
 });
 
 describe("buildClinicalContext", () => {
-  it("ready=false e missing completo quando vazio", () => {
+  it("ready=false, calculable=false e missing completo quando vazio", () => {
     const ctx = buildClinicalContext({
       patientId: "p1",
       weightReadings: [],
       approvedAnamneses: [],
     });
     expect(ctx.ready).toBe(false);
+    expect(ctx.calculable).toBe(false);
     expect(ctx.missing).toEqual([
       "weight",
       "goal",
@@ -38,11 +39,12 @@ describe("buildClinicalContext", () => {
       "heightCm",
       "activity",
     ]);
+    expect(ctx.missingForCalc).toEqual(ctx.missing);
     expect(ctx.currentWeight).toBeNull();
     expect(ctx.currentGoal).toBeNull();
   });
 
-  it("ready=true quando há anamnese aprovada + peso", () => {
+  it("ready=true e calculable=true quando há anamnese aprovada + peso", () => {
     const ana = mkAnamnese("a1", "2026-05-01T00:00:00Z");
     const w: WeightReading = {
       source: "feedback",
@@ -56,10 +58,39 @@ describe("buildClinicalContext", () => {
       approvedAnamneses: [ana],
     });
     expect(ctx.ready).toBe(true);
+    expect(ctx.calculable).toBe(true);
     expect(ctx.missing).toEqual([]);
+    expect(ctx.missingForCalc).toEqual([]);
     expect(ctx.currentWeight?.weightKg).toBe(82);
     expect(ctx.currentGoal?.kind).toBe("cut");
     expect(ctx.demographics.sourceAnamnesisId).toBe("a1");
+  });
+
+  it("calculable=false quando falta apenas um campo essencial", () => {
+    // anamnese aprovada sem activity (basics.activity ausente)
+    const ana: ApprovedAnamnesisInput = {
+      id: "a1",
+      approvedAt: "2026-05-01T00:00:00Z",
+      canonical: {
+        basics: {
+          sex: "female",
+          ageYears: 34,
+          weightKg: 84,
+          heightCm: 165,
+          goal: "maintain",
+          // activity ausente
+        } as any,
+      },
+    };
+    const ctx = buildClinicalContext({
+      patientId: "p1",
+      weightReadings: [
+        { source: "feedback", weightKg: 84, measuredAt: "2026-05-30T00:00:00Z", sourceId: "f" },
+      ],
+      approvedAnamneses: [ana],
+    });
+    expect(ctx.calculable).toBe(false);
+    expect(ctx.missingForCalc).toEqual(["activity"]);
   });
 
   it("demografia vem da anamnese aprovada MAIS RECENTE", () => {
