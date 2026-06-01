@@ -217,7 +217,14 @@ export const adminUpdateNutritionist = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertAdmin(supabase, userId);
-    const patch: Record<string, unknown> = {
+    const patch: {
+      full_name: string;
+      email: string;
+      phone: string | null;
+      crn: string | null;
+      specialty: string | null;
+      feedback_frequency_days?: number;
+    } = {
       full_name: data.full_name,
       email: data.email,
       phone: data.phone ?? null,
