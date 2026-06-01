@@ -17,6 +17,7 @@ import { Route as SignupNutritionistRouteImport } from './routes/signup/nutritio
 import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
 import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedMyPlanV2PreviewRouteImport } from './routes/_authenticated/my-plan-v2-preview'
 import { Route as AuthenticatedMyPlanRouteImport } from './routes/_authenticated/my-plan'
 import { Route as AuthenticatedMyDashboardRouteImport } from './routes/_authenticated/my-dashboard'
 import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
@@ -77,6 +78,12 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMyPlanV2PreviewRoute =
+  AuthenticatedMyPlanV2PreviewRouteImport.update({
+    id: '/my-plan-v2-preview',
+    path: '/my-plan-v2-preview',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedMyPlanRoute = AuthenticatedMyPlanRouteImport.update({
   id: '/my-plan',
   path: '/my-plan',
@@ -202,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/insights': typeof AuthenticatedInsightsRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
+  '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
@@ -231,6 +239,7 @@ export interface FileRoutesByTo {
   '/insights': typeof AuthenticatedInsightsRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
+  '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
@@ -262,6 +271,7 @@ export interface FileRoutesById {
   '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/_authenticated/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
+  '/_authenticated/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/my-dashboard'
     | '/my-plan'
+    | '/my-plan-v2-preview'
     | '/settings'
     | '/templates'
     | '/auth/check-email'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/my-dashboard'
     | '/my-plan'
+    | '/my-plan-v2-preview'
     | '/settings'
     | '/templates'
     | '/auth/check-email'
@@ -352,6 +364,7 @@ export interface FileRouteTypes {
     | '/_authenticated/insights'
     | '/_authenticated/my-dashboard'
     | '/_authenticated/my-plan'
+    | '/_authenticated/my-plan-v2-preview'
     | '/_authenticated/settings'
     | '/_authenticated/templates'
     | '/auth/check-email'
@@ -438,6 +451,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/my-plan-v2-preview': {
+      id: '/_authenticated/my-plan-v2-preview'
+      path: '/my-plan-v2-preview'
+      fullPath: '/my-plan-v2-preview'
+      preLoaderRoute: typeof AuthenticatedMyPlanV2PreviewRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/my-plan': {
@@ -619,6 +639,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedMyDashboardRoute: typeof AuthenticatedMyDashboardRoute
   AuthenticatedMyPlanRoute: typeof AuthenticatedMyPlanRouteWithChildren
+  AuthenticatedMyPlanV2PreviewRoute: typeof AuthenticatedMyPlanV2PreviewRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
   AuthenticatedAnamnesesIdRoute: typeof AuthenticatedAnamnesesIdRoute
@@ -639,6 +660,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedMyDashboardRoute: AuthenticatedMyDashboardRoute,
   AuthenticatedMyPlanRoute: AuthenticatedMyPlanRouteWithChildren,
+  AuthenticatedMyPlanV2PreviewRoute: AuthenticatedMyPlanV2PreviewRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
   AuthenticatedAnamnesesIdRoute: AuthenticatedAnamnesesIdRoute,
@@ -668,3 +690,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
