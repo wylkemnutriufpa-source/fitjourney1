@@ -64,7 +64,7 @@ export function runNutritionEngines(
   // impedir cálculo. Invariante #9.
   if (!ctx.calculable) return null;
 
-  // ready=true ⇒ todos os campos abaixo são não-nulos.
+  // calculable=true ⇒ todos os campos abaixo são não-nulos.
   const weightKg = ctx.currentWeight!.weightKg;
   const sex = ctx.demographics.sex!;
   const ageYears = ctx.demographics.ageYears!;
