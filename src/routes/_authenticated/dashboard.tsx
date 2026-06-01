@@ -24,22 +24,17 @@ function Kpi({
   hint,
   accent,
   icon: Icon,
+  to,
 }: {
   label: string;
   value: string;
   hint?: string;
   accent?: boolean;
   icon: typeof Users;
+  to?: "/patients" | "/anamneses" | "/financeiro";
 }) {
-  return (
-    <div
-      className={
-        "p-5 rounded-lg border space-y-2 " +
-        (accent
-          ? "bg-primary text-primary-foreground border-primary"
-          : "bg-surface border-border")
-      }
-    >
+  const inner = (
+    <>
       <div className="flex items-center justify-between">
         <p
           className={
@@ -62,8 +57,22 @@ function Kpi({
           {hint}
         </p>
       )}
-    </div>
+    </>
   );
+  const cls =
+    "p-5 rounded-lg border space-y-2 transition-colors " +
+    (accent
+      ? "bg-primary text-primary-foreground border-primary "
+      : "bg-surface border-border ") +
+    (to ? (accent ? "hover:bg-primary/90 cursor-pointer" : "hover:border-primary/50 hover:bg-accent/30 cursor-pointer") : "");
+  if (to) {
+    return (
+      <Link to={to} className={cls + " block focus:outline-none focus:ring-2 focus:ring-primary/40"}>
+        {inner}
+      </Link>
+    );
+  }
+  return <div className={cls}>{inner}</div>;
 }
 
 function Dashboard() {
