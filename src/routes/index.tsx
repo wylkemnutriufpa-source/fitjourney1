@@ -161,6 +161,12 @@ function Login() {
               <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
                 <span className="fj-logo-particle fj-logo-particle-gold" />
               </span>
+              <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
+                <span className="fj-logo-particle" />
+              </span>
+              <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
+                <span className="fj-logo-particle fj-logo-particle-gold" />
+              </span>
               <img src={fjLogo} alt="FitJourney" className="relative z-10 size-16 object-contain" />
             </span>
             <span className="fj-wordmark text-xl leading-none">FitJourney</span>
