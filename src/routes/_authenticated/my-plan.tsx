@@ -438,8 +438,8 @@ function FoodItemReadonlyRow({
   // Não usa scaleGroup aberto para evitar trocas absurdas
   // (ex.: arroz por pão no almoço, carne por feijão).
   const substitutions = useMemo(
-    () => getSubstitutionsFor(item?.name ?? "", mealKind),
-    [item?.name, mealKind],
+    () => getSubstitutionsFor(item?.name ?? "", mealKind, itemKcal),
+    [item?.name, mealKind, itemKcal],
   );
 
   return (
