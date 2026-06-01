@@ -105,6 +105,12 @@ const PublishInput = z.object({
   patientId: z.string().uuid(),
   snapshot: z.record(z.any()), // PlannerTemplate serializável
   sourceTemplateId: z.string().uuid().optional(),
+  /**
+   * Quando true, permite publicar mesmo sem ClinicalContext calculável
+   * (paciente sem anamnese aprovada). Motor + gate clínico são pulados;
+   * snapshot é salvo como está com flag `publishedWithoutClinicalContext`.
+   */
+  overrideMissingClinical: z.boolean().optional(),
 });
 
 export type PublishPlanResult = {
