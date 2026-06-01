@@ -565,10 +565,17 @@ function TemplateEditor({
 }: {
   original: PlannerTemplate;
   isMine: boolean;
-  existingMine?: MyTemplate;
+  existingMine?: StoredTemplate;
   patientContext?: { id: string; name: string } | null;
   onClose: () => void;
-  onSave: (t: MyTemplate) => void;
+  onSave: (input: {
+    id?: string;
+    name: string;
+    basedOn: string;
+    finalidade?: string;
+    observacoes?: string;
+    template: PlannerTemplate;
+  }) => void | Promise<void>;
 }) {
   const navigate = useNavigate();
   const [draft, setDraft] = useState<PlannerTemplate>(() => clonePlannerTemplate(original));
