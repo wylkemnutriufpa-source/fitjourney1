@@ -151,7 +151,7 @@ function PatientFeedbacksPage() {
                             Fotos
                           </p>
                           <p className="text-sm font-semibold">
-                            {[f.photoFrontPath, f.photoSidePath].filter(Boolean)
+                            {[f.photoFrontPath, f.photoSidePath, f.photoBackPath].filter(Boolean)
                               .length || "—"}
                           </p>
                         </div>
@@ -161,13 +161,16 @@ function PatientFeedbacksPage() {
                           {f.notes}
                         </p>
                       )}
-                      {(f.photoFrontPath || f.photoSidePath) && (
-                        <div className="flex gap-2 pt-1">
+                      {(f.photoFrontPath || f.photoSidePath || f.photoBackPath) && (
+                        <div className="flex gap-2 pt-1 flex-wrap">
                           {f.photoFrontPath && (
                             <Thumb path={f.photoFrontPath} label="Frontal" />
                           )}
                           {f.photoSidePath && (
                             <Thumb path={f.photoSidePath} label="Lateral" />
+                          )}
+                          {f.photoBackPath && (
+                            <Thumb path={f.photoBackPath} label="Costas" />
                           )}
                         </div>
                       )}
