@@ -84,6 +84,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
       const s = subByNutri.get(n.id);
       return {
         ...n,
+        feedback_frequency_days: Number(n.feedback_frequency_days ?? 7),
         patients_count: countByNutri.get(n.id) ?? 0,
         subscription: s
           ? {
