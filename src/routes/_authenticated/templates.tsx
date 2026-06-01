@@ -74,9 +74,12 @@ import {
   ChevronDown,
   Send,
   CheckCircle2,
+  FlaskConical,
+  ExternalLink,
 } from "lucide-react";
 import { RealPatientPicker } from "@/components/RealPatientPicker";
 import { publishPlanToPatient, type PatientLite } from "@/lib/plans/plans.functions";
+import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
@@ -89,7 +92,28 @@ export const Route = createFileRoute("/_authenticated/templates")({
   component: TemplatesPage,
 });
 
-type Tab = "biblioteca" | "meus";
+type Tab = "biblioteca" | "meus" | "pilotos";
+
+/** Pilotos / Testes — templates em validação arquitetural. NÃO entram em produção. */
+const pilotosCatalog: Array<{
+  id: string;
+  name: string;
+  description: string;
+  tags: string[];
+  kcal: number;
+  previewRoute: string;
+  badge: string;
+}> = [
+  {
+    id: espHipertrofiaV2Piloto.id,
+    name: espHipertrofiaV2Piloto.name,
+    description: espHipertrofiaV2Piloto.description,
+    tags: espHipertrofiaV2Piloto.tags,
+    kcal: espHipertrofiaV2Piloto.kcal,
+    previewRoute: "/my-plan-v2-preview",
+    badge: "V2 — Item Soberano",
+  },
+];
 
 function friendlyPublishError(msg: string): string {
   if (!msg) return "Falha ao publicar plano.";
@@ -376,6 +400,11 @@ function TemplatesPage() {
             Meus Templates
             <span className="text-[10px] font-mono opacity-60">{myList.length}</span>
           </TabBtn>
+          <TabBtn active={tab === "pilotos"} onClick={() => setTab("pilotos")}>
+            <FlaskConical className="size-3.5" />
+            Pilotos / Testes
+            <span className="text-[10px] font-mono opacity-60">{pilotosCatalog.length}</span>
+          </TabBtn>
         </div>
 
 
@@ -442,7 +471,31 @@ function TemplatesPage() {
             ))}
           </div>
         )}
+
+        {tab === "pilotos" && (
+          <div className="space-y-4">
+            <div className="border border-amber-500/40 bg-amber-500/5 rounded-lg p-4 flex gap-3">
+              <FlaskConical className="size-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                  Área isolada de prova de conceito
+                </p>
+                <p className="text-xs text-amber-900/80 dark:text-amber-200/80 max-w-3xl">
+                  Templates aqui validam novas arquiteturas (ex.: V2 — item soberano) sem
+                  afetar a Biblioteca do Sistema nem os planos publicados. Não são editáveis
+                  pelo editor de produção. Use apenas para validação visual.
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {pilotosCatalog.map((p) => (
+                <PilotCard key={p.id} pilot={p} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
 
       {editing && (
         <TemplateEditor
@@ -467,6 +520,51 @@ function TemplatesPage() {
         />
       )}
     </AppShell>
+  );
+}
+
+function PilotCard({
+  pilot,
+}: {
+  pilot: {
+    id: string;
+    name: string;
+    description: string;
+    tags: string[];
+    kcal: number;
+    previewRoute: string;
+    badge: string;
+  };
+}) {
+  const navigate = useNavigate();
+  return (
+    <div className="border border-border rounded-lg p-4 bg-card hover:border-amber-500/60 transition-colors flex flex-col gap-3">
+      <div className="flex items-start justify-between gap-2">
+        <Badge variant="outline" className="text-[10px] font-mono border-amber-500/50 text-amber-700 dark:text-amber-300">
+          {pilot.badge}
+        </Badge>
+        <span className="text-[10px] font-mono text-muted-foreground">{pilot.kcal} kcal</span>
+      </div>
+      <div className="space-y-1">
+        <h3 className="text-sm font-semibold leading-snug">{pilot.name}</h3>
+        <p className="text-xs text-muted-foreground line-clamp-3">{pilot.description}</p>
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {pilot.tags.map((t) => (
+          <span key={t} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+            {t}
+          </span>
+        ))}
+      </div>
+      <Button
+        size="sm"
+        variant="outline"
+        className="gap-1.5 mt-auto"
+        onClick={() => navigate({ to: pilot.previewRoute })}
+      >
+        <ExternalLink className="size-3.5" /> Abrir preview
+      </Button>
+    </div>
   );
 }
 
