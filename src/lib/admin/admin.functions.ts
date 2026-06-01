@@ -17,6 +17,8 @@ async function assertAdmin(supabase: any, userId: string) {
   if (!data) throw new Error("Forbidden: admin role required");
 }
 
+export type NutriPlanTier = "basic" | "pro";
+
 export type AdminNutritionistRow = {
   id: string;
   full_name: string;
@@ -27,6 +29,7 @@ export type AdminNutritionistRow = {
   patients_count: number;
   subscription: {
     id: string;
+    plan_tier: NutriPlanTier;
     monthly_price_cents: number;
     currency: string;
     status: "active" | "paused" | "expired" | "cancelled";
@@ -55,7 +58,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
     const [{ data: subs }, { data: pats }] = await Promise.all([
       supabase
         .from("nutritionist_subscriptions")
-        .select("id, nutritionist_id, monthly_price_cents, currency, status, payment_method, starts_at, ends_at, notes")
+        .select("id, nutritionist_id, plan_tier, monthly_price_cents, currency, status, payment_method, starts_at, ends_at, notes")
         .in("nutritionist_id", ids),
       supabase
         .from("patients")
@@ -83,6 +86,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
         subscription: s
           ? {
               id: s.id,
+              plan_tier: (s.plan_tier ?? "basic") as NutriPlanTier,
               monthly_price_cents: s.monthly_price_cents,
               currency: s.currency,
               status: s.status,
@@ -98,6 +102,7 @@ export const listProfessionals = createServerFn({ method: "POST" })
 
 const UpsertSubInput = z.object({
   nutritionist_id: z.string().uuid(),
+  plan_tier: z.enum(["basic", "pro"]).default("basic"),
   monthly_price_cents: z.number().int().min(0).max(100_000_00),
   status: z.enum(["active", "paused", "expired", "cancelled"]).default("active"),
   payment_method: z
@@ -126,6 +131,7 @@ export const upsertProfessionalSubscription = createServerFn({ method: "POST" })
 
     const payload: any = {
       nutritionist_id: data.nutritionist_id,
+      plan_tier: data.plan_tier,
       monthly_price_cents: data.monthly_price_cents,
       status: data.status,
       payment_method: data.payment_method ?? null,

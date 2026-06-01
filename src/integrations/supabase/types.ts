@@ -250,6 +250,7 @@ export type Database = {
           payment_method:
             | Database["public"]["Enums"]["subscription_payment_method"]
             | null
+          plan_tier: Database["public"]["Enums"]["nutritionist_plan_tier"]
           starts_at: string
           status: Database["public"]["Enums"]["subscription_status"]
           updated_at: string
@@ -265,6 +266,7 @@ export type Database = {
           payment_method?:
             | Database["public"]["Enums"]["subscription_payment_method"]
             | null
+          plan_tier?: Database["public"]["Enums"]["nutritionist_plan_tier"]
           starts_at?: string
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
@@ -280,6 +282,7 @@ export type Database = {
           payment_method?:
             | Database["public"]["Enums"]["subscription_payment_method"]
             | null
+          plan_tier?: Database["public"]["Enums"]["nutritionist_plan_tier"]
           starts_at?: string
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
@@ -823,6 +826,7 @@ export type Database = {
         | "beverage"
         | "mixed"
       food_source: "taco" | "ibge" | "custom"
+      nutritionist_plan_tier: "basic" | "pro"
       plan_status: "draft" | "published" | "archived"
       referral_code_status: "active" | "consumed" | "revoked" | "expired"
       subscription_payment_method:
@@ -978,6 +982,7 @@ export const Constants = {
         "mixed",
       ],
       food_source: ["taco", "ibge", "custom"],
+      nutritionist_plan_tier: ["basic", "pro"],
       plan_status: ["draft", "published", "archived"],
       referral_code_status: ["active", "consumed", "revoked", "expired"],
       subscription_payment_method: [
