@@ -112,6 +112,31 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   const initials = email.slice(0, 2).toUpperCase();
   const displayName = email.split("@")[0];
 
+  const isPatientArea =
+    path === "/my-dashboard" ||
+    path.startsWith("/my-dashboard/") ||
+    path === "/my-plan" ||
+    path.startsWith("/my-plan/") ||
+    path.startsWith("/onboarding/patient");
+
+  const avatarQuery = useQuery({
+    queryKey: ["app-shell-avatar", user?.id, isPatientArea],
+    enabled: !!user?.id,
+    staleTime: 60_000,
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const table = isPatientArea ? "patients" : "nutritionists";
+      const { data } = await supabase
+        .from(table)
+        .select("avatar_url")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+      return (data?.avatar_url as string | null) ?? null;
+    },
+  });
+  const avatarUrl = avatarQuery.data ?? null;
+  const settingsHref = isPatientArea ? "/my-plan/settings" : "/settings";
+
   // Sidebar: começa sempre aberto (SSR e client) para evitar hydration mismatch.
   // Fecha em mobile após o mount via useEffect.
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
