@@ -79,6 +79,54 @@ export const Route = createFileRoute("/_authenticated/templates")({
 
 type Tab = "biblioteca" | "meus";
 
+function normalizeTitle(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/**
+ * Gera opções equivalentes automáticas para a refeição a partir do alimento
+ * recém adicionado, usando o motor curado de substituições. Evita duplicar
+ * opções já existentes (comparando títulos normalizados) e o próprio item.
+ */
+function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): PlannerMealOption[] {
+  const kind = detectMealKind(meal.label, meal.time);
+  const subs = getSubstitutionsFor(food.name, kind, food.kcal || 0);
+  if (subs.length === 0) return [];
+  const taken = new Set<string>([
+    normalizeTitle(food.name),
+    ...meal.equivalents.map((e) => normalizeTitle(e.title)),
+    ...meal.equivalents.flatMap((e) => e.items.map((i) => normalizeTitle(i.name))),
+  ]);
+  const out: PlannerMealOption[] = [];
+  for (const s of subs) {
+    const key = normalizeTitle(s.name);
+    if (taken.has(key)) continue;
+    taken.add(key);
+    out.push(
+      createEmptyMealOption({
+        title: s.name,
+        imageKey: meal.main.imageKey || meal.heroKey || "iogurte-natural",
+        items: [
+          createEmptyFoodItem({
+            foodKey: food.foodKey,
+            name: s.name,
+            qty: s.qty,
+            unit: s.unit,
+            kcal: s.kcal ?? 0,
+            scaleGroup: food.scaleGroup,
+          }),
+        ],
+      }),
+    );
+  }
+  return out;
+}
+
 function TemplatesPage() {
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
