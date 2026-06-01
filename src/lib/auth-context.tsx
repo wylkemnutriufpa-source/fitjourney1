@@ -9,7 +9,7 @@ type AuthState = {
   user: User | null;
   roles: AppRole[];
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error?: string }>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
 };
 
@@ -61,11 +61,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, [loadRoles]);
 
-  async function signIn(email: string, password: string) {
+  async function signIn(email: string, password: string, rememberMe = true) {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: error.message };
     try {
       sessionStorage.setItem("fj_intro_pending", "1");
+      if (rememberMe) {
+        localStorage.setItem("fj_remember_me", "1");
+      } else {
+        localStorage.removeItem("fj_remember_me");
+      }
     } catch {
       // ignore
     }

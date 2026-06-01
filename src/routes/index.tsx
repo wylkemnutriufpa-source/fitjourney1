@@ -21,6 +21,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   if (loading) return null;
@@ -32,7 +33,7 @@ function Login() {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(email, password, rememberMe);
     setSubmitting(false);
     if (error) {
       setError(error);
@@ -134,6 +135,16 @@ function Login() {
               </button>
             </div>
           </div>
+
+          <label className="flex items-center gap-2 cursor-pointer select-none -mt-3">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="size-4 rounded border-border bg-surface text-primary focus:ring-primary accent-primary"
+            />
+            <span className="text-xs text-muted-foreground">Manter conectado</span>
+          </label>
 
           {error && (
             <p className="text-xs font-mono text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
