@@ -30,6 +30,7 @@ import { Route as AuthenticatedMyPlanUpdateHealthProfileRouteImport } from './ro
 import { Route as AuthenticatedMyPlanSettingsRouteImport } from './routes/_authenticated/my-plan.settings'
 import { Route as AuthenticatedMyPlanFeedbackRouteImport } from './routes/_authenticated/my-plan.feedback'
 import { Route as AuthenticatedAnamnesesIdRouteImport } from './routes/_authenticated/anamneses.$id'
+import { Route as AuthenticatedAdminProfissionaisRouteImport } from './routes/_authenticated/admin.profissionais'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
 import { Route as AuthenticatedPatientsIdFeedbacksRouteImport } from './routes/_authenticated/patients/$id/feedbacks'
 import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
@@ -148,6 +149,12 @@ const AuthenticatedAnamnesesIdRoute =
     path: '/anamneses/$id',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminProfissionaisRoute =
+  AuthenticatedAdminProfissionaisRouteImport.update({
+    id: '/profissionais',
+    path: '/profissionais',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedPatientsIdIndexRoute =
   AuthenticatedPatientsIdIndexRouteImport.update({
     id: '/patients/$id/',
@@ -169,7 +176,7 @@ const AuthenticatedPatientsIdDietRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
@@ -194,7 +202,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
@@ -204,6 +212,7 @@ export interface FileRoutesByTo {
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
@@ -221,7 +230,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/my-dashboard': typeof AuthenticatedMyDashboardRoute
@@ -231,6 +240,7 @@ export interface FileRoutesById {
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/_authenticated/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/_authenticated/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/_authenticated/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/_authenticated/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/admin/profissionais'
     | '/anamneses/$id'
     | '/my-plan/feedback'
     | '/my-plan/settings'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/admin/profissionais'
     | '/anamneses/$id'
     | '/my-plan/feedback'
     | '/my-plan/settings'
@@ -309,6 +321,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/_authenticated/admin/profissionais'
     | '/_authenticated/anamneses/$id'
     | '/_authenticated/my-plan/feedback'
     | '/_authenticated/my-plan/settings'
@@ -480,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnamnesesIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/profissionais': {
+      id: '/_authenticated/admin/profissionais'
+      path: '/profissionais'
+      fullPath: '/admin/profissionais'
+      preLoaderRoute: typeof AuthenticatedAdminProfissionaisRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/patients/$id/': {
       id: '/_authenticated/patients/$id/'
       path: '/patients/$id'
@@ -504,6 +524,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminProfissionaisRoute: typeof AuthenticatedAdminProfissionaisRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminProfissionaisRoute: AuthenticatedAdminProfissionaisRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedMyPlanRouteChildren {
   AuthenticatedMyPlanFeedbackRoute: typeof AuthenticatedMyPlanFeedbackRoute
   AuthenticatedMyPlanSettingsRoute: typeof AuthenticatedMyPlanSettingsRoute
@@ -521,7 +552,7 @@ const AuthenticatedMyPlanRouteWithChildren =
   AuthenticatedMyPlanRoute._addFileChildren(AuthenticatedMyPlanRouteChildren)
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedMyDashboardRoute: typeof AuthenticatedMyDashboardRoute
@@ -540,7 +571,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedMyDashboardRoute: AuthenticatedMyDashboardRoute,
