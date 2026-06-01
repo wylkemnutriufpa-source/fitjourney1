@@ -32,7 +32,7 @@ function pickLandingRoute(identity: IdentityStateDTO): string {
 
 function Login() {
   const navigate = useNavigate();
-  const { signIn, signOut, session, loading } = useAuth();
+  const { signIn, session, loading } = useAuth();
   const [email, setEmail] = useState("wylkem.nutri.ufpa@gmail.com");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -44,41 +44,39 @@ function Login() {
 
   useEffect(() => {
     setResolvedTarget(null);
+    setError(null);
     resolvingRef.current = false;
   }, [session?.user?.id]);
 
   // Sessão pré-existente: resolve identidade no servidor antes de navegar.
-  // CRÍTICO: nunca usar fallback cego para /dashboard — paciente cairia no
-  // painel de nutri (bug histórico). Em falha persistente, desloga.
+  // A resolução é determinística (query por auth_user_id em patients/nutritionists).
+  // Se falhar, é problema de infra/rede — NÃO de identidade. Mostramos erro e
+  // mantemos a sessão; usuário pode recarregar. Nunca deslogamos por isso, nunca
+  // damos fallback para outra área (paciente jamais vai parar em /dashboard).
   useEffect(() => {
     if (!session || resolvedTarget || resolvingRef.current) return;
     resolvingRef.current = true;
     let cancelled = false;
     (async () => {
-      for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-          const id = await getMyIdentityState();
-          if (!cancelled) setResolvedTarget(pickLandingRoute(id));
-          return;
-        } catch (err) {
-          if (attempt === 2) {
-            console.error("[Login] identity resolve failed after retries:", err);
-            await signOut();
-            if (!cancelled) {
-              setError("Não foi possível validar seu perfil. Faça login novamente.");
-            }
-            return;
-          }
-          await new Promise((r) => setTimeout(r, 250 * (attempt + 1)));
+      try {
+        const id = await getMyIdentityState();
+        if (!cancelled) setResolvedTarget(pickLandingRoute(id));
+      } catch (err) {
+        console.error("[Login] identity resolve failed:", err);
+        if (!cancelled) {
+          setError(
+            "Não foi possível validar seu perfil agora (problema de conexão). Recarregue a página.",
+          );
         }
+      } finally {
+        resolvingRef.current = false;
       }
-    })().finally(() => {
-      resolvingRef.current = false;
-    });
+    })();
     return () => {
       cancelled = true;
     };
-  }, [session, resolvedTarget, signOut]);
+  }, [session, resolvedTarget]);
+
 
   if (loading) return null;
   if (session) {
