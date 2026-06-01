@@ -17,6 +17,8 @@ import {
   Target,
   ArrowRight,
   Wallet,
+  Sparkles,
+  ClipboardList,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
@@ -101,9 +103,16 @@ function MyDashboardPage() {
     | null;
   const hasPlan = Boolean(plan && snapshot);
 
+  const showLegacyWelcome = Boolean(
+    profile?.sourceLegacyId && profile?.hasAnamnesis === false,
+  );
+
   return (
     <AppShell>
       <div className="space-y-8">
+        {/* Boas-vindas para pacientes migrados do FJ1 */}
+        {showLegacyWelcome && <LegacyWelcomeBanner firstName={firstName} />}
+
         {/* Saudação */}
         <header className="space-y-1">
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
