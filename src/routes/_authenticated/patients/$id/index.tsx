@@ -134,7 +134,7 @@ function PatientProfile() {
           )}
           <Link
             to="/templates"
-            search={{ blank: 1 }}
+            search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
             className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
           >
             <Sparkles className="size-3.5" />
@@ -142,6 +142,7 @@ function PatientProfile() {
           </Link>
           <Link
             to="/templates"
+            search={{ patientId: p.id, patientName: p.fullName }}
             className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
           >
             <FileText className="size-3.5" />
