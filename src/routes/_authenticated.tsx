@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_authenticated")({
       console.error("[_authenticated guard] identity resolve failed:", msg);
       // Só desloga em erro real de auth. Outros erros sobem pro errorComponent.
       if (msg.includes("Unauthorized")) {
-        throw redirect({ to: "/" });
+        throw redirect({ to: "/app" });
       }
       throw err;
     }
