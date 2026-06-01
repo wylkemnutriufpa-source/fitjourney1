@@ -85,6 +85,12 @@ function Dashboard() {
     staleTime: 0,
     refetchOnMount: "always",
   });
+  const { data: weekly = [] } = useQuery({
+    queryKey: ["nutri", "weekly-activity"],
+    queryFn: () => fetchWeekly(),
+    staleTime: 60_000,
+  });
+
 
   const recent = patientsList.slice(0, 5);
   const totalPatients = patientsList.length;
