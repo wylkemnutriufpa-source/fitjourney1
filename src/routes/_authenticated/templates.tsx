@@ -1,7 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState, useRef, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import {
+  listMyTemplates,
+  saveMyTemplate,
+  deleteMyTemplate,
+  type StoredTemplate,
+} from "@/lib/templates/templates.functions";
+import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { AppShell } from "@/components/AppShell";
@@ -27,7 +34,7 @@ import {
 import { TemplateMatcherPanel } from "@/components/TemplateMatcherPanel";
 
 import { imgFor, allFoodKeys, foodImages } from "@/lib/food-images";
-import { useMyTemplates, type MyTemplate } from "@/lib/my-templates-store";
+
 import { SendShareDialog } from "@/components/SendShareDialog";
 import { FoodPickerDialog } from "@/components/FoodPickerDialog";
 import { templateToPrintHtml, templateToWhatsText } from "@/lib/diet-serializers";
@@ -259,8 +266,49 @@ function TemplatesPage() {
   const search = Route.useSearch();
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
-  const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: MyTemplate } | null>(null);
-  const { list: myList, save: saveMine, remove: removeMine } = useMyTemplates();
+  const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: StoredTemplate } | null>(null);
+
+  const qc = useQueryClient();
+  const listFn = useServerFn(listMyTemplates);
+  const saveFn = useServerFn(saveMyTemplate);
+  const deleteFn = useServerFn(deleteMyTemplate);
+  const { data: myList = [] } = useQuery({
+    queryKey: ["my-templates"],
+    queryFn: () => listFn(),
+  });
+  const removeMine = useCallback(
+    async (id: string) => {
+      try {
+        await deleteFn({ data: { id } });
+        await qc.invalidateQueries({ queryKey: ["my-templates"] });
+        toast.success("Template removido.");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Falha ao remover.");
+      }
+    },
+    [deleteFn, qc],
+  );
+  const saveMine = useCallback(
+    async (input: {
+      id?: string;
+      name: string;
+      basedOn: string;
+      finalidade?: string;
+      observacoes?: string;
+      template: PlannerTemplate;
+    }) => {
+      try {
+        await saveFn({ data: input });
+        await qc.invalidateQueries({ queryKey: ["my-templates"] });
+        toast.success("Template salvo em Meus Templates.");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Falha ao salvar.");
+        throw e;
+      }
+    },
+    [saveFn, qc],
+  );
+
 
   // Entrada "?blank=1" abre direto o editor com esqueleto vazio.
   const blankHandled = useRef(false);
@@ -393,10 +441,14 @@ function TemplatesPage() {
               : null
           }
           onClose={() => setEditing(null)}
-          onSave={(t) => {
-            saveMine(t);
-            setEditing(null);
-            setTab("meus");
+          onSave={async (input) => {
+            try {
+              await saveMine(input);
+              setEditing(null);
+              setTab("meus");
+            } catch {
+              /* toast já tratou */
+            }
           }}
         />
       )}
@@ -513,10 +565,17 @@ function TemplateEditor({
 }: {
   original: PlannerTemplate;
   isMine: boolean;
-  existingMine?: MyTemplate;
+  existingMine?: StoredTemplate;
   patientContext?: { id: string; name: string } | null;
   onClose: () => void;
-  onSave: (t: MyTemplate) => void;
+  onSave: (input: {
+    id?: string;
+    name: string;
+    basedOn: string;
+    finalidade?: string;
+    observacoes?: string;
+    template: PlannerTemplate;
+  }) => void | Promise<void>;
 }) {
   const navigate = useNavigate();
   const [draft, setDraft] = useState<PlannerTemplate>(() => clonePlannerTemplate(original));
@@ -559,17 +618,19 @@ function TemplateEditor({
   }
 
   function save() {
-    const toSave: MyTemplate = {
+    const finalTemplate: PlannerTemplate = {
       ...draft,
-      id: isMine ? draft.id : `mine-${Date.now()}`,
       name: name.trim() || draft.name,
       orientacoes: orientacoes.trim() || undefined,
+    };
+    onSave({
+      id: isMine ? draft.id : undefined,
+      name: finalTemplate.name,
       basedOn: isMine ? (existingMine?.basedOn ?? original.id) : original.id,
-      savedAt: new Date().toISOString(),
       finalidade: finalidade.trim() || undefined,
       observacoes: observacoes.trim() || undefined,
-    };
-    onSave(toSave);
+      template: finalTemplate,
+    });
   }
 
   const totalKcal = draft.kcal;
