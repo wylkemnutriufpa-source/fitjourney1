@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated")({
     //    impede o loop "serverFn 401 → redirect / → login → redirect /dashboard".
     const { data: sessionData } = await supabase.auth.getSession();
     if (!sessionData.session) {
-      throw redirect({ to: "/" });
+      throw redirect({ to: "/app" });
     }
 
     // 2) Resolve estado autoritativo no servidor.
