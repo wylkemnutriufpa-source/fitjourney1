@@ -441,3 +441,49 @@ function formatShortDate(iso: string): string {
     return iso;
   }
 }
+
+function LegacyWelcomeBanner({ firstName }: { firstName: string }) {
+  return (
+    <section
+      aria-labelledby="legacy-welcome"
+      className="relative overflow-hidden rounded-xl border border-gold/40 bg-gradient-to-br from-primary/10 via-surface to-gold/5 p-6 sm:p-8 space-y-4"
+    >
+      <div
+        aria-hidden
+        className="absolute -right-16 -top-16 size-48 rounded-full bg-primary/20 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="absolute -left-12 -bottom-12 size-40 rounded-full bg-gold/15 blur-3xl"
+      />
+      <div className="relative space-y-4">
+        <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-gold">
+          <Sparkles className="size-3.5" />
+          Boas-vindas
+        </div>
+        <div className="space-y-2">
+          <h2
+            id="legacy-welcome"
+            className="text-2xl sm:text-3xl font-bold tracking-tight"
+          >
+            Bem-vindo{firstName ? `, ${firstName}` : ""} ao{" "}
+            <span className="fj-wordmark">FitJourney</span>.
+          </h2>
+          <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
+            Identificamos seu cadastro anterior. Para liberar todos os recursos
+            da nova plataforma, atualize sua{" "}
+            <span className="text-foreground font-medium">Anamnese Clínica</span>.
+          </p>
+        </div>
+        <Link
+          to="/my-plan/update-health-profile"
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-[0_0_28px_-6px_oklch(0.62_0.16_155/0.7)]"
+        >
+          <ClipboardList className="size-4" />
+          Atualizar Anamnese Clínica
+          <ArrowRight className="size-4" />
+        </Link>
+      </div>
+    </section>
+  );
+}
