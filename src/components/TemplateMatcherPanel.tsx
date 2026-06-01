@@ -158,10 +158,18 @@ export function TemplateMatcherPanel({
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Paciente (opcional · auto-preenche alvo)
             </p>
-            <PatientPicker value={patient} onChange={setPatient} />
-            {patient && (
+            <RealPatientPicker value={patient} onChange={setPatient} />
+            {patient && ctx && !ctx.calculable && (
+              <p className="text-[10px] font-mono text-amber-400/90">
+                Anamnese de {patient.fullName} incompleta para cálculo
+                (faltando: {ctx.missingForCalc.join(", ") || "—"}). Preencha os
+                campos manualmente.
+              </p>
+            )}
+            {patient && ctx?.calculable && (
               <p className="text-[10px] font-mono text-primary/80">
-                Alvo recalculado pelo motor a partir da anamnese de {patient.name}.
+                Alvo recalculado pelo motor a partir da anamnese aprovada de{" "}
+                {patient.fullName}.
               </p>
             )}
           </div>
