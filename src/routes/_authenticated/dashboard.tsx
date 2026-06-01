@@ -147,12 +147,13 @@ function Dashboard() {
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Kpi label="Total Pacientes" value={String(totalPatients)} hint="base ativa" icon={Users} />
+          <Kpi label="Total Pacientes" value={String(totalPatients)} hint="base ativa" icon={Users} to="/patients" />
           <Kpi
             label="Anamneses aprovadas"
             value={String(approvedCount)}
             hint={totalPatients > 0 ? `${Math.round((approvedCount / totalPatients) * 100)}% da base` : "—"}
             icon={Activity}
+            to="/patients"
           />
           <Kpi
             label="Adesão Média"
@@ -163,12 +164,16 @@ function Dashboard() {
                 : "sem feedbacks"
             }
             icon={TrendingUp}
+            to="/financeiro"
           />
-          <Kpi label="Revisões Pendentes" value={pendingValue} hint="Ação hoje" icon={AlertCircle} accent />
+          <Kpi label="Revisões Pendentes" value={pendingValue} hint="Ação hoje" icon={AlertCircle} accent to="/anamneses" />
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-surface border border-border rounded-lg p-6">
+          <Link
+            to="/financeiro"
+            className="lg:col-span-2 bg-surface border border-border rounded-lg p-6 block hover:border-primary/40 transition-colors group"
+          >
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
