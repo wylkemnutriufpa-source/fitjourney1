@@ -844,6 +844,7 @@ function MealEditor({
   const heroUrl = imgFor(meal.heroKey || meal.main.imageKey);
   const kcal = mealKcalFromOption(meal.main);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [imagePickerOpen, setImagePickerOpen] = useState(false);
 
   function changeMainItem(itemId: string, updater: (i: PlannerFoodItem) => PlannerFoodItem) {
     onChange((m) => updateMainItemWithScaling(m, itemId, updater));
@@ -855,14 +856,40 @@ function MealEditor({
 
   function addMainItemFromCatalog(food: PlannerFoodItem) {
     onChange((m) => {
-      const nextMain = { ...m.main, items: [...m.main.items, food] };
-      const auto = buildAutoEquivalents(m, food);
+      const isFirst = m.main.items.length === 0;
+      let heroKey = m.heroKey;
+      let mainImage = m.main.imageKey;
+      // Auto-imagem soberana: primeiro alimento define a imagem, a menos que o
+      // profissional tenha travado manualmente uma escolha via o banco de imagens.
+      if (isFirst && !m.heroLocked) {
+        const derived = deriveImageKeyForFood(food);
+        if (derived) {
+          heroKey = derived;
+          mainImage = derived;
+        }
+      }
+      const nextMain = { ...m.main, imageKey: mainImage, items: [...m.main.items, food] };
+      // Auto-injeção de equivalentes só dispara no primeiro alimento da refeição.
+      // Alimentos seguintes entram apenas na opção principal — sem amontoar substituições.
+      const auto = isFirst
+        ? buildAutoEquivalents({ ...m, main: nextMain, heroKey }, food)
+        : [];
       return {
         ...m,
+        heroKey,
         main: nextMain,
         equivalents: [...m.equivalents, ...auto],
       };
     });
+  }
+
+  function pickHeroImage(imageKey: string) {
+    onChange((m) => ({
+      ...m,
+      heroKey: imageKey,
+      heroLocked: true,
+      main: { ...m.main, imageKey },
+    }));
   }
 
   function removeMainItem(itemId: string) {
@@ -893,7 +920,12 @@ function MealEditor({
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-background">
       <div className="grid grid-cols-[140px_1fr] gap-0">
-        <div className="relative aspect-square bg-muted">
+        <button
+          type="button"
+          onClick={() => setImagePickerOpen(true)}
+          className="relative aspect-square bg-muted group/img"
+          title="Trocar imagem da refeição"
+        >
           {heroUrl ? (
             <img src={heroUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
           ) : (
@@ -901,10 +933,19 @@ function MealEditor({
               <ImageOff className="size-6" />
             </div>
           )}
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-            <p className="text-white text-[10px] font-mono">{kcal} kcal</p>
+          <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/40 transition-colors grid place-items-center opacity-0 group-hover/img:opacity-100">
+            <span className="text-white text-[10px] font-mono uppercase tracking-widest border border-white/60 rounded px-2 py-1">
+              Trocar imagem
+            </span>
           </div>
-        </div>
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-left">
+            <p className="text-white text-[10px] font-mono">{kcal} kcal</p>
+            {meal.heroLocked && (
+              <p className="text-white/70 text-[9px] font-mono">manual</p>
+            )}
+          </div>
+        </button>
+
 
         <div className="p-3 space-y-3">
           <div className="flex items-center gap-2">
