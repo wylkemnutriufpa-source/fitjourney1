@@ -4,18 +4,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Sparkles, Target, ChevronDown, ChevronUp } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { matchTemplates } from "@/lib/engine";
 import { runNutritionEnginesManual } from "@/lib/clinical/run-nutrition-engines";
 import type { TemplateMeta, MatchResult, Goal as EngineGoal } from "@/lib/engine";
 import { templates as systemTemplates } from "@/lib/template-data";
-import { PatientPicker } from "./PatientPicker";
-import type { Patient } from "@/lib/mock-data";
+import { RealPatientPicker } from "./RealPatientPicker";
+import type { PatientLite } from "@/lib/plans/plans.functions";
+import { getClinicalContext } from "@/lib/clinical/context.functions";
 
 const KCAL_TOLERANCE = 0.15; // ±15% se template não declarar range explícito
 
-function patientGoalToEngine(goal: Patient["goal"]): EngineGoal {
-  if (goal === "Emagrecimento") return "cut";
-  if (goal === "Hipertrofia") return "bulk";
+function clinicalGoalToEngine(kind: string | undefined): EngineGoal {
+  if (kind === "cut") return "cut";
+  if (kind === "bulk") return "bulk";
+  // performance / health / maintain → manutenção como neutro determinístico
   return "maintain";
 }
 
