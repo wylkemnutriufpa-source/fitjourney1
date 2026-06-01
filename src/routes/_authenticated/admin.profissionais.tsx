@@ -323,6 +323,22 @@ function SubscriptionDialog({
                 <Label>Especialidade</Label>
                 <Input value={specialty} onChange={(e) => setSpecialty(e.target.value)} />
               </div>
+              <div className="col-span-2">
+                <Label>Frequência de feedback (dias)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={90}
+                  step={1}
+                  value={feedbackFreq}
+                  onChange={(e) =>
+                    setFeedbackFreq(Math.max(1, Math.min(90, Number(e.target.value) || 1)))
+                  }
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  De quantos em quantos dias os pacientes deste profissional devem registrar feedback.
+                </p>
+              </div>
             </div>
           </div>
 
