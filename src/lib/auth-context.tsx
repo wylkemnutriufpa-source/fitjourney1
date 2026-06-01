@@ -9,7 +9,7 @@ type AuthState = {
   user: User | null;
   roles: AppRole[];
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error?: string }>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
 };
 
