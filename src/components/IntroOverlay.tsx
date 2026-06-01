@@ -79,7 +79,7 @@ export function IntroOverlay() {
         const identity = await getMyIdentityState();
         navigate({ to: pickLandingRoute(identity) });
       } catch {
-        navigate({ to: "/" });
+        navigate({ to: "/app" });
       }
     }
   }
