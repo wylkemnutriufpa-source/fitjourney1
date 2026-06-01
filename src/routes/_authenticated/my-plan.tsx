@@ -368,7 +368,12 @@ function MealCard({
           <div className="p-3 space-y-2.5">
             <ul className="text-sm space-y-1">
               {items.map((it, i) => (
-                <FoodItemReadonlyRow key={it?.id ?? i} item={it} foods={foods} />
+                <FoodItemReadonlyRow
+                  key={it?.id ?? i}
+                  item={it}
+                  foods={foods}
+                  mealKind={mealKind}
+                />
               ))}
               {items.length === 0 && (
                 <li className="text-xs text-muted-foreground italic">
