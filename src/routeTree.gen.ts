@@ -31,6 +31,7 @@ import { Route as AuthenticatedMyPlanSettingsRouteImport } from './routes/_authe
 import { Route as AuthenticatedMyPlanFeedbackRouteImport } from './routes/_authenticated/my-plan.feedback'
 import { Route as AuthenticatedAnamnesesIdRouteImport } from './routes/_authenticated/anamneses.$id'
 import { Route as AuthenticatedAdminProfissionaisRouteImport } from './routes/_authenticated/admin.profissionais'
+import { Route as AuthenticatedAdminPacientesRouteImport } from './routes/_authenticated/admin.pacientes'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
 import { Route as AuthenticatedPatientsIdFeedbacksRouteImport } from './routes/_authenticated/patients/$id/feedbacks'
 import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
@@ -155,6 +156,12 @@ const AuthenticatedAdminProfissionaisRoute =
     path: '/profissionais',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminPacientesRoute =
+  AuthenticatedAdminPacientesRouteImport.update({
+    id: '/pacientes',
+    path: '/pacientes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedPatientsIdIndexRoute =
   AuthenticatedPatientsIdIndexRouteImport.update({
     id: '/patients/$id/',
@@ -186,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
@@ -212,6 +220,7 @@ export interface FileRoutesByTo {
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
@@ -240,6 +249,7 @@ export interface FileRoutesById {
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/_authenticated/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/_authenticated/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/_authenticated/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/_authenticated/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/admin/pacientes'
     | '/admin/profissionais'
     | '/anamneses/$id'
     | '/my-plan/feedback'
@@ -294,6 +305,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/admin/pacientes'
     | '/admin/profissionais'
     | '/anamneses/$id'
     | '/my-plan/feedback'
@@ -321,6 +333,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/_authenticated/admin/pacientes'
     | '/_authenticated/admin/profissionais'
     | '/_authenticated/anamneses/$id'
     | '/_authenticated/my-plan/feedback'
@@ -500,6 +513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminProfissionaisRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/pacientes': {
+      id: '/_authenticated/admin/pacientes'
+      path: '/pacientes'
+      fullPath: '/admin/pacientes'
+      preLoaderRoute: typeof AuthenticatedAdminPacientesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/patients/$id/': {
       id: '/_authenticated/patients/$id/'
       path: '/patients/$id'
@@ -525,10 +545,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminPacientesRoute: typeof AuthenticatedAdminPacientesRoute
   AuthenticatedAdminProfissionaisRoute: typeof AuthenticatedAdminProfissionaisRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminPacientesRoute: AuthenticatedAdminPacientesRoute,
   AuthenticatedAdminProfissionaisRoute: AuthenticatedAdminProfissionaisRoute,
 }
 
