@@ -97,5 +97,10 @@ export const Route = createFileRoute("/_authenticated")({
 
     return { identity };
   },
-  component: () => <Outlet />,
+  component: () => (
+    <>
+      <IntroOverlay />
+      <Outlet />
+    </>
+  ),
 });
