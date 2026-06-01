@@ -523,6 +523,51 @@ function TemplatesPage() {
   );
 }
 
+function PilotCard({
+  pilot,
+}: {
+  pilot: {
+    id: string;
+    name: string;
+    description: string;
+    tags: string[];
+    kcal: number;
+    previewRoute: string;
+    badge: string;
+  };
+}) {
+  const navigate = useNavigate();
+  return (
+    <div className="border border-border rounded-lg p-4 bg-card hover:border-amber-500/60 transition-colors flex flex-col gap-3">
+      <div className="flex items-start justify-between gap-2">
+        <Badge variant="outline" className="text-[10px] font-mono border-amber-500/50 text-amber-700 dark:text-amber-300">
+          {pilot.badge}
+        </Badge>
+        <span className="text-[10px] font-mono text-muted-foreground">{pilot.kcal} kcal</span>
+      </div>
+      <div className="space-y-1">
+        <h3 className="text-sm font-semibold leading-snug">{pilot.name}</h3>
+        <p className="text-xs text-muted-foreground line-clamp-3">{pilot.description}</p>
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {pilot.tags.map((t) => (
+          <span key={t} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+            {t}
+          </span>
+        ))}
+      </div>
+      <Button
+        size="sm"
+        variant="outline"
+        className="gap-1.5 mt-auto"
+        onClick={() => navigate({ to: pilot.previewRoute })}
+      >
+        <ExternalLink className="size-3.5" /> Abrir preview
+      </Button>
+    </div>
+  );
+}
+
 function TabBtn({
   active,
   children,
