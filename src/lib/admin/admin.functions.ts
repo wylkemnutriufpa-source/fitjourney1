@@ -17,6 +17,8 @@ async function assertAdmin(supabase: any, userId: string) {
   if (!data) throw new Error("Forbidden: admin role required");
 }
 
+export type NutriPlanTier = "basic" | "pro";
+
 export type AdminNutritionistRow = {
   id: string;
   full_name: string;
@@ -27,6 +29,7 @@ export type AdminNutritionistRow = {
   patients_count: number;
   subscription: {
     id: string;
+    plan_tier: NutriPlanTier;
     monthly_price_cents: number;
     currency: string;
     status: "active" | "paused" | "expired" | "cancelled";
