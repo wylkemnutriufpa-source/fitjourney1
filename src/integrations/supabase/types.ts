@@ -238,6 +238,62 @@ export type Database = {
         }
         Relationships: []
       }
+      nutritionist_subscriptions: {
+        Row: {
+          created_at: string
+          currency: string
+          ends_at: string | null
+          id: string
+          monthly_price_cents: number
+          notes: string | null
+          nutritionist_id: string
+          payment_method:
+            | Database["public"]["Enums"]["subscription_payment_method"]
+            | null
+          starts_at: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          ends_at?: string | null
+          id?: string
+          monthly_price_cents: number
+          notes?: string | null
+          nutritionist_id: string
+          payment_method?:
+            | Database["public"]["Enums"]["subscription_payment_method"]
+            | null
+          starts_at?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          ends_at?: string | null
+          id?: string
+          monthly_price_cents?: number
+          notes?: string | null
+          nutritionist_id?: string
+          payment_method?:
+            | Database["public"]["Enums"]["subscription_payment_method"]
+            | null
+          starts_at?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutritionist_subscriptions_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nutritionists: {
         Row: {
           auth_user_id: string
