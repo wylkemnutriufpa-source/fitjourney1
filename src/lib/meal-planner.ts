@@ -39,7 +39,10 @@ export type PlannerMeal = {
   main: PlannerMealOption;
   equivalents: PlannerMealOption[];
   heroKey?: string;
+  /** True quando o profissional escolheu a imagem manualmente — não deve ser sobrescrita por inferência automática. */
+  heroLocked?: boolean;
 };
+
 
 export type PlannerTemplate = Omit<LegacyDietTemplate, "kcal" | "meals"> & {
   kcal: number;
