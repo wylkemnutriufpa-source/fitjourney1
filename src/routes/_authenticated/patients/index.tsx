@@ -160,7 +160,6 @@ function Patients() {
               )}
               {!isLoading && !error && filtered.map((p) => {
                 const statusMeta = anamnesisStatusMeta(p.anamnesisStatus);
-                const hasAnamnesis = p.anamnesisStatus !== "none";
                 return (
                 <tr key={p.id} className="border-b border-border last:border-0 hover:bg-accent/30">
                   <td className="p-4">
