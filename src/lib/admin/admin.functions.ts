@@ -131,6 +131,7 @@ export const upsertProfessionalSubscription = createServerFn({ method: "POST" })
 
     const payload: any = {
       nutritionist_id: data.nutritionist_id,
+      plan_tier: data.plan_tier,
       monthly_price_cents: data.monthly_price_cents,
       status: data.status,
       payment_method: data.payment_method ?? null,
