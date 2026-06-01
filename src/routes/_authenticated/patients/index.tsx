@@ -45,6 +45,7 @@ function anamnesisStatusMeta(status: string): { label: string; cls: string; dot:
 }
 
 function Patients() {
+  const navigate = useNavigate();
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const { data: patients = [], isLoading, error } = useQuery({
     queryKey: ["patients-index"],
