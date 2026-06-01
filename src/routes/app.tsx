@@ -8,8 +8,9 @@ import fjLogo from "@/assets/fitjourney-logo.png";
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "FitJourney — Acesso" },
-      { name: "description", content: "Plataforma para nutricionistas esportivos." },
+      { title: "FitJourney — Acesso ao painel" },
+      { name: "description", content: "Entrar no painel do FitJourney." },
+      { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   component: Login,
