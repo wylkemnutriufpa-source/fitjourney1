@@ -35,7 +35,7 @@ function PatientSettings() {
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [heightCm, setHeightCm] = useState("");
+  
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
