@@ -3,7 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { getPatient } from "@/lib/mock-data";
 import { NutritionTargetCard } from "@/components/NutritionTargetCard";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
-import { Edit3, FileText, ChevronRight, MessageSquareHeart } from "lucide-react";
+import { Edit3, FileText, ChevronRight, MessageSquareHeart, Sparkles } from "lucide-react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
