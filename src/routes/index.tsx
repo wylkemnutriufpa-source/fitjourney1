@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { LogoMark } from "@/components/LogoMark";
+import { LogoOrbital } from "@/components/LogoOrbital";
 import {
   DEFAULT_LANDING_CONTENT,
   fetchLandingContent,
@@ -176,7 +177,7 @@ function Landing() {
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${navScrolled ? "glass border-b border-border/30 shadow-card" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
-            <LogoMark className="size-16 object-contain" />
+            <LogoOrbital size="size-12" />
             <span className="fj-wordmark text-lg leading-none">FitJourney</span>
           </Link>
 
@@ -702,7 +703,7 @@ function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2.5 mb-4">
-                <LogoMark className="size-16 object-contain" />
+                <LogoOrbital size="size-12" />
                 <span className="font-display font-bold text-lg">FitJourney</span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed mb-4">
