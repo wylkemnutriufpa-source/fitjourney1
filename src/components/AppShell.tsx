@@ -287,34 +287,36 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         }
       >
         <div className="flex items-center justify-between gap-2 px-2 mb-10">
-          <button
-            type="button"
-            onClick={() => {
-              import("@/components/IntroOverlay").then((m) => m.playIntro());
-            }}
-            className="flex items-center gap-3 group focus:outline-none"
-            title="Reproduzir intro"
-          >
-            <span className="fj-logo-aura relative inline-flex items-center justify-center size-[96px] shrink-0">
-              <span className="fj-logo-pulse" aria-hidden />
-              <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
-                <span className="fj-logo-particle" />
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                import("@/components/IntroOverlay").then((m) => m.playIntro());
+              }}
+              className="focus:outline-none cursor-pointer"
+              title="Reproduzir intro"
+            >
+              <span className="fj-logo-aura relative inline-flex items-center justify-center size-[96px] shrink-0">
+                <span className="fj-logo-pulse" aria-hidden />
+                <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
+                  <span className="fj-logo-particle" />
+                </span>
+                <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
+                  <span className="fj-logo-particle fj-logo-particle-gold" />
+                </span>
+                <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
+                  <span className="fj-logo-particle" />
+                </span>
+                <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
+                  <span className="fj-logo-particle fj-logo-particle-gold" />
+                </span>
+                <LogoVideo className="relative z-10 size-[96px] object-contain" />
               </span>
-              <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
-                <span className="fj-logo-particle fj-logo-particle-gold" />
-              </span>
-              <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
-                <span className="fj-logo-particle" />
-              </span>
-              <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
-                <span className="fj-logo-particle fj-logo-particle-gold" />
-              </span>
-              <LogoVideo className="relative z-10 size-[96px] object-contain transition-transform duration-300 group-hover:scale-105" />
-            </span>
-            <span className="fj-wordmark text-[17px] leading-none">
+            </button>
+            <Link to="/" className="fj-wordmark text-[17px] leading-none">
               FitJourney
-            </span>
-          </button>
+            </Link>
+          </div>
           <button
             onClick={() => setSidebarOpen(false)}
             title="Recolher menu"
