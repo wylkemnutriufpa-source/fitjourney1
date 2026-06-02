@@ -338,7 +338,7 @@ export const reviewAnamnesis = createServerFn({ method: "POST" })
     };
     const patch =
       data.decision === "approved"
-        ? { ...basePatch, approved_by: userId, approved_at: nowIso }
+        ? { ...basePatch, approved_by: nutri.id, approved_at: nowIso }
         : basePatch;
 
     const { error: upErr } = await supabase
