@@ -111,7 +111,7 @@ function BackButton() {
 export function AppShell({ children, header }: { children: ReactNode; header?: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
-  const { user, roles, signOut } = useAuth();
+  const { user, roles, loading: authLoading, signOut } = useAuth();
 
   const isAdmin = roles.includes("admin");
   const email = user?.email ?? "";
@@ -183,12 +183,13 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     staleTime: 60_000,
     enabled: mounted && !!user?.id,
   });
+  const isResolvingIdentity = !mounted || authLoading || (!!user?.id && !identity);
   const isPatientRoute =
     path === "/my-dashboard" ||
     path.startsWith("/my-dashboard/") ||
     path === "/my-plan" ||
     path.startsWith("/my-plan/");
-  const isPatient = identity?.role === "patient" || isPatientRoute;
+  const isPatient = identity?.role === "patient";
   const baseNav = isPatient ? patientNav : nutritionistNav;
   const nav = !isPatient && isAdmin
     ? ([...baseNav, { to: "/admin/profissionais", label: "Admin", icon: ShieldCheck }] as const)
@@ -215,6 +216,10 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   async function handleSignOut() {
     await signOut();
     navigate({ to: "/app" });
+  }
+
+  if (isResolvingIdentity) {
+    return <div className="min-h-screen bg-background text-foreground" />;
   }
 
   return (
