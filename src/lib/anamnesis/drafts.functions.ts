@@ -21,13 +21,7 @@ const AnswersSchema = z
 // ---------------- loadAnamnesisDraft (paciente) ----------------
 export const loadAnamnesisDraft = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(
-    async ({
-      context,
-    }): Promise<
-      | { found: false }
-      | { found: true; answers: Record<string, unknown>; updatedAt: string }
-    > => {
+  .handler(async ({ context }) => {
       const { supabase, userId } = context as {
         supabase: any;
         userId: string;
