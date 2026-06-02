@@ -976,23 +976,25 @@ function TemplateEditor({
           </aside>
         </div>
 
-        <DialogFooter className="px-6 py-4 border-t border-border sticky bottom-0 bg-background">
+        <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t border-border sticky bottom-0 bg-background flex-row flex-wrap justify-end gap-2 sm:gap-3">
           {patientContext && applyError && (
             <div className="w-full mb-2 text-[11px] text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
               {friendlyPublishError(applyError)}
             </div>
           )}
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button size="sm" variant="outline" onClick={onClose}>Cancelar</Button>
           {patientContext ? (
             <Button
+              size="sm"
               disabled={applyBusy}
               onClick={() => doPublish(patientContext.id, patientContext.name)}
             >
               <Send className="size-4" />
-              {applyBusy ? "Salvando…" : `Salvar plano para ${patientContext.name}`}
+              {applyBusy ? "Salvando…" : `Salvar para ${patientContext.name}`}
             </Button>
           ) : (
             <Button
+              size="sm"
               variant="outline"
               onClick={() => {
                 setApplyDone(null);
@@ -1000,14 +1002,16 @@ function TemplateEditor({
                 setApplyOpen(true);
               }}
             >
-              <Send className="size-4" /> Aplicar a paciente
+              <Send className="size-4" /> <span className="hidden sm:inline">Aplicar a paciente</span><span className="sm:hidden">Aplicar</span>
             </Button>
           )}
-          <Button onClick={save} variant={patientContext ? "outline" : "default"}>
+          <Button size="sm" onClick={save} variant={patientContext ? "outline" : "default"}>
             {isMine ? <Save className="size-4" /> : <Copy className="size-4" />}
-            {isMine ? "Salvar alterações" : "Salvar em Meus Templates"}
+            <span className="hidden sm:inline">{isMine ? "Salvar alterações" : "Salvar em Meus Templates"}</span>
+            <span className="sm:hidden">{isMine ? "Salvar" : "Salvar template"}</span>
           </Button>
         </DialogFooter>
+
       </DialogContent>
 
       {/* Confirmação pós-publicação direta para o paciente do contexto */}
