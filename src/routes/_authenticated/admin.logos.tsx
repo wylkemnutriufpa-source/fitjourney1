@@ -316,7 +316,7 @@ function SlotCard({
             <div className="flex items-center gap-2">
               <div className="size-10 rounded-md bg-background border border-border grid place-items-center overflow-hidden shrink-0">
                 {cfg.customUrl ? (
-                  /^data:video\//i.test(cfg.customUrl) ? (
+                  /^data:video\//i.test(cfg.customUrl) || /\.(mp4|webm)(\?|$)/i.test(cfg.customUrl) ? (
                     <video
                       src={cfg.customUrl}
                       autoPlay
