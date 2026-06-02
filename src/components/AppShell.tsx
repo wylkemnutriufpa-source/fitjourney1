@@ -111,17 +111,7 @@ function BackButton() {
 }
 
 function AccessGateSplash() {
-  return (
-    <div className="min-h-screen bg-background text-foreground grid place-items-center">
-      <div className="flex flex-col items-center gap-4">
-        <span className="fj-logo-aura relative inline-flex items-center justify-center size-[72px] shrink-0">
-          <span className="fj-logo-pulse" aria-hidden />
-          <img src={fjLogo} alt="FitJourney" className="relative z-10 size-[72px] object-contain" />
-        </span>
-        <div className="size-5 rounded-full border-2 border-primary/30 border-t-primary animate-spin" aria-hidden />
-      </div>
-    </div>
-  );
+  return <VideoLoaderFullscreen label="Carregando…" />;
 }
 
 export function AppShell({ children, header }: { children: ReactNode; header?: ReactNode }) {
