@@ -128,9 +128,9 @@ function PatientSignupPage() {
           <p className="text-sm text-muted-foreground">
             Peça um novo link ao seu nutricionista.
           </p>
-          <Link to="/" className="inline-block text-xs text-primary hover:underline">
-            Voltar para o início
-          </Link>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Entre em contato com seu nutricionista.
+          </p>
         </div>
       </div>
     );
