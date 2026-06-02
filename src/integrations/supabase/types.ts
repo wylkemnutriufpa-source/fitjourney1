@@ -589,7 +589,7 @@ export type Database = {
           full_name: string
           height_cm: number | null
           id: string
-          nutritionist_id: string | null
+          nutritionist_id: string
           onboarding_completed_at: string | null
           onboarding_version: number | null
           phone: string | null
@@ -606,7 +606,7 @@ export type Database = {
           full_name: string
           height_cm?: number | null
           id?: string
-          nutritionist_id?: string | null
+          nutritionist_id: string
           onboarding_completed_at?: string | null
           onboarding_version?: number | null
           phone?: string | null
@@ -623,7 +623,7 @@ export type Database = {
           full_name?: string
           height_cm?: number | null
           id?: string
-          nutritionist_id?: string | null
+          nutritionist_id?: string
           onboarding_completed_at?: string | null
           onboarding_version?: number | null
           phone?: string | null
