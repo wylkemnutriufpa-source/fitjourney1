@@ -4,6 +4,7 @@ import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyIdentityState, type IdentityStateDTO } from "@/lib/phase2/identity.functions";
 import { LogoVideo } from "@/components/LogoVideo";
+import { LogoOrbital } from "@/components/LogoOrbital";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
