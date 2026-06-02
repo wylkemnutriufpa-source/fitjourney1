@@ -27,7 +27,7 @@ import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { applyTheme, getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
-import fjLogo from "@/assets/fitjourney-logo.png";
+import { LogoMark } from "@/components/LogoMark";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
 import { VideoLoaderFullscreen } from "@/components/VideoLoader";
 
@@ -309,11 +309,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
               <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
                 <span className="fj-logo-particle fj-logo-particle-gold" />
               </span>
-              <img
-                src={fjLogo}
-                alt="FitJourney"
-                className="relative z-10 size-[72px] object-contain transition-transform duration-300 group-hover:scale-105"
-              />
+              <LogoMark className="relative z-10 size-[72px] object-contain transition-transform duration-300 group-hover:scale-105" />
             </span>
             <span className="fj-wordmark text-[17px] leading-none">
               FitJourney
