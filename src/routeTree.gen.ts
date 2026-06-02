@@ -14,6 +14,8 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SignupPatientRouteImport } from './routes/signup/patient'
 import { Route as SignupNutritionistRouteImport } from './routes/signup/nutritionist'
+import { Route as NSlugRouteImport } from './routes/n.$slug'
+import { Route as CSlugRouteImport } from './routes/c.$slug'
 import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
 import { Route as AuthenticatedTemplatesV2EditorRouteImport } from './routes/_authenticated/templates-v2-editor'
 import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
@@ -27,6 +29,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients/index'
 import { Route as AuthenticatedAnamnesesIndexRouteImport } from './routes/_authenticated/anamneses.index'
+import { Route as CSlugCodeRouteImport } from './routes/c.$slug.$code'
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients/new'
 import { Route as AuthenticatedOnboardingPatientRouteImport } from './routes/_authenticated/onboarding/patient'
 import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './routes/_authenticated/onboarding/nutritionist'
@@ -63,6 +66,16 @@ const SignupPatientRoute = SignupPatientRouteImport.update({
 const SignupNutritionistRoute = SignupNutritionistRouteImport.update({
   id: '/signup/nutritionist',
   path: '/signup/nutritionist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NSlugRoute = NSlugRouteImport.update({
+  id: '/n/$slug',
+  path: '/n/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CSlugRoute = CSlugRouteImport.update({
+  id: '/c/$slug',
+  path: '/c/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCheckEmailRoute = AuthCheckEmailRouteImport.update({
@@ -135,6 +148,11 @@ const AuthenticatedAnamnesesIndexRoute =
     path: '/anamneses/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const CSlugCodeRoute = CSlugCodeRouteImport.update({
+  id: '/$code',
+  path: '/$code',
+  getParentRoute: () => CSlugRoute,
+} as any)
 const AuthenticatedPatientsNewRoute =
   AuthenticatedPatientsNewRouteImport.update({
     id: '/patients/new',
@@ -228,6 +246,8 @@ export interface FileRoutesByFullPath {
   '/templates': typeof AuthenticatedTemplatesRoute
   '/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
+  '/c/$slug': typeof CSlugRouteWithChildren
+  '/n/$slug': typeof NSlugRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/admin/landing': typeof AuthenticatedAdminLandingRoute
@@ -240,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/c/$slug/$code': typeof CSlugCodeRoute
   '/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
@@ -260,6 +281,8 @@ export interface FileRoutesByTo {
   '/templates': typeof AuthenticatedTemplatesRoute
   '/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
+  '/c/$slug': typeof CSlugRouteWithChildren
+  '/n/$slug': typeof NSlugRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/admin/landing': typeof AuthenticatedAdminLandingRoute
@@ -272,6 +295,7 @@ export interface FileRoutesByTo {
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/c/$slug/$code': typeof CSlugCodeRoute
   '/anamneses': typeof AuthenticatedAnamnesesIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
@@ -294,6 +318,8 @@ export interface FileRoutesById {
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/_authenticated/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
+  '/c/$slug': typeof CSlugRouteWithChildren
+  '/n/$slug': typeof NSlugRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/_authenticated/admin/landing': typeof AuthenticatedAdminLandingRoute
@@ -306,6 +332,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/_authenticated/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/c/$slug/$code': typeof CSlugCodeRoute
   '/_authenticated/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
   '/_authenticated/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
@@ -328,6 +355,8 @@ export interface FileRouteTypes {
     | '/templates'
     | '/templates-v2-editor'
     | '/auth/check-email'
+    | '/c/$slug'
+    | '/n/$slug'
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/admin/landing'
@@ -340,6 +369,7 @@ export interface FileRouteTypes {
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
+    | '/c/$slug/$code'
     | '/anamneses/'
     | '/patients/'
     | '/patients/$id/diet'
@@ -360,6 +390,8 @@ export interface FileRouteTypes {
     | '/templates'
     | '/templates-v2-editor'
     | '/auth/check-email'
+    | '/c/$slug'
+    | '/n/$slug'
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/admin/landing'
@@ -372,6 +404,7 @@ export interface FileRouteTypes {
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
+    | '/c/$slug/$code'
     | '/anamneses'
     | '/patients'
     | '/patients/$id/diet'
@@ -393,6 +426,8 @@ export interface FileRouteTypes {
     | '/_authenticated/templates'
     | '/_authenticated/templates-v2-editor'
     | '/auth/check-email'
+    | '/c/$slug'
+    | '/n/$slug'
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/_authenticated/admin/landing'
@@ -405,6 +440,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding/nutritionist'
     | '/_authenticated/onboarding/patient'
     | '/_authenticated/patients/new'
+    | '/c/$slug/$code'
     | '/_authenticated/anamneses/'
     | '/_authenticated/patients/'
     | '/_authenticated/patients/$id/diet'
@@ -417,6 +453,8 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AppRoute: typeof AppRoute
   AuthCheckEmailRoute: typeof AuthCheckEmailRoute
+  CSlugRoute: typeof CSlugRouteWithChildren
+  NSlugRoute: typeof NSlugRoute
   SignupNutritionistRoute: typeof SignupNutritionistRoute
   SignupPatientRoute: typeof SignupPatientRoute
 }
@@ -456,6 +494,20 @@ declare module '@tanstack/react-router' {
       path: '/signup/nutritionist'
       fullPath: '/signup/nutritionist'
       preLoaderRoute: typeof SignupNutritionistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/n/$slug': {
+      id: '/n/$slug'
+      path: '/n/$slug'
+      fullPath: '/n/$slug'
+      preLoaderRoute: typeof NSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$slug': {
+      id: '/c/$slug'
+      path: '/c/$slug'
+      fullPath: '/c/$slug'
+      preLoaderRoute: typeof CSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/check-email': {
@@ -548,6 +600,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/anamneses/'
       preLoaderRoute: typeof AuthenticatedAnamnesesIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/c/$slug/$code': {
+      id: '/c/$slug/$code'
+      path: '/$code'
+      fullPath: '/c/$slug/$code'
+      preLoaderRoute: typeof CSlugCodeRouteImport
+      parentRoute: typeof CSlugRoute
     }
     '/_authenticated/patients/new': {
       id: '/_authenticated/patients/new'
@@ -723,11 +782,23 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface CSlugRouteChildren {
+  CSlugCodeRoute: typeof CSlugCodeRoute
+}
+
+const CSlugRouteChildren: CSlugRouteChildren = {
+  CSlugCodeRoute: CSlugCodeRoute,
+}
+
+const CSlugRouteWithChildren = CSlugRoute._addFileChildren(CSlugRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AppRoute: AppRoute,
   AuthCheckEmailRoute: AuthCheckEmailRoute,
+  CSlugRoute: CSlugRouteWithChildren,
+  NSlugRoute: NSlugRoute,
   SignupNutritionistRoute: SignupNutritionistRoute,
   SignupPatientRoute: SignupPatientRoute,
 }

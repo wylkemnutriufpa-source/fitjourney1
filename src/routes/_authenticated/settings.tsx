@@ -75,6 +75,9 @@ function Settings() {
   const [email, setEmail] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [phone, setPhone] = useState("");
+  const [slug, setSlug] = useState("");
+  const [publicHeadline, setPublicHeadline] = useState("");
+  const [publicBio, setPublicBio] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -86,6 +89,9 @@ function Settings() {
       setEmail(profile.email ?? "");
       setSpecialty(profile.specialty ?? "");
       setPhone(profile.phone ?? "");
+      setSlug(profile.slug ?? "");
+      setPublicHeadline(profile.publicHeadline ?? "");
+      setPublicBio(profile.publicBio ?? "");
     }
   }, [profile]);
 
