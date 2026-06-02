@@ -13,6 +13,7 @@ import {
 } from "@/lib/logo-settings";
 import type { LogoEffect } from "@/components/LogoOrbital";
 import { RotateCcw, Upload, Trash2, ImageIcon } from "lucide-react";
+import { uploadLandingAsset } from "@/lib/landing/landing-content";
 
 export const Route = createFileRoute("/_authenticated/admin/logos")({
   component: LogosAdminPage,
