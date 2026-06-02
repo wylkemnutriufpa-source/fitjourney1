@@ -310,7 +310,7 @@ export async function saveLandingContent(content: LandingContent): Promise<void>
   const { error } = await supabase
     .from("landing_content")
     .update({
-      content: content as unknown as Record<string, unknown>,
+      content: content as any,
       schema_version: LANDING_SCHEMA_VERSION,
     })
     .eq("singleton", true);
