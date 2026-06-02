@@ -386,6 +386,33 @@
   50%      { opacity: 1;   transform: scale(1.25); }
 }
 
+/* ─── Aura orgânica respirando ─── */
+.fj-aura { position: absolute; inset: -35%; pointer-events: none; filter: blur(14px); mix-blend-mode: screen; }
+.fj-aura-blob {
+  position: absolute; inset: 0;
+  border-radius: 42% 58% 55% 45% / 50% 45% 55% 50%;
+  opacity: 0.75;
+}
+.fj-aura-blob-1 {
+  background: radial-gradient(closest-side, oklch(0.72 0.18 165 / 0.85), oklch(0.72 0.18 165 / 0) 70%);
+  animation: fj-aura-morph 7s ease-in-out infinite, fj-aura-breathe 4.5s ease-in-out infinite;
+}
+.fj-aura-blob-2 {
+  background: radial-gradient(closest-side, oklch(0.85 0.14 88 / 0.8), oklch(0.85 0.14 88 / 0) 70%);
+  animation: fj-aura-morph 9s ease-in-out -3s infinite reverse, fj-aura-breathe 5.5s ease-in-out -1.5s infinite;
+}
+@keyframes fj-aura-morph {
+  0%, 100% { border-radius: 42% 58% 55% 45% / 50% 45% 55% 50%; transform: rotate(0deg) scale(1); }
+  33%      { border-radius: 60% 40% 45% 55% / 40% 60% 40% 60%; transform: rotate(120deg) scale(1.08); }
+  66%      { border-radius: 48% 52% 38% 62% / 58% 42% 60% 40%; transform: rotate(240deg) scale(0.95); }
+}
+@keyframes fj-aura-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  50%      { opacity: 0.9;  transform: scale(1.12); }
+}
+
+
+
 /* ─── Landing utilities (ported from FitJourney 1.0) ─── */
 @layer utilities {
   .glass {
