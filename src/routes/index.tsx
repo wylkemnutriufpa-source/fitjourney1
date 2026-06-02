@@ -707,8 +707,8 @@ function Landing() {
       {/* ══════════ FOOTER ══════════ */}
       <footer className="border-t border-border/30 py-14 px-4 bg-muted/10">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-12">
+            <div className="col-span-2 md:col-span-2">
               <div className="flex items-center gap-2.5 mb-4">
                 <button
                   type="button"
@@ -747,7 +747,26 @@ function Landing() {
                 <li><Link to="/signup/nutritionist" className="hover:text-primary transition-colors">Criar conta</Link></li>
               </ul>
             </div>
+            <div>
+              <h4 className="font-display font-semibold mb-4 text-sm">Legal & Suporte</h4>
+              <ul className="space-y-2.5 text-sm text-muted-foreground">
+                <li><Link to="/termos" className="hover:text-foreground transition-colors">Termos de Uso</Link></li>
+                <li><Link to="/privacidade" className="hover:text-foreground transition-colors">Privacidade</Link></li>
+                <li><Link to="/suporte" className="hover:text-foreground transition-colors">Suporte</Link></li>
+                <li>
+                  <a href="mailto:sistemafitjourney.suporte@gmail.com" className="hover:text-foreground transition-colors break-all">
+                    sistemafitjourney.suporte@gmail.com
+                  </a>
+                </li>
+                <li>
+                  <a href="https://wa.me/5591984155365" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                    WhatsApp: (91) 98415-5365
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
+
           <div className="border-t border-border/30 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p>© {new Date().getFullYear()} FitJourney. Todos os direitos reservados.</p>
             <p className="flex items-center gap-1.5">
