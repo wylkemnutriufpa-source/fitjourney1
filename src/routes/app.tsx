@@ -178,17 +178,14 @@ function Login() {
 
       <div className="flex items-center justify-center p-8">
         <form onSubmit={submit} className="w-full max-w-sm space-y-7">
-          <div className="lg:hidden flex flex-col items-center gap-3 -mt-2 mb-4">
-            <button
-              type="button"
-              onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-              className="focus:outline-none cursor-pointer"
-              title="Ver intro"
-            >
-              <LogoOrbital slot="auth-hero" />
-            </button>
-            <Link to="/" className="fj-wordmark text-2xl leading-none">FitJourney</Link>
+          <div className="lg:hidden -mt-2 mb-4 flex justify-center">
+            <BrandLockup
+              slot="auth-hero"
+              wordmarkAs={<Link to="/" className="fj-wordmark leading-none">FitJourney</Link>}
+              onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+            />
           </div>
+
           <div>
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Acesso
