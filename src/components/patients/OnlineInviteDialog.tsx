@@ -122,8 +122,20 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
     try {
       await navigator.clipboard.writeText(inviteUrl);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      setTimeout(() => setCopied(false), 2000);
       toast.success("Link copiado");
+    } catch {
+      toast.error("Não foi possível copiar");
+    }
+  }
+
+  async function copyFullMessage() {
+    if (!fullText) return;
+    try {
+      await navigator.clipboard.writeText(fullText);
+      setCopiedAll(true);
+      setTimeout(() => setCopiedAll(false), 2000);
+      toast.success("Mensagem inteira copiada");
     } catch {
       toast.error("Não foi possível copiar");
     }
