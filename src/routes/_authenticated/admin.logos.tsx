@@ -167,23 +167,12 @@ function LogosAdminPage() {
         }
       }
 
-      if (bytes > MAX_STORED_BYTES) {
-        setErrorBySlot((s) => ({
-          ...s,
-          [slot]: `Mesmo após compressão ficou grande (${(bytes / 1024 / 1024).toFixed(2)} MB). Use uma imagem mais simples.`,
-        }));
-        return;
-      }
-
-      try {
-        update(slot, { customUrl: dataUrl, variant: "orbital" });
-      } catch {
-        setErrorBySlot((s) => ({
-          ...s,
-          [slot]: "Não foi possível salvar no navegador (storage cheio). Tente uma imagem menor.",
-        }));
-        return;
-      }
+      setInfoBySlot((s) => ({ ...s, [slot]: "Enviando imagem…" }));
+      const blob = dataUrlToBlob(dataUrl);
+      const ext = (blob.type.split("/")[1] || "png").replace("svg+xml", "svg");
+      const uploadFile = new File([blob], `logo.${ext}`, { type: blob.type });
+      const publicUrl = await uploadLandingAsset(uploadFile);
+      update(slot, { customUrl: publicUrl, variant: "orbital" });
 
       const compressedKb = (bytes / 1024).toFixed(0);
       const originalKb = (file.size / 1024).toFixed(0);
@@ -191,8 +180,8 @@ function LogosAdminPage() {
         ...s,
         [slot]:
           width > 0
-            ? `Pronto: ${width}×${height}px · ${compressedKb} KB (original ${originalKb} KB).`
-            : `Pronto: SVG ${originalKb} KB.`,
+            ? `Pronto: ${width}×${height}px · ${compressedKb} KB (original ${originalKb} KB). Salvo no servidor — reflete em todo o sistema.`
+            : `Pronto: SVG ${originalKb} KB. Salvo no servidor.`,
       }));
     } catch (e: any) {
       setErrorBySlot((s) => ({
