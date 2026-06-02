@@ -185,6 +185,11 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   });
   const isResolvingIdentity = !mounted || authLoading || (!!user?.id && !identity);
   const isPatient = identity?.role === "patient";
+  const roleRouteMismatch = Boolean(
+    identity?.state === "S3" &&
+      ((identity.role === "patient" && !isPatientArea) ||
+        (identity.role !== "patient" && isPatientArea)),
+  );
   const baseNav = isPatient ? patientNav : nutritionistNav;
   const nav = !isPatient && isAdmin
     ? ([...baseNav, { to: "/admin/profissionais", label: "Admin", icon: ShieldCheck }] as const)
@@ -213,7 +218,15 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     navigate({ to: "/app" });
   }
 
-  if (isResolvingIdentity) {
+  useEffect(() => {
+    if (!roleRouteMismatch) return;
+    navigate({
+      to: identity?.role === "patient" ? "/my-dashboard" : "/dashboard",
+      replace: true,
+    });
+  }, [identity?.role, navigate, roleRouteMismatch]);
+
+  if (isResolvingIdentity || roleRouteMismatch) {
     return <div className="min-h-screen bg-background text-foreground" />;
   }
 
