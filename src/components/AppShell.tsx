@@ -29,6 +29,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 import { LogoVideo } from "@/components/LogoVideo";
 import { LogoOrbital } from "@/components/LogoOrbital";
+import { BrandLockup } from "@/components/BrandLockup";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
 import { VideoLoaderFullscreen } from "@/components/VideoLoader";
 
