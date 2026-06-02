@@ -5,6 +5,17 @@ import { Loader2, ShieldCheck, LogOut } from "lucide-react";
 import { createNutritionistProfile } from "@/domain/write/nutritionist.functions";
 import { useAuth } from "@/lib/auth-context";
 
+function slugifyProfessionalName(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-")
+    .slice(0, 40);
+}
+
 export const Route = createFileRoute("/_authenticated/onboarding/nutritionist")({
   head: () => ({
     meta: [{ title: "Onboarding — FitJourney" }],
@@ -18,6 +29,8 @@ function OnboardingNutritionistPage() {
   const createProfile = useServerFn(createNutritionistProfile);
 
   const [fullName, setFullName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [slugTouched, setSlugTouched] = useState(false);
   const [crn, setCrn] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +43,7 @@ function OnboardingNutritionistPage() {
       await createProfile({
         data: {
           fullName: fullName.trim(),
+          slug: slug.trim().toLowerCase(),
           crn: crn.trim() || undefined,
         },
       });
@@ -72,9 +86,47 @@ function OnboardingNutritionistPage() {
             required
             maxLength={255}
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setFullName(value);
+              if (!slugTouched) setSlug(slugifyProfessionalName(value));
+            }}
             className="w-full bg-surface border border-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-primary"
           />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            Endereço público da sua landing
+          </label>
+          <div className="rounded-md border border-border bg-surface px-3 py-2.5 focus-within:border-primary">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-mono text-muted-foreground">
+                fitjourney.com.br/n/
+              </span>
+              <input
+                required
+                minLength={3}
+                maxLength={40}
+                value={slug}
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  setSlug(
+                    e.target.value
+                      .toLowerCase()
+                      .replace(/[^a-z0-9-]/g, "")
+                      .replace(/-{2,}/g, "-")
+                      .slice(0, 40),
+                  );
+                }}
+                placeholder="dr-wylkem"
+                className="w-full bg-transparent font-mono text-sm focus:outline-none"
+              />
+            </div>
+          </div>
+          <p className="text-[10px] text-muted-foreground/70">
+            Esse mesmo endereço será usado para sua landing e para o convite bonito dos pacientes.
+          </p>
         </div>
 
         <div className="space-y-2">

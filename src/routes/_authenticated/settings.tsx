@@ -29,6 +29,17 @@ function onlyDigits(s: string) {
   return s.replace(/\D+/g, "");
 }
 
+function slugifyProfessionalName(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-")
+    .slice(0, 40);
+}
+
 function Settings() {
   const fetchProfile = useServerFn(getMyNutritionistProfile);
   const updateProfile = useServerFn(updateMyNutritionistProfile);
@@ -89,7 +100,10 @@ function Settings() {
       setEmail(profile.email ?? "");
       setSpecialty(profile.specialty ?? "");
       setPhone(profile.phone ?? "");
-      setSlug(profile.slug ?? "");
+      setSlug(
+        profile.slug ??
+          slugifyProfessionalName(profile.displayName || profile.fullName || ""),
+      );
       setPublicHeadline(profile.publicHeadline ?? "");
       setPublicBio(profile.publicBio ?? "");
     }
@@ -119,16 +133,20 @@ function Settings() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
+  const effectiveSlug = slug.trim().toLowerCase();
+  const savedSlug = profile?.slug ?? "";
+  const slugPendingSave = !!effectiveSlug && effectiveSlug !== savedSlug;
+
   const inviteUrl = useMemo(() => {
     if (!referral) return "";
-    if (slug) return publicUrl(`/c/${slug}/${referral.code}`);
-    return publicUrl(`/signup/patient?code=${referral.code}`);
-  }, [referral, slug]);
+    if (!effectiveSlug) return "";
+    return publicUrl(`/c/${effectiveSlug}/${referral.code}`);
+  }, [effectiveSlug, referral]);
 
   const landingUrl = useMemo(() => {
-    if (!slug) return "";
-    return publicUrl(`/n/${slug}`);
-  }, [slug]);
+    if (!effectiveSlug) return "";
+    return publicUrl(`/n/${effectiveSlug}`);
+  }, [effectiveSlug]);
 
   const waUrl = useMemo(() => {
     const d = onlyDigits(phone);
@@ -438,31 +456,49 @@ function Settings() {
 
           <div className="space-y-1.5">
             <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Endereço (slug) — letras minúsculas, números e hífen
+              Endereço da sua landing e convite
             </label>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground font-mono shrink-0">
-                fitjourney.com.br/n/
-              </span>
-              <input
-                className={inputCls + " font-mono"}
-                value={slug}
-                onChange={(e) =>
-                  setSlug(
-                    e.target.value
-                      .toLowerCase()
-                      .replace(/[^a-z0-9-]/g, "")
-                      .slice(0, 40),
-                  )
-                }
-                disabled={saving}
-                placeholder="dr-wylkem"
-                maxLength={40}
-              />
+            <div className="rounded-xl border border-border bg-background p-3 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <span className="text-xs text-muted-foreground font-mono shrink-0">
+                  fitjourney.com.br/n/
+                </span>
+                <input
+                  className={inputCls + " font-mono flex-1"}
+                  value={slug}
+                  onChange={(e) =>
+                    setSlug(
+                      e.target.value
+                        .toLowerCase()
+                        .replace(/[^a-z0-9-]/g, "")
+                        .replace(/-{2,}/g, "-")
+                        .slice(0, 40),
+                    )
+                  }
+                  disabled={saving}
+                  placeholder="dr-wylkem"
+                  maxLength={40}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 min-w-0">
+                <Link2 className="size-4 text-primary shrink-0" />
+                <code className="text-xs flex-1 truncate">
+                  {landingUrl || publicUrl("/n/seu-nome")}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => copy(landingUrl, "Endereço da landing")}
+                  disabled={!landingUrl || slugPendingSave}
+                  className="text-[10px] font-mono uppercase tracking-widest px-2 py-1 border border-border rounded hover:border-primary/40 disabled:opacity-40"
+                >
+                  <Copy className="size-3" />
+                </button>
+              </div>
             </div>
             <p className="text-[10px] text-muted-foreground/70">
-              Entre 3 e 40 caracteres. Define também o link bonito de convite:{" "}
-              <code className="font-mono">/c/{slug || "seu-slug"}/CODIGO</code>.
+              O endereço já fica pronto para copiar. Ao salvar, a landing e o convite passam a usar esse slug.
+              {slugPendingSave ? " Salve para ativar este novo endereço." : ""}
             </p>
           </div>
 
@@ -517,12 +553,16 @@ function Settings() {
             </button>
           </div>
           <p className="text-xs text-muted-foreground -mt-1">
-            Compartilhe este link com novos pacientes. Eles entram pelo link e ficam
-            vinculados automaticamente ao seu cadastro.
+            Compartilhe este link com novos pacientes. Ele abre direto o cadastro e o vínculo
+            com seu perfil é gravado no servidor antes da anamnese.
           </p>
           {!profile ? (
             <p className="text-xs text-muted-foreground">
               Salve seu perfil antes para liberar o link de convite.
+            </p>
+          ) : !effectiveSlug ? (
+            <p className="text-xs text-muted-foreground">
+              Defina e salve seu slug acima para liberar o link bonito de convite.
             </p>
           ) : !referral ? (
             <p className="text-xs text-muted-foreground">
@@ -530,11 +570,17 @@ function Settings() {
             </p>
           ) : (
             <div className="space-y-2">
+              {slugPendingSave && (
+                <p className="text-[11px] text-primary bg-primary/10 border border-primary/20 rounded-md px-3 py-2">
+                  Você alterou o slug. Clique em “Salvar Configurações” para ativar este link.
+                </p>
+              )}
               <div className="flex items-center gap-2 p-3 border border-border rounded-md bg-background">
                 <Link2 className="size-4 text-primary shrink-0" />
                 <code className="text-xs flex-1 truncate">{inviteUrl}</code>
                 <button
                   onClick={() => copy(inviteUrl, "Link")}
+                  disabled={slugPendingSave}
                   className="text-[10px] font-mono uppercase tracking-widest px-2 py-1 border border-border rounded hover:border-primary/40"
                 >
                   <Copy className="size-3" />
