@@ -37,8 +37,8 @@ function LogoTestPage() {
               key={v.id}
               className="glass rounded-xl p-8 flex flex-col items-center gap-5"
             >
-              <div className="flex items-center justify-center h-48 w-48">
-                <LogoOrbital effect={v.id} size="size-36" />
+              <div className="flex items-center justify-center h-56 w-56">
+                <LogoOrbital effect={v.id} size="size-44" />
               </div>
               <div className="text-center">
                 <div className="font-semibold">{v.label}</div>
