@@ -1,6 +1,6 @@
 import { LogoMark } from "@/components/LogoMark";
 
-export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle";
+export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle" | "lines";
 
 interface LogoOrbitalProps {
   size?: string;
@@ -15,7 +15,7 @@ interface LogoOrbitalProps {
 export function LogoOrbital({
   size = "size-16",
   className = "",
-  effect = "sparkle",
+  effect = "lines",
 }: LogoOrbitalProps) {
   return (
     <span
@@ -85,6 +85,17 @@ export function LogoOrbital({
           {Array.from({ length: 12 }).map((_, i) => (
             <span key={i} />
           ))}
+        </span>
+      )}
+
+      {effect === "lines" && (
+        <span className="fj-lines" aria-hidden>
+          <svg viewBox="-60 -60 120 120">
+            <path d="M -55 -10 C -40 -45, -10 -55, 20 -40 S 55 -5, 50 25" />
+            <path d="M 55 10 C 40 45, 10 55, -20 40 S -55 5, -50 -25" />
+            <path d="M -50 30 C -25 20, 25 -20, 50 -30" />
+            <path d="M 50 35 C 20 25, -20 -25, -50 -35" />
+          </svg>
         </span>
       )}
 
