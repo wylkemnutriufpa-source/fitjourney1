@@ -484,8 +484,8 @@ function TemplatesPage() {
                 </p>
                 <p className="text-xs text-amber-900/80 dark:text-amber-200/80 max-w-3xl">
                   Templates aqui validam novas arquiteturas (ex.: V2 — item soberano) sem
-                  afetar a Biblioteca do Sistema nem os planos publicados. Não são editáveis
-                  pelo editor de produção. Use apenas para validação visual.
+                  afetar a Biblioteca do Sistema nem os planos publicados. O V2 tem editor
+                  próprio de teste; o preview continua sendo somente leitura por contrato.
                 </p>
               </div>
             </div>
@@ -534,6 +534,7 @@ function PilotCard({
     description: string;
     tags: string[];
     kcal: number;
+    editorRoute: string;
     previewRoute: string;
     badge: string;
   };
