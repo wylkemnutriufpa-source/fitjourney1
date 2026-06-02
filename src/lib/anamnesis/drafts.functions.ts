@@ -44,11 +44,11 @@ export const loadAnamnesisDraft = createServerFn({ method: "GET" })
       if (error) throw new Error(error.message);
       if (!row) return { found: false };
 
-      const raw =
+      const raw: Record<string, any> =
         row.data && typeof row.data === "object" && "raw" in row.data
-          ? (row.data.raw as Record<string, unknown>)
+          ? ((row.data as any).raw ?? {})
           : {};
-      return { found: true, answers: raw, updatedAt: row.updated_at };
+      return { found: true as const, answers: raw, updatedAt: row.updated_at as string };
     },
   );
 
