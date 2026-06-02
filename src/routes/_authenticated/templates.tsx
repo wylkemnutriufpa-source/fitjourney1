@@ -101,6 +101,7 @@ const pilotosCatalog: Array<{
   description: string;
   tags: string[];
   kcal: number;
+  editorRoute: string;
   previewRoute: string;
   badge: string;
 }> = [
@@ -110,6 +111,7 @@ const pilotosCatalog: Array<{
     description: espHipertrofiaV2Piloto.description,
     tags: espHipertrofiaV2Piloto.tags,
     kcal: espHipertrofiaV2Piloto.kcal,
+    editorRoute: "/templates-v2-editor",
     previewRoute: "/my-plan-v2-preview",
     badge: "V2 — Item Soberano",
   },
