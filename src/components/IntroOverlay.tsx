@@ -58,9 +58,10 @@ export function IntroOverlay() {
 
   useEffect(() => {
     if (!show) return;
-    const t1 = window.setTimeout(() => setTextVisible(true), 600);
-    const t2 = window.setTimeout(() => setFadeOut(true), 6500);
-    const t3 = window.setTimeout(() => finish(), 7200);
+    // Texto entra lentamente, acompanhando o giro da intro (≈3s para sincronizar com o pico do giro)
+    const t1 = window.setTimeout(() => setTextVisible(true), 2400);
+    const t2 = window.setTimeout(() => setFadeOut(true), 7200);
+    const t3 = window.setTimeout(() => finish(), 7900);
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
