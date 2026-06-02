@@ -8,10 +8,10 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  ChevronLeft,
   ShieldCheck,
   ArrowLeft,
   Menu,
-  X,
   ClipboardList,
   MessageSquareHeart,
   DollarSign,
@@ -273,18 +273,18 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Backdrop mobile */}
+      {/* Backdrop mobile — leve, sem escurecer todo o fundo */}
       {sidebarOpen && (
         <button
           aria-label="Fechar menu"
           onClick={() => setSidebarOpen(false)}
-          className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 z-40 bg-background/20 backdrop-blur-[2px]"
         />
       )}
 
       <aside
         className={
-          "fixed left-0 top-0 z-50 h-full w-64 border-r border-border bg-sidebar px-4 py-6 flex flex-col transition-transform duration-200 " +
+          "fixed left-0 top-0 z-50 h-full w-64 border-r border-border/60 bg-sidebar/60 backdrop-blur-xl supports-[backdrop-filter]:bg-sidebar/50 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.35)] px-4 py-6 flex flex-col transition-transform duration-200 " +
           (sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0 md:w-0 md:px-0 md:border-r-0 md:overflow-hidden")
         }
       >
@@ -300,9 +300,10 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
           <button
             onClick={() => setSidebarOpen(false)}
             title="Recolher menu"
-            className="md:hidden p-1.5 text-muted-foreground hover:text-foreground"
+            aria-label="Recolher menu"
+            className="p-1.5 rounded-md border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
           >
-            <X className="size-4" />
+            <ChevronLeft className="size-4" />
           </button>
         </div>
 
