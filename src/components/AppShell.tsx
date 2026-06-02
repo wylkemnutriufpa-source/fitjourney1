@@ -108,10 +108,24 @@ function BackButton() {
   );
 }
 
+function AccessGateSplash() {
+  return (
+    <div className="min-h-screen bg-background text-foreground grid place-items-center">
+      <div className="flex flex-col items-center gap-4">
+        <span className="fj-logo-aura relative inline-flex items-center justify-center size-[72px] shrink-0">
+          <span className="fj-logo-pulse" aria-hidden />
+          <img src={fjLogo} alt="FitJourney" className="relative z-10 size-[72px] object-contain" />
+        </span>
+        <div className="size-5 rounded-full border-2 border-primary/30 border-t-primary animate-spin" aria-hidden />
+      </div>
+    </div>
+  );
+}
+
 export function AppShell({ children, header }: { children: ReactNode; header?: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
-  const { user, roles, signOut } = useAuth();
+  const { user, roles, loading: authLoading, signOut } = useAuth();
 
   const isAdmin = roles.includes("admin");
   const email = user?.email ?? "";
@@ -183,12 +197,15 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     staleTime: 60_000,
     enabled: mounted && !!user?.id,
   });
-  const isPatientRoute =
-    path === "/my-dashboard" ||
-    path.startsWith("/my-dashboard/") ||
-    path === "/my-plan" ||
-    path.startsWith("/my-plan/");
-  const isPatient = identity?.role === "patient" || isPatientRoute;
+  const knownProfessionalByRole = isAdmin;
+  const effectiveRole = identity?.role ?? (knownProfessionalByRole ? "nutritionist" : null);
+  const isResolvingIdentity = !mounted || authLoading || (!!user?.id && !identity && !knownProfessionalByRole);
+  const isPatient = effectiveRole === "patient";
+  const roleRouteMismatch = Boolean(
+    effectiveRole &&
+      ((effectiveRole === "patient" && !isPatientArea) ||
+        (effectiveRole !== "patient" && isPatientArea)),
+  );
   const baseNav = isPatient ? patientNav : nutritionistNav;
   const nav = !isPatient && isAdmin
     ? ([...baseNav, { to: "/admin/profissionais", label: "Admin", icon: ShieldCheck }] as const)
@@ -215,6 +232,18 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   async function handleSignOut() {
     await signOut();
     navigate({ to: "/app" });
+  }
+
+  useEffect(() => {
+    if (!roleRouteMismatch) return;
+    navigate({
+      to: effectiveRole === "patient" ? "/my-dashboard" : "/dashboard",
+      replace: true,
+    });
+  }, [effectiveRole, navigate, roleRouteMismatch]);
+
+  if (isResolvingIdentity || roleRouteMismatch) {
+    return <AccessGateSplash />;
   }
 
   return (
