@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,6 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const rolesRequestRef = useRef(0);
 
   const loadRoles = useCallback(async (userId: string) => {
     const { data } = await supabase
@@ -36,6 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      const requestId = ++rolesRequestRef.current;
+      setLoading(true);
       setSession((prev) => {
         if (prev?.access_token === s?.access_token && prev?.user?.id === s?.user?.id) {
           return prev; // idem token → não re-renderiza
@@ -43,16 +46,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return s;
       });
       if (s?.user) {
-        setTimeout(() => loadRoles(s.user.id), 0);
+        setTimeout(() => {
+          loadRoles(s.user.id).finally(() => {
+            if (rolesRequestRef.current === requestId) setLoading(false);
+          });
+        }, 0);
       } else {
         setRoles([]);
+        setLoading(false);
       }
     });
 
     supabase.auth.getSession().then(({ data }) => {
+      const requestId = ++rolesRequestRef.current;
       setSession(data.session);
       if (data.session?.user) {
-        loadRoles(data.session.user.id).finally(() => setLoading(false));
+        loadRoles(data.session.user.id).finally(() => {
+          if (rolesRequestRef.current === requestId) setLoading(false);
+        });
       } else {
         setLoading(false);
       }
