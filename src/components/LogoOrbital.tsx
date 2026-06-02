@@ -80,6 +80,14 @@ export function LogoOrbital({
         </span>
       )}
 
+      {effect === "sparkle" && (
+        <span className="fj-sparkle" aria-hidden>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <span key={i} />
+          ))}
+        </span>
+      )}
+
       <LogoMark className={`relative z-10 ${size} object-contain`} />
     </span>
   );
