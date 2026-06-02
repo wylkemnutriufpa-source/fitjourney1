@@ -7,7 +7,7 @@ import {
   ArrowRight, Star, Zap, Heart, ChevronRight, Pill, Camera,
   Target, MessageSquare, FileText, Rocket, ClipboardCheck,
   Palette, DollarSign, Play, ArrowDown, Menu, X, Globe, Lock, Cpu,
-  Dumbbell, Instagram, Mail,
+  Dumbbell, Instagram, Mail, MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 
