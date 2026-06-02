@@ -94,6 +94,10 @@ export const createNutritionistProfile = createServerFn({ method: "POST" })
         if (error) {
           const code = (error as { code?: string }).code;
           if (code === "23505") {
+            const conflictText = `${error.message ?? ""} ${(error as { details?: string }).details ?? ""}`.toLowerCase();
+            if (conflictText.includes("slug") || conflictText.includes("nutritionists_slug")) {
+              throw new Error("Este endereço da landing já está em uso. Escolha outro.");
+            }
             auditEvent({
               flow: "createNutritionistProfile",
               step: "profile.insert",
