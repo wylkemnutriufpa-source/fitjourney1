@@ -142,7 +142,7 @@ export function IntroOverlay() {
             transition: "opacity 1800ms ease-out 900ms, transform 1800ms ease-out 900ms",
           }}
         >
-          Performance · Nutrition · Lab
+          Acompanhamento Nutricional especializado.
         </p>
       </div>
 
