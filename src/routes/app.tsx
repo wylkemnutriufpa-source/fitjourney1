@@ -110,7 +110,7 @@ function Login() {
     <div className="min-h-screen grid lg:grid-cols-2 bg-background text-foreground">
       <div className="hidden lg:flex flex-col justify-between p-12 bg-sidebar border-r border-border relative overflow-hidden">
         <div className="flex items-center gap-3 relative z-10">
-          <span className="fj-logo-aura relative inline-flex items-center justify-center size-10 shrink-0">
+          <span className="fj-logo-aura relative inline-flex items-center justify-center size-14 shrink-0">
             <span className="fj-logo-pulse" aria-hidden />
             <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
               <span className="fj-logo-particle" />
@@ -124,7 +124,7 @@ function Login() {
             <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
               <span className="fj-logo-particle fj-logo-particle-gold" />
             </span>
-            <LogoVideo className="relative z-10 size-10 object-contain" />
+            <LogoVideo className="relative z-10 size-14 object-contain" />
           </span>
           <span className="fj-wordmark text-2xl leading-none">FitJourney</span>
         </div>
