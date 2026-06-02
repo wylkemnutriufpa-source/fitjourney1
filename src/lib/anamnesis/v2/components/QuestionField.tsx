@@ -90,23 +90,43 @@ export function QuestionField({ question: q, value, onChange, error }: Props) {
       )}
 
       {q.type === "number" && (
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            inputMode="decimal"
-            min={q.min}
-            max={q.max}
-            value={value === null || value === undefined ? "" : Number(value)}
-            onChange={(e) => {
-              const raw = e.target.value;
-              onChange(raw === "" ? null : Number(raw));
-            }}
-            className={inputCls}
-          />
-          {q.unit && (
-            <span className="text-xs font-mono text-muted-foreground">{q.unit}</span>
+        <>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              inputMode="decimal"
+              min={q.min}
+              max={q.max}
+              placeholder={
+                q.unit === "cm"
+                  ? "ex: 165"
+                  : q.unit === "kg"
+                    ? "ex: 70"
+                    : q.min !== undefined
+                      ? `entre ${q.min} e ${q.max ?? "—"}`
+                      : undefined
+              }
+              value={value === null || value === undefined ? "" : Number(value)}
+              onChange={(e) => {
+                const raw = e.target.value;
+                onChange(raw === "" ? null : Number(raw));
+              }}
+              className={inputCls}
+            />
+            {q.unit && (
+              <span className="text-xs font-mono text-muted-foreground">{q.unit}</span>
+            )}
+          </div>
+          {(q.min !== undefined || q.max !== undefined) && (
+            <p className="text-[11px] text-muted-foreground">
+              Informe em <strong>{q.unit ?? "número"}</strong>
+              {q.min !== undefined && q.max !== undefined
+                ? ` (entre ${q.min} e ${q.max})`
+                : ""}
+              .
+            </p>
           )}
-        </div>
+        </>
       )}
 
       {q.type === "text" && (
