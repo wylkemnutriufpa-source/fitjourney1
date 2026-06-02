@@ -108,6 +108,20 @@ function BackButton() {
   );
 }
 
+function AccessGateSplash() {
+  return (
+    <div className="min-h-screen bg-background text-foreground grid place-items-center">
+      <div className="flex flex-col items-center gap-4">
+        <span className="fj-logo-aura relative inline-flex items-center justify-center size-[72px] shrink-0">
+          <span className="fj-logo-pulse" aria-hidden />
+          <img src={fjLogo} alt="FitJourney" className="relative z-10 size-[72px] object-contain" />
+        </span>
+        <div className="size-5 rounded-full border-2 border-primary/30 border-t-primary animate-spin" aria-hidden />
+      </div>
+    </div>
+  );
+}
+
 export function AppShell({ children, header }: { children: ReactNode; header?: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
@@ -227,7 +241,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   }, [identity?.role, navigate, roleRouteMismatch]);
 
   if (isResolvingIdentity || roleRouteMismatch) {
-    return <div className="min-h-screen bg-background text-foreground" />;
+    return <AccessGateSplash />;
   }
 
   return (
