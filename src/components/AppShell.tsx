@@ -296,22 +296,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
               className="focus:outline-none cursor-pointer"
               title="Reproduzir intro"
             >
-              <span className="fj-logo-aura relative inline-flex items-center justify-center size-[96px] shrink-0">
-                <span className="fj-logo-pulse" aria-hidden />
-                <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
-                  <span className="fj-logo-particle" />
-                </span>
-                <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
-                  <span className="fj-logo-particle fj-logo-particle-gold" />
-                </span>
-                <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
-                  <span className="fj-logo-particle" />
-                </span>
-                <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
-                  <span className="fj-logo-particle fj-logo-particle-gold" />
-                </span>
-                <LogoVideo className="relative z-10 size-[96px] object-contain" />
-              </span>
+              <LogoOrbital slot="sidebar" />
             </button>
             <span className="fj-wordmark text-[17px] leading-none">
               FitJourney
