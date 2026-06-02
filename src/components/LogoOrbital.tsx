@@ -144,8 +144,6 @@ export function LogoOrbital({
         <span className="fj-halo" aria-hidden>
           <span className="fj-halo-ring fj-halo-ring-1" />
           <span className="fj-halo-ring fj-halo-ring-2" />
-          <span className="fj-halo-wisp fj-halo-wisp-l" />
-          <span className="fj-halo-wisp fj-halo-wisp-r" />
         </span>
       )}
 
