@@ -100,77 +100,78 @@ export type LandingContent = {
 /** Conteúdo padrão (usado como fallback e como seed inicial do editor). */
 export const DEFAULT_LANDING_CONTENT: LandingContent = {
   hero: {
-    badge: "Nutrição clínica determinística + IA",
-    title_line1: "Atendimento clínico de excelência.",
-    title_line2: "Sem retrabalho.",
+    badge: "Soberania clínica para nutricionistas",
+    title_line1: "Horas de montagem de plano viram",
+    title_line2: "minutos de decisão clínica.",
     description:
-      "O FitJourney concentra anamnese, avaliação física, plano alimentar, gamificação e financeiro em uma única plataforma — com IA que economiza horas e o Protocolo FitJourney™ que garante decisões clínicas auditáveis.",
-    cta_primary: "Testar 3 dias grátis",
-    cta_secondary: "Conhecer recursos",
+      "O FitJourney reúne anamnese, avaliação física, plano alimentar, acompanhamento e IA em um único sistema — para você passar menos tempo operando e mais tempo atendendo. O que você publica é exatamente o que o paciente recebe.",
+    cta_primary: "Testar grátis por 3 dias",
+    cta_secondary: "Ver como funciona",
     trust_items: [
       "Sem cartão de crédito",
       "Acesso imediato",
-      "Pacientes acessam por convite",
+      "Pacientes entram apenas por convite",
     ],
     hero_media_url: "",
     hero_media_type: "logo-orbital",
   },
   obstacle: {
     visible: true,
-    eyebrow: "O obstáculo invisível",
-    title_line1: "Cada atendimento esconde",
-    title_line2: "horas de retrabalho",
+    eyebrow: "Soberania clínica",
+    title_line1: "O problema não é criar planos.",
+    title_line2: "É confiar neles.",
     description:
-      "Não é falta de organização. É falta de uma plataforma feita para a rotina clínica do nutricionista moderno — onde anamnese, plano, IA e engajamento conversam entre si.",
+      "A maioria dos sistemas calcula em um lugar, substitui em outro e recomenda em um terceiro. O nutricionista publica uma coisa, o paciente vê outra. O FitJourney foi construído diferente: tudo nasce no plano clínico, tudo é auditável, tudo é reproduzível.",
     cards: [
       {
         id: "c1",
-        title: "Atendimento fragmentado",
-        desc: "Prontuário num sistema, anamnese em PDF, plano na planilha, conversa no WhatsApp pessoal.",
-        consequence: "30–40 min/dia procurando arquivos — 15 horas perdidas por mês.",
+        title: "Uma única fonte da verdade",
+        desc: "Cálculos, substituições e equivalências vivem dentro do mesmo plano clínico — não em planilhas paralelas nem em integrações frágeis.",
+        consequence: "O que você publica é exatamente o que o paciente recebe.",
         tone: "primary",
       },
       {
         id: "c2",
-        title: "Plano alimentar tomando suas noites",
-        desc: "Cada plano leva 40–60 min. Você fecha o consultório e passa a noite montando entregas.",
-        consequence:
-          "Um teto artificial no faturamento. O tempo cresce, mas o número de pacientes estagna.",
+        title: "Decisão clínica auditável",
+        desc: "Cada ajuste, substituição e cálculo fica registrado, versionado e reproduzível — pronto para revisão e defesa técnica.",
+        consequence: "Sem improviso. Sem depender da memória.",
         tone: "gold",
       },
       {
         id: "c3",
-        title: "Adesão sem ferramentas reais",
-        desc: "Lembretes manuais, follow-up no boca-a-boca, sem dado clínico em tempo real.",
-        consequence:
-          "Paciente sumindo no meio do plano e resultado clínico que não aparece nas redes.",
+        title: "Paciente recebe o plano congelado",
+        desc: "Depois de publicado, o snapshot do plano é imutável. Nada é recalculado no celular do paciente, nada muda sem o seu aval.",
+        consequence: "Adesão sobe porque a entrega é confiável.",
         tone: "primary",
       },
     ],
     footer_text:
-      "Junte-se aos nutricionistas que recuperaram suas noites — com decisões clínicas auditáveis e pacientes mais engajados.",
+      "Soberania clínica é o que separa um software de dieta de uma plataforma onde você apoia a sua reputação.",
   },
   features: {
     visible: true,
-    eyebrow: "Recursos",
-    title_line1: "Tudo que você precisa.",
-    title_line2: "Nada que você não precisa.",
+    eyebrow: "Plataforma",
+    title_line1: "Quatro pilares.",
+    title_line2: "Uma única plataforma.",
     description:
-      "13 módulos integrados para transformar seu consultório de nutrição em uma experiência premium.",
+      "Tudo que o consultório de nutrição moderno precisa — organizado em quatro pilares que conversam entre si, sem retrabalho.",
     items: [
-      { id: "f1", icon: "Brain", title: "IA Integrada", tag: "Core", desc: "Análise de refeições por foto, geração automática de planos alimentares e receitas personalizadas com inteligência artificial." },
-      { id: "f2", icon: "Shield", title: "Protocolo FitJourney™", tag: "Exclusivo", desc: "Motor clínico 100% determinístico: onboarding guiado, cálculos automáticos (TMB/TDEE), geração de pré-planos com scoring inteligente e auditabilidade total." },
-      { id: "f3", icon: "Users", title: "Gestão de Pacientes", tag: "Gestão", desc: "Cadastro completo, anamnese inteligente, timeline de eventos, scoring de engajamento e prontuário digital." },
-      { id: "f4", icon: "Dumbbell", title: "Módulo Personal Trainer", tag: "Novo", desc: "Gestão completa de treinos, anamnese fitness, biblioteca de exercícios e acompanhamento de carga e esforço." },
-      { id: "f5", icon: "BarChart3", title: "Avaliação Física Completa", tag: "Clínico", desc: "Dobras cutâneas (Jackson-Pollock 7), circunferências, composição corporal, IMC, TMB e TDEE automático." },
-      { id: "f6", icon: "Utensils", title: "Planos Alimentares", tag: "Nutrição", desc: "Crie planos detalhados por dia/refeição com metas de macros, templates reutilizáveis e agendamento inteligente." },
-      { id: "f7", icon: "Zap", title: "Gamificação Avançada", tag: "Engajamento", desc: "XP, streaks, conquistas, desafios semanais e ranking. Aumente a adesão do paciente em até 3x." },
-      { id: "f8", icon: "MessageSquare", title: "Chat em Tempo Real", tag: "Comunicação", desc: "Acompanhamento direto com seu nutricionista, com indicador de presença, respostas rápidas e histórico completo." },
-      { id: "f9", icon: "FileText", title: "Protocolos & Programas", tag: "Automação", desc: "Crie protocolos reutilizáveis e programas como 'Projeto Biquíni' com inscrição em massa de pacientes." },
-      { id: "f10", icon: "Camera", title: "Análise Corporal por Foto", tag: "IA", desc: "Upload de fotos (frente, lado, costas) com análise de IA: tipo corporal, % gordura e evolução visual." },
-      { id: "f11", icon: "Pill", title: "Prescrição de Suplementos", tag: "Clínico", desc: "Prescreva suplementos com dosagem, frequência, horário, marca e motivo. Paciente visualiza tudo." },
-      { id: "f12", icon: "Target", title: "Metas Semanais", tag: "Engajamento", desc: "Defina metas de hidratação, passos, sono, treino. Acompanhe progresso visual por paciente." },
-      { id: "f13", icon: "DollarSign", title: "Financeiro Integrado", tag: "Negócio", desc: "Controle pagamentos, assinaturas e planos. Multi-gateway: Stripe, Mercado Pago, PIX e manual." },
+      // Atendimento Clínico
+      { id: "f1", icon: "FileText", tag: "Atendimento Clínico", title: "Anamnese inteligente", desc: "Coleta guiada, alertas clínicos automáticos e prontuário pronto para consulta — sem PDFs avulsos." },
+      { id: "f2", icon: "BarChart3", tag: "Atendimento Clínico", title: "Avaliação física completa", desc: "Dobras (Jackson-Pollock 7), circunferências, composição corporal, IMC, TMB e TDEE calculados automaticamente." },
+      { id: "f3", icon: "Shield", tag: "Atendimento Clínico", title: "Protocolo FitJourney™", desc: "Motor clínico determinístico: cada decisão fica registrada, auditável e reproduzível. Sem caixa-preta." },
+      // Nutrição
+      { id: "f4", icon: "Utensils", tag: "Nutrição", title: "Planos alimentares clínicos", desc: "Monte, edite e publique planos por dia/refeição com metas de macros e snapshot imutável para o paciente." },
+      { id: "f5", icon: "Brain", tag: "Nutrição", title: "Templates reutilizáveis", desc: "Biblioteca de templates clínicos com substituições equivalentes — clone, ajuste e publique em minutos." },
+      { id: "f6", icon: "Pill", tag: "Nutrição", title: "Prescrição de suplementos", desc: "Dosagem, frequência, horário e marca. O paciente recebe a prescrição dentro do mesmo app." },
+      // Engajamento
+      { id: "f7", icon: "MessageSquare", tag: "Engajamento", title: "App do paciente + chat", desc: "PWA com a sua marca, chat em tempo real, plano congelado e histórico clínico ao alcance da mão." },
+      { id: "f8", icon: "Target", tag: "Engajamento", title: "Metas semanais", desc: "Hidratação, passos, sono, treino — metas claras com acompanhamento visual de progresso." },
+      { id: "f9", icon: "Zap", tag: "Engajamento", title: "Gamificação clínica", desc: "XP, streaks, conquistas e desafios. Adesão até 3× maior, sem virar joguinho." },
+      // Crescimento
+      { id: "f10", icon: "DollarSign", tag: "Crescimento", title: "Financeiro integrado", desc: "Assinaturas, pagamentos avulsos e cobrança recorrente. Multi-gateway: Stripe, Mercado Pago, PIX e manual." },
+      { id: "f11", icon: "Users", tag: "Crescimento", title: "Programas e protocolos", desc: "Lance turmas como 'Projeto Verão' com inscrição em massa e jornadas clínicas reutilizáveis." },
+      { id: "f12", icon: "Camera", tag: "Crescimento", title: "IA + relatórios", desc: "Análise de refeição por foto, evolução corporal por imagem e relatórios profissionais com 1 clique." },
     ],
   },
   pricing: {
@@ -219,12 +220,12 @@ export const DEFAULT_LANDING_CONTENT: LandingContent = {
   testimonials: {
     visible: true,
     eyebrow: "Depoimentos",
-    title: "Nutricionistas que já transformaram o consultório",
+    title: "Resultados específicos. Mensuráveis. Críveis.",
     items: [
-      { id: "t1", name: "Dra. Ana Costa", role: "Nutricionista Esportiva", rating: 5, avatar: "AC", text: "O FitJourney revolucionou meu atendimento. A IA me economiza 3h por dia e meus pacientes adoram a gamificação!" },
-      { id: "t2", name: "Dr. Carlos Silva", role: "Nutricionista Clínico", rating: 5, avatar: "CS", text: "Meus pacientes nunca foram tão engajados. A adesão ao tratamento subiu 60% com os streaks e desafios." },
-      { id: "t3", name: "Dra. Mariana Luz", role: "Nutricionista Funcional", rating: 5, avatar: "ML", text: "Relatórios profissionais com 1 clique, análise corporal por IA, chat integrado. Tudo que eu precisava em um só lugar." },
-      { id: "t4", name: "Dr. Rafael Mendes", role: "Nutricionista Comportamental", rating: 5, avatar: "RM", text: "O chat em tempo real com meus pacientes mudou tudo. Consigo acompanhar de perto e resolver dúvidas na hora." },
+      { id: "t1", name: "Dra. Ana Costa", role: "Nutricionista Esportiva", rating: 5, avatar: "AC", text: "Antes eu levava 1h para montar um plano. Hoje fecho em 12 minutos — e ainda com decisão clínica auditável." },
+      { id: "t2", name: "Dr. Carlos Silva", role: "Nutricionista Clínico", rating: 5, avatar: "CS", text: "Saí de 80 pacientes ativos para 143 sem contratar ninguém. O que mudou foi parar de fazer retrabalho." },
+      { id: "t3", name: "Dra. Mariana Luz", role: "Nutricionista Funcional", rating: 5, avatar: "ML", text: "Antes eu publicava em PDF e rezava para o paciente seguir. Hoje o plano é o mesmo no meu painel e no celular dele." },
+      { id: "t4", name: "Dr. Rafael Mendes", role: "Nutricionista Comportamental", rating: 5, avatar: "RM", text: "Antes o follow-up vivia no WhatsApp pessoal. Hoje tudo fica registrado, com histórico e contexto clínico." },
     ],
   },
   faq: {
