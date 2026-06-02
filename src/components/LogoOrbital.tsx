@@ -28,8 +28,10 @@ export function LogoOrbital({
   const cfg = slot ? settings : null;
   const finalEffect: LogoEffect = cfg?.variant === "static" ? ("none" as any) : cfg?.effect ?? effect;
   const finalSizePx = cfg?.sizePx ?? sizePx;
-  const useVideo = cfg?.variant === "video" && !cfg?.customUrl;
   const customUrl = cfg?.customUrl ?? null;
+  const customIsVideo = !!customUrl && /^data:video\//i.test(customUrl);
+  const useVideo = cfg?.variant === "video" && !customUrl;
+
 
   const sizeStyle: CSSProperties | undefined = finalSizePx
     ? { width: finalSizePx, height: finalSizePx }
@@ -145,11 +147,24 @@ export function LogoOrbital({
         </span>
       )}
 
-      {useVideo ? (
+      {customIsVideo ? (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          src={customUrl!}
+          className={`relative z-10 object-contain ${sizeClass}`}
+          style={{ background: "transparent", ...(sizeStyle ?? {}) }}
+          aria-label="Logo"
+        />
+      ) : useVideo ? (
         <LogoVideo className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} />
       ) : (
         <LogoMark className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} src={customUrl} />
       )}
+
     </span>
   );
 }

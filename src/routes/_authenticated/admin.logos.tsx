@@ -18,11 +18,15 @@ export const Route = createFileRoute("/_authenticated/admin/logos")({
   component: LogosAdminPage,
 });
 
-const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (igual avatar)
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (imagem — igual avatar)
+const MAX_VIDEO_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (vídeo curto estilo boomerang)
+const MAX_VIDEO_DURATION_S = 6; // s — vídeo "boomerang" curto
 const MAX_DIMENSION = 1024; // px — comprime automaticamente acima disso
 const MIN_DIMENSION = 32; // px — abaixo disso é pequeno demais p/ logo
 const MAX_ASPECT_RATIO = 6; // razão maior:menor
 const MAX_STORED_BYTES = 1.5 * 1024 * 1024; // 1.5 MB após compressão (limite localStorage)
+const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm"];
+
 
 function readAsDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -74,10 +78,64 @@ function LogosAdminPage() {
     setErrorBySlot((s) => ({ ...s, [slot]: undefined }));
     setInfoBySlot((s) => ({ ...s, [slot]: undefined }));
 
-    if (!file.type.startsWith("image/")) {
-      setErrorBySlot((s) => ({ ...s, [slot]: "Arquivo precisa ser uma imagem (PNG, JPG, WebP ou SVG)." }));
+    const isVideo = ACCEPTED_VIDEO_TYPES.includes(file.type);
+    const isImage = file.type.startsWith("image/");
+
+    if (!isVideo && !isImage) {
+      setErrorBySlot((s) => ({
+        ...s,
+        [slot]: "Arquivo precisa ser imagem (PNG, JPG, WebP, SVG) ou vídeo curto (MP4, WebM).",
+      }));
       return;
     }
+
+    // ===== VÍDEO (boomerang curto) =====
+    if (isVideo) {
+      if (file.size > MAX_VIDEO_UPLOAD_BYTES) {
+        setErrorBySlot((s) => ({
+          ...s,
+          [slot]: `Vídeo muito grande (${(file.size / 1024 / 1024).toFixed(2)} MB). Máximo: 4 MB.`,
+        }));
+        return;
+      }
+      try {
+        const dataUrl = await readAsDataUrl(file);
+        // valida duração
+        const duration = await new Promise<number>((resolve, reject) => {
+          const v = document.createElement("video");
+          v.preload = "metadata";
+          v.muted = true;
+          v.onloadedmetadata = () => resolve(v.duration || 0);
+          v.onerror = () => reject(new Error("Não foi possível ler o vídeo."));
+          v.src = dataUrl;
+        });
+        if (duration > MAX_VIDEO_DURATION_S + 0.5) {
+          setErrorBySlot((s) => ({
+            ...s,
+            [slot]: `Vídeo longo demais (${duration.toFixed(1)}s). Máximo: ${MAX_VIDEO_DURATION_S}s — use um clipe curto estilo boomerang.`,
+          }));
+          return;
+        }
+        try {
+          update(slot, { customUrl: dataUrl, variant: "orbital" });
+        } catch {
+          setErrorBySlot((s) => ({
+            ...s,
+            [slot]: "Não foi possível salvar no navegador (storage cheio). Use um vídeo menor.",
+          }));
+          return;
+        }
+        setInfoBySlot((s) => ({
+          ...s,
+          [slot]: `Pronto: vídeo ${duration.toFixed(1)}s · ${(file.size / 1024).toFixed(0)} KB. Reproduz em loop automático.`,
+        }));
+      } catch (e: any) {
+        setErrorBySlot((s) => ({ ...s, [slot]: e?.message ?? "Falha ao processar vídeo." }));
+      }
+      return;
+    }
+
+    // ===== IMAGEM =====
     if (file.size > MAX_UPLOAD_BYTES) {
       setErrorBySlot((s) => ({
         ...s,
@@ -141,6 +199,7 @@ function LogosAdminPage() {
       }));
     }
   }
+
 
   return (
     <div className="space-y-4">
@@ -266,7 +325,18 @@ function SlotCard({
             <div className="flex items-center gap-2">
               <div className="size-10 rounded-md bg-background border border-border grid place-items-center overflow-hidden shrink-0">
                 {cfg.customUrl ? (
-                  <img src={cfg.customUrl} alt="" className="size-full object-contain" />
+                  /^data:video\//i.test(cfg.customUrl) ? (
+                    <video
+                      src={cfg.customUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="size-full object-contain"
+                    />
+                  ) : (
+                    <img src={cfg.customUrl} alt="" className="size-full object-contain" />
+                  )
                 ) : (
                   <ImageIcon className="size-4 text-muted-foreground" />
                 )}
@@ -291,7 +361,7 @@ function SlotCard({
             <input
               ref={fileRef}
               type="file"
-              accept="image/*"
+              accept="image/*,video/mp4,video/webm"
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
@@ -310,8 +380,11 @@ function SlotCard({
               </div>
             )}
             <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
-              PNG, JPG, WebP ou SVG até 4 MB. Imagens grandes são redimensionadas para no máx. {MAX_DIMENSION}px e comprimidas automaticamente. Proporção até {MAX_ASPECT_RATIO}:1.
+              <strong>Imagem:</strong> PNG/JPG/WebP/SVG até 4 MB (auto-comprime, proporção até {MAX_ASPECT_RATIO}:1).
+              <br />
+              <strong>Vídeo boomerang:</strong> MP4/WebM até 4 MB e {MAX_VIDEO_DURATION_S}s — roda em loop automático sem som.
             </p>
+
           </div>
 
           <SliderRow
@@ -344,11 +417,12 @@ function SlotCard({
                 <option key={v.value} value={v.value}>{v.label}</option>
               ))}
             </select>
-            {cfg.customUrl && cfg.variant === "video" && (
+            {cfg.customUrl && cfg.variant === "video" && !/^data:video\//i.test(cfg.customUrl) && (
               <p className="text-[10px] text-muted-foreground/70 mt-1">
-                Logo customizada usa a versão estática mesmo com variante "vídeo".
+                Logo customizada (imagem) usa a versão estática mesmo com variante "vídeo". Para animar, faça upload de um vídeo curto.
               </p>
             )}
+
           </div>
 
           <div>
