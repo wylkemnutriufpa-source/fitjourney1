@@ -379,6 +379,9 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
             >
               <Menu className="size-4" />
             </button>
+            <span className="md:hidden inline-flex items-center">
+              <LogoOrbital slot="mobile-header" />
+            </span>
             <BackButton />
             <Crumbs />
           </div>
