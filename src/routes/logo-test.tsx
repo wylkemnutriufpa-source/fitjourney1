@@ -37,8 +37,8 @@ function LogoTestPage() {
               key={v.id}
               className="glass rounded-xl p-8 flex flex-col items-center gap-5"
             >
-              <div className="flex items-center justify-center h-40 w-40">
-                <LogoOrbital effect={v.id} size="size-24" />
+              <div className="flex items-center justify-center h-48 w-48">
+                <LogoOrbital effect={v.id} size="size-36" />
               </div>
               <div className="text-center">
                 <div className="font-semibold">{v.label}</div>
@@ -53,7 +53,7 @@ function LogoTestPage() {
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-8 items-center justify-items-center">
             {variants.map((v) => (
               <div key={v.id} className="flex flex-col items-center gap-3">
-                <LogoOrbital effect={v.id} size="size-16" />
+                <LogoOrbital effect={v.id} size="size-24" />
                 <span className="text-xs text-muted-foreground">{v.label.split(" · ")[0]}</span>
               </div>
             ))}
