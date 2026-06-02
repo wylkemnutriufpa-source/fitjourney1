@@ -400,6 +400,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
+            <ThemeToggle />
             {header}
             <div className="text-right hidden sm:block">
               <p className="text-xs font-medium flex items-center gap-1.5 justify-end">
