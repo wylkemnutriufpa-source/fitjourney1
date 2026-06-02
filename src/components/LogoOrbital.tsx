@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { LogoMark } from "@/components/LogoMark";
 import { LogoVideo } from "@/components/LogoVideo";
 import { useLogoSettings, type LogoSlot } from "@/lib/logo-settings";
@@ -14,7 +15,7 @@ interface LogoOrbitalProps {
 
 /**
  * Logo FitJourney com efeito animado ao redor.
- * Quando `slot` é passado, lê tamanho/efeito/variant das configurações do admin.
+ * Quando `slot` é passado, lê tamanho/efeito/variant/customUrl/padding/margin das configurações do admin.
  */
 export function LogoOrbital({
   size = "size-16",
@@ -27,15 +28,31 @@ export function LogoOrbital({
   const cfg = slot ? settings : null;
   const finalEffect: LogoEffect = cfg?.variant === "static" ? ("none" as any) : cfg?.effect ?? effect;
   const finalSizePx = cfg?.sizePx ?? sizePx;
-  const useVideo = cfg?.variant === "video";
+  const useVideo = cfg?.variant === "video" && !cfg?.customUrl;
+  const customUrl = cfg?.customUrl ?? null;
 
-  const sizeStyle = finalSizePx ? { width: finalSizePx, height: finalSizePx } : undefined;
+  const sizeStyle: CSSProperties | undefined = finalSizePx
+    ? { width: finalSizePx, height: finalSizePx }
+    : undefined;
   const sizeClass = finalSizePx ? "" : size;
+
+  const wrapperStyle: CSSProperties = {
+    ...(sizeStyle ?? {}),
+    paddingLeft: cfg?.paddingX || undefined,
+    paddingRight: cfg?.paddingX || undefined,
+    paddingTop: cfg?.paddingY || undefined,
+    paddingBottom: cfg?.paddingY || undefined,
+    marginLeft: cfg?.marginX || undefined,
+    marginRight: cfg?.marginX || undefined,
+    marginTop: cfg?.marginY || undefined,
+    marginBottom: cfg?.marginY || undefined,
+    boxSizing: cfg?.paddingX || cfg?.paddingY ? "content-box" : undefined,
+  };
 
   return (
     <span
       className={`fj-logo-aura relative inline-flex items-center justify-center shrink-0 ${sizeClass} ${className}`}
-      style={sizeStyle}
+      style={wrapperStyle}
     >
       <span className="fj-logo-pulse" aria-hidden />
 
@@ -127,7 +144,7 @@ export function LogoOrbital({
       {useVideo ? (
         <LogoVideo className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} />
       ) : (
-        <LogoMark className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} />
+        <LogoMark className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} src={customUrl} />
       )}
     </span>
   );
