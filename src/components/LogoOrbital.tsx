@@ -73,6 +73,13 @@ export function LogoOrbital({
         </span>
       )}
 
+      {effect === "aura" && (
+        <span className="fj-aura" aria-hidden>
+          <span className="fj-aura-blob fj-aura-blob-1" />
+          <span className="fj-aura-blob fj-aura-blob-2" />
+        </span>
+      )}
+
       <LogoMark className={`relative z-10 ${size} object-contain`} />
     </span>
   );
