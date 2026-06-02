@@ -175,6 +175,7 @@ function Landing() {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const navScrolled = useNavScroll();
 
