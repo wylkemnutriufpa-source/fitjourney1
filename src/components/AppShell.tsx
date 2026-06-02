@@ -15,6 +15,9 @@ import {
   ClipboardList,
   MessageSquareHeart,
   DollarSign,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
