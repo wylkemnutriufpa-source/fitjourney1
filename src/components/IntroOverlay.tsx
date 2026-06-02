@@ -138,7 +138,8 @@ export function IntroOverlay() {
             textVisible ? "opacity-80 translate-y-0" : "opacity-0 translate-y-4"
           }`}
           style={{
-            color: "black",
+            color: "oklch(0.78 0.13 85)",
+            textShadow: "0 0 20px oklch(0.65 0.14 85 / 0.4)",
             transition: "opacity 1800ms ease-out 900ms, transform 1800ms ease-out 900ms",
           }}
         >
