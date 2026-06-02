@@ -147,9 +147,8 @@ function Patients() {
             <tbody>
               {isLoading && (
                 <tr>
-                  <td colSpan={5} className="p-12 text-center text-muted-foreground text-sm">
-                    <Loader2 className="mx-auto mb-2 size-4 animate-spin" />
-                    Carregando pacientes…
+                  <td colSpan={5} className="p-12 text-center">
+                    <VideoLoader size="md" label="Carregando pacientes…" />
                   </td>
                 </tr>
               )}

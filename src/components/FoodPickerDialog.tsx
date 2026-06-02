@@ -147,8 +147,8 @@ export function FoodPickerDialog({
 
         <div className="overflow-y-auto -mx-1 px-1 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
           {isLoading && (
-            <div className="col-span-full flex items-center justify-center py-8 text-muted-foreground gap-2 text-xs">
-              <Loader2 className="size-4 animate-spin" /> Carregando catálogo...
+            <div className="col-span-full flex items-center justify-center py-8">
+              <VideoLoader size="sm" label="Carregando catálogo..." />
             </div>
           )}
           {!isLoading && items.map((it) => (

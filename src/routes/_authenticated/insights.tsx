@@ -53,9 +53,7 @@ function InsightsPage() {
         </section>
 
         {isLoading || !data ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" /> Carregando…
-          </div>
+          <VideoLoader size="md" label="Carregando…" />
         ) : data.average.sampleSize === 0 ? (
           <div className="bg-surface border border-border rounded-lg p-8 text-center text-sm text-muted-foreground">
             Ainda não há feedbacks dos pacientes. Os gráficos aparecerão aqui assim

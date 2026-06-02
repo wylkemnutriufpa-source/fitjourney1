@@ -94,9 +94,7 @@ function PatientProfile() {
   if (isLoading) {
     return (
       <AppShell>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Carregando paciente…
-        </div>
+        <VideoLoader size="md" label="Carregando paciente…" />
       </AppShell>
     );
   }
