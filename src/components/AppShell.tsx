@@ -26,6 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 import fjLogo from "@/assets/fitjourney-logo.png";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
+import { VideoLoaderFullscreen } from "@/components/VideoLoader";
 
 // Cache module-level do estado do sidebar — sobrevive a remounts do AppShell.
 let __sidebarOpenCache: boolean | null = null;
