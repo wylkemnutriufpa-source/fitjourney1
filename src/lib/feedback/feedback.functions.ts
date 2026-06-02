@@ -141,6 +141,7 @@ export const listMyFeedbacks = createServerFn({ method: "GET" })
       .from("patient_feedbacks")
       .select(SELECT_COLS)
       .eq("patient_id", patient.id)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error(error.message);
