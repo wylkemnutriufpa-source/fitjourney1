@@ -845,9 +845,9 @@ function Landing() {
         aria-label="Converse com Sistema FitJourney no WhatsApp"
         className="fixed bottom-5 right-5 z-40 group inline-flex items-center gap-2 rounded-full bg-[#25D366] text-white pl-3 pr-4 py-3 shadow-[0_10px_30px_-8px_rgba(37,211,102,0.55)] hover:shadow-[0_14px_36px_-8px_rgba(37,211,102,0.75)] hover:scale-[1.04] active:scale-95 transition-all"
       >
-        <span className="relative inline-flex items-center justify-center size-6">
+        <span className="relative inline-flex items-center justify-center size-8">
           <span className="absolute inset-0 rounded-full bg-white/30 animate-ping" aria-hidden />
-          <WhatsAppIcon className="relative size-6" />
+          <WhatsAppIcon className="relative size-7" />
         </span>
         <span className="hidden sm:inline text-sm font-semibold whitespace-nowrap">
           Converse no WhatsApp
