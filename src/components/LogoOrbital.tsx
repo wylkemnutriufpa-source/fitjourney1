@@ -28,8 +28,10 @@ export function LogoOrbital({
   const cfg = slot ? settings : null;
   const finalEffect: LogoEffect = cfg?.variant === "static" ? ("none" as any) : cfg?.effect ?? effect;
   const finalSizePx = cfg?.sizePx ?? sizePx;
-  const useVideo = cfg?.variant === "video" && !cfg?.customUrl;
   const customUrl = cfg?.customUrl ?? null;
+  const customIsVideo = !!customUrl && /^data:video\//i.test(customUrl);
+  const useVideo = cfg?.variant === "video" && !customUrl;
+
 
   const sizeStyle: CSSProperties | undefined = finalSizePx
     ? { width: finalSizePx, height: finalSizePx }
