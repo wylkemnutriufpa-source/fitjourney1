@@ -203,7 +203,7 @@
 
 .fj-logo-pulse {
   position: absolute;
-  inset: -18%;
+  inset: -10%;
   border-radius: 9999px;
   background: radial-gradient(
     circle at center,
@@ -229,7 +229,7 @@
 
 .fj-logo-orbit {
   position: absolute;
-  inset: -22%;
+  inset: -14%;
   border-radius: 9999px;
   pointer-events: none;
   animation: fj-logo-spin linear infinite;
@@ -239,16 +239,16 @@
 .fj-logo-orbit-2 {
   animation-duration: 9s;
   animation-direction: reverse;
-  inset: -32%;
+  inset: -20%;
 }
 .fj-logo-orbit-3 {
   animation-duration: 4.5s;
-  inset: -12%;
+  inset: -8%;
 }
 .fj-logo-orbit-4 {
   animation-duration: 7.5s;
   animation-direction: reverse;
-  inset: -26%;
+  inset: -17%;
   transform: rotate(45deg);
 }
 
