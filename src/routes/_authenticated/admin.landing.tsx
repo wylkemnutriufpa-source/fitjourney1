@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { VideoLoader } from "@/components/VideoLoader";
 import {
   Save, Loader2, ArrowUp, ArrowDown, Trash2, Plus, Image as ImageIcon,
   Eye, ExternalLink,

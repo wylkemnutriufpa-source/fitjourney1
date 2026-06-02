@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { foodCatalog, foodCategories, type FoodCategory, type CatalogFood } from "@/lib/food-catalog";
 import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { Beef, Wheat, Sprout, Nut, Apple, Salad, Carrot, Milk, Droplet, Coffee, Utensils, Loader2 } from "lucide-react";
+import { VideoLoader } from "@/components/VideoLoader";
 
 const ICONS: Record<FoodCategory, React.ComponentType<{ className?: string }>> = {
   Proteínas: Beef,

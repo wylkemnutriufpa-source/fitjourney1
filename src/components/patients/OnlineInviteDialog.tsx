@@ -18,6 +18,7 @@ import {
   User,
 } from "lucide-react";
 import { toast } from "sonner";
+import { VideoLoader } from "@/components/VideoLoader";
 import {
   getOrCreateMyReferralCode,
   getMyNutritionistProfile,

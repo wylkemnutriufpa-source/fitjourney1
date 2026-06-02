@@ -18,6 +18,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { TrendingUp, ArrowLeft, Loader2 } from "lucide-react";
 import { getMyAdherenceInsights } from "@/lib/dashboard/dashboard.functions";
+import { VideoLoader } from "@/components/VideoLoader";
 
 export const Route = createFileRoute("/_authenticated/insights")({
   head: () => ({ meta: [{ title: "Insights — FitJourney" }] }),

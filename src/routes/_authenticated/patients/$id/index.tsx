@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
+import { VideoLoader } from "@/components/VideoLoader";
 import {
   ArrowLeft,
   FileText,

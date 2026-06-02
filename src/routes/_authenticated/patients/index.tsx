@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
 import { Plus, Search, FileText, Share2, Loader2 } from "lucide-react";
 import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
+import { VideoLoader } from "@/components/VideoLoader";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
   head: () => ({ meta: [{ title: "Pacientes — FitJourney" }] }),
