@@ -157,9 +157,38 @@ const testimonials = [
 ];
 
 const plans = [
-  { name: "Basic", price: "R$ 30", period: "/mês", popular: false, features: ["Até 20 pacientes", "Planos alimentares básicos", "Chat com pacientes"], cta: "Testar Grátis por 3 dias →" },
-  { name: "Profissional", price: "R$ 75", period: "/mês", popular: true, features: ["Até 100 pacientes", "Planos alimentares ilimitados", "Análise de IA", "Relatórios automáticos", "Suporte prioritário"], cta: "Testar Grátis por 3 dias →" },
-  { name: "Premium", price: "R$ 147", period: "/mês", popular: false, features: ["Pacientes ilimitados", "Todas as funcionalidades Pro", "Branding personalizado", "API de integração", "Suporte dedicado", "Todas as IAs do sistema", "Todo sistema de gamificação"], cta: "Testar Grátis por 3 dias →" },
+  {
+    name: "Basic",
+    price: "R$ 39,90",
+    period: "/mês",
+    popular: false,
+    features: [
+      "Até 30 pacientes ativos",
+      "Anamnese inteligente + prontuário",
+      "Planos alimentares com templates",
+      "Avaliação física completa (TMB/TDEE)",
+      "Chat em tempo real com pacientes",
+      "Aplicativo PWA da sua marca",
+    ],
+    cta: "Começar 3 dias grátis →",
+  },
+  {
+    name: "Pro",
+    price: "R$ 74,90",
+    period: "/mês",
+    popular: true,
+    features: [
+      "Pacientes ilimitados",
+      "Protocolo FitJourney™ (motor clínico determinístico)",
+      "IA: análise de refeição por foto + receitas",
+      "Gamificação completa (XP, streaks, conquistas)",
+      "Análise corporal por foto + evolução visual",
+      "Prescrição de suplementos + metas semanais",
+      "Financeiro multi-gateway (Stripe, Pix, Mercado Pago)",
+      "Branding personalizado + suporte prioritário",
+    ],
+    cta: "Começar 3 dias grátis →",
+  },
 ];
 
 const faqs = [
@@ -258,7 +287,7 @@ function Landing() {
       </nav>
 
       {/* ══════════ HERO ══════════ */}
-      <section ref={heroRef} className="relative pt-28 pb-24 md:pt-44 md:pb-36 px-4 overflow-hidden noise-overlay">
+      <section ref={heroRef} className="relative pt-28 pb-20 md:pt-36 md:pb-28 px-4 overflow-hidden noise-overlay">
         <div className="absolute inset-0 -z-10 dot-grid opacity-40" />
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute top-10 -left-32 w-[600px] h-[600px] bg-primary/[0.06] blur-[120px] morph-orb" />
@@ -266,66 +295,203 @@ function Landing() {
           <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-primary/[0.04] blur-[150px] morph-orb" style={{ animationDelay: "-8s" }} />
         </div>
 
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10">
-          <motion.div variants={stagger} initial="hidden" animate="show" className="max-w-5xl mx-auto text-center">
-            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-premium text-primary text-sm font-semibold mb-8 gradient-border">
-              <Sparkles className="w-4 h-4" />
-              Plataforma #1 para Nutricionistas Modernos
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-8 items-center">
+            {/* — Coluna esquerda: copy — */}
+            <motion.div variants={stagger} initial="hidden" animate="show" className="text-center lg:text-left">
+              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-premium text-primary text-sm font-semibold mb-8 gradient-border">
+                <Sparkles className="w-4 h-4" />
+                Nutrição clínica determinística + IA
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              </motion.div>
+
+              <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] mb-6 tracking-tight">
+                Atendimento clínico de excelência.{" "}
+                <span className="text-gradient-animated">Sem retrabalho.</span>
+              </motion.h1>
+
+              <motion.p variants={fadeUp} className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
+                O FitJourney concentra anamnese, avaliação física, plano alimentar, gamificação e financeiro em uma única plataforma — com IA que economiza horas e o Protocolo FitJourney™ que garante decisões clínicas auditáveis.
+              </motion.p>
+
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-5">
+                <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-8 h-14 font-semibold hover:scale-[1.03] active:scale-[0.98] transition-transform">
+                  Testar 3 dias grátis <ArrowRight className="w-4 h-4" />
+                </Link>
+                <a href="#features" className="inline-flex items-center justify-center gap-2 border border-border glass rounded-md text-base px-7 h-14 font-medium hover:bg-muted transition-colors">
+                  <Play className="w-4 h-4" /> Conhecer recursos
+                </a>
+              </motion.div>
+
+              <motion.p variants={fadeUp} className="text-xs text-muted-foreground flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-1">
+                <span>✅ Sem cartão de crédito</span>
+                <span>✅ Acesso imediato</span>
+                <span>✅ Pacientes acessam por convite</span>
+              </motion.p>
+
+              <motion.div variants={fadeUp} className="grid grid-cols-4 gap-3 max-w-md mx-auto lg:mx-0 mt-10">
+                {stats.map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    className="text-center glass-premium rounded-xl p-2.5 gradient-border"
+                  >
+                    <p className="font-display text-lg md:text-2xl font-bold text-gradient-animated leading-none">
+                      <AnimatedCounter value={stat.value.replace(/[^0-9]/g, "")} suffix={stat.value.replace(/[0-9.]/g, "")} />
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-1.5 font-medium leading-tight">{stat.label}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-6xl md:text-7xl font-bold leading-[1.08] mb-6 tracking-tight">
-              Transforme seu consultório com{" "}
-              <span className="text-gradient-animated">IA e Gamificação</span>
-            </motion.h1>
+            {/* — Coluna direita: logo orbital + chips de módulos — */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+              className="relative mx-auto w-full max-w-[460px] aspect-square hidden md:block"
+            >
+              {/* anéis orbitais decorativos */}
+              <div className="absolute inset-[8%] rounded-full border border-primary/20" />
+              <div className="absolute inset-[22%] rounded-full border border-[var(--gold)]/15 border-dashed" />
+              <div className="absolute inset-[36%] rounded-full border border-primary/10" />
 
-            <motion.p variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-              Gerencie pacientes, crie planos alimentares personalizados com IA, e engaje seus clientes com gamificação — tudo em uma plataforma completa e intuitiva.
-            </motion.p>
+              {/* halo pulsante */}
+              <div className="absolute inset-[28%] rounded-full bg-primary/10 blur-3xl animate-pulse" />
 
-            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-              <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-10 h-14 font-semibold hover:scale-105 active:scale-[0.98] transition-transform">
-                Começar Gratuitamente <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a href="#features" className="inline-flex items-center justify-center gap-2 border border-border glass rounded-md text-base px-8 h-14 font-medium hover:bg-muted transition-colors">
-                <Play className="w-4 h-4" /> Ver Recursos
-              </a>
-            </motion.div>
+              {/* logo central com aura + partículas orbitais */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative fj-logo-aura" style={{ width: 180, height: 180 }}>
+                  <div className="fj-logo-pulse" />
+                  <div className="fj-logo-orbit fj-logo-orbit-1">
+                    <span className="fj-logo-particle" />
+                  </div>
+                  <div className="fj-logo-orbit fj-logo-orbit-2">
+                    <span className="fj-logo-particle fj-logo-particle-gold" />
+                  </div>
+                  <div className="fj-logo-orbit fj-logo-orbit-3">
+                    <span className="fj-logo-particle" />
+                  </div>
+                  <div className="fj-logo-orbit fj-logo-orbit-4">
+                    <span className="fj-logo-particle fj-logo-particle-gold" />
+                  </div>
+                  <img src={fjLogo} alt="FitJourney" className="relative z-10 w-full h-full object-contain drop-shadow-[0_0_30px_oklch(0.62_0.16_155/0.55)]" />
+                </div>
+              </div>
 
-            <motion.p variants={fadeUp} className="text-xs text-muted-foreground mb-16">
-              ✅ 3 dias grátis · Sem cartão de crédito · Setup em 30 segundos
-            </motion.p>
-
-            <motion.div variants={fadeUp} className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-              {stats.map((stat, i) => (
+              {/* chips flutuantes de módulos */}
+              {[
+                { icon: Users, label: "Pacientes", style: "top-[4%] left-[6%]", delay: 0 },
+                { icon: Brain, label: "IA Clínica", style: "top-[2%] right-[4%]", delay: 0.4 },
+                { icon: Utensils, label: "Plano Alimentar", style: "top-[44%] -left-[6%]", delay: 0.8 },
+                { icon: Zap, label: "Gamificação", style: "top-[42%] -right-[8%]", delay: 1.2 },
+                { icon: BarChart3, label: "Avaliação Física", style: "bottom-[6%] left-[2%]", delay: 1.6 },
+                { icon: DollarSign, label: "Financeiro", style: "bottom-[2%] right-[6%]", delay: 2 },
+              ].map((chip) => (
                 <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-center glass-premium rounded-2xl p-4 gradient-border"
+                  key={chip.label}
+                  initial={{ opacity: 0, scale: 0.6, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 0.6 + chip.delay * 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className={`absolute ${chip.style}`}
                 >
-                  <p className="font-display text-3xl md:text-4xl font-bold text-gradient-animated">
-                    <AnimatedCounter value={stat.value.replace(/[^0-9]/g, "")} suffix={stat.value.replace(/[0-9.]/g, "")} />
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1 font-medium">{stat.label}</p>
+                  <motion.div
+                    animate={{ y: [0, -6, 0] }}
+                    transition={{ duration: 3 + chip.delay, repeat: Infinity, ease: "easeInOut", delay: chip.delay }}
+                    className="glass-premium gradient-border rounded-full px-3.5 py-2 flex items-center gap-2 shadow-card whitespace-nowrap"
+                  >
+                    <chip.icon className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-xs font-semibold">{chip.label}</span>
+                  </motion.div>
                 </motion.div>
               ))}
             </motion.div>
-          </motion.div>
+          </div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground"
         >
-          <span className="text-xs font-medium tracking-wider uppercase">Scroll</span>
+          <span className="text-xs font-medium tracking-wider uppercase">Role</span>
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}>
             <ArrowDown className="w-4 h-4" />
           </motion.div>
         </motion.div>
+      </section>
+
+      {/* ══════════ OBSTÁCULO INVISÍVEL ══════════ */}
+      <section className="py-24 px-4 relative noise-overlay border-y border-border/30 bg-muted/10">
+        <div className="max-w-6xl mx-auto relative z-10">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid md:grid-cols-[1fr_1.2fr] gap-10 mb-16 items-end">
+            <div>
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 gradient-border uppercase tracking-widest">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--gold)]" /> O obstáculo invisível
+              </span>
+              <h2 className="font-display text-3xl md:text-5xl font-bold leading-[1.08]">
+                Cada atendimento esconde{" "}
+                <span className="text-gradient-animated italic font-display">horas de retrabalho</span>
+              </h2>
+            </div>
+            <p className="text-muted-foreground text-base md:text-lg leading-relaxed md:text-right">
+              Não é falta de organização. É falta de uma plataforma feita para a rotina clínica do nutricionista moderno — onde anamnese, plano, IA e engajamento conversam entre si.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              {
+                title: "Atendimento fragmentado",
+                desc: "Prontuário num sistema, anamnese em PDF, plano na planilha, conversa no WhatsApp pessoal.",
+                consequence: "30–40 min/dia procurando arquivos — 15 horas perdidas por mês.",
+                tone: "primary",
+              },
+              {
+                title: "Plano alimentar tomando suas noites",
+                desc: "Cada plano leva 40–60 min. Você fecha o consultório e passa a noite montando entregas.",
+                consequence: "Um teto artificial no faturamento. O tempo cresce, mas o número de pacientes estagna.",
+                tone: "gold",
+              },
+              {
+                title: "Adesão sem ferramentas reais",
+                desc: "Lembretes manuais, follow-up no boca-a-boca, sem dado clínico em tempo real.",
+                consequence: "Paciente sumindo no meio do plano e resultado clínico que não aparece nas redes.",
+                tone: "primary",
+              },
+            ].map((p, i) => (
+              <motion.div
+                key={p.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                className="glass-premium gradient-border rounded-2xl p-7 card-hover-glow flex flex-col"
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-5 ${p.tone === "gold" ? "bg-[var(--gold)]/10 text-[var(--gold)]" : "bg-primary/10 text-primary"}`}>
+                  <X className="w-5 h-5" />
+                </div>
+                <h3 className="font-display font-semibold text-lg mb-3">{p.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-5">{p.desc}</p>
+                <div className="mt-auto pt-4 border-t border-border/40">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-1.5">Consequência</p>
+                  <p className={`text-sm font-medium ${p.tone === "gold" ? "text-[var(--gold)]" : "text-primary"}`}>{p.consequence}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mt-14 text-center">
+            <p className="text-muted-foreground text-sm mb-5">Junte-se aos nutricionistas que recuperaram suas noites — com decisões clínicas auditáveis e pacientes mais engajados.</p>
+            <a href="#features" className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all">
+              Como o FitJourney resolve <ArrowRight className="w-4 h-4" />
+            </a>
+          </motion.div>
+        </div>
       </section>
 
       {/* ══════════ TRUST BADGES ══════════ */}
@@ -614,7 +780,7 @@ function Landing() {
             <p className="text-muted-foreground text-lg">Sem letras miúdas. Sem surpresas.</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start max-w-3xl mx-auto">
             {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
