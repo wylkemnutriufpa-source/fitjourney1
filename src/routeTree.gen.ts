@@ -43,6 +43,7 @@ import { Route as AuthenticatedMyPlanFeedbackRouteImport } from './routes/_authe
 import { Route as AuthenticatedAnamnesesIdRouteImport } from './routes/_authenticated/anamneses.$id'
 import { Route as AuthenticatedAdminProfissionaisRouteImport } from './routes/_authenticated/admin.profissionais'
 import { Route as AuthenticatedAdminPacientesRouteImport } from './routes/_authenticated/admin.pacientes'
+import { Route as AuthenticatedAdminLogosRouteImport } from './routes/_authenticated/admin.logos'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminLandingRouteImport } from './routes/_authenticated/admin.landing'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
@@ -232,6 +233,11 @@ const AuthenticatedAdminPacientesRoute =
     path: '/pacientes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminLogosRoute = AuthenticatedAdminLogosRouteImport.update({
+  id: '/logos',
+  path: '/logos',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminLeadsRoute = AuthenticatedAdminLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
@@ -286,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/signup/patient': typeof SignupPatientRoute
   '/admin/landing': typeof AuthenticatedAdminLandingRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/logos': typeof AuthenticatedAdminLogosRoute
   '/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
@@ -326,6 +333,7 @@ export interface FileRoutesByTo {
   '/signup/patient': typeof SignupPatientRoute
   '/admin/landing': typeof AuthenticatedAdminLandingRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/logos': typeof AuthenticatedAdminLogosRoute
   '/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
@@ -368,6 +376,7 @@ export interface FileRoutesById {
   '/signup/patient': typeof SignupPatientRoute
   '/_authenticated/admin/landing': typeof AuthenticatedAdminLandingRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/_authenticated/admin/logos': typeof AuthenticatedAdminLogosRoute
   '/_authenticated/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/_authenticated/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/_authenticated/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
@@ -410,6 +419,7 @@ export interface FileRouteTypes {
     | '/signup/patient'
     | '/admin/landing'
     | '/admin/leads'
+    | '/admin/logos'
     | '/admin/pacientes'
     | '/admin/profissionais'
     | '/anamneses/$id'
@@ -450,6 +460,7 @@ export interface FileRouteTypes {
     | '/signup/patient'
     | '/admin/landing'
     | '/admin/leads'
+    | '/admin/logos'
     | '/admin/pacientes'
     | '/admin/profissionais'
     | '/anamneses/$id'
@@ -491,6 +502,7 @@ export interface FileRouteTypes {
     | '/signup/patient'
     | '/_authenticated/admin/landing'
     | '/_authenticated/admin/leads'
+    | '/_authenticated/admin/logos'
     | '/_authenticated/admin/pacientes'
     | '/_authenticated/admin/profissionais'
     | '/_authenticated/anamneses/$id'
@@ -763,6 +775,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPacientesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/logos': {
+      id: '/_authenticated/admin/logos'
+      path: '/logos'
+      fullPath: '/admin/logos'
+      preLoaderRoute: typeof AuthenticatedAdminLogosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/leads': {
       id: '/_authenticated/admin/leads'
       path: '/leads'
@@ -804,6 +823,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminLandingRoute: typeof AuthenticatedAdminLandingRoute
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
+  AuthenticatedAdminLogosRoute: typeof AuthenticatedAdminLogosRoute
   AuthenticatedAdminPacientesRoute: typeof AuthenticatedAdminPacientesRoute
   AuthenticatedAdminProfissionaisRoute: typeof AuthenticatedAdminProfissionaisRoute
 }
@@ -811,6 +831,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminLandingRoute: AuthenticatedAdminLandingRoute,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
+  AuthenticatedAdminLogosRoute: AuthenticatedAdminLogosRoute,
   AuthenticatedAdminPacientesRoute: AuthenticatedAdminPacientesRoute,
   AuthenticatedAdminProfissionaisRoute: AuthenticatedAdminProfissionaisRoute,
 }

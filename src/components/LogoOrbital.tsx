@@ -1,29 +1,45 @@
 import { LogoMark } from "@/components/LogoMark";
+import { LogoVideo } from "@/components/LogoVideo";
+import { useLogoSettings, type LogoSlot } from "@/lib/logo-settings";
 
 export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle" | "lines" | "halo";
 
 interface LogoOrbitalProps {
   size?: string;
+  sizePx?: number;
   className?: string;
   effect?: LogoEffect;
+  slot?: LogoSlot;
 }
 
 /**
  * Logo FitJourney com efeito animado ao redor.
- * Variantes: orbit (default), dust, comet, ripple, energy.
+ * Quando `slot` é passado, lê tamanho/efeito/variant das configurações do admin.
  */
 export function LogoOrbital({
   size = "size-16",
+  sizePx,
   className = "",
   effect = "halo",
+  slot,
 }: LogoOrbitalProps) {
+  const settings = useLogoSettings(slot ?? "landing-header");
+  const cfg = slot ? settings : null;
+  const finalEffect: LogoEffect = cfg?.variant === "static" ? ("none" as any) : cfg?.effect ?? effect;
+  const finalSizePx = cfg?.sizePx ?? sizePx;
+  const useVideo = cfg?.variant === "video";
+
+  const sizeStyle = finalSizePx ? { width: finalSizePx, height: finalSizePx } : undefined;
+  const sizeClass = finalSizePx ? "" : size;
+
   return (
     <span
-      className={`fj-logo-aura relative inline-flex items-center justify-center shrink-0 ${size} ${className}`}
+      className={`fj-logo-aura relative inline-flex items-center justify-center shrink-0 ${sizeClass} ${className}`}
+      style={sizeStyle}
     >
       <span className="fj-logo-pulse" aria-hidden />
 
-      {effect === "orbit" && (
+      {finalEffect === "orbit" && (
         <>
           <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
             <span className="fj-logo-particle" />
@@ -40,7 +56,7 @@ export function LogoOrbital({
         </>
       )}
 
-      {effect === "dust" && (
+      {finalEffect === "dust" && (
         <span className="fj-dust" aria-hidden>
           {Array.from({ length: 8 }).map((_, i) => (
             <span key={i} />
@@ -48,14 +64,14 @@ export function LogoOrbital({
         </span>
       )}
 
-      {effect === "comet" && (
+      {finalEffect === "comet" && (
         <>
           <span className="fj-comet" aria-hidden />
           <span className="fj-comet fj-comet-2" aria-hidden />
         </>
       )}
 
-      {effect === "ripple" && (
+      {finalEffect === "ripple" && (
         <span className="fj-ripple" aria-hidden>
           <span />
           <span />
@@ -63,7 +79,7 @@ export function LogoOrbital({
         </span>
       )}
 
-      {effect === "energy" && (
+      {finalEffect === "energy" && (
         <span className="fj-energy" aria-hidden>
           <svg viewBox="-60 -60 120 120">
             <circle cx="0" cy="0" r="45" />
@@ -73,14 +89,14 @@ export function LogoOrbital({
         </span>
       )}
 
-      {effect === "aura" && (
+      {finalEffect === "aura" && (
         <span className="fj-aura" aria-hidden>
           <span className="fj-aura-blob fj-aura-blob-1" />
           <span className="fj-aura-blob fj-aura-blob-2" />
         </span>
       )}
 
-      {effect === "sparkle" && (
+      {finalEffect === "sparkle" && (
         <span className="fj-sparkle" aria-hidden>
           {Array.from({ length: 12 }).map((_, i) => (
             <span key={i} />
@@ -88,7 +104,7 @@ export function LogoOrbital({
         </span>
       )}
 
-      {effect === "lines" && (
+      {finalEffect === "lines" && (
         <span className="fj-lines" aria-hidden>
           <svg viewBox="-60 -60 120 120">
             <path d="M -55 -10 C -40 -45, -10 -55, 20 -40 S 55 -5, 50 25" />
@@ -99,7 +115,7 @@ export function LogoOrbital({
         </span>
       )}
 
-      {effect === "halo" && (
+      {finalEffect === "halo" && (
         <span className="fj-halo" aria-hidden>
           <span className="fj-halo-ring fj-halo-ring-1" />
           <span className="fj-halo-ring fj-halo-ring-2" />
@@ -108,7 +124,11 @@ export function LogoOrbital({
         </span>
       )}
 
-      <LogoMark className={`relative z-10 ${size} object-contain`} />
+      {useVideo ? (
+        <LogoVideo className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} />
+      ) : (
+        <LogoMark className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} />
+      )}
     </span>
   );
 }

@@ -1,15 +1,13 @@
+import type { CSSProperties } from "react";
 import logoWebm from "@/assets/fitjourney-logo.webm.asset.json";
 import logoMp4 from "@/assets/fitjourney-logo.mp4.asset.json";
 
 interface LogoVideoProps {
   className?: string;
+  style?: CSSProperties;
 }
 
-/**
- * Logo animada (boomerang) — usada nas áreas internas (auth e sidebar do app).
- * Landing page continua usando LogoMark estático.
- */
-export function LogoVideo({ className = "size-10 object-contain" }: LogoVideoProps) {
+export function LogoVideo({ className = "size-10 object-contain", style }: LogoVideoProps) {
   return (
     <video
       autoPlay
@@ -18,7 +16,7 @@ export function LogoVideo({ className = "size-10 object-contain" }: LogoVideoPro
       playsInline
       preload="auto"
       className={className}
-      style={{ background: "transparent" }}
+      style={{ background: "transparent", ...style }}
       aria-label="FitJourney"
     >
       <source src={logoWebm.url} type="video/webm" />
