@@ -34,6 +34,33 @@ import { VideoLoaderFullscreen } from "@/components/VideoLoader";
 // Cache module-level do estado do sidebar — sobrevive a remounts do AppShell.
 let __sidebarOpenCache: boolean | null = null;
 
+function ThemeToggle() {
+  const [mode, setMode] = useState<ThemeMode>("system");
+  useEffect(() => {
+    setMode(getStoredTheme());
+  }, []);
+  function cycle() {
+    const order: ThemeMode[] = ["dark", "light", "system"];
+    const next = order[(order.indexOf(mode) + 1) % order.length];
+    setMode(next);
+    setTheme(next);
+  }
+  const Icon = mode === "light" ? Sun : mode === "dark" ? Moon : Monitor;
+  const label =
+    mode === "light" ? "Tema: claro" : mode === "dark" ? "Tema: escuro" : "Tema: sistema";
+  return (
+    <button
+      type="button"
+      onClick={cycle}
+      title={label}
+      aria-label={label}
+      className="p-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+    >
+      <Icon className="size-4" />
+    </button>
+  );
+}
+
 
 
 
