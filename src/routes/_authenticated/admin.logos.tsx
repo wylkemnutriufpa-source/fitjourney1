@@ -299,9 +299,18 @@ function SlotCard({
                 e.target.value = "";
               }}
             />
-            {error && <div className="text-xs text-destructive">{error}</div>}
+            {error && (
+              <div className="text-xs text-destructive bg-destructive/10 border border-destructive/30 rounded px-2 py-1.5">
+                {error}
+              </div>
+            )}
+            {info && !error && (
+              <div className="text-xs text-primary bg-primary/10 border border-primary/30 rounded px-2 py-1.5">
+                {info}
+              </div>
+            )}
             <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
-              PNG/SVG/JPG até 800 KB. Salva localmente no seu navegador.
+              PNG, JPG, WebP ou SVG até 4 MB. Imagens grandes são redimensionadas para no máx. {MAX_DIMENSION}px e comprimidas automaticamente. Proporção até {MAX_ASPECT_RATIO}:1.
             </p>
           </div>
 
