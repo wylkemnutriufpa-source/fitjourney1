@@ -77,6 +77,36 @@ export function AnamnesisRunner({
   const isLast = blockIdx === catalog.blocks.length - 1;
   const progress = Math.round(((blockIdx + 1) / catalog.blocks.length) * 100);
 
+  // Autosave local (debounced 400ms). Rascunho — não verdade clínica.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (Object.keys(answers).length === 0) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      try {
+        window.localStorage.setItem(
+          draftKey,
+          JSON.stringify({ answers, updatedAt: Date.now() }),
+        );
+        setSavedAt(Date.now());
+      } catch {
+        // quota cheia / privacy mode — silenciar; rascunho é best-effort
+      }
+    }, 400);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [answers, draftKey]);
+
+  function clearDraft() {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.removeItem(draftKey);
+    } catch {
+      /* ignore */
+    }
+  }
+
   function setAnswer(id: string, v: Answers[string]) {
     setAnswers((prev) => ({ ...prev, [id]: v }));
   }
@@ -91,10 +121,12 @@ export function AnamnesisRunner({
     if (isLast) {
       if (allIssues.length > 0) return;
       await onSubmit(answers);
+      clearDraft();
       return;
     }
     setBlockIdx((i) => i + 1);
   }
+
 
   function handleBack() {
     setBlockIdx((i) => Math.max(0, i - 1));
