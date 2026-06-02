@@ -121,8 +121,14 @@ function Settings() {
 
   const inviteUrl = useMemo(() => {
     if (!referral) return "";
+    if (slug) return publicUrl(`/c/${slug}/${referral.code}`);
     return publicUrl(`/signup/patient?code=${referral.code}`);
-  }, [referral]);
+  }, [referral, slug]);
+
+  const landingUrl = useMemo(() => {
+    if (!slug) return "";
+    return publicUrl(`/n/${slug}`);
+  }, [slug]);
 
   const waUrl = useMemo(() => {
     const d = onlyDigits(phone);
@@ -146,6 +152,9 @@ function Settings() {
           email: email.trim(),
           specialty: specialty.trim() || undefined,
           phone: phone.trim() || undefined,
+          slug: slug.trim().toLowerCase() || undefined,
+          publicHeadline: publicHeadline.trim() || undefined,
+          publicBio: publicBio.trim() || undefined,
         },
       });
       toast.success("Configurações salvas");
