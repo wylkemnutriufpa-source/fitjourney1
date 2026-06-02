@@ -198,7 +198,7 @@ function LogosAdminPage() {
         <div>
           <h2 className="text-lg font-semibold">Logos — Tamanho, Efeitos, Upload & Espaçamento</h2>
           <p className="text-sm text-muted-foreground">
-            Ajuste cada logo com preview ao vivo no contexto real (landing / app). Configurações salvas no navegador.
+            Ajuste cada logo com preview ao vivo no contexto real (landing / app). Salvo no servidor — reflete em todo o sistema (incluindo o app do paciente em qualquer dispositivo).
           </p>
         </div>
         <button
