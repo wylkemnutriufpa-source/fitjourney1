@@ -194,9 +194,11 @@ export const getMyFeedbackStatus = createServerFn({ method: "GET" })
       .from("patient_feedbacks")
       .select("created_at")
       .eq("patient_id", patient.id)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
+
 
     const lastAt: string | null = last?.created_at ?? null;
     let daysSince: number | null = null;
