@@ -125,52 +125,14 @@ function PatientProfile() {
   return (
     <AppShell
       header={
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/patients" })}
-            className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
-          >
-            <ArrowLeft className="size-3.5" />
-            Pacientes
-          </button>
-          {p.anamnesis && (
-            <Link
-              to="/anamneses/$id"
-              params={{ id: p.anamnesis.id }}
-              className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
-            >
-              <ClipboardList className="size-3.5" />
-              Ver anamnese
-            </Link>
-          )}
-          {hasPublishedPlan && (
-            <Link
-              to="/patients/$id/diet"
-              params={{ id: p.id }}
-              className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
-            >
-              <Eye className="size-3.5" />
-              Ver plano vigente
-            </Link>
-          )}
-          <Link
-            to="/templates"
-            search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
-            className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
-          >
-            <Sparkles className="size-3.5" />
-            Plano do zero
-          </Link>
-          <Link
-            to="/templates"
-            search={{ patientId: p.id, patientName: p.fullName }}
-            className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
-          >
-            <FileText className="size-3.5" />
-            {hasPublishedPlan ? "Novo plano" : "Elaborar plano"}
-          </Link>
-        </div>
+        <button
+          type="button"
+          onClick={() => navigate({ to: "/patients" })}
+          className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+        >
+          <ArrowLeft className="size-3.5" />
+          <span className="hidden sm:inline">Pacientes</span>
+        </button>
       }
     >
       <div className="space-y-10">
@@ -210,7 +172,48 @@ function PatientProfile() {
               </div>
             </div>
           </div>
+
+          {/* Ações do paciente — toolbar dedicada para não competir por espaço no header */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {p.anamnesis && (
+              <Link
+                to="/anamneses/$id"
+                params={{ id: p.anamnesis.id }}
+                className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+              >
+                <ClipboardList className="size-3.5" />
+                Ver anamnese
+              </Link>
+            )}
+            {hasPublishedPlan && (
+              <Link
+                to="/patients/$id/diet"
+                params={{ id: p.id }}
+                className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+              >
+                <Eye className="size-3.5" />
+                Ver plano vigente
+              </Link>
+            )}
+            <Link
+              to="/templates"
+              search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
+              className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+            >
+              <Sparkles className="size-3.5" />
+              Plano do zero
+            </Link>
+            <Link
+              to="/templates"
+              search={{ patientId: p.id, patientName: p.fullName }}
+              className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+            >
+              <FileText className="size-3.5" />
+              {hasPublishedPlan ? "Novo plano" : "Elaborar plano"}
+            </Link>
+          </div>
         </div>
+
 
         {/* Dados básicos / contato */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">

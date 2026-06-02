@@ -89,11 +89,13 @@ function BackButton() {
   }
   function goBack() {
     // Determinístico: sobe para a rota pai dentro do app.
-    // NÃO usar router.history.back() — ele pode sair do app shell
-    // (login, intro, landing antiga) e quebrar a continuidade visual.
+    // NÃO usar router.history.back() — ele pode sair do app shell.
     const segs = path.split("/").filter(Boolean);
     segs.pop();
-    const parent = segs.length > 0 ? "/" + segs.join("/") : "/dashboard";
+    let parent = segs.length > 0 ? "/" + segs.join("/") : "/dashboard";
+    // /admin redireciona para /admin/profissionais → causaria no-op.
+    // Sobe direto para /dashboard nesse caso.
+    if (parent === "/admin") parent = "/dashboard";
     navigate({ to: parent });
   }
   return (

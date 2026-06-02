@@ -798,17 +798,17 @@ function TemplateEditor({
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto p-0 gap-0">
-        <DialogHeader className="px-6 py-4 border-b border-border sticky top-0 bg-background z-10">
-          <div className="flex items-start justify-between gap-4">
+        <DialogHeader className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border sticky top-0 bg-background z-10">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <Badge variant="secondary" className="mb-1">
-                {draft.category}
-              </Badge>
-              <DialogTitle className="text-xl">
-                {isMine ? "Editando · " : "Editor · "}
-                {original.name}
-              </DialogTitle>
-              <DialogDescription className="text-xs">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="secondary">{draft.category}</Badge>
+                <DialogTitle className="text-base sm:text-xl leading-tight">
+                  {isMine ? "Editando · " : "Editor · "}
+                  {original.name}
+                </DialogTitle>
+              </div>
+              <DialogDescription className="text-xs mt-1 hidden sm:block">
                 Cada alimento é editável de forma independente. Alterar a gramatura do principal
                 escala todas as substituições proporcionalmente.
               </DialogDescription>
@@ -832,14 +832,14 @@ function TemplateEditor({
                   })
                 }
               >
-                <Printer className="size-3.5" /> PDF
+                <Printer className="size-3.5" /> <span className="hidden sm:inline">PDF</span>
               </Button>
               <Button
                 size="sm"
                 onClick={() => setShareOpen(true)}
                 className="bg-[#25D366] hover:bg-[#1ebe57] text-white"
               >
-                <MessageCircle className="size-3.5" /> WhatsApp
+                <MessageCircle className="size-3.5" /> <span className="hidden sm:inline">WhatsApp</span>
               </Button>
             </div>
           </div>
@@ -856,10 +856,11 @@ function TemplateEditor({
               active={editorTab === "orientacoes"}
               onClick={() => setEditorTab("orientacoes")}
             >
-              <ClipboardList className="size-3.5" /> Orientações Nutricionais
+              <ClipboardList className="size-3.5" /> <span className="hidden sm:inline">Orientações Nutricionais</span><span className="sm:hidden">Orientações</span>
             </TabBtn>
           </div>
         </DialogHeader>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-0">
           <div className="p-6 space-y-4">
@@ -975,23 +976,25 @@ function TemplateEditor({
           </aside>
         </div>
 
-        <DialogFooter className="px-6 py-4 border-t border-border sticky bottom-0 bg-background">
+        <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t border-border sticky bottom-0 bg-background flex-row flex-wrap justify-end gap-2 sm:gap-3">
           {patientContext && applyError && (
             <div className="w-full mb-2 text-[11px] text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
               {friendlyPublishError(applyError)}
             </div>
           )}
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button size="sm" variant="outline" onClick={onClose}>Cancelar</Button>
           {patientContext ? (
             <Button
+              size="sm"
               disabled={applyBusy}
               onClick={() => doPublish(patientContext.id, patientContext.name)}
             >
               <Send className="size-4" />
-              {applyBusy ? "Salvando…" : `Salvar plano para ${patientContext.name}`}
+              {applyBusy ? "Salvando…" : `Salvar para ${patientContext.name}`}
             </Button>
           ) : (
             <Button
+              size="sm"
               variant="outline"
               onClick={() => {
                 setApplyDone(null);
@@ -999,14 +1002,16 @@ function TemplateEditor({
                 setApplyOpen(true);
               }}
             >
-              <Send className="size-4" /> Aplicar a paciente
+              <Send className="size-4" /> <span className="hidden sm:inline">Aplicar a paciente</span><span className="sm:hidden">Aplicar</span>
             </Button>
           )}
-          <Button onClick={save} variant={patientContext ? "outline" : "default"}>
+          <Button size="sm" onClick={save} variant={patientContext ? "outline" : "default"}>
             {isMine ? <Save className="size-4" /> : <Copy className="size-4" />}
-            {isMine ? "Salvar alterações" : "Salvar em Meus Templates"}
+            <span className="hidden sm:inline">{isMine ? "Salvar alterações" : "Salvar em Meus Templates"}</span>
+            <span className="sm:hidden">{isMine ? "Salvar" : "Salvar template"}</span>
           </Button>
         </DialogFooter>
+
       </DialogContent>
 
       {/* Confirmação pós-publicação direta para o paciente do contexto */}
