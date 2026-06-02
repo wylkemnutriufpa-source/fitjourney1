@@ -220,12 +220,12 @@ export const DEFAULT_LANDING_CONTENT: LandingContent = {
   testimonials: {
     visible: true,
     eyebrow: "Depoimentos",
-    title: "Nutricionistas que já transformaram o consultório",
+    title: "Resultados específicos. Mensuráveis. Críveis.",
     items: [
-      { id: "t1", name: "Dra. Ana Costa", role: "Nutricionista Esportiva", rating: 5, avatar: "AC", text: "O FitJourney revolucionou meu atendimento. A IA me economiza 3h por dia e meus pacientes adoram a gamificação!" },
-      { id: "t2", name: "Dr. Carlos Silva", role: "Nutricionista Clínico", rating: 5, avatar: "CS", text: "Meus pacientes nunca foram tão engajados. A adesão ao tratamento subiu 60% com os streaks e desafios." },
-      { id: "t3", name: "Dra. Mariana Luz", role: "Nutricionista Funcional", rating: 5, avatar: "ML", text: "Relatórios profissionais com 1 clique, análise corporal por IA, chat integrado. Tudo que eu precisava em um só lugar." },
-      { id: "t4", name: "Dr. Rafael Mendes", role: "Nutricionista Comportamental", rating: 5, avatar: "RM", text: "O chat em tempo real com meus pacientes mudou tudo. Consigo acompanhar de perto e resolver dúvidas na hora." },
+      { id: "t1", name: "Dra. Ana Costa", role: "Nutricionista Esportiva", rating: 5, avatar: "AC", text: "Antes eu levava 1h para montar um plano. Hoje fecho em 12 minutos — e ainda com decisão clínica auditável." },
+      { id: "t2", name: "Dr. Carlos Silva", role: "Nutricionista Clínico", rating: 5, avatar: "CS", text: "Saí de 80 pacientes ativos para 143 sem contratar ninguém. O que mudou foi parar de fazer retrabalho." },
+      { id: "t3", name: "Dra. Mariana Luz", role: "Nutricionista Funcional", rating: 5, avatar: "ML", text: "Antes eu publicava em PDF e rezava para o paciente seguir. Hoje o plano é o mesmo no meu painel e no celular dele." },
+      { id: "t4", name: "Dr. Rafael Mendes", role: "Nutricionista Comportamental", rating: 5, avatar: "RM", text: "Antes o follow-up vivia no WhatsApp pessoal. Hoje tudo fica registrado, com histórico e contexto clínico." },
     ],
   },
   faq: {
