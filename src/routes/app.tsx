@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { getMyIdentityState, type IdentityStateDTO } from "@/lib/phase2/identity.functions";
 import { LogoVideo } from "@/components/LogoVideo";
 import { LogoOrbital } from "@/components/LogoOrbital";
+import { BrandLockup } from "@/components/BrandLockup";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
