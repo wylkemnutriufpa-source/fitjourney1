@@ -222,7 +222,7 @@ function Landing() {
               className="focus:outline-none cursor-pointer transition-transform duration-300 hover:scale-105"
               title="Ver intro"
             >
-              <LogoOrbital size="size-14" />
+              <LogoOrbital slot="landing-header" />
             </button>
             <span className="fj-header-sep hidden sm:block" aria-hidden="true" />
             <Link to="/" className="fj-wordmark text-xl leading-none tracking-wide">
