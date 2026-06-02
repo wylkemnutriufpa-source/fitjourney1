@@ -1,30 +1,22 @@
-import logoWebm from "@/assets/fitjourney-logo.webm.asset.json";
-import logoMp4 from "@/assets/fitjourney-logo.mp4.asset.json";
+import logoWebp from "@/assets/fitjourney-logo.webp.asset.json";
 
 interface LogoMarkProps {
   className?: string;
 }
 
 /**
- * LOGO oficial FitJourney — vídeo em loop com fundo realmente transparente.
- * Fonte: MP4 H.264 (sem alpha) re-codificado para WebM VP9 (yuva420p) via
- * chromakey do branco. Sem mix-blend e sem caixa de fundo: o <video> usa
- * transparent letterboxing nativo.
+ * LOGO oficial FitJourney — animated WebP transparente.
+ * Substitui o vídeo VP9-alpha (que iOS Safari renderiza como caixa branca).
+ * Animated WebP é suportado nativamente em iOS 14+, Android Chrome, Firefox e Edge.
  */
 export function LogoMark({ className = "size-10 object-contain" }: LogoMarkProps) {
   return (
-    <video
-      autoPlay
-      muted
-      loop
-      playsInline
-      preload="auto"
-      aria-label="FitJourney"
+    <img
+      src={logoWebp.url}
+      alt="FitJourney"
       className={className}
       style={{ background: "transparent" }}
-    >
-      <source src={logoWebm.url} type="video/webm" />
-      <source src={logoMp4.url} type="video/mp4" />
-    </video>
+      draggable={false}
+    />
   );
 }
