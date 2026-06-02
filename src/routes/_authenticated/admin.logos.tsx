@@ -20,13 +20,21 @@ export const Route = createFileRoute("/_authenticated/admin/logos")({
 });
 
 const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (imagem — igual avatar)
-const MAX_VIDEO_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (vídeo curto estilo boomerang)
-const MAX_VIDEO_DURATION_S = 6; // s — vídeo "boomerang" curto
-const MAX_DIMENSION = 1024; // px — comprime automaticamente acima disso
-const MIN_DIMENSION = 32; // px — abaixo disso é pequeno demais p/ logo
-const MAX_ASPECT_RATIO = 6; // razão maior:menor
-const MAX_STORED_BYTES = 1.5 * 1024 * 1024; // 1.5 MB após compressão (limite localStorage)
+const MAX_VIDEO_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB
+const MAX_VIDEO_DURATION_S = 6;
+const MAX_DIMENSION = 1024;
+const MIN_DIMENSION = 32;
+const MAX_ASPECT_RATIO = 6;
 const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm"];
+
+function dataUrlToBlob(dataUrl: string): Blob {
+  const [meta, b64] = dataUrl.split(",");
+  const mime = /data:([^;]+);base64/.exec(meta)?.[1] ?? "application/octet-stream";
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
 
 
 function readAsDataUrl(file: Blob): Promise<string> {
