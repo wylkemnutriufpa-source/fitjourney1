@@ -23,7 +23,8 @@ export function LogoOrbital({
   effect = "halo",
   slot,
 }: LogoOrbitalProps) {
-  const cfg = slot ? useLogoSettings(slot) : null;
+  const settings = useLogoSettings(slot ?? "landing-header");
+  const cfg = slot ? settings : null;
   const finalEffect: LogoEffect = cfg?.variant === "static" ? ("none" as any) : cfg?.effect ?? effect;
   const finalSizePx = cfg?.sizePx ?? sizePx;
   const useVideo = cfg?.variant === "video";
