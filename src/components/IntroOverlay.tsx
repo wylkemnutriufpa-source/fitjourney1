@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { getMyIdentityState, type IdentityStateDTO } from "@/lib/phase2/identity.functions";
+import introVideo from "@/assets/intro-reference.mp4.asset.json";
 
 const STORAGE_KEY = "fj_intro_pending";
 const EVENT_NAME = "fj:play-intro";
