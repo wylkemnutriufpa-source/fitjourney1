@@ -81,10 +81,23 @@ async function compressImage(file: File): Promise<{ dataUrl: string; width: numb
 }
 
 function LogosAdminPage() {
-  const { get, update, reset } = useLogoSettingsEditor();
+  const { get, update, reset, save, dirty, saving } = useLogoSettingsEditor();
   const [errorBySlot, setErrorBySlot] = useState<Partial<Record<LogoSlot, string>>>({});
   const [infoBySlot, setInfoBySlot] = useState<Partial<Record<LogoSlot, string>>>({});
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
   const slots = Object.keys(SLOT_META) as LogoSlot[];
+
+  async function handleSave() {
+    setSaveError(null);
+    try {
+      await save();
+      setSavedAt(Date.now());
+    } catch (e: any) {
+      setSaveError(e?.message ?? "Falha ao salvar no servidor.");
+    }
+  }
+
 
   async function handleUpload(slot: LogoSlot, file: File) {
     setErrorBySlot((s) => ({ ...s, [slot]: undefined }));
