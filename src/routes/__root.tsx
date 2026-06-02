@@ -94,6 +94,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@fitjourney" },
       { name: "twitter:title", content: "FitJourney — Nutrição clínica e esportiva" },
       { name: "twitter:description", content: "Plataforma de nutrição clínica e esportiva. Anamnese, dieta cirúrgica e acompanhamento de pacientes." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/StdQ07rPbDMv4Qh75goHxDt3m4e2/social-images/social-1780433875841-WhatsApp_Image_2026-06-02_at_17.56.54.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/StdQ07rPbDMv4Qh75goHxDt3m4e2/social-images/social-1780433875841-WhatsApp_Image_2026-06-02_at_17.56.54.webp" },
     ],
     links: [
       {
