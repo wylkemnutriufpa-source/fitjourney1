@@ -26,7 +26,6 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 import { LogoMark } from "@/components/LogoMark";
-import { LogoOrbital } from "@/components/LogoOrbital";
 import { BrandLockup } from "@/components/BrandLockup";
 import {
   DEFAULT_LANDING_CONTENT,
