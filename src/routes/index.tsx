@@ -214,12 +214,13 @@ function Landing() {
             <button
               type="button"
               onClick={() => setContactOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md border border-border/60 bg-card/40 backdrop-blur-sm hover:border-primary/60 hover:text-foreground transition-colors text-muted-foreground"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full border border-border/50 bg-card/30 backdrop-blur-md hover:border-primary/50 hover:text-foreground hover:bg-primary/5 transition-all text-muted-foreground"
+              title="Fale com a gente"
             >
-              <MessageCircle className="w-3.5 h-3.5" /> Fale com a gente
+              <MessageCircle className="w-3.5 h-3.5" /> Contato
             </button>
-            <Link to="/app" className="px-3 py-1.5 text-sm font-medium rounded-md hover:bg-muted transition-colors">Entrar</Link>
-            <Link to="/signup/nutritionist" className="inline-flex items-center gap-1.5 gradient-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity">
+            <Link to="/app" className="px-3 py-1.5 text-sm font-medium rounded-full hover:bg-muted/60 transition-colors">Entrar</Link>
+            <Link to="/signup/nutritionist" className="inline-flex items-center gap-1.5 gradient-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-semibold shadow-glow hover:shadow-[0_0_24px_-4px_var(--primary-glow)] hover:scale-[1.03] active:scale-[0.97] transition-all">
               Começar Grátis <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
