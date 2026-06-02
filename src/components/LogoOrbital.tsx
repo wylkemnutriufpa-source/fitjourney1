@@ -99,6 +99,15 @@ export function LogoOrbital({
         </span>
       )}
 
+      {effect === "halo" && (
+        <span className="fj-halo" aria-hidden>
+          <span className="fj-halo-ring fj-halo-ring-1" />
+          <span className="fj-halo-ring fj-halo-ring-2" />
+          <span className="fj-halo-wisp fj-halo-wisp-l" />
+          <span className="fj-halo-wisp fj-halo-wisp-r" />
+        </span>
+      )}
+
       <LogoMark className={`relative z-10 ${size} object-contain`} />
     </span>
   );
