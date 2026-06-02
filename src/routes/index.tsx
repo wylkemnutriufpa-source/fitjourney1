@@ -780,7 +780,7 @@ function Landing() {
             <p className="text-muted-foreground text-lg">Sem letras miúdas. Sem surpresas.</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start max-w-3xl mx-auto">
             {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
