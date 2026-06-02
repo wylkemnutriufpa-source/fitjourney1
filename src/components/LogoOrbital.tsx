@@ -52,7 +52,9 @@ export function LogoOrbital({
   };
 
   // Logos customizadas (upload) não recebem a aura/pulse ambientes — só o efeito explícito.
-  const hideAmbient = !!customUrl;
+  // Admin também pode forçar o desligamento da aura por slot via `showAura: false`.
+  const auraDisabledBySlot = cfg ? cfg.showAura === false : false;
+  const hideAmbient = !!customUrl || auraDisabledBySlot;
 
   return (
     <span
