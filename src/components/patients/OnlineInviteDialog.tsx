@@ -59,6 +59,7 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
   const [code, setCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
   const [message, setMessage] = useState("");
   const linkId = useId();
   const msgId = useId();
