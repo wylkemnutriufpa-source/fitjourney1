@@ -211,15 +211,32 @@ function Landing() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setContactOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md border border-border/60 bg-card/40 backdrop-blur-sm hover:border-primary/60 hover:text-foreground transition-colors text-muted-foreground"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> Fale com a gente
+            </button>
             <Link to="/app" className="px-3 py-1.5 text-sm font-medium rounded-md hover:bg-muted transition-colors">Entrar</Link>
             <Link to="/signup/nutritionist" className="inline-flex items-center gap-1.5 gradient-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity">
               Começar Grátis <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <button className="md:hidden p-2" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Menu">
-            {mobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="md:hidden flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setContactOpen(true)}
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Fale com a gente"
+            >
+              <MessageCircle className="w-5 h-5" />
+            </button>
+            <button className="p-2" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Menu">
+              {mobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {mobileMenu && (
