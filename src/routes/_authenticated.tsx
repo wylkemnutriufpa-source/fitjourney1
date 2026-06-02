@@ -43,10 +43,21 @@ export const Route = createFileRoute("/_authenticated")({
     const onOnboarding =
       path === "/onboarding/nutritionist" ||
       path.startsWith("/onboarding/nutritionist/");
+    const onPatientOnboarding =
+      path === "/onboarding/patient" || path.startsWith("/onboarding/patient/");
+    const isPatientRoute =
+      path === "/my-dashboard" ||
+      path.startsWith("/my-dashboard/") ||
+      path === "/my-plan" ||
+      path.startsWith("/my-plan/") ||
+      onPatientOnboarding;
 
     const isAdmin = identity.appRoles.includes("admin");
 
     if (isAdmin && identity.state !== "S1") {
+      if (isPatientRoute) {
+        throw redirect({ to: "/dashboard", replace: true });
+      }
       if (onOnboarding && path !== "/dashboard") {
         throw redirect({ to: "/dashboard", replace: true });
       }
@@ -65,14 +76,16 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/dashboard", replace: true });
     }
 
+    if (identity.state === "S3" && identity.role !== "patient" && isPatientRoute) {
+      throw redirect({ to: "/dashboard", replace: true });
+    }
+
     // Patient gate: pacientes acessam /my-dashboard, /my-plan/* e
     // /onboarding/patient.
     // - Enquanto onboarding_completed_at IS NULL → força /onboarding/patient.
     // - Após onboarding concluído: /onboarding/patient bloqueado (semântica de
     //   primeira entrada). Tela inicial = /my-dashboard (invariante #6).
     if (identity.state === "S3" && identity.role === "patient") {
-      const onPatientOnboarding =
-        path === "/onboarding/patient" || path.startsWith("/onboarding/patient/");
       const onboardingDone = Boolean(identity.patient?.onboardingCompletedAt);
 
       if (!onboardingDone) {
@@ -85,12 +98,7 @@ export const Route = createFileRoute("/_authenticated")({
       if (onPatientOnboarding) {
         throw redirect({ to: "/my-dashboard", replace: true });
       }
-      const isPatientRoute =
-        path === "/my-dashboard" ||
-        path.startsWith("/my-dashboard/") ||
-        path === "/my-plan" ||
-        path.startsWith("/my-plan/");
-      if (!isPatientRoute) {
+      if (!isPatientRoute || onPatientOnboarding) {
         throw redirect({ to: "/my-dashboard", replace: true });
       }
     }
