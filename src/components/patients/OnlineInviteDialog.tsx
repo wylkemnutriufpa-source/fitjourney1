@@ -77,10 +77,8 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
 
   const inviteUrl = useMemo(() => {
     if (!code) return "";
-    // Se o nutri tem slug, usa o link bonito /c/{slug}/{code}.
-    // Caso contrário, mantém o link antigo /signup/patient?code=X (compat).
-    if (profile?.slug) return publicUrl(`/c/${profile.slug}/${code}`);
-    return publicUrl(`/signup/patient?code=${code}`);
+    if (!profile?.slug) return "";
+    return publicUrl(`/c/${profile.slug}/${code}`);
   }, [code, profile?.slug]);
 
   useEffect(() => {
@@ -196,6 +194,10 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
           ) : !code ? (
             <p className="text-sm text-destructive">
               Não foi possível gerar o link. Verifique seu perfil em Configurações.
+            </p>
+          ) : !profile?.slug ? (
+            <p className="text-sm text-destructive leading-relaxed">
+              Defina seu endereço público em Configurações para liberar o link bonito de convite.
             </p>
           ) : (
             <>
