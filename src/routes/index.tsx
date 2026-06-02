@@ -1,14 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Sparkles, Users, Brain, Shield, BarChart3, Utensils, CheckCircle2,
   ArrowRight, Star, Zap, Heart, ChevronRight, Pill, Camera,
   Target, MessageSquare, FileText, Rocket, ClipboardCheck,
   Palette, DollarSign, Play, ArrowDown, Menu, X, Globe, Lock, Cpu,
   Dumbbell,
+  type LucideIcon,
 } from "lucide-react";
 import fjLogo from "@/assets/fitjourney-logo.png";
+import {
+  DEFAULT_LANDING_CONTENT,
+  fetchLandingContent,
+  type LandingContent,
+} from "@/lib/landing/landing-content";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -63,150 +70,37 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-/* ─── animation variants ─── */
 const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const } },
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 };
-const stagger = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.08 } },
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } } };
+const scaleIn = { hidden: { opacity: 0, scale: 0.96 }, show: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } } };
+
+/* ─── Mapa de ícones (string editável → componente Lucide) ─── */
+const ICONS: Record<string, LucideIcon> = {
+  Brain, Shield, Users, Dumbbell, BarChart3, Utensils, Zap, MessageSquare,
+  FileText, Camera, Pill, Target, DollarSign, Sparkles, Heart, Rocket,
+  ClipboardCheck, Palette, Lock, Globe, Cpu, Star, Play, ChevronRight,
 };
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.92 },
-  show: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
-};
-
-/* ─── Animated Counter ─── */
-function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: string }) {
-  const num = parseInt(value.replace(/[^0-9]/g, "")) || 0;
-  const prefix = value.replace(/[0-9]/g, "").replace(suffix, "");
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
-
-  useEffect(() => {
-    if (hasAnimated || !ref.current) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHasAnimated(true);
-          const dur = 2000;
-          const start = performance.now();
-          const step = (now: number) => {
-            const prog = Math.min((now - start) / dur, 1);
-            const ease = 1 - Math.pow(1 - prog, 4);
-            setCount(Math.floor(ease * num));
-            if (prog < 1) requestAnimationFrame(step);
-          };
-          requestAnimationFrame(step);
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.3 },
-    );
-    obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [num, hasAnimated]);
-
-  return (
-    <span ref={ref} className="counter-animate">
-      {prefix}
-      {count}
-      {suffix}
-    </span>
-  );
+function Icon({ name, className }: { name: string; className?: string }) {
+  const C = ICONS[name] ?? Sparkles;
+  return <C className={className} />;
 }
 
-/* ─── data ─── */
-const features = [
-  { icon: Brain, title: "IA Integrada", desc: "Análise de refeições por foto, geração automática de planos alimentares e receitas personalizadas com inteligência artificial.", tag: "Core" },
-  { icon: Shield, title: "Protocolo FitJourney™", desc: "Motor clínico 100% determinístico: onboarding guiado, cálculos automáticos (TMB/TDEE), geração de pré-planos com scoring inteligente e auditabilidade total.", tag: "Exclusivo" },
-  { icon: Users, title: "Gestão de Pacientes", desc: "Cadastro completo, anamnese inteligente, timeline de eventos, scoring de engajamento e prontuário digital.", tag: "Gestão" },
-  { icon: Dumbbell, title: "Módulo Personal Trainer", desc: "Gestão completa de treinos, anamnese fitness, biblioteca de exercícios e acompanhamento de carga e esforço.", tag: "Novo" },
-  { icon: BarChart3, title: "Avaliação Física Completa", desc: "Dobras cutâneas (Jackson-Pollock 7), circunferências, composição corporal, IMC, TMB e TDEE automático.", tag: "Clínico" },
-  { icon: Utensils, title: "Planos Alimentares", desc: "Crie planos detalhados por dia/refeição com metas de macros, templates reutilizáveis e agendamento inteligente.", tag: "Nutrição" },
-  { icon: Zap, title: "Gamificação Avançada", desc: "XP, streaks, conquistas, desafios semanais e ranking. Aumente a adesão do paciente em até 3x.", tag: "Engajamento" },
-  { icon: MessageSquare, title: "Chat em Tempo Real", desc: "Acompanhamento direto com seu nutricionista, com indicador de presença, respostas rápidas e histórico completo.", tag: "Comunicação" },
-  { icon: FileText, title: "Protocolos & Programas", desc: "Crie protocolos reutilizáveis e programas como 'Projeto Biquíni' com inscrição em massa de pacientes.", tag: "Automação" },
-  { icon: Camera, title: "Análise Corporal por Foto", desc: "Upload de fotos (frente, lado, costas) com análise de IA: tipo corporal, % gordura e evolução visual.", tag: "IA" },
-  { icon: Pill, title: "Prescrição de Suplementos", desc: "Prescreva suplementos com dosagem, frequência, horário, marca e motivo. Paciente visualiza tudo.", tag: "Clínico" },
-  { icon: Target, title: "Metas Semanais", desc: "Defina metas de hidratação, passos, sono, treino. Acompanhe progresso visual por paciente.", tag: "Engajamento" },
-  { icon: DollarSign, title: "Financeiro Integrado", desc: "Controle pagamentos, assinaturas e planos. Multi-gateway: Stripe, Mercado Pago, PIX e manual.", tag: "Negócio" },
-];
-
+/* ─── Conteúdo estático (não editável pelo admin nesta v1) ─── */
 const howItWorks = [
   { step: "01", title: "Crie sua conta profissional", desc: "Cadastro exclusivo para nutricionistas. 3 dias grátis, sem cartão.", icon: Sparkles },
   { step: "02", title: "Convide seus pacientes", desc: "Pacientes recebem acesso por convite — via link mágico ou senha temporária.", icon: Users },
   { step: "03", title: "Configure protocolos", desc: "Crie planos alimentares, protocolos e metas personalizadas.", icon: ClipboardCheck },
   { step: "04", title: "Acompanhe com IA", desc: "A IA analisa evolução, gera relatórios e sugere ajustes automaticamente.", icon: Brain },
 ];
-
 const howItWorksPatient = [
   { step: "01", title: "Receba o convite", desc: "Seu nutricionista cria sua conta e envia o acesso por e-mail.", icon: Lock },
   { step: "02", title: "Complete seu onboarding", desc: "Preencha a anamnese e aceite os termos clínicos (LGPD).", icon: ClipboardCheck },
   { step: "03", title: "Siga seu plano", desc: "Acesse dietas, checklists, receitas e acompanhe sua evolução.", icon: Target },
   { step: "04", title: "Evolua com dados", desc: "Sua jornada é acompanhada por inteligência clínica em tempo real.", icon: Brain },
 ];
-
-const testimonials = [
-  { name: "Dra. Ana Costa", role: "Nutricionista Esportiva", text: "O FitJourney revolucionou meu atendimento. A IA me economiza 3h por dia e meus pacientes adoram a gamificação!", rating: 5, avatar: "AC" },
-  { name: "Dr. Carlos Silva", role: "Nutricionista Clínico", text: "Meus pacientes nunca foram tão engajados. A adesão ao tratamento subiu 60% com os streaks e desafios.", rating: 5, avatar: "CS" },
-  { name: "Dra. Mariana Luz", role: "Nutricionista Funcional", text: "Relatórios profissionais com 1 clique, análise corporal por IA, chat integrado. Tudo que eu precisava em um só lugar.", rating: 5, avatar: "ML" },
-  { name: "Dr. Rafael Mendes", role: "Nutricionista Comportamental", text: "O chat em tempo real com meus pacientes mudou tudo. Consigo acompanhar de perto e resolver dúvidas na hora.", rating: 5, avatar: "RM" },
-];
-
-const plans = [
-  {
-    name: "Basic",
-    price: "R$ 39,90",
-    period: "/mês",
-    popular: false,
-    features: [
-      "Até 30 pacientes ativos",
-      "Anamnese inteligente + prontuário",
-      "Planos alimentares com templates",
-      "Avaliação física completa (TMB/TDEE)",
-      "Chat em tempo real com pacientes",
-      "Aplicativo PWA da sua marca",
-    ],
-    cta: "Começar 3 dias grátis →",
-  },
-  {
-    name: "Pro",
-    price: "R$ 74,90",
-    period: "/mês",
-    popular: true,
-    features: [
-      "Pacientes ilimitados",
-      "Protocolo FitJourney™ (motor clínico determinístico)",
-      "IA: análise de refeição por foto + receitas",
-      "Gamificação completa (XP, streaks, conquistas)",
-      "Análise corporal por foto + evolução visual",
-      "Prescrição de suplementos + metas semanais",
-      "Financeiro multi-gateway (Stripe, Pix, Mercado Pago)",
-      "Branding personalizado + suporte prioritário",
-    ],
-    cta: "Começar 3 dias grátis →",
-  },
-];
-
-const faqs = [
-  { q: "Preciso instalar alguma coisa?", a: "Não! FitJourney é 100% web e PWA. Funciona no navegador e pode ser instalado como app no celular." },
-  { q: "Meus pacientes precisam pagar?", a: "Não. Apenas o profissional paga pelo plano. Pacientes acessam gratuitamente com login próprio." },
-  { q: "A IA substitui o nutricionista?", a: "Jamais! A IA é sua assistente — analisa dados, gera sugestões e economiza tempo. Todas as decisões clínicas são suas." },
-  { q: "Meus dados estão seguros?", a: "Sim. Usamos criptografia de ponta, autenticação robusta e Row-Level Security. Cada paciente só acessa seus próprios dados." },
-  { q: "Posso personalizar com minha marca?", a: "Sim! No plano Premium você personaliza cores, logo e nome da marca. Seus pacientes veem sua identidade visual." },
-  { q: "Tem suporte?", a: "Sim! Chat in-app e email para todos. Suporte prioritário para planos Profissional e Premium." },
-];
-
-const stats = [
-  { value: "500+", label: "Nutricionistas" },
-  { value: "10k+", label: "Pacientes ativos" },
-  { value: "60%", label: "Mais adesão" },
-  { value: "99.9%", label: "Uptime" },
-];
-
 const allFeaturesList = [
   "Dashboard inteligente", "Gestão de pacientes", "Anamnese com IA", "Planos alimentares",
   "Avaliação física completa", "Análise corporal por foto", "Protocolos reutilizáveis",
@@ -217,14 +111,36 @@ const allFeaturesList = [
   "Dicas globais", "Biblioteca do paciente", "Calculadoras (peso/água)", "Health Check Quiz",
 ];
 
-const trustBadges = [
-  { icon: Lock, label: "LGPD Compliant" },
-  { icon: Shield, label: "Dados Criptografados" },
-  { icon: Globe, label: "99.9% Uptime" },
-  { icon: Cpu, label: "IA de Última Geração" },
-];
+function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [display, setDisplay] = useState("0");
+  const target = parseFloat(value) || 0;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const duration = 1500;
+          const start = performance.now();
+          const step = (now: number) => {
+            const p = Math.min(1, (now - start) / duration);
+            const e = 1 - Math.pow(1 - p, 3);
+            setDisplay(Math.floor(target * e).toString());
+            if (p < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.3 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [target]);
+  return <span ref={ref}>{display}{suffix}</span>;
+}
 
-/* ─── Hook: nav scroll state ─── */
 function useNavScroll() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -244,6 +160,14 @@ function Landing() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const navScrolled = useNavScroll();
+
+  const { data } = useQuery<LandingContent>({
+    queryKey: ["landing-content"],
+    queryFn: fetchLandingContent,
+    initialData: DEFAULT_LANDING_CONTENT,
+    staleTime: 60_000,
+  });
+  const c = data ?? DEFAULT_LANDING_CONTENT;
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -301,113 +225,108 @@ function Landing() {
             <motion.div variants={stagger} initial="hidden" animate="show" className="text-center lg:text-left">
               <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-premium text-primary text-sm font-semibold mb-8 gradient-border">
                 <Sparkles className="w-4 h-4" />
-                Nutrição clínica determinística + IA
+                {c.hero.badge}
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               </motion.div>
 
               <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] mb-6 tracking-tight">
-                Atendimento clínico de excelência.{" "}
-                <span className="text-gradient-animated">Sem retrabalho.</span>
+                {c.hero.title_line1}{" "}
+                <span className="text-gradient-animated">{c.hero.title_line2}</span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
-                O FitJourney concentra anamnese, avaliação física, plano alimentar, gamificação e financeiro em uma única plataforma — com IA que economiza horas e o Protocolo FitJourney™ que garante decisões clínicas auditáveis.
+                {c.hero.description}
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-5">
                 <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-8 h-14 font-semibold hover:scale-[1.03] active:scale-[0.98] transition-transform">
-                  Testar 3 dias grátis <ArrowRight className="w-4 h-4" />
+                  {c.hero.cta_primary} <ArrowRight className="w-4 h-4" />
                 </Link>
                 <a href="#features" className="inline-flex items-center justify-center gap-2 border border-border glass rounded-md text-base px-7 h-14 font-medium hover:bg-muted transition-colors">
-                  <Play className="w-4 h-4" /> Conhecer recursos
+                  <Play className="w-4 h-4" /> {c.hero.cta_secondary}
                 </a>
               </motion.div>
 
               <motion.p variants={fadeUp} className="text-xs text-muted-foreground flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-1">
-                <span>✅ Sem cartão de crédito</span>
-                <span>✅ Acesso imediato</span>
-                <span>✅ Pacientes acessam por convite</span>
+                {c.hero.trust_items.map((t) => (
+                  <span key={t}>✅ {t}</span>
+                ))}
               </motion.p>
 
-              <motion.div variants={fadeUp} className="grid grid-cols-4 gap-3 max-w-md mx-auto lg:mx-0 mt-10">
-                {stats.map((stat, i) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                    className="text-center glass-premium rounded-xl p-2.5 gradient-border"
-                  >
-                    <p className="font-display text-lg md:text-2xl font-bold text-gradient-animated leading-none">
-                      <AnimatedCounter value={stat.value.replace(/[^0-9]/g, "")} suffix={stat.value.replace(/[0-9.]/g, "")} />
-                    </p>
-                    <p className="text-[10px] text-muted-foreground mt-1.5 font-medium leading-tight">{stat.label}</p>
-                  </motion.div>
-                ))}
-              </motion.div>
+              {c.stats.visible && (
+                <motion.div variants={fadeUp} className="grid grid-cols-4 gap-3 max-w-md mx-auto lg:mx-0 mt-10">
+                  {c.stats.items.map((stat, i) => (
+                    <motion.div
+                      key={stat.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                      className="text-center glass-premium rounded-xl p-2.5 gradient-border"
+                    >
+                      <p className="font-display text-lg md:text-2xl font-bold text-gradient-animated leading-none">
+                        <AnimatedCounter value={stat.value.replace(/[^0-9]/g, "")} suffix={stat.value.replace(/[0-9.]/g, "")} />
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-1.5 font-medium leading-tight">{stat.label}</p>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
             </motion.div>
 
-            {/* — Coluna direita: logo orbital + chips de módulos — */}
+            {/* — Coluna direita: mídia editável OU logo orbital — */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
               className="relative mx-auto w-full max-w-[460px] aspect-square hidden md:block"
             >
-              {/* anéis orbitais decorativos */}
-              <div className="absolute inset-[8%] rounded-full border border-primary/20" />
-              <div className="absolute inset-[22%] rounded-full border border-[var(--gold)]/15 border-dashed" />
-              <div className="absolute inset-[36%] rounded-full border border-primary/10" />
-
-              {/* halo pulsante */}
-              <div className="absolute inset-[28%] rounded-full bg-primary/10 blur-3xl animate-pulse" />
-
-              {/* logo central com aura + partículas orbitais */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative fj-logo-aura" style={{ width: 180, height: 180 }}>
-                  <div className="fj-logo-pulse" />
-                  <div className="fj-logo-orbit fj-logo-orbit-1">
-                    <span className="fj-logo-particle" />
+              {c.hero.hero_media_type === "image" && c.hero.hero_media_url ? (
+                <img src={c.hero.hero_media_url} alt="" className="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-glow" />
+              ) : c.hero.hero_media_type === "video" && c.hero.hero_media_url ? (
+                <video src={c.hero.hero_media_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-glow" />
+              ) : (
+                <>
+                  <div className="absolute inset-[8%] rounded-full border border-primary/20" />
+                  <div className="absolute inset-[22%] rounded-full border border-[var(--gold)]/15 border-dashed" />
+                  <div className="absolute inset-[36%] rounded-full border border-primary/10" />
+                  <div className="absolute inset-[28%] rounded-full bg-primary/10 blur-3xl animate-pulse" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative fj-logo-aura" style={{ width: 180, height: 180 }}>
+                      <div className="fj-logo-pulse" />
+                      <div className="fj-logo-orbit fj-logo-orbit-1"><span className="fj-logo-particle" /></div>
+                      <div className="fj-logo-orbit fj-logo-orbit-2"><span className="fj-logo-particle fj-logo-particle-gold" /></div>
+                      <div className="fj-logo-orbit fj-logo-orbit-3"><span className="fj-logo-particle" /></div>
+                      <div className="fj-logo-orbit fj-logo-orbit-4"><span className="fj-logo-particle fj-logo-particle-gold" /></div>
+                      <img src={fjLogo} alt="FitJourney" className="relative z-10 w-full h-full object-contain drop-shadow-[0_0_30px_oklch(0.62_0.16_155/0.55)]" />
+                    </div>
                   </div>
-                  <div className="fj-logo-orbit fj-logo-orbit-2">
-                    <span className="fj-logo-particle fj-logo-particle-gold" />
-                  </div>
-                  <div className="fj-logo-orbit fj-logo-orbit-3">
-                    <span className="fj-logo-particle" />
-                  </div>
-                  <div className="fj-logo-orbit fj-logo-orbit-4">
-                    <span className="fj-logo-particle fj-logo-particle-gold" />
-                  </div>
-                  <img src={fjLogo} alt="FitJourney" className="relative z-10 w-full h-full object-contain drop-shadow-[0_0_30px_oklch(0.62_0.16_155/0.55)]" />
-                </div>
-              </div>
-
-              {/* chips flutuantes de módulos */}
-              {[
-                { icon: Users, label: "Pacientes", style: "top-[4%] left-[6%]", delay: 0 },
-                { icon: Brain, label: "IA Clínica", style: "top-[2%] right-[4%]", delay: 0.4 },
-                { icon: Utensils, label: "Plano Alimentar", style: "top-[44%] -left-[6%]", delay: 0.8 },
-                { icon: Zap, label: "Gamificação", style: "top-[42%] -right-[8%]", delay: 1.2 },
-                { icon: BarChart3, label: "Avaliação Física", style: "bottom-[6%] left-[2%]", delay: 1.6 },
-                { icon: DollarSign, label: "Financeiro", style: "bottom-[2%] right-[6%]", delay: 2 },
-              ].map((chip) => (
-                <motion.div
-                  key={chip.label}
-                  initial={{ opacity: 0, scale: 0.6, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ delay: 0.6 + chip.delay * 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className={`absolute ${chip.style}`}
-                >
-                  <motion.div
-                    animate={{ y: [0, -6, 0] }}
-                    transition={{ duration: 3 + chip.delay, repeat: Infinity, ease: "easeInOut", delay: chip.delay }}
-                    className="glass-premium gradient-border rounded-full px-3.5 py-2 flex items-center gap-2 shadow-card whitespace-nowrap"
-                  >
-                    <chip.icon className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-xs font-semibold">{chip.label}</span>
-                  </motion.div>
-                </motion.div>
-              ))}
+                  {[
+                    { icon: Users, label: "Pacientes", style: "top-[4%] left-[6%]", delay: 0 },
+                    { icon: Brain, label: "IA Clínica", style: "top-[2%] right-[4%]", delay: 0.4 },
+                    { icon: Utensils, label: "Plano Alimentar", style: "top-[44%] -left-[6%]", delay: 0.8 },
+                    { icon: Zap, label: "Gamificação", style: "top-[42%] -right-[8%]", delay: 1.2 },
+                    { icon: BarChart3, label: "Avaliação Física", style: "bottom-[6%] left-[2%]", delay: 1.6 },
+                    { icon: DollarSign, label: "Financeiro", style: "bottom-[2%] right-[6%]", delay: 2 },
+                  ].map((chip) => (
+                    <motion.div
+                      key={chip.label}
+                      initial={{ opacity: 0, scale: 0.6, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{ delay: 0.6 + chip.delay * 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                      className={`absolute ${chip.style}`}
+                    >
+                      <motion.div
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 3 + chip.delay, repeat: Infinity, ease: "easeInOut", delay: chip.delay }}
+                        className="glass-premium gradient-border rounded-full px-3.5 py-2 flex items-center gap-2 shadow-card whitespace-nowrap"
+                      >
+                        <chip.icon className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-xs font-semibold">{chip.label}</span>
+                      </motion.div>
+                    </motion.div>
+                  ))}
+                </>
+              )}
             </motion.div>
           </div>
         </motion.div>
@@ -426,87 +345,72 @@ function Landing() {
       </section>
 
       {/* ══════════ OBSTÁCULO INVISÍVEL ══════════ */}
-      <section className="py-24 px-4 relative noise-overlay border-y border-border/30 bg-muted/10">
-        <div className="max-w-6xl mx-auto relative z-10">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid md:grid-cols-[1fr_1.2fr] gap-10 mb-16 items-end">
-            <div>
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 gradient-border uppercase tracking-widest">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--gold)]" /> O obstáculo invisível
-              </span>
-              <h2 className="font-display text-3xl md:text-5xl font-bold leading-[1.08]">
-                Cada atendimento esconde{" "}
-                <span className="text-gradient-animated italic font-display">horas de retrabalho</span>
-              </h2>
+      {c.obstacle.visible && (
+        <section className="py-24 px-4 relative noise-overlay border-y border-border/30 bg-muted/10">
+          <div className="max-w-6xl mx-auto relative z-10">
+            <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid md:grid-cols-[1fr_1.2fr] gap-10 mb-16 items-end">
+              <div>
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 gradient-border uppercase tracking-widest">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--gold)]" /> {c.obstacle.eyebrow}
+                </span>
+                <h2 className="font-display text-3xl md:text-5xl font-bold leading-[1.08]">
+                  {c.obstacle.title_line1}{" "}
+                  <span className="text-gradient-animated italic font-display">{c.obstacle.title_line2}</span>
+                </h2>
+              </div>
+              <p className="text-muted-foreground text-base md:text-lg leading-relaxed md:text-right">
+                {c.obstacle.description}
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {c.obstacle.cards.map((p, i) => (
+                <motion.div
+                  key={p.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                  className="glass-premium gradient-border rounded-2xl p-7 card-hover-glow flex flex-col"
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-5 ${p.tone === "gold" ? "bg-[var(--gold)]/10 text-[var(--gold)]" : "bg-primary/10 text-primary"}`}>
+                    <X className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-display font-semibold text-lg mb-3">{p.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-5">{p.desc}</p>
+                  <div className="mt-auto pt-4 border-t border-border/40">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-1.5">Consequência</p>
+                    <p className={`text-sm font-medium ${p.tone === "gold" ? "text-[var(--gold)]" : "text-primary"}`}>{p.consequence}</p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-            <p className="text-muted-foreground text-base md:text-lg leading-relaxed md:text-right">
-              Não é falta de organização. É falta de uma plataforma feita para a rotina clínica do nutricionista moderno — onde anamnese, plano, IA e engajamento conversam entre si.
-            </p>
-          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              {
-                title: "Atendimento fragmentado",
-                desc: "Prontuário num sistema, anamnese em PDF, plano na planilha, conversa no WhatsApp pessoal.",
-                consequence: "30–40 min/dia procurando arquivos — 15 horas perdidas por mês.",
-                tone: "primary",
-              },
-              {
-                title: "Plano alimentar tomando suas noites",
-                desc: "Cada plano leva 40–60 min. Você fecha o consultório e passa a noite montando entregas.",
-                consequence: "Um teto artificial no faturamento. O tempo cresce, mas o número de pacientes estagna.",
-                tone: "gold",
-              },
-              {
-                title: "Adesão sem ferramentas reais",
-                desc: "Lembretes manuais, follow-up no boca-a-boca, sem dado clínico em tempo real.",
-                consequence: "Paciente sumindo no meio do plano e resultado clínico que não aparece nas redes.",
-                tone: "primary",
-              },
-            ].map((p, i) => (
-              <motion.div
-                key={p.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-                className="glass-premium gradient-border rounded-2xl p-7 card-hover-glow flex flex-col"
-              >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-5 ${p.tone === "gold" ? "bg-[var(--gold)]/10 text-[var(--gold)]" : "bg-primary/10 text-primary"}`}>
-                  <X className="w-5 h-5" />
-                </div>
-                <h3 className="font-display font-semibold text-lg mb-3">{p.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-5">{p.desc}</p>
-                <div className="mt-auto pt-4 border-t border-border/40">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-1.5">Consequência</p>
-                  <p className={`text-sm font-medium ${p.tone === "gold" ? "text-[var(--gold)]" : "text-primary"}`}>{p.consequence}</p>
-                </div>
-              </motion.div>
-            ))}
+            <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mt-14 text-center">
+              <p className="text-muted-foreground text-sm mb-5">{c.obstacle.footer_text}</p>
+              <a href="#features" className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all">
+                Como o FitJourney resolve <ArrowRight className="w-4 h-4" />
+              </a>
+            </motion.div>
           </div>
-
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mt-14 text-center">
-            <p className="text-muted-foreground text-sm mb-5">Junte-se aos nutricionistas que recuperaram suas noites — com decisões clínicas auditáveis e pacientes mais engajados.</p>
-            <a href="#features" className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all">
-              Como o FitJourney resolve <ArrowRight className="w-4 h-4" />
-            </a>
-          </motion.div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ══════════ TRUST BADGES ══════════ */}
-      <section className="py-6 border-y border-border/30 bg-muted/10">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-6 md:gap-12">
-            {trustBadges.map((b) => (
-              <div key={b.label} className="flex items-center gap-2 text-muted-foreground/70">
-                <b.icon className="w-4 h-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">{b.label}</span>
-              </div>
-            ))}
+      {c.trust_badges.visible && (
+        <section className="py-6 border-y border-border/30 bg-muted/10">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex flex-wrap justify-center gap-6 md:gap-12">
+              {c.trust_badges.items.map((b) => (
+                <div key={b.id} className="flex items-center gap-2 text-muted-foreground/70">
+                  <Shield className="w-4 h-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">{b.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ══════════ SOCIAL PROOF BAR ══════════ */}
       <section className="py-10 bg-muted/20">
@@ -521,40 +425,42 @@ function Landing() {
       </section>
 
       {/* ══════════ FEATURES ══════════ */}
-      <section id="features" className="py-28 px-4 relative noise-overlay">
-        <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
-            <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">Recursos</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold mb-5">
-              Tudo que você precisa.<br className="hidden md:block" />{" "}
-              <span className="text-gradient-animated">Nada que você não precisa.</span>
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto text-lg">13 módulos integrados para transformar seu consultório de nutrição em uma experiência premium.</p>
-          </motion.div>
+      {c.features.visible && (
+        <section id="features" className="py-28 px-4 relative noise-overlay">
+          <div className="max-w-7xl mx-auto relative z-10">
+            <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
+              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.features.eyebrow}</span>
+              <h2 className="font-display text-3xl md:text-5xl font-bold mb-5">
+                {c.features.title_line1}<br className="hidden md:block" />{" "}
+                <span className="text-gradient-animated">{c.features.title_line2}</span>
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto text-lg">{c.features.description}</p>
+            </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {features.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative glass-premium rounded-2xl p-6 card-hover-glow shimmer-sweep cursor-default gradient-border"
-              >
-                <div className="absolute top-4 right-4">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary">{f.tag}</span>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary/15 group-hover:shadow-glow transition-all duration-500">
-                  <f.icon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-display font-semibold text-lg mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-              </motion.div>
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {c.features.items.map((f, i) => (
+                <motion.div
+                  key={f.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="group relative glass-premium rounded-2xl p-6 card-hover-glow shimmer-sweep cursor-default gradient-border"
+                >
+                  <div className="absolute top-4 right-4">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary">{f.tag}</span>
+                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary/15 group-hover:shadow-glow transition-all duration-500">
+                    <Icon name={f.icon} className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="font-display font-semibold text-lg mb-2">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ══════════ FULL FEATURE LIST ══════════ */}
       <section className="py-16 px-4 bg-muted/20 border-y border-border/30">
@@ -642,237 +548,152 @@ function Landing() {
         </div>
       </section>
 
-      {/* ══════════ DIFERENCIAIS + MOCK DASHBOARD ══════════ */}
-      <section className="py-28 px-4 bg-muted/10 border-y border-border/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}>
-              <motion.span variants={fadeUp} className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">Diferenciais</motion.span>
-              <motion.h2 variants={fadeUp} className="font-display text-3xl md:text-4xl font-bold mb-8 leading-tight">
-                Por que nutricionistas escolhem o <span className="text-gradient-animated">FitJourney</span>?
-              </motion.h2>
-              <div className="space-y-6">
-                {[
-                  { icon: Brain, title: "IA que economiza tempo", desc: "Gere planos, receitas e relatórios com 1 clique. Economia de 3h/dia." },
-                  { icon: Zap, title: "Pacientes engajados", desc: "Gamificação aumenta adesão em 60%. Seus pacientes voltam todo dia." },
-                  { icon: Shield, title: "Segurança LGPD", desc: "Dados criptografados, acesso por role, compliance total." },
-                  { icon: Palette, title: "Sua marca, seu app", desc: "Cores, logo e identidade visual personalizada para seus pacientes." },
-                ].map((item) => (
-                  <motion.div key={item.title} variants={fadeUp} className="flex gap-4 items-start group">
-                    <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/15 group-hover:shadow-glow transition-all duration-500">
-                      <item.icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <h4 className="font-display font-semibold mb-1">{item.title}</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+      {/* ══════════ TESTIMONIALS ══════════ */}
+      {c.testimonials.visible && (
+        <section id="testimonials" className="py-28 px-4 relative noise-overlay">
+          <div className="max-w-6xl mx-auto relative z-10">
+            <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
+              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.testimonials.eyebrow}</span>
+              <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
+                {c.testimonials.title}
+              </h2>
             </motion.div>
 
-            <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={scaleIn} className="relative">
-              <div className="glass-premium rounded-2xl p-6 shadow-card gradient-border shimmer-sweep">
-                <div className="flex items-center gap-2 mb-5">
-                  <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                  <div className="w-3 h-3 rounded-full bg-[var(--gold)]/60" />
-                  <div className="w-3 h-3 rounded-full bg-primary/60" />
-                  <span className="ml-2 text-xs text-muted-foreground font-mono">fitjourney.com.br/dashboard</span>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex gap-3">
-                    <div className="flex-1 rounded-xl bg-primary/10 p-4">
-                      <p className="text-xs text-muted-foreground mb-1">Pacientes Ativos</p>
-                      <p className="font-display text-2xl font-bold text-primary">47</p>
-                    </div>
-                    <div className="flex-1 rounded-xl bg-[var(--gold)]/10 p-4">
-                      <p className="text-xs text-muted-foreground mb-1">Adesão Média</p>
-                      <p className="font-display text-2xl font-bold text-[var(--gold)]">87%</p>
-                    </div>
-                  </div>
-                  <div className="rounded-xl bg-muted/50 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-medium">Maria Silva — Streak 🔥</p>
-                      <span className="text-xs text-primary font-bold">14 dias</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
-                      <motion.div className="h-full rounded-full gradient-primary" initial={{ width: "0%" }} whileInView={{ width: "78%" }} viewport={{ once: true }} transition={{ delay: 0.5, duration: 1.5, ease: "easeOut" }} />
-                    </div>
-                  </div>
-                  <div className="rounded-xl bg-muted/50 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-medium">João Costa — XP Level</p>
-                      <span className="text-xs text-[var(--gold)] font-bold">Nível 12</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
-                      <motion.div className="h-full rounded-full gradient-accent" initial={{ width: "0%" }} whileInView={{ width: "62%" }} viewport={{ once: true }} transition={{ delay: 0.7, duration: 1.5, ease: "easeOut" }} />
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    {[
-                      { emoji: "🎯", label: "23 metas", bg: "bg-primary/10" },
-                      { emoji: "💬", label: "5 msgs", bg: "bg-[var(--gold)]/10" },
-                      { emoji: "📊", label: "3 avaliações", bg: "bg-muted/60" },
-                      { emoji: "🏆", label: "8 conquistas", bg: "bg-primary/10" },
-                    ].map((m) => (
-                      <div key={m.label} className={`flex-1 rounded-lg ${m.bg} p-3 text-center`}>
-                        <p className="text-lg">{m.emoji}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium">{m.label}</p>
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {c.testimonials.items.map((t, i) => (
+                <motion.div key={t.id} initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }} className="glass-premium rounded-2xl p-7 card-hover-glow gradient-border">
+                  <div className="flex gap-0.5 mb-5">
+                    {Array.from({ length: t.rating }).map((_, j) => (
+                      <Star key={j} className="w-4 h-4 fill-[var(--gold)] text-[var(--gold)]" />
                     ))}
                   </div>
-                </div>
-              </div>
-              <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.8 }} className="absolute -top-4 -right-4 glass-premium rounded-xl px-4 py-2.5 shadow-card gradient-border">
-                <p className="text-xs font-bold text-primary flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> +150 XP</p>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 1 }} className="absolute -bottom-4 -left-4 glass-premium rounded-xl px-4 py-2.5 shadow-card gradient-border">
-                <p className="text-xs font-bold text-[var(--gold)] flex items-center gap-1.5"><Star className="w-3.5 h-3.5 fill-current" /> 4.9/5 rating</p>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════ TESTIMONIALS ══════════ */}
-      <section id="testimonials" className="py-28 px-4 relative noise-overlay">
-        <div className="max-w-6xl mx-auto relative z-10">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
-            <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 gradient-border uppercase tracking-widest">Depoimentos</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-              Amado por <span className="text-gradient-animated">nutricionistas</span>
-            </h2>
-            <p className="text-muted-foreground text-lg">Veja o que profissionais reais dizem sobre o FitJourney</p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {testimonials.map((t, i) => (
-              <motion.div key={t.name} initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }} className="glass-premium rounded-2xl p-7 card-hover-glow gradient-border">
-                <div className="flex gap-0.5 mb-5">
-                  {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} className="w-4 h-4 fill-[var(--gold)] text-[var(--gold)]" />
-                  ))}
-                </div>
-                <p className="text-sm mb-6 leading-relaxed italic text-foreground/90">"{t.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full gradient-primary flex items-center justify-center text-primary-foreground text-sm font-bold shadow-glow">
-                    {t.avatar}
+                  <p className="text-sm mb-6 leading-relaxed italic text-foreground/90">"{t.text}"</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-full gradient-primary flex items-center justify-center text-primary-foreground text-sm font-bold shadow-glow">
+                      {t.avatar}
+                    </div>
+                    <div>
+                      <p className="font-display font-semibold text-sm">{t.name}</p>
+                      <p className="text-xs text-muted-foreground">{t.role}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-display font-semibold text-sm">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ══════════ PRICING ══════════ */}
-      <section id="pricing" className="py-28 px-4 bg-muted/20 border-y border-border/30">
-        <div className="max-w-5xl mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
-            <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">Preços</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-              Simples e <span className="text-gradient-animated">transparente</span>
-            </h2>
-            <p className="text-muted-foreground text-lg">Sem letras miúdas. Sem surpresas.</p>
-          </motion.div>
+      {c.pricing.visible && (
+        <section id="pricing" className="py-28 px-4 bg-muted/20 border-y border-border/30">
+          <div className="max-w-5xl mx-auto">
+            <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
+              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.pricing.eyebrow}</span>
+              <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
+                {c.pricing.title_line1} <span className="text-gradient-animated">{c.pricing.title_line2}</span>
+              </h2>
+              <p className="text-muted-foreground text-lg">{c.pricing.description}</p>
+            </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start max-w-3xl mx-auto">
-            {plans.map((plan, i) => (
-              <motion.div
-                key={plan.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-                className={`relative glass-premium rounded-2xl p-8 gradient-border ${plan.popular ? "ring-2 ring-primary/30 shadow-glow md:scale-105" : "card-hover-glow"} transition-all`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full gradient-primary text-primary-foreground text-xs font-bold shadow-glow">
-                    ⭐ Mais Popular
-                  </div>
-                )}
-                <h3 className="font-display font-bold text-xl mb-1">{plan.name}</h3>
-                <div className="flex items-baseline gap-1.5 mb-6">
-                  <span className="font-display text-4xl font-bold">{plan.price}</span>
-                  <span className="text-sm text-muted-foreground">{plan.period}</span>
-                </div>
-                <ul className="space-y-3.5 mb-8">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to="/signup/nutritionist"
-                  className={`w-full h-12 inline-flex items-center justify-center gap-1 rounded-md font-semibold text-sm transition-opacity ${plan.popular ? "gradient-primary text-primary-foreground shadow-glow hover:opacity-90" : "border border-border hover:bg-muted"}`}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start max-w-3xl mx-auto">
+              {c.pricing.plans.map((plan, i) => (
+                <motion.div
+                  key={plan.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                  className={`relative glass-premium rounded-2xl p-8 gradient-border ${plan.popular ? "ring-2 ring-primary/30 shadow-glow md:scale-105" : "card-hover-glow"} transition-all`}
                 >
-                  {plan.cta} <ChevronRight className="w-4 h-4 ml-1" />
-                </Link>
-              </motion.div>
-            ))}
+                  {plan.popular && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full gradient-primary text-primary-foreground text-xs font-bold shadow-glow">
+                      ⭐ Mais Popular
+                    </div>
+                  )}
+                  <h3 className="font-display font-bold text-xl mb-1">{plan.name}</h3>
+                  <div className="flex items-baseline gap-1.5 mb-6">
+                    <span className="font-display text-4xl font-bold">{plan.price}</span>
+                    <span className="text-sm text-muted-foreground">{plan.period}</span>
+                  </div>
+                  <ul className="space-y-3.5 mb-8">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2.5 text-sm">
+                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to="/signup/nutritionist"
+                    className={`w-full h-12 inline-flex items-center justify-center gap-1 rounded-md font-semibold text-sm transition-opacity ${plan.popular ? "gradient-primary text-primary-foreground shadow-glow hover:opacity-90" : "border border-border hover:bg-muted"}`}
+                  >
+                    {plan.cta} <ChevronRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ══════════ FAQ ══════════ */}
-      <section id="faq" className="py-28 px-4">
-        <div className="max-w-3xl mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 gradient-border uppercase tracking-widest">FAQ</span>
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">Perguntas frequentes</h2>
-          </motion.div>
+      {c.faq.visible && (
+        <section id="faq" className="py-28 px-4">
+          <div className="max-w-3xl mx-auto">
+            <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-16">
+              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.faq.eyebrow}</span>
+              <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">{c.faq.title}</h2>
+            </motion.div>
 
-          <div className="space-y-3">
-            {faqs.map((faq, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full glass-premium rounded-xl p-5 text-left card-hover-glow gradient-border"
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-display font-semibold text-sm pr-4">{faq.q}</h3>
-                    <ChevronRight className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-90" : ""}`} />
-                  </div>
-                  {openFaq === i && (
-                    <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="text-sm text-muted-foreground mt-3 leading-relaxed">
-                      {faq.a}
-                    </motion.p>
-                  )}
-                </button>
-              </motion.div>
-            ))}
+            <div className="space-y-3">
+              {c.faq.items.map((faq, i) => (
+                <motion.div key={faq.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
+                  <button
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    className="w-full glass-premium rounded-xl p-5 text-left card-hover-glow gradient-border"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-display font-semibold text-sm pr-4">{faq.q}</h3>
+                      <ChevronRight className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-90" : ""}`} />
+                    </div>
+                    {openFaq === i && (
+                      <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="text-sm text-muted-foreground mt-3 leading-relaxed">
+                        {faq.a}
+                      </motion.p>
+                    )}
+                  </button>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ══════════ FINAL CTA ══════════ */}
-      <section className="py-28 px-4 relative noise-overlay">
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={scaleIn} className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="absolute inset-0 rounded-3xl gradient-primary opacity-[0.03] blur-2xl" />
-          <div className="relative glass-premium rounded-3xl p-10 md:p-20 gradient-border shimmer-sweep">
-            <div className="w-16 h-16 mx-auto rounded-2xl gradient-primary shadow-glow flex items-center justify-center mb-8">
-              <Rocket className="w-8 h-8 text-primary-foreground" />
+      {c.final_cta.visible && (
+        <section className="py-28 px-4 relative noise-overlay">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={scaleIn} className="max-w-4xl mx-auto text-center relative z-10">
+            <div className="absolute inset-0 rounded-3xl gradient-primary opacity-[0.03] blur-2xl" />
+            <div className="relative glass-premium rounded-3xl p-10 md:p-20 gradient-border shimmer-sweep">
+              <div className="w-16 h-16 mx-auto rounded-2xl gradient-primary shadow-glow flex items-center justify-center mb-8">
+                <Rocket className="w-8 h-8 text-primary-foreground" />
+              </div>
+              <h2 className="font-display text-3xl md:text-5xl font-bold mb-5">
+                {c.final_cta.title}
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
+                {c.final_cta.description}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-12 h-14 font-semibold hover:scale-105 active:scale-[0.98] transition-transform">
+                  <Sparkles className="w-4 h-4" /> {c.final_cta.cta_primary}
+                </Link>
+              </div>
+              <p className="text-xs text-muted-foreground mt-5">Sem cartão de crédito · 3 dias grátis · Pacientes acessam por convite</p>
             </div>
-            <h2 className="font-display text-3xl md:text-5xl font-bold mb-5">
-              Pronto para <span className="text-gradient-animated">decolar</span>?
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
-              Junte-se a centenas de nutricionistas que já transformaram seu atendimento com FitJourney. Comece grátis agora mesmo.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-12 h-14 font-semibold hover:scale-105 active:scale-[0.98] transition-transform">
-                <Sparkles className="w-4 h-4" /> Criar Conta Profissional
-              </Link>
-            </div>
-            <p className="text-xs text-muted-foreground mt-5">Sem cartão de crédito · 3 dias grátis · Pacientes acessam por convite</p>
-          </div>
-        </motion.div>
-      </section>
+          </motion.div>
+        </section>
+      )}
 
       {/* ══════════ FOOTER ══════════ */}
       <footer className="border-t border-border/30 py-14 px-4 bg-muted/10">
@@ -887,8 +708,8 @@ function Landing() {
                 Plataforma completa para nutricionistas modernos.
               </p>
               <div className="flex gap-2 flex-wrap">
-                {trustBadges.slice(0, 3).map((b) => (
-                  <span key={b.label} className="text-[10px] font-semibold text-muted-foreground/60 bg-muted/50 px-2 py-1 rounded-md">
+                {c.trust_badges.items.slice(0, 3).map((b) => (
+                  <span key={b.id} className="text-[10px] font-semibold text-muted-foreground/60 bg-muted/50 px-2 py-1 rounded-md">
                     {b.label}
                   </span>
                 ))}
