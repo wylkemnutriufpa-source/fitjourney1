@@ -59,6 +59,7 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
   const [code, setCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
   const [message, setMessage] = useState("");
   const linkId = useId();
   const msgId = useId();
@@ -114,21 +115,32 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
     }
   }, [open, patientName, displayName]);
 
-  if (!open) return null;
+  const fullText = `${message}${inviteUrl}`;
 
   async function copyLink() {
     if (!inviteUrl) return;
     try {
       await navigator.clipboard.writeText(inviteUrl);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      setTimeout(() => setCopied(false), 2000);
       toast.success("Link copiado");
     } catch {
       toast.error("Não foi possível copiar");
     }
   }
 
-  const fullText = `${message}${inviteUrl}`;
+  async function copyFullMessage() {
+    if (!fullText) return;
+    try {
+      await navigator.clipboard.writeText(fullText);
+      setCopiedAll(true);
+      setTimeout(() => setCopiedAll(false), 2000);
+      toast.success("Mensagem inteira copiada");
+    } catch {
+      toast.error("Não foi possível copiar");
+    }
+  }
+
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(fullText)}`;
   const mailUrl = `mailto:?subject=${encodeURIComponent(
     "Convite FitJourney"
@@ -137,6 +149,8 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
   const inputBase =
     "w-full bg-surface border border-border rounded-xl px-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/60 " +
     "focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition";
+
+  if (!open) return null;
 
   return (
     <div
@@ -235,21 +249,40 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
               </p>
 
               <div className="grid grid-cols-3 gap-2.5 pt-1">
-                {[
-                  { icon: MessageCircle, label: "WhatsApp", onClick: () => window.open(whatsappUrl, "_blank", "noopener,noreferrer") },
-                  { icon: Mail, label: "Email", onClick: () => window.open(mailUrl, "_blank", "noopener,noreferrer") },
-                  { icon: Link2, label: "Copiar", onClick: copyLink },
-                ].map(({ icon: Icon, label, onClick }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={onClick}
-                    className="flex flex-col items-center gap-2 py-3.5 rounded-2xl border border-border hover:border-primary hover:bg-primary/5 transition-colors"
-                  >
-                    <Icon className="size-4 text-primary" />
-                    <span className="text-xs font-medium text-foreground">{label}</span>
-                  </button>
-                ))}
+                <button
+                  type="button"
+                  onClick={() => window.open(whatsappUrl, "_blank", "noopener,noreferrer")}
+                  className="flex flex-col items-center gap-2 py-3.5 rounded-2xl border border-border hover:border-primary hover:bg-primary/5 transition-colors"
+                >
+                  <MessageCircle className="size-4 text-primary" />
+                  <span className="text-xs font-medium text-foreground">WhatsApp</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.open(mailUrl, "_blank", "noopener,noreferrer")}
+                  className="flex flex-col items-center gap-2 py-3.5 rounded-2xl border border-border hover:border-primary hover:bg-primary/5 transition-colors"
+                >
+                  <Mail className="size-4 text-primary" />
+                  <span className="text-xs font-medium text-foreground">Email</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={copyFullMessage}
+                  className={`flex flex-col items-center gap-2 py-3.5 rounded-2xl border transition-colors ${
+                    copiedAll
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-primary hover:bg-primary/5"
+                  }`}
+                >
+                  {copiedAll ? (
+                    <Check className="size-4 text-primary" />
+                  ) : (
+                    <Copy className="size-4 text-primary" />
+                  )}
+                  <span className={`text-xs font-medium ${copiedAll ? "text-primary" : "text-foreground"}`}>
+                    {copiedAll ? "Copiado" : "Copiar tudo"}
+                  </span>
+                </button>
               </div>
             </>
           )}
