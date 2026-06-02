@@ -22,7 +22,7 @@ interface VideoLoaderProps {
 export function VideoLoader({ size = "md", label, className = "" }: VideoLoaderProps) {
   return (
     <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
-      <div className={`${SIZE_MAP[size]} relative overflow-hidden rounded-full`}>
+      <div className={`${SIZE_MAP[size]} relative`}>
         <video
           src={loaderVideo.url}
           autoPlay
@@ -30,7 +30,8 @@ export function VideoLoader({ size = "md", label, className = "" }: VideoLoaderP
           loop
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="w-full h-full object-contain"
+          style={{ mixBlendMode: "screen" }}
         />
       </div>
       {label && (
