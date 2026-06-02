@@ -364,6 +364,15 @@ export function AnamnesisRunner({
         ))}
       </div>
 
+      {submitBlockedMsg && (
+        <div
+          role="alert"
+          className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive"
+        >
+          {submitBlockedMsg}
+        </div>
+      )}
+
       <div className="flex items-center justify-between pt-4 border-t border-border gap-3 flex-wrap">
         <div className="flex items-center gap-3">
           <button
