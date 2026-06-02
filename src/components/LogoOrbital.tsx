@@ -49,12 +49,16 @@ export function LogoOrbital({
     boxSizing: cfg?.paddingX || cfg?.paddingY ? "content-box" : undefined,
   };
 
+  // Logos customizadas (upload) não recebem a aura/pulse ambientes — só o efeito explícito.
+  const hideAmbient = !!customUrl;
+
   return (
     <span
-      className={`fj-logo-aura relative inline-flex items-center justify-center shrink-0 ${sizeClass} ${className}`}
+      className={`${hideAmbient ? "" : "fj-logo-aura"} relative inline-flex items-center justify-center shrink-0 ${sizeClass} ${className}`}
       style={wrapperStyle}
     >
-      <span className="fj-logo-pulse" aria-hidden />
+      {!hideAmbient && <span className="fj-logo-pulse" aria-hidden />}
+
 
       {finalEffect === "orbit" && (
         <>
