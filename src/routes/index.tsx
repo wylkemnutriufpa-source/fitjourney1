@@ -10,7 +10,7 @@ import {
   Dumbbell,
   type LucideIcon,
 } from "lucide-react";
-import fjLogo from "@/assets/fitjourney-logo.png";
+import { LogoMark } from "@/components/LogoMark";
 import {
   DEFAULT_LANDING_CONTENT,
   fetchLandingContent,
@@ -176,7 +176,7 @@ function Landing() {
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${navScrolled ? "glass border-b border-border/30 shadow-card" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src={fjLogo} alt="FitJourney" className="size-8 object-contain" />
+            <LogoMark className="size-8 object-contain" />
             <span className="fj-wordmark text-lg leading-none">FitJourney</span>
           </Link>
 
@@ -298,7 +298,7 @@ function Landing() {
                       <div className="fj-logo-orbit fj-logo-orbit-2"><span className="fj-logo-particle fj-logo-particle-gold" /></div>
                       <div className="fj-logo-orbit fj-logo-orbit-3"><span className="fj-logo-particle" /></div>
                       <div className="fj-logo-orbit fj-logo-orbit-4"><span className="fj-logo-particle fj-logo-particle-gold" /></div>
-                      <img src={fjLogo} alt="FitJourney" className="relative z-10 w-full h-full object-contain drop-shadow-[0_0_30px_oklch(0.62_0.16_155/0.55)]" />
+                      <LogoMark className="relative z-10 w-full h-full object-contain drop-shadow-[0_0_30px_oklch(0.62_0.16_155/0.55)]" />
                     </div>
                   </div>
                   {[
@@ -702,7 +702,7 @@ function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2.5 mb-4">
-                <img src={fjLogo} alt="FitJourney" className="size-9 object-contain" />
+                <LogoMark className="size-9 object-contain" />
                 <span className="font-display font-bold text-lg">FitJourney</span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed mb-4">

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyIdentityState, type IdentityStateDTO } from "@/lib/phase2/identity.functions";
-import fjLogo from "@/assets/fitjourney-logo.png";
+import { LogoMark } from "@/components/LogoMark";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -124,11 +124,7 @@ function Login() {
             <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
               <span className="fj-logo-particle fj-logo-particle-gold" />
             </span>
-            <img
-              src={fjLogo}
-              alt="FitJourney"
-              className="relative z-10 size-10 object-contain"
-            />
+            <LogoMark className="relative z-10 size-10 object-contain" />
           </span>
           <span className="fj-wordmark text-2xl leading-none">FitJourney</span>
         </div>
@@ -206,7 +202,7 @@ function Login() {
               <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
                 <span className="fj-logo-particle fj-logo-particle-gold" />
               </span>
-              <img src={fjLogo} alt="FitJourney" className="relative z-10 size-16 object-contain" />
+              <LogoMark className="relative z-10 size-16 object-contain" />
             </span>
             <span className="fj-wordmark text-xl leading-none">FitJourney</span>
           </div>
