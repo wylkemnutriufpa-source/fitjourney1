@@ -636,13 +636,13 @@ function SliderRow({
   );
 }
 
-/** Mock minimalista do contexto onde cada logo aparece de fato. */
+/** Mock minimalista do contexto onde cada logo aparece de fato. Usa BrandLockup
+ *  para refletir a configuração do wordmark (posição/gap/tamanho/offset). */
 function ContextMock({ slot }: { slot: LogoSlot }) {
   if (slot === "landing-header") {
     return (
       <div className="w-full max-w-md rounded-md border border-border bg-background/80 px-3 py-2 flex items-center gap-3">
-        <LogoOrbital slot={slot} />
-        <span className="fj-wordmark text-sm">FitJourney</span>
+        <BrandLockup slot={slot} />
         <div className="ml-auto flex gap-2 text-[10px] font-mono uppercase text-muted-foreground">
           <span>Sobre</span><span>Preços</span><span>Login</span>
         </div>
@@ -652,18 +652,15 @@ function ContextMock({ slot }: { slot: LogoSlot }) {
   if (slot === "landing-footer") {
     return (
       <div className="w-full max-w-md rounded-md border border-border bg-background/80 p-3 flex items-center gap-3">
-        <LogoOrbital slot={slot} />
-        <div className="text-[10px] font-mono uppercase text-muted-foreground">© FitJourney 2026</div>
+        <BrandLockup slot={slot} />
+        <div className="ml-auto text-[10px] font-mono uppercase text-muted-foreground">© 2026</div>
       </div>
     );
   }
   if (slot === "auth-form") {
     return (
       <div className="w-full max-w-xs rounded-md border border-border bg-background/80 p-3 space-y-2">
-        <div className="flex items-center gap-2">
-          <LogoOrbital slot={slot} />
-          <span className="text-sm font-semibold">Entrar</span>
-        </div>
+        <BrandLockup slot={slot} />
         <div className="h-6 rounded bg-muted/40" />
         <div className="h-6 rounded bg-muted/40" />
       </div>
@@ -671,19 +668,15 @@ function ContextMock({ slot }: { slot: LogoSlot }) {
   }
   if (slot === "auth-hero") {
     return (
-      <div className="w-full max-w-sm rounded-md border border-border bg-background/80 p-6 flex flex-col items-center gap-3">
-        <LogoOrbital slot={slot} />
-        <span className="text-sm font-semibold">FitJourney</span>
+      <div className="w-full max-w-sm rounded-md border border-border bg-background/80 p-6 flex justify-center">
+        <BrandLockup slot={slot} />
       </div>
     );
   }
   if (slot === "sidebar") {
     return (
       <div className="w-full max-w-[220px] rounded-md border border-border bg-sidebar/60 p-3 flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <LogoOrbital slot={slot} />
-          <span className="fj-wordmark text-sm">FitJourney</span>
-        </div>
+        <BrandLockup slot={slot} />
         <div className="space-y-1">
           <div className="h-4 rounded bg-muted/40" />
           <div className="h-4 rounded bg-muted/40" />
@@ -696,8 +689,9 @@ function ContextMock({ slot }: { slot: LogoSlot }) {
   return (
     <div className="w-full max-w-sm rounded-md border border-border bg-background/80 px-3 py-2 flex items-center gap-2">
       <div className="size-6 rounded border border-border" />
-      <LogoOrbital slot={slot} />
+      <BrandLockup slot={slot} />
       <span className="text-xs text-muted-foreground ml-auto">/dashboard</span>
     </div>
   );
 }
+
