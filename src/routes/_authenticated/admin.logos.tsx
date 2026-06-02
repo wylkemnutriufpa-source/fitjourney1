@@ -325,7 +325,18 @@ function SlotCard({
             <div className="flex items-center gap-2">
               <div className="size-10 rounded-md bg-background border border-border grid place-items-center overflow-hidden shrink-0">
                 {cfg.customUrl ? (
-                  <img src={cfg.customUrl} alt="" className="size-full object-contain" />
+                  /^data:video\//i.test(cfg.customUrl) ? (
+                    <video
+                      src={cfg.customUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="size-full object-contain"
+                    />
+                  ) : (
+                    <img src={cfg.customUrl} alt="" className="size-full object-contain" />
+                  )
                 ) : (
                   <ImageIcon className="size-4 text-muted-foreground" />
                 )}
@@ -350,7 +361,7 @@ function SlotCard({
             <input
               ref={fileRef}
               type="file"
-              accept="image/*"
+              accept="image/*,video/mp4,video/webm"
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
@@ -369,8 +380,11 @@ function SlotCard({
               </div>
             )}
             <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
-              PNG, JPG, WebP ou SVG até 4 MB. Imagens grandes são redimensionadas para no máx. {MAX_DIMENSION}px e comprimidas automaticamente. Proporção até {MAX_ASPECT_RATIO}:1.
+              <strong>Imagem:</strong> PNG/JPG/WebP/SVG até 4 MB (auto-comprime, proporção até {MAX_ASPECT_RATIO}:1).
+              <br />
+              <strong>Vídeo boomerang:</strong> MP4/WebM até 4 MB e {MAX_VIDEO_DURATION_S}s — roda em loop automático sem som.
             </p>
+
           </div>
 
           <SliderRow
