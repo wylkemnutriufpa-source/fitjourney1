@@ -15,13 +15,16 @@ import {
   ClipboardList,
   MessageSquareHeart,
   DollarSign,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
-import { applyTheme, getStoredTheme } from "@/lib/patient/theme";
+import { applyTheme, getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 import fjLogo from "@/assets/fitjourney-logo.png";
@@ -30,6 +33,33 @@ import { VideoLoaderFullscreen } from "@/components/VideoLoader";
 
 // Cache module-level do estado do sidebar — sobrevive a remounts do AppShell.
 let __sidebarOpenCache: boolean | null = null;
+
+function ThemeToggle() {
+  const [mode, setMode] = useState<ThemeMode>("system");
+  useEffect(() => {
+    setMode(getStoredTheme());
+  }, []);
+  function cycle() {
+    const order: ThemeMode[] = ["dark", "light", "system"];
+    const next = order[(order.indexOf(mode) + 1) % order.length];
+    setMode(next);
+    setTheme(next);
+  }
+  const Icon = mode === "light" ? Sun : mode === "dark" ? Moon : Monitor;
+  const label =
+    mode === "light" ? "Tema: claro" : mode === "dark" ? "Tema: escuro" : "Tema: sistema";
+  return (
+    <button
+      type="button"
+      onClick={cycle}
+      title={label}
+      aria-label={label}
+      className="p-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+    >
+      <Icon className="size-4" />
+    </button>
+  );
+}
 
 
 
@@ -370,6 +400,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
+            <ThemeToggle />
             {header}
             <div className="text-right hidden sm:block">
               <p className="text-xs font-medium flex items-center gap-1.5 justify-end">
