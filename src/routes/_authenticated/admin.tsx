@@ -23,6 +23,7 @@ function AdminLayout() {
   const tabs = [
     { to: "/admin/profissionais", label: "Profissionais" },
     { to: "/admin/pacientes", label: "Pacientes" },
+    { to: "/admin/leads", label: "Leads" },
     { to: "/admin/landing", label: "Landing Page" },
   ];
   return (
