@@ -413,6 +413,95 @@ function Settings() {
           </div>
         </section>
 
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-5">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
+              03 · Sua landing page pública
+            </h2>
+            {landingUrl && (
+              <a
+                href={landingUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[10px] font-mono uppercase tracking-widest text-primary hover:underline"
+              >
+                Ver página ↗
+              </a>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground -mt-1">
+            Cada profissional tem uma landing personalizada em{" "}
+            <code className="font-mono">fitjourney.com.br/n/seu-slug</code>.
+            Compartilhe esse link em redes sociais — pacientes conhecem você e
+            se cadastram direto.
+          </p>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Endereço (slug) — letras minúsculas, números e hífen
+            </label>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground font-mono shrink-0">
+                fitjourney.com.br/n/
+              </span>
+              <input
+                className={inputCls + " font-mono"}
+                value={slug}
+                onChange={(e) =>
+                  setSlug(
+                    e.target.value
+                      .toLowerCase()
+                      .replace(/[^a-z0-9-]/g, "")
+                      .slice(0, 40),
+                  )
+                }
+                disabled={saving}
+                placeholder="dr-wylkem"
+                maxLength={40}
+              />
+            </div>
+            <p className="text-[10px] text-muted-foreground/70">
+              Entre 3 e 40 caracteres. Define também o link bonito de convite:{" "}
+              <code className="font-mono">/c/{slug || "seu-slug"}/CODIGO</code>.
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Chamada principal (headline)
+            </label>
+            <input
+              className={inputCls}
+              value={publicHeadline}
+              onChange={(e) => setPublicHeadline(e.target.value)}
+              disabled={saving}
+              placeholder="Plano alimentar personalizado para sua rotina."
+              maxLength={160}
+            />
+            <p className="text-[10px] text-muted-foreground/70">
+              Aparece em destaque na sua landing. Até 160 caracteres.
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Sobre você (bio)
+            </label>
+            <textarea
+              className={inputCls + " min-h-[140px] resize-y leading-relaxed"}
+              value={publicBio}
+              onChange={(e) => setPublicBio(e.target.value)}
+              disabled={saving}
+              placeholder="Quem você é, sua formação, abordagem, especialidades…"
+              maxLength={2000}
+            />
+            <p className="text-[10px] text-muted-foreground/70">
+              {publicBio.length}/2000 caracteres.
+            </p>
+          </div>
+        </section>
+
+
 
         <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
           <div className="flex items-center justify-between gap-3">
