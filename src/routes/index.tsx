@@ -280,7 +280,7 @@ function Landing() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-              className="relative mx-auto w-full max-w-[460px] aspect-square hidden md:block"
+              className="relative mx-auto w-full max-w-[560px] aspect-square hidden md:block"
             >
               {c.hero.hero_media_type === "image" && c.hero.hero_media_url ? (
                 <img src={c.hero.hero_media_url} alt="" className="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-glow" />
@@ -293,7 +293,7 @@ function Landing() {
                   <div className="absolute inset-[36%] rounded-full border border-primary/10" />
                   <div className="absolute inset-[28%] rounded-full bg-primary/10 blur-3xl animate-pulse" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="relative fj-logo-aura" style={{ width: 180, height: 180 }}>
+                    <div className="relative fj-logo-aura" style={{ width: 280, height: 280 }}>
                       <div className="fj-logo-pulse" />
                       <div className="fj-logo-orbit fj-logo-orbit-1"><span className="fj-logo-particle" /></div>
                       <div className="fj-logo-orbit fj-logo-orbit-2"><span className="fj-logo-particle fj-logo-particle-gold" /></div>
