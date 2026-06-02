@@ -13,6 +13,16 @@ import { withDomainGate } from "./gate.server";
 
 const CreateNutritionistInput = z.object({
   fullName: z.string().trim().min(1).max(255),
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(3)
+    .max(40)
+    .regex(
+      /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/,
+      "Slug deve ter 3-40 caracteres: letras minúsculas, números e hífen",
+    ),
   crn: z
     .string()
     .trim()
@@ -76,6 +86,7 @@ export const createNutritionistProfile = createServerFn({ method: "POST" })
             full_name: data.fullName,
             email: authUser.user.email,
             crn: data.crn ?? null,
+            slug: data.slug,
           })
           .select("id")
           .single();
