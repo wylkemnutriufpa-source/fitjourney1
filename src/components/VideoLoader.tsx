@@ -1,4 +1,5 @@
-import loaderVideo from "@/assets/loader.mp4.asset.json";
+import loaderWebm from "@/assets/loader.webm.asset.json";
+import loaderMp4 from "@/assets/loader.mp4.asset.json";
 
 type Size = "sm" | "md" | "lg" | "xl";
 
@@ -16,23 +17,25 @@ interface VideoLoaderProps {
 }
 
 /**
- * Loader oficial FitJourney — substitui spinners de "tela carregando".
- * Usa o vídeo da intro em loop, adaptável a mobile.
+ * Loader oficial FitJourney — vídeo da intro com fundo realmente transparente
+ * (WebM VP9 yuva420p via chromakey). Sem caixa de fundo, sem mix-blend.
  */
 export function VideoLoader({ size = "md", label, className = "" }: VideoLoaderProps) {
   return (
     <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
       <div className={`${SIZE_MAP[size]} relative`}>
         <video
-          src={loaderVideo.url}
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
           className="w-full h-full object-contain"
-          style={{ mixBlendMode: "screen" }}
-        />
+          style={{ background: "transparent" }}
+        >
+          <source src={loaderWebm.url} type="video/webm" />
+          <source src={loaderMp4.url} type="video/mp4" />
+        </video>
       </div>
       {label && (
         <p className="text-xs sm:text-sm text-muted-foreground font-medium tracking-wide text-center px-4">
