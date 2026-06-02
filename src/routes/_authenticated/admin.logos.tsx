@@ -18,33 +18,128 @@ export const Route = createFileRoute("/_authenticated/admin/logos")({
   component: LogosAdminPage,
 });
 
-const MAX_UPLOAD_BYTES = 800 * 1024; // 800 KB — armazenado em localStorage como data URL
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (igual avatar)
+const MAX_DIMENSION = 1024; // px — comprime automaticamente acima disso
+const MIN_DIMENSION = 32; // px — abaixo disso é pequeno demais p/ logo
+const MAX_ASPECT_RATIO = 6; // razão maior:menor
+const MAX_STORED_BYTES = 1.5 * 1024 * 1024; // 1.5 MB após compressão (limite localStorage)
+
+function readAsDataUrl(file: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error ?? new Error("Falha ao ler arquivo"));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Não foi possível decodificar a imagem"));
+    img.src = src;
+  });
+}
+
+/** Comprime/redimensiona via canvas, preservando proporção e transparência (PNG). */
+async function compressImage(file: File): Promise<{ dataUrl: string; width: number; height: number; bytes: number }> {
+  const originalUrl = await readAsDataUrl(file);
+  if (file.type === "image/svg+xml") {
+    return { dataUrl: originalUrl, width: 0, height: 0, bytes: file.size };
+  }
+  const img = await loadImage(originalUrl);
+  const { width: w0, height: h0 } = img;
+  const scale = Math.min(1, MAX_DIMENSION / Math.max(w0, h0));
+  const width = Math.round(w0 * scale);
+  const height = Math.round(h0 * scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas não disponível neste navegador");
+  ctx.drawImage(img, 0, 0, width, height);
+  const dataUrl = canvas.toDataURL("image/png");
+  const bytes = Math.ceil((dataUrl.length - "data:image/png;base64,".length) * 0.75);
+  return { dataUrl, width, height, bytes };
+}
 
 function LogosAdminPage() {
   const { get, update, reset } = useLogoSettingsEditor();
   const [errorBySlot, setErrorBySlot] = useState<Partial<Record<LogoSlot, string>>>({});
+  const [infoBySlot, setInfoBySlot] = useState<Partial<Record<LogoSlot, string>>>({});
   const slots = Object.keys(SLOT_META) as LogoSlot[];
 
   async function handleUpload(slot: LogoSlot, file: File) {
     setErrorBySlot((s) => ({ ...s, [slot]: undefined }));
+    setInfoBySlot((s) => ({ ...s, [slot]: undefined }));
+
     if (!file.type.startsWith("image/")) {
-      setErrorBySlot((s) => ({ ...s, [slot]: "Arquivo precisa ser uma imagem." }));
+      setErrorBySlot((s) => ({ ...s, [slot]: "Arquivo precisa ser uma imagem (PNG, JPG, WebP ou SVG)." }));
       return;
     }
     if (file.size > MAX_UPLOAD_BYTES) {
       setErrorBySlot((s) => ({
         ...s,
-        [slot]: `Imagem muito grande (${(file.size / 1024).toFixed(0)} KB). Máximo: ${MAX_UPLOAD_BYTES / 1024} KB.`,
+        [slot]: `Imagem muito grande (${(file.size / 1024 / 1024).toFixed(2)} MB). Máximo: 4 MB.`,
       }));
       return;
     }
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
-    update(slot, { customUrl: dataUrl, variant: "orbital" });
+
+    try {
+      const { dataUrl, width, height, bytes } = await compressImage(file);
+
+      if (width > 0 && height > 0) {
+        if (Math.min(width, height) < MIN_DIMENSION) {
+          setErrorBySlot((s) => ({
+            ...s,
+            [slot]: `Imagem pequena demais (${width}×${height}px). Mínimo: ${MIN_DIMENSION}×${MIN_DIMENSION}px.`,
+          }));
+          return;
+        }
+        const ratio = Math.max(width, height) / Math.min(width, height);
+        if (ratio > MAX_ASPECT_RATIO) {
+          setErrorBySlot((s) => ({
+            ...s,
+            [slot]: `Proporção muito alongada (${ratio.toFixed(1)}:1). Use uma logo mais quadrada (até ${MAX_ASPECT_RATIO}:1).`,
+          }));
+          return;
+        }
+      }
+
+      if (bytes > MAX_STORED_BYTES) {
+        setErrorBySlot((s) => ({
+          ...s,
+          [slot]: `Mesmo após compressão ficou grande (${(bytes / 1024 / 1024).toFixed(2)} MB). Use uma imagem mais simples.`,
+        }));
+        return;
+      }
+
+      try {
+        update(slot, { customUrl: dataUrl, variant: "orbital" });
+      } catch {
+        setErrorBySlot((s) => ({
+          ...s,
+          [slot]: "Não foi possível salvar no navegador (storage cheio). Tente uma imagem menor.",
+        }));
+        return;
+      }
+
+      const compressedKb = (bytes / 1024).toFixed(0);
+      const originalKb = (file.size / 1024).toFixed(0);
+      setInfoBySlot((s) => ({
+        ...s,
+        [slot]:
+          width > 0
+            ? `Pronto: ${width}×${height}px · ${compressedKb} KB (original ${originalKb} KB).`
+            : `Pronto: SVG ${originalKb} KB.`,
+      }));
+    } catch (e: any) {
+      setErrorBySlot((s) => ({
+        ...s,
+        [slot]: e?.message ?? "Falha ao processar a imagem.",
+      }));
+    }
   }
 
   return (
