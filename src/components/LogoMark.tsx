@@ -5,9 +5,8 @@ interface LogoMarkProps {
 }
 
 /**
- * LOGO oficial FitJourney — vídeo em loop, sem fundo.
- * Substitui a imagem estática anterior (fitjourney-logo.png) em todos os lugares
- * onde a logo aparece ao lado do nome "FitJourney" (landing, app, auth).
+ * LOGO oficial FitJourney — vídeo em loop, fundo já transparente no arquivo.
+ * Sem mix-blend, sem caixa: renderiza o vídeo cru.
  */
 export function LogoMark({ className = "size-8 object-contain" }: LogoMarkProps) {
   return (
@@ -20,7 +19,7 @@ export function LogoMark({ className = "size-8 object-contain" }: LogoMarkProps)
       preload="auto"
       aria-label="FitJourney"
       className={className}
-      style={{ mixBlendMode: "screen" }}
     />
   );
 }
+
