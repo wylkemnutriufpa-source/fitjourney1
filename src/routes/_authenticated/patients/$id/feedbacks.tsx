@@ -325,7 +325,7 @@ function EditFeedbackDialog({
               inputMode="decimal"
               value={form.weightKg}
               onChange={(e) => setForm({ ...form, weightKg: e.target.value })}
-              className="input"
+              className={INPUT_CLS}
             />
           </Field>
           <Field label="Cintura (cm)">
@@ -334,7 +334,7 @@ function EditFeedbackDialog({
               inputMode="decimal"
               value={form.waistCm}
               onChange={(e) => setForm({ ...form, waistCm: e.target.value })}
-              className="input"
+              className={INPUT_CLS}
             />
           </Field>
           <Field label="Abdômen (cm)">
@@ -343,7 +343,7 @@ function EditFeedbackDialog({
               inputMode="decimal"
               value={form.abdomenCm}
               onChange={(e) => setForm({ ...form, abdomenCm: e.target.value })}
-              className="input"
+              className={INPUT_CLS}
             />
           </Field>
           <Field label="Quadril (cm)">
@@ -352,7 +352,7 @@ function EditFeedbackDialog({
               inputMode="decimal"
               value={form.hipCm}
               onChange={(e) => setForm({ ...form, hipCm: e.target.value })}
-              className="input"
+              className={INPUT_CLS}
             />
           </Field>
         </div>
@@ -362,7 +362,7 @@ function EditFeedbackDialog({
             onChange={(e) =>
               setForm({ ...form, adherenceRating: e.target.value as any })
             }
-            className="input"
+            className={INPUT_CLS}
           >
             <option value="muito_dificil">Muito difícil</option>
             <option value="dificil">Difícil</option>
@@ -377,7 +377,7 @@ function EditFeedbackDialog({
             onChange={(e) =>
               setForm({ ...form, resultRating: e.target.value as any })
             }
-            className="input"
+            className={INPUT_CLS}
           >
             <option value="">— sem avaliação —</option>
             <option value="piores">Piorou</option>
@@ -391,7 +391,7 @@ function EditFeedbackDialog({
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
             rows={3}
-            className="input"
+            className={INPUT_CLS}
           />
         </Field>
         {err && (
