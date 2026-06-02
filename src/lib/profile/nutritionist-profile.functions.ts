@@ -17,6 +17,9 @@ export interface MyNutritionistProfile {
   crn: string | null;
   specialty: string | null;
   phone: string | null;
+  slug: string | null;
+  publicBio: string | null;
+  publicHeadline: string | null;
 }
 
 export const getMyNutritionistProfile = createServerFn({ method: "GET" })
@@ -25,7 +28,9 @@ export const getMyNutritionistProfile = createServerFn({ method: "GET" })
     const { userId } = context;
     const { data, error } = await supabaseAdmin
       .from("nutritionists")
-      .select("id, full_name, display_name, avatar_url, email, crn, specialty, phone")
+      .select(
+        "id, full_name, display_name, avatar_url, email, crn, specialty, phone, slug, public_bio, public_headline",
+      )
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -39,6 +44,9 @@ export const getMyNutritionistProfile = createServerFn({ method: "GET" })
       crn: data.crn,
       specialty: data.specialty,
       phone: data.phone,
+      slug: data.slug ?? null,
+      publicBio: data.public_bio ?? null,
+      publicHeadline: data.public_headline ?? null,
     };
   });
 
