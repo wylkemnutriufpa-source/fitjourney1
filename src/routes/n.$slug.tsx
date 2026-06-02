@@ -75,10 +75,17 @@ function NutritionistLanding() {
       {/* Top nav */}
       <header className="border-b border-border/60 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
-            <LogoOrbital size="size-9" />
-            <span className="font-bold tracking-tight">FitJourney</span>
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+              className="focus:outline-none cursor-pointer"
+              title="Ver intro"
+            >
+              <LogoOrbital size="size-9" />
+            </button>
+            <Link to="/" className="font-bold tracking-tight">FitJourney</Link>
+          </div>
           <Link
             to="/app"
             className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground"

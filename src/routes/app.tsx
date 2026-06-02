@@ -110,23 +110,30 @@ function Login() {
     <div className="min-h-screen grid lg:grid-cols-2 bg-background text-foreground">
       <div className="hidden lg:flex flex-col justify-between p-12 bg-sidebar border-r border-border relative overflow-hidden">
         <div className="flex items-center gap-3 relative z-10">
-          <span className="fj-logo-aura relative inline-flex items-center justify-center size-14 shrink-0">
-            <span className="fj-logo-pulse" aria-hidden />
-            <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
-              <span className="fj-logo-particle" />
+          <button
+            type="button"
+            onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+            className="focus:outline-none cursor-pointer"
+            title="Ver intro"
+          >
+            <span className="fj-logo-aura relative inline-flex items-center justify-center size-14 shrink-0">
+              <span className="fj-logo-pulse" aria-hidden />
+              <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
+                <span className="fj-logo-particle" />
+              </span>
+              <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
+                <span className="fj-logo-particle fj-logo-particle-gold" />
+              </span>
+              <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
+                <span className="fj-logo-particle" />
+              </span>
+              <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
+                <span className="fj-logo-particle fj-logo-particle-gold" />
+              </span>
+              <LogoVideo className="relative z-10 size-14 object-contain" />
             </span>
-            <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
-              <span className="fj-logo-particle fj-logo-particle-gold" />
-            </span>
-            <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
-              <span className="fj-logo-particle" />
-            </span>
-            <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
-              <span className="fj-logo-particle fj-logo-particle-gold" />
-            </span>
-            <LogoVideo className="relative z-10 size-14 object-contain" />
-          </span>
-          <span className="fj-wordmark text-2xl leading-none">FitJourney</span>
+          </button>
+          <Link to="/" className="fj-wordmark text-2xl leading-none">FitJourney</Link>
         </div>
 
         <div className="space-y-6 relative z-10">
@@ -188,23 +195,30 @@ function Login() {
       <div className="flex items-center justify-center p-8">
         <form onSubmit={submit} className="w-full max-w-sm space-y-7">
           <div className="lg:hidden flex flex-col items-center gap-3 -mt-2 mb-4">
-            <span className="fj-logo-aura relative inline-flex items-center justify-center size-32 shrink-0">
-              <span className="fj-logo-pulse" aria-hidden />
-              <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
-                <span className="fj-logo-particle" />
+            <button
+              type="button"
+              onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+              className="focus:outline-none cursor-pointer"
+              title="Ver intro"
+            >
+              <span className="fj-logo-aura relative inline-flex items-center justify-center size-32 shrink-0">
+                <span className="fj-logo-pulse" aria-hidden />
+                <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
+                  <span className="fj-logo-particle" />
+                </span>
+                <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
+                  <span className="fj-logo-particle fj-logo-particle-gold" />
+                </span>
+                <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
+                  <span className="fj-logo-particle" />
+                </span>
+                <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
+                  <span className="fj-logo-particle fj-logo-particle-gold" />
+                </span>
+                <LogoVideo className="relative z-10 size-32 object-contain" />
               </span>
-              <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
-                <span className="fj-logo-particle fj-logo-particle-gold" />
-              </span>
-              <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
-                <span className="fj-logo-particle" />
-              </span>
-              <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
-                <span className="fj-logo-particle fj-logo-particle-gold" />
-              </span>
-              <LogoVideo className="relative z-10 size-32 object-contain" />
-            </span>
-            <span className="fj-wordmark text-2xl leading-none">FitJourney</span>
+            </button>
+            <Link to="/" className="fj-wordmark text-2xl leading-none">FitJourney</Link>
           </div>
           <div>
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">

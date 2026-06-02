@@ -710,8 +710,15 @@ function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2.5 mb-4">
-                <LogoOrbital size="size-14" />
-                <span className="font-display font-bold text-lg">FitJourney</span>
+                <button
+                  type="button"
+                  onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+                  className="focus:outline-none cursor-pointer"
+                  title="Ver intro"
+                >
+                  <LogoOrbital size="size-14" />
+                </button>
+                <Link to="/" className="font-display font-bold text-lg">FitJourney</Link>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed mb-4">
                 Plataforma completa para nutricionistas modernos.
