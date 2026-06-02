@@ -313,9 +313,9 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 <LogoVideo className="relative z-10 size-[96px] object-contain" />
               </span>
             </button>
-            <Link to="/" className="fj-wordmark text-[17px] leading-none">
+            <span className="fj-wordmark text-[17px] leading-none">
               FitJourney
-            </Link>
+            </span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}

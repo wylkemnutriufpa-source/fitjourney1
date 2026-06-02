@@ -64,7 +64,7 @@ function PatientOnboardingPage() {
             </p>
             <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
               <Activity className="size-7 text-primary" />
-              <Link to="/" className="fj-wordmark">FitJourney</Link>
+              <span className="fj-wordmark">FitJourney</span>
             </h1>
           </div>
           <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">

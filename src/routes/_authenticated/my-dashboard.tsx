@@ -478,7 +478,7 @@ function LegacyWelcomeBanner({ firstName }: { firstName: string }) {
             className="text-2xl sm:text-3xl font-bold tracking-tight"
           >
             Bem-vindo{firstName ? `, ${firstName}` : ""} ao{" "}
-            <Link to="/" className="fj-wordmark">FitJourney</Link>.
+            <span className="fj-wordmark">FitJourney</span>.
           </h2>
           <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
             Identificamos seu cadastro anterior. Para liberar todos os recursos
