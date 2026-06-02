@@ -207,12 +207,12 @@
   border-radius: 9999px;
   background: radial-gradient(
     circle at center,
-    oklch(0.62 0.16 155 / 0.55) 0%,
-    oklch(0.62 0.16 155 / 0.18) 38%,
+    oklch(0.62 0.16 155 / 0.20) 0%,
+    oklch(0.62 0.16 155 / 0.08) 38%,
     transparent 70%
   );
-  filter: blur(6px);
-  animation: fj-logo-pulse 2.8s ease-in-out infinite;
+  filter: blur(8px);
+  opacity: 0.32;
   pointer-events: none;
 }
 
