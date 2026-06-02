@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -43,6 +43,7 @@ function deepClone<T>(x: T): T {
 // --- Componente raiz -------------------------------------------------------
 
 function TemplateV2Editor() {
+  const navigate = useNavigate();
   const [draft, setDraft] = useState<PlannerTemplateV2>(() =>
     deepClone(espHipertrofiaV2Piloto),
   );
@@ -132,7 +133,7 @@ function TemplateV2Editor() {
       const snap = buildSnapshotV2(draft);
       saveSnapshot(snap);
       toast.success("Snapshot V2 gerado e salvo no storage.");
-      window.open("/my-plan-v2-preview", "_blank");
+      void navigate({ to: "/my-plan-v2-preview" });
     } catch (e) {
       const err = e as { issues?: Array<{ path: (string | number)[]; message: string }>; message?: string };
       const msg =
