@@ -483,9 +483,106 @@ function SlotCard({
             </select>
           </div>
 
-          <div className="text-[10px] font-mono text-muted-foreground/70">
-            padrão: {def.sizePx}px · {def.variant} · {def.effect}
+          {/* Aura/luzes de fundo */}
+          <div className="rounded-lg border border-border/60 p-3 space-y-2">
+            <label className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-xs font-semibold">Aura / pulse de fundo</div>
+                <div className="text-[10px] text-muted-foreground">As "luzes" que ficam ao redor da logo padrão.</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={cfg.showAura !== false}
+                onChange={(e) => onUpdate({ showAura: e.target.checked })}
+                className="size-4 accent-primary"
+              />
+            </label>
+            {cfg.customUrl && (
+              <p className="text-[10px] text-muted-foreground/70">
+                Logos customizadas já entram sem aura automaticamente.
+              </p>
+            )}
           </div>
+
+          {/* Wordmark "FitJourney" */}
+          <div className="rounded-lg border border-border/60 p-3 space-y-3">
+            <label className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-xs font-semibold">Mostrar "FitJourney" junto da logo</div>
+                <div className="text-[10px] text-muted-foreground">Texto que aparece ao lado/acima/abaixo da logo neste slot.</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={cfg.wordmark.show}
+                onChange={(e) => onUpdate({ wordmark: { ...cfg.wordmark, show: e.target.checked } })}
+                className="size-4 accent-primary"
+              />
+            </label>
+
+            {cfg.wordmark.show && (
+              <>
+                <div>
+                  <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground block mb-1">
+                    Posição
+                  </label>
+                  <select
+                    value={cfg.wordmark.position}
+                    onChange={(e) =>
+                      onUpdate({ wordmark: { ...cfg.wordmark, position: e.target.value as WordmarkPosition } })
+                    }
+                    className="w-full text-sm px-2 py-1.5 rounded-md border border-border bg-background"
+                  >
+                    {WORDMARK_POSITIONS.map((p) => (
+                      <option key={p.value} value={p.value}>{p.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <SliderRow
+                  label="Distância da logo (gap)"
+                  value={cfg.wordmark.gap}
+                  min={0}
+                  max={64}
+                  step={1}
+                  suffix="px"
+                  onChange={(v) => onUpdate({ wordmark: { ...cfg.wordmark, gap: v } })}
+                />
+                <SliderRow
+                  label="Tamanho do texto"
+                  value={cfg.wordmark.sizePx}
+                  min={10}
+                  max={48}
+                  step={1}
+                  suffix="px"
+                  onChange={(v) => onUpdate({ wordmark: { ...cfg.wordmark, sizePx: v } })}
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <SliderRow
+                    label="Offset X"
+                    value={cfg.wordmark.offsetX}
+                    min={-40}
+                    max={40}
+                    step={1}
+                    suffix="px"
+                    onChange={(v) => onUpdate({ wordmark: { ...cfg.wordmark, offsetX: v } })}
+                  />
+                  <SliderRow
+                    label="Offset Y"
+                    value={cfg.wordmark.offsetY}
+                    min={-40}
+                    max={40}
+                    step={1}
+                    suffix="px"
+                    onChange={(v) => onUpdate({ wordmark: { ...cfg.wordmark, offsetY: v } })}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="text-[10px] font-mono text-muted-foreground/70">
+            padrão: {def.sizePx}px · {def.variant} · {def.effect} · wordmark {def.wordmark.show ? def.wordmark.position : "oculto"}
+          </div>
+
         </div>
       </div>
     </div>
