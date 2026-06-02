@@ -37,7 +37,6 @@ export type PlannerFoodItemV2 = {
   carbG: number;
   fatG: number;
   scaleGroup: ScaleGroupV2;
-  // Campos soberanos — OPCIONAIS no piloto.
   measures?: ItemMeasureV2[];
   substitutions?: ItemSubstitutionV2[];
   notes?: string;
@@ -47,21 +46,60 @@ export type PlannerMealV2 = {
   id: string;
   time: string;
   label: string;
-  /** Composição soberana: lista de itens reais (frango + arroz + feijão...). */
   items: PlannerFoodItemV2[];
-  /** Observação de refeição (escopo meal, independente de item.notes). */
   notes?: string;
   heroKey?: string;
+};
+
+export type DayIdV2 =
+  | "seg"
+  | "ter"
+  | "qua"
+  | "qui"
+  | "sex"
+  | "sab"
+  | "dom";
+
+export type PlannerDayV2 = {
+  id: DayIdV2;
+  label: string;
+  meals: PlannerMealV2[];
 };
 
 export type PlannerTemplateV2 = {
   id: string;
   name: string;
-  category: "Esportivo" | "Clínico" | "Regional" | "Gestante" | "Pré/Pós-operatório" | "Bariátrica";
+  category:
+    | "Esportivo"
+    | "Clínico"
+    | "Regional"
+    | "Gestante"
+    | "Pré/Pós-operatório"
+    | "Bariátrica";
   description: string;
   tags: string[];
   kcal: number;
-  meals: PlannerMealV2[];
+  days: PlannerDayV2[];
   /** Marcador explícito de piloto. */
   v2: true;
+};
+
+export const DAY_ORDER_V2: DayIdV2[] = [
+  "seg",
+  "ter",
+  "qua",
+  "qui",
+  "sex",
+  "sab",
+  "dom",
+];
+
+export const DAY_LABEL_V2: Record<DayIdV2, string> = {
+  seg: "Segunda",
+  ter: "Terça",
+  qua: "Quarta",
+  qui: "Quinta",
+  sex: "Sexta",
+  sab: "Sábado",
+  dom: "Domingo",
 };
