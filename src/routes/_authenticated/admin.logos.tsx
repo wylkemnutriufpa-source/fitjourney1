@@ -1,18 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { LogoOrbital } from "@/components/LogoOrbital";
+import { BrandLockup } from "@/components/BrandLockup";
 import {
   useLogoSettingsEditor,
   SLOT_META,
   EFFECT_OPTIONS,
   VARIANT_OPTIONS,
+  WORDMARK_POSITIONS,
   DEFAULTS,
   type LogoSlot,
   type LogoVariant,
   type SlotConfig,
+  type WordmarkPosition,
 } from "@/lib/logo-settings";
 import type { LogoEffect } from "@/components/LogoOrbital";
-import { RotateCcw, Upload, Trash2, ImageIcon } from "lucide-react";
+import { RotateCcw, Upload, Trash2, ImageIcon, Save, Check } from "lucide-react";
 import { uploadLandingAsset } from "@/lib/landing/landing-content";
 
 export const Route = createFileRoute("/_authenticated/admin/logos")({
