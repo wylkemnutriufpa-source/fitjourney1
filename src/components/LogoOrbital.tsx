@@ -15,7 +15,7 @@ interface LogoOrbitalProps {
 export function LogoOrbital({
   size = "size-16",
   className = "",
-  effect = "orbit",
+  effect = "dust",
 }: LogoOrbitalProps) {
   return (
     <span
