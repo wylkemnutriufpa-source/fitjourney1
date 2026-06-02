@@ -216,18 +216,12 @@ function Landing() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
             className="flex items-center gap-3"
           >
-            <button
-              type="button"
-              onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-              className="focus:outline-none cursor-pointer transition-transform duration-300 hover:scale-105"
-              title="Ver intro"
-            >
-              <LogoOrbital slot="landing-header" />
-            </button>
-            <span className="fj-header-sep hidden sm:block" aria-hidden="true" />
-            <Link to="/" className="fj-wordmark text-xl leading-none tracking-wide">
-              FitJourney
-            </Link>
+            <BrandLockup
+              slot="landing-header"
+              wordmarkAs={<Link to="/" className="fj-wordmark leading-none tracking-wide">FitJourney</Link>}
+              onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+            />
+
           </motion.div>
 
           <motion.div
