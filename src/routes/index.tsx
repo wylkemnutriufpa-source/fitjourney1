@@ -189,41 +189,82 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* ══════════ NAV ══════════ */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${navScrolled ? "glass border-b border-border/40 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.4)]" : "bg-transparent"}`}>
+      {/* ══════════ NAV — Premium Reveal ══════════ */}
+      <motion.nav
+        initial={{ y: -32, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+          navScrolled
+            ? "backdrop-blur-2xl bg-background/55 shadow-[0_12px_40px_-16px_rgba(0,0,0,0.55)]"
+            : "backdrop-blur-md bg-background/10"
+        }`}
+      >
+        {/* Shimmer dourado de abertura (uma passada) */}
+        <div className="fj-header-shimmer" aria-hidden="true" />
+
+        {/* Linha gradiente esmeralda→dourada com sweep luminoso */}
+        <div
+          className={`fj-header-line transition-opacity duration-700 ${navScrolled ? "opacity-100" : "opacity-60"}`}
+          aria-hidden="true"
+        />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
+            className="flex items-center gap-3"
+          >
             <button
               type="button"
               onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-              className="focus:outline-none cursor-pointer"
+              className="focus:outline-none cursor-pointer transition-transform duration-300 hover:scale-105"
               title="Ver intro"
             >
               <LogoOrbital size="size-14" />
             </button>
-            <Link to="/" className="fj-wordmark text-lg leading-none">FitJourney</Link>
-          </div>
+            <span className="fj-header-sep hidden sm:block" aria-hidden="true" />
+            <Link to="/" className="fj-wordmark text-xl leading-none tracking-wide">
+              FitJourney
+            </Link>
+          </motion.div>
 
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
+            className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground"
+          >
             {[["#features", "Recursos"], ["#how", "Como Funciona"], ["#pricing", "Preços"], ["#testimonials", "Depoimentos"], ["#faq", "FAQ"]].map(([href, label]) => (
-              <a key={href} href={href} className="hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full">{label}</a>
+              <a key={href} href={href} className="hover:text-foreground transition-colors relative after:absolute after:bottom-[-6px] after:left-0 after:h-px after:w-0 after:bg-gradient-to-r after:from-primary after:to-[var(--gold)] after:transition-all after:duration-300 hover:after:w-full">{label}</a>
             ))}
-          </div>
+          </motion.div>
 
-          <div className="hidden md:flex items-center gap-3">
+          <motion.div
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
+            className="hidden md:flex items-center gap-2.5"
+          >
             <button
               type="button"
               onClick={() => setContactOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full border border-border/50 bg-card/30 backdrop-blur-md hover:border-primary/50 hover:text-foreground hover:bg-primary/5 transition-all text-muted-foreground"
+              className="fj-magnetic inline-flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-medium rounded-full border border-border/50 bg-card/30 backdrop-blur-md text-muted-foreground hover:text-foreground hover:bg-primary/5"
               title="Fale com a gente"
             >
               <MessageCircle className="w-3.5 h-3.5" /> Contato
             </button>
-            <Link to="/app" className="px-3 py-1.5 text-sm font-medium rounded-full hover:bg-muted/60 transition-colors">Entrar</Link>
-            <Link to="/signup/nutritionist" className="inline-flex items-center gap-1.5 gradient-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-semibold shadow-glow hover:shadow-[0_0_24px_-4px_var(--primary-glow)] hover:scale-[1.03] active:scale-[0.97] transition-all">
+            <Link to="/app" className="fj-magnetic px-3.5 py-1.5 text-sm font-medium rounded-full border border-transparent hover:bg-muted/40 transition-colors">
+              Entrar
+            </Link>
+            <Link
+              to="/signup/nutritionist"
+              className="relative inline-flex items-center gap-1.5 gradient-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-semibold shadow-[0_8px_24px_-8px_oklch(0.62_0.16_155/0.7)] hover:shadow-[0_12px_32px_-8px_oklch(0.62_0.16_155/0.85)] hover:scale-[1.04] active:scale-[0.97] transition-all overflow-hidden shimmer-sweep"
+            >
               Começar Grátis <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-          </div>
+          </motion.div>
 
           <div className="md:hidden flex items-center gap-1">
             <button
@@ -251,7 +292,7 @@ function Landing() {
             </div>
           </motion.div>
         )}
-      </nav>
+      </motion.nav>
 
       {/* ══════════ HERO ══════════ */}
       <section ref={heroRef} className="relative pt-28 pb-20 md:pt-36 md:pb-28 px-4 overflow-hidden noise-overlay">
