@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as LogoTestRouteImport } from './routes/logo-test'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -46,6 +48,16 @@ import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedPatientsIdFeedbacksRouteImport } from './routes/_authenticated/patients/$id/feedbacks'
 import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LogoTestRoute = LogoTestRouteImport.update({
   id: '/logo-test',
   path: '/logo-test',
@@ -248,6 +260,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/logo-test': typeof LogoTestRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
@@ -285,6 +299,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/logo-test': typeof LogoTestRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
@@ -324,6 +340,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/app': typeof AppRoute
   '/logo-test': typeof LogoTestRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
@@ -363,6 +381,8 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/logo-test'
+    | '/privacidade'
+    | '/termos'
     | '/admin'
     | '/dashboard'
     | '/financeiro'
@@ -400,6 +420,8 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/logo-test'
+    | '/privacidade'
+    | '/termos'
     | '/admin'
     | '/dashboard'
     | '/financeiro'
@@ -438,6 +460,8 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/app'
     | '/logo-test'
+    | '/privacidade'
+    | '/termos'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro'
@@ -477,6 +501,8 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AppRoute: typeof AppRoute
   LogoTestRoute: typeof LogoTestRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  TermosRoute: typeof TermosRoute
   AuthCheckEmailRoute: typeof AuthCheckEmailRoute
   CSlugRoute: typeof CSlugRouteWithChildren
   NSlugRoute: typeof NSlugRoute
@@ -486,6 +512,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/logo-test': {
       id: '/logo-test'
       path: '/logo-test'
@@ -838,6 +878,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AppRoute: AppRoute,
   LogoTestRoute: LogoTestRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
+  TermosRoute: TermosRoute,
   AuthCheckEmailRoute: AuthCheckEmailRoute,
   CSlugRoute: CSlugRouteWithChildren,
   NSlugRoute: NSlugRoute,
