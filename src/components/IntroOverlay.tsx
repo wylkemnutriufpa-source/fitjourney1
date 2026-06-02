@@ -79,6 +79,11 @@ export function IntroOverlay() {
     manualRef.current = false;
     if (wasManual) {
       try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData.session) {
+          navigate({ to: "/app" });
+          return;
+        }
         const identity = await getMyIdentityState();
         navigate({ to: pickLandingRoute(identity) });
       } catch {
