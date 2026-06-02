@@ -871,6 +871,126 @@ function Landing() {
           Converse no WhatsApp
         </span>
       </a>
+
+      {contactOpen && <ContactModal onClose={() => setContactOpen(false)} />}
+    </div>
+  );
+}
+
+function ContactModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-[10000] flex items-center justify-center px-4 animate-fade-in"
+      style={{
+        background: "radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.95) 70%)",
+        backdropFilter: "blur(8px)",
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md rounded-2xl border p-8 shadow-[0_30px_120px_-20px_rgba(0,0,0,0.8)] animate-scale-in"
+        style={{
+          background: "linear-gradient(180deg, oklch(0.18 0.02 240) 0%, oklch(0.12 0.02 240) 100%)",
+          borderColor: "oklch(0.62 0.16 155 / 0.35)",
+          boxShadow:
+            "0 0 0 1px oklch(0.62 0.16 155 / 0.15), 0 30px 120px -20px rgba(0,0,0,0.8), inset 0 1px 0 oklch(0.85 0.14 155 / 0.08)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 text-white/40 hover:text-white text-xl leading-none"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+
+        <div className="text-center mb-7">
+          <p
+            className="text-[10px] font-mono uppercase tracking-[0.4em] mb-3"
+            style={{ color: "oklch(0.78 0.13 85)" }}
+          >
+            Atendimento premium
+          </p>
+          <h2
+            className="fj-wordmark text-2xl md:text-3xl tracking-tight"
+            style={{ color: "oklch(0.92 0.05 155)" }}
+          >
+            Fale com a gente
+          </h2>
+          <p className="mt-3 text-sm text-white/60 leading-relaxed">
+            Escolha o canal de sua preferência. Respondemos em horário comercial.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <a
+            href={CONTACT_WHATSAPP}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-[oklch(0.62_0.16_155/0.5)] p-4 transition group"
+          >
+            <span
+              className="grid place-items-center size-11 rounded-lg shrink-0"
+              style={{ background: "#25D366", boxShadow: "0 8px 24px -8px rgba(37,211,102,0.5)" }}
+            >
+              <WhatsAppIcon className="size-6 text-white" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-white font-semibold text-sm">WhatsApp</span>
+              <span className="block text-white/50 text-xs truncate">{CONTACT_WHATSAPP_LABEL}</span>
+            </span>
+            <ArrowRight className="size-4 text-white/30 group-hover:text-white/80 group-hover:translate-x-0.5 transition" />
+          </a>
+
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-[oklch(0.62_0.16_155/0.5)] p-4 transition group"
+          >
+            <span
+              className="grid place-items-center size-11 rounded-lg shrink-0"
+              style={{
+                background: "linear-gradient(135deg, oklch(0.62 0.16 155) 0%, oklch(0.55 0.14 200) 100%)",
+                boxShadow: "0 8px 24px -8px oklch(0.62 0.16 155 / 0.5)",
+              }}
+            >
+              <Mail className="size-5 text-white" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-white font-semibold text-sm">E-mail</span>
+              <span className="block text-white/50 text-xs truncate">{CONTACT_EMAIL}</span>
+            </span>
+            <ArrowRight className="size-4 text-white/30 group-hover:text-white/80 group-hover:translate-x-0.5 transition" />
+          </a>
+
+          <a
+            href={CONTACT_INSTAGRAM}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-[oklch(0.62_0.16_155/0.5)] p-4 transition group"
+          >
+            <span
+              className="grid place-items-center size-11 rounded-lg shrink-0"
+              style={{
+                background: "linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
+                boxShadow: "0 8px 24px -8px rgba(220,39,67,0.5)",
+              }}
+            >
+              <Instagram className="size-5 text-white" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-white font-semibold text-sm">Instagram</span>
+              <span className="block text-white/50 text-xs truncate">@fitjourney_system</span>
+            </span>
+            <ArrowRight className="size-4 text-white/30 group-hover:text-white/80 group-hover:translate-x-0.5 transition" />
+          </a>
+        </div>
+
+        <p className="text-[10px] font-mono uppercase tracking-widest text-white/40 text-center pt-6">
+          Sistema FitJourney · Suporte oficial
+        </p>
+      </div>
     </div>
   );
 }
