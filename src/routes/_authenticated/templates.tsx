@@ -101,6 +101,7 @@ const pilotosCatalog: Array<{
   description: string;
   tags: string[];
   kcal: number;
+  editorRoute: string;
   previewRoute: string;
   badge: string;
 }> = [
@@ -110,6 +111,7 @@ const pilotosCatalog: Array<{
     description: espHipertrofiaV2Piloto.description,
     tags: espHipertrofiaV2Piloto.tags,
     kcal: espHipertrofiaV2Piloto.kcal,
+    editorRoute: "/templates-v2-editor",
     previewRoute: "/my-plan-v2-preview",
     badge: "V2 — Item Soberano",
   },
@@ -482,8 +484,8 @@ function TemplatesPage() {
                 </p>
                 <p className="text-xs text-amber-900/80 dark:text-amber-200/80 max-w-3xl">
                   Templates aqui validam novas arquiteturas (ex.: V2 — item soberano) sem
-                  afetar a Biblioteca do Sistema nem os planos publicados. Não são editáveis
-                  pelo editor de produção. Use apenas para validação visual.
+                  afetar a Biblioteca do Sistema nem os planos publicados. O V2 tem editor
+                  próprio de teste; o preview continua sendo somente leitura por contrato.
                 </p>
               </div>
             </div>
@@ -532,6 +534,7 @@ function PilotCard({
     description: string;
     tags: string[];
     kcal: number;
+    editorRoute: string;
     previewRoute: string;
     badge: string;
   };
@@ -556,14 +559,23 @@ function PilotCard({
           </span>
         ))}
       </div>
-      <Button
-        size="sm"
-        variant="outline"
-        className="gap-1.5 mt-auto"
-        onClick={() => navigate({ to: pilot.previewRoute })}
-      >
-        <ExternalLink className="size-3.5" /> Abrir preview
-      </Button>
+      <div className="mt-auto grid grid-cols-2 gap-2">
+        <Button
+          size="sm"
+          className="gap-1.5"
+          onClick={() => navigate({ to: pilot.editorRoute })}
+        >
+          <Pencil className="size-3.5" /> Editar piloto
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          onClick={() => navigate({ to: pilot.previewRoute })}
+        >
+          <ExternalLink className="size-3.5" /> Preview
+        </Button>
+      </div>
     </div>
   );
 }
