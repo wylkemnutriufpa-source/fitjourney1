@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { VideoLoader } from "@/components/VideoLoader";
 import {
   ArrowLeft,
   Clock,
@@ -114,10 +115,7 @@ function PatientPlanPage() {
         </div>
 
         {isLoading && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" />
-            Carregando planos…
-          </div>
+          <VideoLoader size="md" label="Carregando planos…" />
         )}
 
         {error && (

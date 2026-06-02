@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { VideoLoader } from "@/components/VideoLoader";
 import {
   Save, Loader2, ArrowUp, ArrowDown, Trash2, Plus, Image as ImageIcon,
   Eye, ExternalLink,
@@ -76,8 +77,8 @@ function AdminLandingEditor() {
 
   if (loading || !content) {
     return (
-      <div className="flex items-center justify-center py-20 text-muted-foreground">
-        <Loader2 className="size-5 animate-spin mr-2" /> Carregando editor…
+      <div className="flex items-center justify-center py-20">
+        <VideoLoader size="lg" label="Carregando editor…" />
       </div>
     );
   }

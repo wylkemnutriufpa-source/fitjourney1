@@ -18,6 +18,7 @@ import {
   User,
 } from "lucide-react";
 import { toast } from "sonner";
+import { VideoLoader } from "@/components/VideoLoader";
 import {
   getOrCreateMyReferralCode,
   getMyNutritionistProfile,
@@ -186,9 +187,8 @@ export function OnlineInviteDialog({ open, onClose, patientName }: Props) {
           </div>
 
           {loading ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
-              <Loader2 className="size-4 animate-spin" />
-              Carregando convite…
+            <div className="flex items-center justify-center py-4">
+              <VideoLoader size="sm" label="Carregando convite…" />
             </div>
           ) : !code ? (
             <p className="text-sm text-destructive">
