@@ -1,6 +1,6 @@
 import { LogoMark } from "@/components/LogoMark";
 
-export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura";
+export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle";
 
 interface LogoOrbitalProps {
   size?: string;
@@ -15,7 +15,7 @@ interface LogoOrbitalProps {
 export function LogoOrbital({
   size = "size-16",
   className = "",
-  effect = "aura",
+  effect = "sparkle",
 }: LogoOrbitalProps) {
   return (
     <span
@@ -77,6 +77,14 @@ export function LogoOrbital({
         <span className="fj-aura" aria-hidden>
           <span className="fj-aura-blob fj-aura-blob-1" />
           <span className="fj-aura-blob fj-aura-blob-2" />
+        </span>
+      )}
+
+      {effect === "sparkle" && (
+        <span className="fj-sparkle" aria-hidden>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <span key={i} />
+          ))}
         </span>
       )}
 
