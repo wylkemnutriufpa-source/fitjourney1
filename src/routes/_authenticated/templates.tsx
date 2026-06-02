@@ -559,14 +559,23 @@ function PilotCard({
           </span>
         ))}
       </div>
-      <Button
-        size="sm"
-        variant="outline"
-        className="gap-1.5 mt-auto"
-        onClick={() => navigate({ to: pilot.previewRoute })}
-      >
-        <ExternalLink className="size-3.5" /> Abrir preview
-      </Button>
+      <div className="mt-auto grid grid-cols-2 gap-2">
+        <Button
+          size="sm"
+          className="gap-1.5"
+          onClick={() => navigate({ to: pilot.editorRoute })}
+        >
+          <Pencil className="size-3.5" /> Editar piloto
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          onClick={() => navigate({ to: pilot.previewRoute })}
+        >
+          <ExternalLink className="size-3.5" /> Preview
+        </Button>
+      </div>
     </div>
   );
 }
