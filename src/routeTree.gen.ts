@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermosRouteImport } from './routes/termos'
+import { Route as SuporteRouteImport } from './routes/suporte'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as LogoTestRouteImport } from './routes/logo-test'
 import { Route as AppRouteImport } from './routes/app'
@@ -51,6 +52,11 @@ import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authe
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
   path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuporteRoute = SuporteRouteImport.update({
+  id: '/suporte',
+  path: '/suporte',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRoute
   '/logo-test': typeof LogoTestRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -300,6 +307,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppRoute
   '/logo-test': typeof LogoTestRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -341,6 +349,7 @@ export interface FileRoutesById {
   '/app': typeof AppRoute
   '/logo-test': typeof LogoTestRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -382,6 +391,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/logo-test'
     | '/privacidade'
+    | '/suporte'
     | '/termos'
     | '/admin'
     | '/dashboard'
@@ -421,6 +431,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/logo-test'
     | '/privacidade'
+    | '/suporte'
     | '/termos'
     | '/admin'
     | '/dashboard'
@@ -461,6 +472,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/logo-test'
     | '/privacidade'
+    | '/suporte'
     | '/termos'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
@@ -502,6 +514,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRoute
   LogoTestRoute: typeof LogoTestRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  SuporteRoute: typeof SuporteRoute
   TermosRoute: typeof TermosRoute
   AuthCheckEmailRoute: typeof AuthCheckEmailRoute
   CSlugRoute: typeof CSlugRouteWithChildren
@@ -517,6 +530,13 @@ declare module '@tanstack/react-router' {
       path: '/termos'
       fullPath: '/termos'
       preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/suporte': {
+      id: '/suporte'
+      path: '/suporte'
+      fullPath: '/suporte'
+      preLoaderRoute: typeof SuporteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -879,6 +899,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRoute,
   LogoTestRoute: LogoTestRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  SuporteRoute: SuporteRoute,
   TermosRoute: TermosRoute,
   AuthCheckEmailRoute: AuthCheckEmailRoute,
   CSlugRoute: CSlugRouteWithChildren,
