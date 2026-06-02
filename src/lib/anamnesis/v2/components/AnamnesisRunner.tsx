@@ -1,8 +1,8 @@
 // Runner UI — paciente online e (Fase 2) nutricionista manual usam o MESMO.
 // Sem lógica clínica embutida. Apenas renderiza o catálogo.
 
-import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Loader2, Save } from "lucide-react";
 import { loadCatalog } from "../catalog/loader";
 import type { Answers } from "../catalog/types";
 import {
@@ -17,17 +17,44 @@ interface Props {
   onSubmit: (answers: Answers) => Promise<void> | void;
   submitting?: boolean;
   submitLabel?: string;
+  /**
+   * Chave de autosave local (localStorage). Rascunho apenas — não é verdade
+   * clínica. Limpo automaticamente após submit bem-sucedido.
+   * Default: "fj:anamnesis-draft:v1".
+   */
+  draftKey?: string;
 }
+
+const DEFAULT_DRAFT_KEY = "fj:anamnesis-draft:v1";
 
 export function AnamnesisRunner({
   initialAnswers,
   onSubmit,
   submitting,
   submitLabel = "Finalizar anamnese",
+  draftKey = DEFAULT_DRAFT_KEY,
 }: Props) {
   const catalog = useMemo(() => loadCatalog(), []);
-  const [answers, setAnswers] = useState<Answers>(initialAnswers ?? {});
+
+  // Carrega rascunho local (se houver) na montagem.
+  const [answers, setAnswers] = useState<Answers>(() => {
+    if (initialAnswers && Object.keys(initialAnswers).length > 0) {
+      return initialAnswers;
+    }
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = window.localStorage.getItem(draftKey);
+      if (!raw) return {};
+      const parsed = JSON.parse(raw) as { answers?: Answers };
+      return parsed.answers ?? {};
+    } catch {
+      return {};
+    }
+  });
   const [blockIdx, setBlockIdx] = useState(0);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const visible = useMemo(
