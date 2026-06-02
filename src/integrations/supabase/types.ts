@@ -238,6 +238,36 @@ export type Database = {
         }
         Relationships: []
       }
+      landing_content: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          schema_version: number
+          singleton: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          schema_version?: number
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          schema_version?: number
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       nutritionist_subscriptions: {
         Row: {
           created_at: string
