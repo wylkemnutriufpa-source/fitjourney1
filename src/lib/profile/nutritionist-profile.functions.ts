@@ -17,6 +17,9 @@ export interface MyNutritionistProfile {
   crn: string | null;
   specialty: string | null;
   phone: string | null;
+  slug: string | null;
+  publicBio: string | null;
+  publicHeadline: string | null;
 }
 
 export const getMyNutritionistProfile = createServerFn({ method: "GET" })
@@ -25,7 +28,9 @@ export const getMyNutritionistProfile = createServerFn({ method: "GET" })
     const { userId } = context;
     const { data, error } = await supabaseAdmin
       .from("nutritionists")
-      .select("id, full_name, display_name, avatar_url, email, crn, specialty, phone")
+      .select(
+        "id, full_name, display_name, avatar_url, email, crn, specialty, phone, slug, public_bio, public_headline",
+      )
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -39,6 +44,9 @@ export const getMyNutritionistProfile = createServerFn({ method: "GET" })
       crn: data.crn,
       specialty: data.specialty,
       phone: data.phone,
+      slug: data.slug ?? null,
+      publicBio: data.public_bio ?? null,
+      publicHeadline: data.public_headline ?? null,
     };
   });
 
@@ -73,6 +81,29 @@ const UpdateInput = z.object({
     .regex(/^[0-9+()\-\s]*$/, "Telefone inválido")
     .optional()
     .or(z.literal("").transform(() => undefined)),
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(40)
+    .regex(
+      /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/,
+      "Slug deve ter 3-40 caracteres: letras minúsculas, números e hífen",
+    )
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  publicBio: z
+    .string()
+    .trim()
+    .max(2000)
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  publicHeadline: z
+    .string()
+    .trim()
+    .max(160)
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
 });
 
 export const updateMyNutritionistProfile = createServerFn({ method: "POST" })
@@ -93,12 +124,24 @@ export const updateMyNutritionistProfile = createServerFn({ method: "POST" })
           email: data.email,
           specialty: data.specialty ?? null,
           phone: data.phone ?? null,
+          slug: data.slug ?? null,
+          public_bio: data.publicBio ?? null,
+          public_headline: data.publicHeadline ?? null,
         },
         { onConflict: "auth_user_id" }
       )
-      .select("id, full_name, display_name, avatar_url, email, crn, specialty, phone")
+      .select(
+        "id, full_name, display_name, avatar_url, email, crn, specialty, phone, slug, public_bio, public_headline",
+      )
       .single();
-    if (error) throw new Error(`Failed to save profile: ${error.message}`);
+    if (error) {
+      // 23505 = unique_violation (slug duplicado)
+      const code = (error as { code?: string }).code;
+      if (code === "23505") {
+        throw new Error("Este endereço (slug) já está em uso. Escolha outro.");
+      }
+      throw new Error(`Failed to save profile: ${error.message}`);
+    }
     return {
       id: upserted.id,
       fullName: upserted.full_name,
@@ -108,6 +151,9 @@ export const updateMyNutritionistProfile = createServerFn({ method: "POST" })
       crn: upserted.crn,
       specialty: upserted.specialty,
       phone: upserted.phone,
+      slug: upserted.slug ?? null,
+      publicBio: upserted.public_bio ?? null,
+      publicHeadline: upserted.public_headline ?? null,
     };
   });
 
