@@ -3,7 +3,7 @@
 // READ ONLY. Zero recálculo. Zero normalização. Zero inferência.
 // Lê ClinicalContext (estado clínico atual) + snapshot do plano ativo.
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -87,14 +87,21 @@ function MyDashboardPage() {
     staleTime: 30_000,
   });
 
-  const greeting = useMemo(() => {
+  // Saudação depende do horário/local do cliente → calcular só após mount
+  // evita hydration mismatch (React #418) que apagava a tela.
+  const [greeting, setGreeting] = useState<{
+    label: string;
+    message: string;
+    today: string;
+  } | null>(null);
+  useEffect(() => {
     const now = new Date();
     const period = getPeriod(now.getHours());
-    return {
+    setGreeting({
       label: periodLabel(period),
       message: pickGreetingMessage(period),
       today: formatTodayPtBr(now),
-    };
+    });
   }, []);
 
   const firstName = (profile?.fullName ?? "").split(" ")[0] ?? "";
@@ -113,18 +120,22 @@ function MyDashboardPage() {
         {/* Boas-vindas para pacientes migrados do FJ1 */}
         {showLegacyWelcome && <LegacyWelcomeBanner firstName={firstName} />}
 
-        {/* Saudação */}
-        <header className="space-y-1">
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-            {greeting.today}
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {greeting.label}
-            {firstName ? `, ${firstName}` : ""}
-          </h1>
-          <p className="text-sm text-muted-foreground max-w-xl">
-            {greeting.message}
-          </p>
+        {/* Saudação — só renderiza após mount (evita SSR/client mismatch). */}
+        <header className="space-y-1 min-h-[88px]">
+          {greeting && (
+            <>
+              <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                {greeting.today}
+              </p>
+              <h1 className="text-3xl font-bold tracking-tight">
+                {greeting.label}
+                {firstName ? `, ${firstName}` : ""}
+              </h1>
+              <p className="text-sm text-muted-foreground max-w-xl">
+                {greeting.message}
+              </p>
+            </>
+          )}
         </header>
 
         {/* Estado clínico */}
