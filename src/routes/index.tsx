@@ -752,12 +752,39 @@ function Landing() {
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed mb-4">
                 Plataforma completa para nutricionistas modernos.
               </p>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap mb-5">
                 {c.trust_badges.items.slice(0, 3).map((b) => (
                   <span key={b.id} className="text-[10px] font-semibold text-muted-foreground/60 bg-muted/50 px-2 py-1 rounded-md">
                     {b.label}
                   </span>
                 ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={CONTACT_INSTAGRAM}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram FitJourney"
+                  className="size-10 inline-flex items-center justify-center rounded-full border border-border bg-card/50 hover:border-primary/60 hover:text-primary transition-colors"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a
+                  href={CONTACT_WHATSAPP}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="WhatsApp FitJourney"
+                  className="size-10 inline-flex items-center justify-center rounded-full border border-border bg-card/50 hover:border-[#25D366]/60 hover:text-[#25D366] transition-colors"
+                >
+                  <WhatsAppIcon className="w-4 h-4" />
+                </a>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  aria-label="E-mail FitJourney"
+                  className="size-10 inline-flex items-center justify-center rounded-full border border-border bg-card/50 hover:border-primary/60 hover:text-primary transition-colors"
+                >
+                  <Mail className="w-4 h-4" />
+                </a>
               </div>
             </div>
             <div>
