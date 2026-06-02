@@ -114,7 +114,7 @@ export const submitPatientAnamnesisUpdate = createServerFn({ method: "POST" })
         submitted_at: new Date().toISOString(),
         version: nextVersion,
         supersedes_id: prev?.id ?? null,
-        created_by: userId,
+        created_by: null,
         catalog_version: catalog.version,
         completion_score: canonical.completionScore,
         clinical_flags: canonical.clinicalTags,
