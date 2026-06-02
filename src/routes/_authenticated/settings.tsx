@@ -29,6 +29,17 @@ function onlyDigits(s: string) {
   return s.replace(/\D+/g, "");
 }
 
+function slugifyProfessionalName(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-")
+    .slice(0, 40);
+}
+
 function Settings() {
   const fetchProfile = useServerFn(getMyNutritionistProfile);
   const updateProfile = useServerFn(updateMyNutritionistProfile);
@@ -89,7 +100,10 @@ function Settings() {
       setEmail(profile.email ?? "");
       setSpecialty(profile.specialty ?? "");
       setPhone(profile.phone ?? "");
-      setSlug(profile.slug ?? "");
+      setSlug(
+        profile.slug ??
+          slugifyProfessionalName(profile.displayName || profile.fullName || ""),
+      );
       setPublicHeadline(profile.publicHeadline ?? "");
       setPublicBio(profile.publicBio ?? "");
     }
@@ -119,16 +133,20 @@ function Settings() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
+  const effectiveSlug = slug.trim().toLowerCase();
+  const savedSlug = profile?.slug ?? "";
+  const slugPendingSave = !!effectiveSlug && effectiveSlug !== savedSlug;
+
   const inviteUrl = useMemo(() => {
     if (!referral) return "";
-    if (slug) return publicUrl(`/c/${slug}/${referral.code}`);
-    return publicUrl(`/signup/patient?code=${referral.code}`);
-  }, [referral, slug]);
+    if (!effectiveSlug) return "";
+    return publicUrl(`/c/${effectiveSlug}/${referral.code}`);
+  }, [effectiveSlug, referral]);
 
   const landingUrl = useMemo(() => {
-    if (!slug) return "";
-    return publicUrl(`/n/${slug}`);
-  }, [slug]);
+    if (!effectiveSlug) return "";
+    return publicUrl(`/n/${effectiveSlug}`);
+  }, [effectiveSlug]);
 
   const waUrl = useMemo(() => {
     const d = onlyDigits(phone);
