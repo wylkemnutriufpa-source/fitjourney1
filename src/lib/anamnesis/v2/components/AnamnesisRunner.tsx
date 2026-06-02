@@ -139,7 +139,15 @@ export function AnamnesisRunner({
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Bloco {blockIdx + 1} de {catalog.blocks.length}
           </p>
-          <p className="text-[10px] font-mono text-muted-foreground">{progress}%</p>
+          <div className="flex items-center gap-2">
+            {savedAt && (
+              <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <Save className="size-3" />
+                Rascunho salvo
+              </span>
+            )}
+            <p className="text-[10px] font-mono text-muted-foreground">{progress}%</p>
+          </div>
         </div>
         <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           <div
@@ -148,6 +156,7 @@ export function AnamnesisRunner({
           />
         </div>
       </div>
+
 
       <div>
         <h2 className="text-2xl font-bold tracking-tight">{block.title}</h2>
