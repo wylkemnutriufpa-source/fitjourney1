@@ -49,8 +49,8 @@ export const loadAnamnesisDraft = createServerFn({ method: "GET" })
           ? ((row.data as any).raw ?? {})
           : {};
       return { found: true as const, answers: raw, updatedAt: row.updated_at as string };
-    },
-  );
+    });
+
 
 // ---------------- saveAnamnesisDraft (paciente) ----------------
 const SaveInput = z.object({ answers: AnswersSchema });
