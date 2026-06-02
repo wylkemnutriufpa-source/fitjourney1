@@ -94,6 +94,7 @@ export function AnamnesisRunner({
   const hasUnsavedChanges = useRef(false);
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [submitBlockedMsg, setSubmitBlockedMsg] = useState<string | null>(null);
 
   // 1) Hidrata do DB se enableDbDraft e ainda sem respostas significativas.
   useEffect(() => {
