@@ -116,22 +116,7 @@ function Login() {
             className="focus:outline-none cursor-pointer"
             title="Ver intro"
           >
-            <span className="fj-logo-aura relative inline-flex items-center justify-center size-14 shrink-0">
-              <span className="fj-logo-pulse" aria-hidden />
-              <span className="fj-logo-orbit fj-logo-orbit-1" aria-hidden>
-                <span className="fj-logo-particle" />
-              </span>
-              <span className="fj-logo-orbit fj-logo-orbit-2" aria-hidden>
-                <span className="fj-logo-particle fj-logo-particle-gold" />
-              </span>
-              <span className="fj-logo-orbit fj-logo-orbit-3" aria-hidden>
-                <span className="fj-logo-particle" />
-              </span>
-              <span className="fj-logo-orbit fj-logo-orbit-4" aria-hidden>
-                <span className="fj-logo-particle fj-logo-particle-gold" />
-              </span>
-              <LogoVideo className="relative z-10 size-14 object-contain" />
-            </span>
+            <LogoOrbital slot="auth-form" />
           </button>
           <Link to="/" className="fj-wordmark text-2xl leading-none">FitJourney</Link>
         </div>
