@@ -291,7 +291,7 @@ function Landing() {
                   <div className="absolute inset-[8%] rounded-full border border-primary/20" />
                   <div className="absolute inset-[22%] rounded-full border border-[var(--gold)]/15 border-dashed" />
                   <div className="absolute inset-[36%] rounded-full border border-primary/10" />
-                  <div className="absolute inset-[28%] rounded-full bg-primary/10 blur-3xl animate-pulse" />
+                  <div className="absolute inset-[28%] rounded-full bg-primary/10 blur-3xl" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="relative fj-logo-aura" style={{ width: 280, height: 280 }}>
                       <div className="fj-logo-pulse" />
