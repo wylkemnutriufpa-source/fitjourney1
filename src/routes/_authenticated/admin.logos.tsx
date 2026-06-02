@@ -408,7 +408,7 @@ function SlotCard({
                 <option key={v.value} value={v.value}>{v.label}</option>
               ))}
             </select>
-            {cfg.customUrl && cfg.variant === "video" && !/^data:video\//i.test(cfg.customUrl) && (
+            {cfg.customUrl && cfg.variant === "video" && !(/^data:video\//i.test(cfg.customUrl) || /\.(mp4|webm)(\?|$)/i.test(cfg.customUrl)) && (
               <p className="text-[10px] text-muted-foreground/70 mt-1">
                 Logo customizada (imagem) usa a versão estática mesmo com variante "vídeo". Para animar, faça upload de um vídeo curto.
               </p>
