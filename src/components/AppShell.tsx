@@ -288,21 +288,14 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         }
       >
         <div className="flex items-center justify-between gap-2 px-2 mb-10">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                import("@/components/IntroOverlay").then((m) => m.playIntro());
-              }}
-              className="focus:outline-none cursor-pointer"
-              title="Reproduzir intro"
-            >
-              <LogoOrbital slot="sidebar" />
-            </button>
-            <span className="fj-wordmark text-[17px] leading-none">
-              FitJourney
-            </span>
-          </div>
+          <BrandLockup
+            slot="sidebar"
+            wordmarkClassName="fj-wordmark leading-none"
+            onLogoClick={() => {
+              import("@/components/IntroOverlay").then((m) => m.playIntro());
+            }}
+          />
+
           <button
             onClick={() => setSidebarOpen(false)}
             title="Recolher menu"
