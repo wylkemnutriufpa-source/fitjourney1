@@ -230,6 +230,20 @@ function Landing() {
               <Link to="/app" className="flex-1 inline-flex items-center justify-center border border-border rounded-md px-3 py-2 text-sm font-semibold">Entrar</Link>
               <Link to="/signup/nutritionist" className="flex-1 inline-flex items-center justify-center gradient-primary text-primary-foreground rounded-md px-3 py-2 text-sm font-semibold shadow-glow">Criar Conta</Link>
             </div>
+            <div className="pt-3 mt-2 border-t border-border/30">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Fale com a gente</p>
+              <div className="flex items-center gap-2">
+                <a href={CONTACT_WHATSAPP} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card/50 px-3 py-2 text-sm hover:border-primary/60 transition-colors">
+                  <WhatsAppIcon className="w-4 h-4 text-[#25D366]" /> WhatsApp
+                </a>
+                <a href={CONTACT_INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card/50 px-3 py-2 text-sm hover:border-primary/60 transition-colors">
+                  <Instagram className="w-4 h-4" /> Instagram
+                </a>
+                <a href={`mailto:${CONTACT_EMAIL}`} aria-label="E-mail" className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card/50 px-3 py-2 text-sm hover:border-primary/60 transition-colors">
+                  <Mail className="w-4 h-4" /> E-mail
+                </a>
+              </div>
+            </div>
           </motion.div>
         )}
       </nav>
