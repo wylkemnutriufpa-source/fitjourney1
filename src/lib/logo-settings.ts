@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import type { LogoEffect } from "@/components/LogoOrbital";
+import { supabase } from "@/integrations/supabase/client";
 
 export type LogoSlot =
   | "landing-header"
@@ -15,12 +16,10 @@ export interface SlotConfig {
   sizePx: number;
   effect: LogoEffect;
   variant: LogoVariant;
-  /** Data URL ou URL de uma logo customizada (opcional). Quando definida, substitui a estática. */
+  /** URL pública (storage) ou data URL de uma logo customizada. */
   customUrl?: string | null;
-  /** Espaçamento interno (padding) em px ao redor da logo */
   paddingX: number;
   paddingY: number;
-  /** Espaçamento externo (margin) em px */
   marginX: number;
   marginY: number;
 }
@@ -46,15 +45,7 @@ export const DEFAULTS: Record<LogoSlot, SlotConfig> = {
 };
 
 export const EFFECT_OPTIONS: LogoEffect[] = [
-  "halo",
-  "orbit",
-  "aura",
-  "sparkle",
-  "ripple",
-  "comet",
-  "dust",
-  "energy",
-  "lines",
+  "halo", "orbit", "aura", "sparkle", "ripple", "comet", "dust", "energy", "lines",
 ];
 
 export const VARIANT_OPTIONS: { value: LogoVariant; label: string }[] = [
@@ -66,7 +57,9 @@ export const VARIANT_OPTIONS: { value: LogoVariant; label: string }[] = [
 const STORAGE_KEY = "fj_logo_settings_v2";
 const EVENT_NAME = "fj:logo-settings-change";
 
-function readAll(): Partial<Record<LogoSlot, SlotConfig>> {
+type SettingsMap = Partial<Record<LogoSlot, SlotConfig>>;
+
+function readAll(): SettingsMap {
   if (typeof window === "undefined") return {};
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -77,12 +70,58 @@ function readAll(): Partial<Record<LogoSlot, SlotConfig>> {
   }
 }
 
-function writeAll(all: Partial<Record<LogoSlot, SlotConfig>>) {
+function writeAll(all: SettingsMap) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
     window.dispatchEvent(new CustomEvent(EVENT_NAME));
   } catch (e) {
     console.warn("[logo-settings] write failed", e);
+  }
+}
+
+// ===== Sync com DB (landing_content.content.logos) =====
+let _dbSyncPromise: Promise<void> | null = null;
+
+function syncFromDb(): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve();
+  if (_dbSyncPromise) return _dbSyncPromise;
+  _dbSyncPromise = (async () => {
+    try {
+      const { data, error } = await supabase
+        .from("landing_content")
+        .select("content")
+        .eq("singleton", true)
+        .maybeSingle();
+      if (error) throw error;
+      const remote = (data?.content as Record<string, unknown> | null)?.logos as SettingsMap | undefined;
+      if (remote && typeof remote === "object") {
+        writeAll(remote);
+      }
+    } catch (e) {
+      console.warn("[logo-settings] DB sync failed", e);
+    }
+  })();
+  return _dbSyncPromise;
+}
+
+async function pushToDb(all: SettingsMap): Promise<void> {
+  try {
+    const { data, error: readErr } = await supabase
+      .from("landing_content")
+      .select("content")
+      .eq("singleton", true)
+      .maybeSingle();
+    if (readErr) throw readErr;
+    const current = (data?.content as Record<string, unknown> | null) ?? {};
+    const merged = { ...current, logos: all };
+    const { error } = await supabase
+      .from("landing_content")
+      .update({ content: merged as never })
+      .eq("singleton", true);
+    if (error) throw error;
+  } catch (e) {
+    console.warn("[logo-settings] DB push failed", e);
+    throw e;
   }
 }
 
@@ -96,6 +135,7 @@ export function useLogoSettings(slot: LogoSlot): SlotConfig {
   useEffect(() => {
     const refresh = () => setCfg(getLogoSettings(slot));
     refresh();
+    syncFromDb().then(refresh);
     window.addEventListener(EVENT_NAME, refresh);
     window.addEventListener("storage", refresh);
     return () => {
@@ -107,9 +147,10 @@ export function useLogoSettings(slot: LogoSlot): SlotConfig {
 }
 
 export function useLogoSettingsEditor() {
-  const [all, setAll] = useState<Partial<Record<LogoSlot, SlotConfig>>>(() => readAll());
+  const [all, setAll] = useState<SettingsMap>(() => readAll());
   useEffect(() => {
     const refresh = () => setAll(readAll());
+    syncFromDb().then(refresh);
     window.addEventListener(EVENT_NAME, refresh);
     return () => window.removeEventListener(EVENT_NAME, refresh);
   }, []);
@@ -119,18 +160,21 @@ export function useLogoSettingsEditor() {
     const next = { ...current, [slot]: { ...DEFAULTS[slot], ...(current[slot] ?? {}), ...patch } };
     writeAll(next);
     setAll(next);
+    void pushToDb(next);
   }, []);
 
   const reset = useCallback((slot?: LogoSlot) => {
     if (!slot) {
       writeAll({});
       setAll({});
+      void pushToDb({});
       return;
     }
     const current = readAll();
     delete current[slot];
     writeAll(current);
     setAll({ ...current });
+    void pushToDb(current);
   }, []);
 
   const get = useCallback((slot: LogoSlot): SlotConfig => {
