@@ -411,6 +411,109 @@
   50%      { opacity: 0.9;  transform: scale(1.12); }
 }
 
+/* ============================================================
+   Premium Header — reveal, linha dourada animada e shimmer
+   ============================================================ */
+.fj-header-line {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fj-header-line::before,
+.fj-header-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.fj-header-line::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.62 0.16 155 / 0.55) 30%,
+    oklch(0.80 0.13 88 / 0.85) 50%,
+    oklch(0.62 0.16 155 / 0.55) 70%,
+    transparent 100%
+  );
+  opacity: 0.65;
+}
+.fj-header-line::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.95 0.13 92 / 0.95) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: fj-header-line-sweep 7s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px oklch(0.85 0.14 88 / 0.6));
+}
+@keyframes fj-header-line-sweep {
+  0%   { transform: translateX(-100%); }
+  55%  { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+
+.fj-header-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  animation: fj-header-shimmer-show 0.6s ease-out 0.4s forwards;
+}
+.fj-header-shimmer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    color-mix(in oklab, var(--gold) 28%, transparent) 50%,
+    transparent 70%
+  );
+  transform: translateX(-110%);
+  animation: fj-header-intro-sweep 2.4s cubic-bezier(0.22, 1, 0.36, 1) 0.5s 1 forwards;
+}
+@keyframes fj-header-shimmer-show { to { opacity: 1; } }
+@keyframes fj-header-intro-sweep { to { transform: translateX(110%); } }
+
+/* Botão magnético: glow sutil que pulsa no idle e intensifica no hover */
+.fj-magnetic {
+  position: relative;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease;
+}
+.fj-magnetic::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--primary) 55%, transparent),
+    color-mix(in oklab, var(--gold) 45%, transparent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .35s ease;
+  pointer-events: none;
+}
+.fj-magnetic:hover { transform: translateY(-1px); }
+.fj-magnetic:hover::before { opacity: 1; }
+
+/* Separador vertical dourado sutil no header */
+.fj-header-sep {
+  width: 1px;
+  height: 18px;
+  background: linear-gradient(180deg,
+    transparent,
+    color-mix(in oklab, var(--gold) 50%, transparent),
+    transparent);
+}
+
 /* ─── Sparkle discreto (glitter estrelas) ─── */
 .fj-sparkle { position: absolute; inset: -30%; pointer-events: none; }
 .fj-sparkle span {
