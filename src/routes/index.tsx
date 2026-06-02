@@ -810,13 +810,18 @@ function Landing() {
                 <li><Link to="/privacidade" className="hover:text-foreground transition-colors">Privacidade</Link></li>
                 <li><Link to="/suporte" className="hover:text-foreground transition-colors">Suporte</Link></li>
                 <li>
-                  <a href="mailto:sistemafitjourney.suporte@gmail.com" className="hover:text-foreground transition-colors break-all">
-                    sistemafitjourney.suporte@gmail.com
+                  <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex items-center gap-2 hover:text-foreground transition-colors break-all">
+                    <Mail className="w-3.5 h-3.5 shrink-0" /> {CONTACT_EMAIL}
                   </a>
                 </li>
                 <li>
-                  <a href="https://wa.me/5591984155365" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
-                    WhatsApp: (91) 98415-5365
+                  <a href={CONTACT_WHATSAPP} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-foreground transition-colors">
+                    <WhatsAppIcon className="w-3.5 h-3.5 shrink-0 text-[#25D366]" /> {CONTACT_WHATSAPP_LABEL}
+                  </a>
+                </li>
+                <li>
+                  <a href={CONTACT_INSTAGRAM} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-foreground transition-colors">
+                    <Instagram className="w-3.5 h-3.5 shrink-0" /> @fitjourney_system
                   </a>
                 </li>
               </ul>
