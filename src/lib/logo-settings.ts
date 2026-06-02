@@ -12,6 +12,20 @@ export type LogoSlot =
 
 export type LogoVariant = "orbital" | "video" | "static";
 
+export type WordmarkPosition = "right" | "left" | "below" | "above";
+
+export interface WordmarkConfig {
+  show: boolean;
+  position: WordmarkPosition;
+  /** distância (px) entre logo e texto. */
+  gap: number;
+  /** tamanho do texto (px). */
+  sizePx: number;
+  /** offset fino do texto (px) — empurra para os lados / cima / baixo. */
+  offsetX: number;
+  offsetY: number;
+}
+
 export interface SlotConfig {
   sizePx: number;
   effect: LogoEffect;
@@ -22,6 +36,10 @@ export interface SlotConfig {
   paddingY: number;
   marginX: number;
   marginY: number;
+  /** Aura/pulse ambiente ao redor da logo (as "luzes"). */
+  showAura: boolean;
+  /** Configuração do wordmark "FitJourney" que aparece junto da logo. */
+  wordmark: WordmarkConfig;
 }
 
 export const SLOT_META: Record<LogoSlot, { label: string; description: string; context: "landing" | "app" }> = {
@@ -33,15 +51,19 @@ export const SLOT_META: Record<LogoSlot, { label: string; description: string; c
   "mobile-header": { label: "Header Mobile do App", description: "Topo mobile dentro do app", context: "app" },
 };
 
-const baseDefaults = { paddingX: 0, paddingY: 0, marginX: 0, marginY: 0, customUrl: null } as const;
+const baseDefaults = { paddingX: 0, paddingY: 0, marginX: 0, marginY: 0, customUrl: null, showAura: true } as const;
+
+function wm(partial: Partial<WordmarkConfig> = {}): WordmarkConfig {
+  return { show: true, position: "right", gap: 12, sizePx: 17, offsetX: 0, offsetY: 0, ...partial };
+}
 
 export const DEFAULTS: Record<LogoSlot, SlotConfig> = {
-  "landing-header": { sizePx: 56, effect: "halo", variant: "orbital", ...baseDefaults },
-  "landing-footer": { sizePx: 56, effect: "halo", variant: "orbital", ...baseDefaults },
-  "auth-form": { sizePx: 56, effect: "halo", variant: "video", ...baseDefaults },
-  "auth-hero": { sizePx: 128, effect: "halo", variant: "video", ...baseDefaults },
-  sidebar: { sizePx: 96, effect: "halo", variant: "video", ...baseDefaults },
-  "mobile-header": { sizePx: 40, effect: "halo", variant: "video", ...baseDefaults },
+  "landing-header": { sizePx: 56, effect: "halo", variant: "orbital", ...baseDefaults, wordmark: wm({ position: "right", gap: 12, sizePx: 20 }) },
+  "landing-footer": { sizePx: 56, effect: "halo", variant: "orbital", ...baseDefaults, wordmark: wm({ position: "right", gap: 10, sizePx: 18 }) },
+  "auth-form":      { sizePx: 56, effect: "halo", variant: "video",   ...baseDefaults, wordmark: wm({ position: "right", gap: 10, sizePx: 24 }) },
+  "auth-hero":      { sizePx: 128, effect: "halo", variant: "video",  ...baseDefaults, wordmark: wm({ position: "below", gap: 12, sizePx: 24 }) },
+  sidebar:          { sizePx: 96, effect: "halo", variant: "video",   ...baseDefaults, wordmark: wm({ position: "right", gap: 12, sizePx: 17 }) },
+  "mobile-header":  { sizePx: 40, effect: "halo", variant: "video",   ...baseDefaults, wordmark: wm({ show: false, position: "right", gap: 8, sizePx: 14 }) },
 };
 
 export const EFFECT_OPTIONS: LogoEffect[] = [
@@ -52,6 +74,13 @@ export const VARIANT_OPTIONS: { value: LogoVariant; label: string }[] = [
   { value: "orbital", label: "Estática + efeito" },
   { value: "video", label: "Vídeo animado" },
   { value: "static", label: "Só estática (sem efeito)" },
+];
+
+export const WORDMARK_POSITIONS: { value: WordmarkPosition; label: string }[] = [
+  { value: "right", label: "À direita da logo" },
+  { value: "left", label: "À esquerda da logo" },
+  { value: "below", label: "Abaixo da logo" },
+  { value: "above", label: "Acima da logo" },
 ];
 
 const STORAGE_KEY = "fj_logo_settings_v2";
@@ -105,29 +134,34 @@ function syncFromDb(): Promise<void> {
 }
 
 async function pushToDb(all: SettingsMap): Promise<void> {
-  try {
-    const { data, error: readErr } = await supabase
-      .from("landing_content")
-      .select("content")
-      .eq("singleton", true)
-      .maybeSingle();
-    if (readErr) throw readErr;
-    const current = (data?.content as Record<string, unknown> | null) ?? {};
-    const merged = { ...current, logos: all };
-    const { error } = await supabase
-      .from("landing_content")
-      .update({ content: merged as never })
-      .eq("singleton", true);
-    if (error) throw error;
-  } catch (e) {
-    console.warn("[logo-settings] DB push failed", e);
-    throw e;
-  }
+  const { data, error: readErr } = await supabase
+    .from("landing_content")
+    .select("content")
+    .eq("singleton", true)
+    .maybeSingle();
+  if (readErr) throw readErr;
+  const current = (data?.content as Record<string, unknown> | null) ?? {};
+  const merged = { ...current, logos: all };
+  const { error } = await supabase
+    .from("landing_content")
+    .update({ content: merged as never })
+    .eq("singleton", true);
+  if (error) throw error;
+}
+
+function mergeConfig(slot: LogoSlot, partial?: Partial<SlotConfig>): SlotConfig {
+  const def = DEFAULTS[slot];
+  const merged: SlotConfig = {
+    ...def,
+    ...(partial ?? {}),
+    wordmark: { ...def.wordmark, ...(partial?.wordmark ?? {}) },
+  };
+  return merged;
 }
 
 export function getLogoSettings(slot: LogoSlot): SlotConfig {
   const all = readAll();
-  return { ...DEFAULTS[slot], ...(all[slot] ?? {}) };
+  return mergeConfig(slot, all[slot]);
 }
 
 export function useLogoSettings(slot: LogoSlot): SlotConfig {
@@ -146,40 +180,69 @@ export function useLogoSettings(slot: LogoSlot): SlotConfig {
   return cfg;
 }
 
+/**
+ * Editor admin. Mudanças aplicam imediatamente no preview local (localStorage),
+ * mas só vão pro servidor quando `save()` é chamado. `dirty` indica alterações
+ * pendentes desde o último save.
+ */
 export function useLogoSettingsEditor() {
   const [all, setAll] = useState<SettingsMap>(() => readAll());
+  const [savedSnapshot, setSavedSnapshot] = useState<string>(() => JSON.stringify(readAll()));
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
-    const refresh = () => setAll(readAll());
-    syncFromDb().then(refresh);
+    const refresh = () => {
+      const next = readAll();
+      setAll(next);
+    };
+    syncFromDb().then(() => {
+      const next = readAll();
+      setAll(next);
+      setSavedSnapshot(JSON.stringify(next));
+    });
     window.addEventListener(EVENT_NAME, refresh);
     return () => window.removeEventListener(EVENT_NAME, refresh);
   }, []);
 
   const update = useCallback((slot: LogoSlot, patch: Partial<SlotConfig>) => {
     const current = readAll();
-    const next = { ...current, [slot]: { ...DEFAULTS[slot], ...(current[slot] ?? {}), ...patch } };
+    const base = mergeConfig(slot, current[slot]);
+    const nextSlot: SlotConfig = {
+      ...base,
+      ...patch,
+      wordmark: { ...base.wordmark, ...(patch.wordmark ?? {}) },
+    };
+    const next = { ...current, [slot]: nextSlot };
     writeAll(next);
     setAll(next);
-    void pushToDb(next);
   }, []);
 
   const reset = useCallback((slot?: LogoSlot) => {
     if (!slot) {
       writeAll({});
       setAll({});
-      void pushToDb({});
       return;
     }
     const current = readAll();
     delete current[slot];
     writeAll(current);
     setAll({ ...current });
-    void pushToDb(current);
   }, []);
 
-  const get = useCallback((slot: LogoSlot): SlotConfig => {
-    return { ...DEFAULTS[slot], ...(all[slot] ?? {}) };
-  }, [all]);
+  const save = useCallback(async () => {
+    setSaving(true);
+    try {
+      const current = readAll();
+      await pushToDb(current);
+      setSavedSnapshot(JSON.stringify(current));
+    } finally {
+      setSaving(false);
+    }
+  }, []);
 
-  return { get, update, reset };
+  const get = useCallback((slot: LogoSlot): SlotConfig => mergeConfig(slot, all[slot]), [all]);
+
+  const dirty = JSON.stringify(all) !== savedSnapshot;
+
+  return { get, update, reset, save, dirty, saving };
 }

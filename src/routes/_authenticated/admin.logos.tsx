@@ -1,18 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { LogoOrbital } from "@/components/LogoOrbital";
+import { BrandLockup } from "@/components/BrandLockup";
 import {
   useLogoSettingsEditor,
   SLOT_META,
   EFFECT_OPTIONS,
   VARIANT_OPTIONS,
+  WORDMARK_POSITIONS,
   DEFAULTS,
   type LogoSlot,
   type LogoVariant,
   type SlotConfig,
+  type WordmarkPosition,
 } from "@/lib/logo-settings";
 import type { LogoEffect } from "@/components/LogoOrbital";
-import { RotateCcw, Upload, Trash2, ImageIcon } from "lucide-react";
+import { RotateCcw, Upload, Trash2, ImageIcon, Save, Check } from "lucide-react";
 import { uploadLandingAsset } from "@/lib/landing/landing-content";
 
 export const Route = createFileRoute("/_authenticated/admin/logos")({
@@ -78,10 +81,23 @@ async function compressImage(file: File): Promise<{ dataUrl: string; width: numb
 }
 
 function LogosAdminPage() {
-  const { get, update, reset } = useLogoSettingsEditor();
+  const { get, update, reset, save, dirty, saving } = useLogoSettingsEditor();
   const [errorBySlot, setErrorBySlot] = useState<Partial<Record<LogoSlot, string>>>({});
   const [infoBySlot, setInfoBySlot] = useState<Partial<Record<LogoSlot, string>>>({});
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
   const slots = Object.keys(SLOT_META) as LogoSlot[];
+
+  async function handleSave() {
+    setSaveError(null);
+    try {
+      await save();
+      setSavedAt(Date.now());
+    } catch (e: any) {
+      setSaveError(e?.message ?? "Falha ao salvar no servidor.");
+    }
+  }
+
 
   async function handleUpload(slot: LogoSlot, file: File) {
     setErrorBySlot((s) => ({ ...s, [slot]: undefined }));
@@ -196,19 +212,54 @@ function LogosAdminPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-lg font-semibold">Logos — Tamanho, Efeitos, Upload & Espaçamento</h2>
+          <h2 className="text-lg font-semibold">Logos — Tamanho, Efeitos, Upload, Wordmark & Espaçamento</h2>
           <p className="text-sm text-muted-foreground">
-            Ajuste cada logo com preview ao vivo no contexto real (landing / app). Salvo no servidor — reflete em todo o sistema (incluindo o app do paciente em qualquer dispositivo).
+            Ajuste cada logo com preview ao vivo. Mudanças ficam em rascunho local — clique em <strong>Salvar e publicar</strong> para refletir em todo o sistema (landing pública + app do paciente em qualquer dispositivo).
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => reset()}
-          className="text-xs font-mono uppercase tracking-widest px-3 py-2 rounded-md border border-border hover:border-primary/60 hover:text-primary transition inline-flex items-center gap-2"
-        >
-          <RotateCcw className="size-3" /> Resetar tudo
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => reset()}
+            className="text-xs font-mono uppercase tracking-widest px-3 py-2 rounded-md border border-border hover:border-primary/60 hover:text-primary transition inline-flex items-center gap-2"
+          >
+            <RotateCcw className="size-3" /> Resetar tudo
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || (!dirty && savedAt === null)}
+            className={
+              "text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-md transition inline-flex items-center gap-2 " +
+              (dirty
+                ? "bg-primary text-primary-foreground hover:opacity-90"
+                : "bg-muted text-muted-foreground border border-border")
+            }
+            title={dirty ? "Publicar mudanças no servidor" : "Sem alterações para salvar"}
+          >
+            {saving ? (
+              <><Save className="size-3 animate-pulse" /> Salvando…</>
+            ) : dirty ? (
+              <><Save className="size-3" /> Salvar e publicar</>
+            ) : (
+              <><Check className="size-3" /> {savedAt ? "Salvo" : "Sem alterações"}</>
+            )}
+          </button>
+        </div>
       </div>
+
+      {dirty && (
+        <div className="text-xs text-primary bg-primary/10 border border-primary/30 rounded px-3 py-2">
+          Você tem alterações em rascunho. Elas aparecem aqui no preview, mas só vão para o app do paciente quando você clicar em <strong>Salvar e publicar</strong>.
+        </div>
+      )}
+      {saveError && (
+        <div className="text-xs text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
+          {saveError}
+        </div>
+      )}
+
+
 
       <div className="grid grid-cols-1 gap-4">
         {slots.map((slot) => {
@@ -432,9 +483,106 @@ function SlotCard({
             </select>
           </div>
 
-          <div className="text-[10px] font-mono text-muted-foreground/70">
-            padrão: {def.sizePx}px · {def.variant} · {def.effect}
+          {/* Aura/luzes de fundo */}
+          <div className="rounded-lg border border-border/60 p-3 space-y-2">
+            <label className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-xs font-semibold">Aura / pulse de fundo</div>
+                <div className="text-[10px] text-muted-foreground">As "luzes" que ficam ao redor da logo padrão.</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={cfg.showAura !== false}
+                onChange={(e) => onUpdate({ showAura: e.target.checked })}
+                className="size-4 accent-primary"
+              />
+            </label>
+            {cfg.customUrl && (
+              <p className="text-[10px] text-muted-foreground/70">
+                Logos customizadas já entram sem aura automaticamente.
+              </p>
+            )}
           </div>
+
+          {/* Wordmark "FitJourney" */}
+          <div className="rounded-lg border border-border/60 p-3 space-y-3">
+            <label className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-xs font-semibold">Mostrar "FitJourney" junto da logo</div>
+                <div className="text-[10px] text-muted-foreground">Texto que aparece ao lado/acima/abaixo da logo neste slot.</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={cfg.wordmark.show}
+                onChange={(e) => onUpdate({ wordmark: { ...cfg.wordmark, show: e.target.checked } })}
+                className="size-4 accent-primary"
+              />
+            </label>
+
+            {cfg.wordmark.show && (
+              <>
+                <div>
+                  <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground block mb-1">
+                    Posição
+                  </label>
+                  <select
+                    value={cfg.wordmark.position}
+                    onChange={(e) =>
+                      onUpdate({ wordmark: { ...cfg.wordmark, position: e.target.value as WordmarkPosition } })
+                    }
+                    className="w-full text-sm px-2 py-1.5 rounded-md border border-border bg-background"
+                  >
+                    {WORDMARK_POSITIONS.map((p) => (
+                      <option key={p.value} value={p.value}>{p.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <SliderRow
+                  label="Distância da logo (gap)"
+                  value={cfg.wordmark.gap}
+                  min={0}
+                  max={64}
+                  step={1}
+                  suffix="px"
+                  onChange={(v) => onUpdate({ wordmark: { ...cfg.wordmark, gap: v } })}
+                />
+                <SliderRow
+                  label="Tamanho do texto"
+                  value={cfg.wordmark.sizePx}
+                  min={10}
+                  max={48}
+                  step={1}
+                  suffix="px"
+                  onChange={(v) => onUpdate({ wordmark: { ...cfg.wordmark, sizePx: v } })}
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <SliderRow
+                    label="Offset X"
+                    value={cfg.wordmark.offsetX}
+                    min={-40}
+                    max={40}
+                    step={1}
+                    suffix="px"
+                    onChange={(v) => onUpdate({ wordmark: { ...cfg.wordmark, offsetX: v } })}
+                  />
+                  <SliderRow
+                    label="Offset Y"
+                    value={cfg.wordmark.offsetY}
+                    min={-40}
+                    max={40}
+                    step={1}
+                    suffix="px"
+                    onChange={(v) => onUpdate({ wordmark: { ...cfg.wordmark, offsetY: v } })}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="text-[10px] font-mono text-muted-foreground/70">
+            padrão: {def.sizePx}px · {def.variant} · {def.effect} · wordmark {def.wordmark.show ? def.wordmark.position : "oculto"}
+          </div>
+
         </div>
       </div>
     </div>
@@ -488,13 +636,13 @@ function SliderRow({
   );
 }
 
-/** Mock minimalista do contexto onde cada logo aparece de fato. */
+/** Mock minimalista do contexto onde cada logo aparece de fato. Usa BrandLockup
+ *  para refletir a configuração do wordmark (posição/gap/tamanho/offset). */
 function ContextMock({ slot }: { slot: LogoSlot }) {
   if (slot === "landing-header") {
     return (
       <div className="w-full max-w-md rounded-md border border-border bg-background/80 px-3 py-2 flex items-center gap-3">
-        <LogoOrbital slot={slot} />
-        <span className="fj-wordmark text-sm">FitJourney</span>
+        <BrandLockup slot={slot} />
         <div className="ml-auto flex gap-2 text-[10px] font-mono uppercase text-muted-foreground">
           <span>Sobre</span><span>Preços</span><span>Login</span>
         </div>
@@ -504,18 +652,15 @@ function ContextMock({ slot }: { slot: LogoSlot }) {
   if (slot === "landing-footer") {
     return (
       <div className="w-full max-w-md rounded-md border border-border bg-background/80 p-3 flex items-center gap-3">
-        <LogoOrbital slot={slot} />
-        <div className="text-[10px] font-mono uppercase text-muted-foreground">© FitJourney 2026</div>
+        <BrandLockup slot={slot} />
+        <div className="ml-auto text-[10px] font-mono uppercase text-muted-foreground">© 2026</div>
       </div>
     );
   }
   if (slot === "auth-form") {
     return (
       <div className="w-full max-w-xs rounded-md border border-border bg-background/80 p-3 space-y-2">
-        <div className="flex items-center gap-2">
-          <LogoOrbital slot={slot} />
-          <span className="text-sm font-semibold">Entrar</span>
-        </div>
+        <BrandLockup slot={slot} />
         <div className="h-6 rounded bg-muted/40" />
         <div className="h-6 rounded bg-muted/40" />
       </div>
@@ -523,19 +668,15 @@ function ContextMock({ slot }: { slot: LogoSlot }) {
   }
   if (slot === "auth-hero") {
     return (
-      <div className="w-full max-w-sm rounded-md border border-border bg-background/80 p-6 flex flex-col items-center gap-3">
-        <LogoOrbital slot={slot} />
-        <span className="text-sm font-semibold">FitJourney</span>
+      <div className="w-full max-w-sm rounded-md border border-border bg-background/80 p-6 flex justify-center">
+        <BrandLockup slot={slot} />
       </div>
     );
   }
   if (slot === "sidebar") {
     return (
       <div className="w-full max-w-[220px] rounded-md border border-border bg-sidebar/60 p-3 flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <LogoOrbital slot={slot} />
-          <span className="fj-wordmark text-sm">FitJourney</span>
-        </div>
+        <BrandLockup slot={slot} />
         <div className="space-y-1">
           <div className="h-4 rounded bg-muted/40" />
           <div className="h-4 rounded bg-muted/40" />
@@ -548,8 +689,9 @@ function ContextMock({ slot }: { slot: LogoSlot }) {
   return (
     <div className="w-full max-w-sm rounded-md border border-border bg-background/80 px-3 py-2 flex items-center gap-2">
       <div className="size-6 rounded border border-border" />
-      <LogoOrbital slot={slot} />
+      <BrandLockup slot={slot} />
       <span className="text-xs text-muted-foreground ml-auto">/dashboard</span>
     </div>
   );
 }
+

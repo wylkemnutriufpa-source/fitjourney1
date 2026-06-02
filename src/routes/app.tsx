@@ -3,8 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyIdentityState, type IdentityStateDTO } from "@/lib/phase2/identity.functions";
-import { LogoVideo } from "@/components/LogoVideo";
-import { LogoOrbital } from "@/components/LogoOrbital";
+import { BrandLockup } from "@/components/BrandLockup";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -110,17 +109,14 @@ function Login() {
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background text-foreground">
       <div className="hidden lg:flex flex-col justify-between p-12 bg-sidebar border-r border-border relative overflow-hidden">
-        <div className="flex items-center gap-3 relative z-10">
-          <button
-            type="button"
-            onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-            className="focus:outline-none cursor-pointer"
-            title="Ver intro"
-          >
-            <LogoOrbital slot="auth-form" />
-          </button>
-          <Link to="/" className="fj-wordmark text-2xl leading-none">FitJourney</Link>
+        <div className="relative z-10">
+          <BrandLockup
+            slot="auth-form"
+            wordmarkAs={<Link to="/" className="fj-wordmark leading-none">FitJourney</Link>}
+            onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+          />
         </div>
+
 
         <div className="space-y-6 relative z-10">
           <p className="text-[10px] font-mono uppercase tracking-widest text-primary">
@@ -180,17 +176,14 @@ function Login() {
 
       <div className="flex items-center justify-center p-8">
         <form onSubmit={submit} className="w-full max-w-sm space-y-7">
-          <div className="lg:hidden flex flex-col items-center gap-3 -mt-2 mb-4">
-            <button
-              type="button"
-              onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-              className="focus:outline-none cursor-pointer"
-              title="Ver intro"
-            >
-              <LogoOrbital slot="auth-hero" />
-            </button>
-            <Link to="/" className="fj-wordmark text-2xl leading-none">FitJourney</Link>
+          <div className="lg:hidden -mt-2 mb-4 flex justify-center">
+            <BrandLockup
+              slot="auth-hero"
+              wordmarkAs={<Link to="/" className="fj-wordmark leading-none">FitJourney</Link>}
+              onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+            />
           </div>
+
           <div>
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Acesso

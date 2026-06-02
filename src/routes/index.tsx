@@ -26,7 +26,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 import { LogoMark } from "@/components/LogoMark";
-import { LogoOrbital } from "@/components/LogoOrbital";
+import { BrandLockup } from "@/components/BrandLockup";
 import {
   DEFAULT_LANDING_CONTENT,
   fetchLandingContent,
@@ -216,18 +216,12 @@ function Landing() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
             className="flex items-center gap-3"
           >
-            <button
-              type="button"
-              onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-              className="focus:outline-none cursor-pointer transition-transform duration-300 hover:scale-105"
-              title="Ver intro"
-            >
-              <LogoOrbital slot="landing-header" />
-            </button>
-            <span className="fj-header-sep hidden sm:block" aria-hidden="true" />
-            <Link to="/" className="fj-wordmark text-xl leading-none tracking-wide">
-              FitJourney
-            </Link>
+            <BrandLockup
+              slot="landing-header"
+              wordmarkAs={<Link to="/" className="fj-wordmark leading-none tracking-wide">FitJourney</Link>}
+              onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+            />
+
           </motion.div>
 
           <motion.div
@@ -784,17 +778,14 @@ function Landing() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-12">
             <div className="col-span-2 md:col-span-2">
-              <div className="flex items-center gap-2.5 mb-4">
-                <button
-                  type="button"
-                  onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-                  className="focus:outline-none cursor-pointer"
-                  title="Ver intro"
-                >
-                  <LogoOrbital slot="landing-footer" />
-                </button>
-                <Link to="/" className="font-display font-bold text-lg">FitJourney</Link>
+              <div className="mb-4">
+                <BrandLockup
+                  slot="landing-footer"
+                  wordmarkAs={<Link to="/" className="font-display font-bold">FitJourney</Link>}
+                  onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+                />
               </div>
+
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed mb-4">
                 Plataforma completa para nutricionistas modernos.
               </p>
