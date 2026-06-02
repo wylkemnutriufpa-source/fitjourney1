@@ -102,38 +102,44 @@ export function IntroOverlay() {
     >
       <video
         ref={videoRef}
-        src="/videos/intro-reference.mp4"
+        src={introVideo.url}
         autoPlay
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-90"
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/50" />
 
       <div className="relative z-10 text-center px-6">
         <h1
-          className={`fj-wordmark text-5xl md:text-7xl lg:text-8xl tracking-tight transition-all duration-1000 ${
+          className={`fj-wordmark text-5xl md:text-7xl lg:text-8xl tracking-tight ${
             textVisible
               ? "opacity-100 translate-y-0 blur-0"
-              : "opacity-0 translate-y-6 blur-sm"
+              : "opacity-0 translate-y-8 blur-md"
           }`}
           style={{
             color: "oklch(0.85 0.14 155)",
             textShadow:
               "0 0 40px oklch(0.62 0.16 155 / 0.6), 0 0 80px oklch(0.62 0.16 155 / 0.35)",
+            transition: "opacity 2200ms cubic-bezier(0.22, 1, 0.36, 1), transform 2200ms cubic-bezier(0.22, 1, 0.36, 1), filter 2200ms cubic-bezier(0.22, 1, 0.36, 1)",
           }}
         >
           Bem-vindo ao FitJourney
         </h1>
         <p
-          className={`mt-6 text-sm md:text-base font-mono uppercase tracking-[0.35em] transition-all duration-1000 delay-500 ${
+          className={`mt-6 text-sm md:text-base font-mono uppercase tracking-[0.35em] ${
             textVisible ? "opacity-80 translate-y-0" : "opacity-0 translate-y-4"
           }`}
-          style={{ color: "oklch(0.78 0.09 85)" }}
+          style={{
+            color: "oklch(0.78 0.09 85)",
+            transition: "opacity 1800ms ease-out 900ms, transform 1800ms ease-out 900ms",
+          }}
         >
           Performance · Nutrition · Lab
         </p>
       </div>
+
 
       <button
         type="button"
