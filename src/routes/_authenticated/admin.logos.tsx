@@ -166,6 +166,7 @@ function LogosAdminPage() {
           const meta = SLOT_META[slot];
           const def = DEFAULTS[slot];
           const err = errorBySlot[slot];
+          const info = infoBySlot[slot];
           return (
             <SlotCard
               key={slot}
@@ -176,9 +177,14 @@ function LogosAdminPage() {
               context={meta.context}
               def={def}
               error={err}
+              info={info}
               onUpload={handleUpload}
               onUpdate={(patch) => update(slot, patch)}
-              onResetSlot={() => reset(slot)}
+              onResetSlot={() => {
+                reset(slot);
+                setErrorBySlot((s) => ({ ...s, [slot]: undefined }));
+                setInfoBySlot((s) => ({ ...s, [slot]: `Slot "${meta.label}" restaurado ao padrão.` }));
+              }}
               onClearCustom={() => update(slot, { customUrl: null })}
             />
           );
