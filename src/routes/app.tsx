@@ -111,17 +111,14 @@ function Login() {
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background text-foreground">
       <div className="hidden lg:flex flex-col justify-between p-12 bg-sidebar border-r border-border relative overflow-hidden">
-        <div className="flex items-center gap-3 relative z-10">
-          <button
-            type="button"
-            onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-            className="focus:outline-none cursor-pointer"
-            title="Ver intro"
-          >
-            <LogoOrbital slot="auth-form" />
-          </button>
-          <Link to="/" className="fj-wordmark text-2xl leading-none">FitJourney</Link>
+        <div className="relative z-10">
+          <BrandLockup
+            slot="auth-form"
+            wordmarkAs={<Link to="/" className="fj-wordmark leading-none">FitJourney</Link>}
+            onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+          />
         </div>
+
 
         <div className="space-y-6 relative z-10">
           <p className="text-[10px] font-mono uppercase tracking-widest text-primary">
