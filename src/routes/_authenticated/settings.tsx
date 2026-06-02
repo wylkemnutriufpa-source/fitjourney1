@@ -553,12 +553,16 @@ function Settings() {
             </button>
           </div>
           <p className="text-xs text-muted-foreground -mt-1">
-            Compartilhe este link com novos pacientes. Eles entram pelo link e ficam
-            vinculados automaticamente ao seu cadastro.
+            Compartilhe este link com novos pacientes. Ele abre direto o cadastro e o vínculo
+            com seu perfil é gravado no servidor antes da anamnese.
           </p>
           {!profile ? (
             <p className="text-xs text-muted-foreground">
               Salve seu perfil antes para liberar o link de convite.
+            </p>
+          ) : !effectiveSlug ? (
+            <p className="text-xs text-muted-foreground">
+              Defina e salve seu slug acima para liberar o link bonito de convite.
             </p>
           ) : !referral ? (
             <p className="text-xs text-muted-foreground">
@@ -566,11 +570,17 @@ function Settings() {
             </p>
           ) : (
             <div className="space-y-2">
+              {slugPendingSave && (
+                <p className="text-[11px] text-primary bg-primary/10 border border-primary/20 rounded-md px-3 py-2">
+                  Você alterou o slug. Clique em “Salvar Configurações” para ativar este link.
+                </p>
+              )}
               <div className="flex items-center gap-2 p-3 border border-border rounded-md bg-background">
                 <Link2 className="size-4 text-primary shrink-0" />
                 <code className="text-xs flex-1 truncate">{inviteUrl}</code>
                 <button
                   onClick={() => copy(inviteUrl, "Link")}
+                  disabled={slugPendingSave}
                   className="text-[10px] font-mono uppercase tracking-widest px-2 py-1 border border-border rounded hover:border-primary/40"
                 >
                   <Copy className="size-3" />
