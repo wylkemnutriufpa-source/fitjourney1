@@ -425,6 +425,10 @@ export type Database = {
           abdomen_cm: number | null
           adherence_rating: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          edited_at: string | null
+          edited_by: string | null
           height_cm_snapshot: number | null
           hip_cm: number | null
           id: string
@@ -442,6 +446,10 @@ export type Database = {
           abdomen_cm?: number | null
           adherence_rating: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          edited_at?: string | null
+          edited_by?: string | null
           height_cm_snapshot?: number | null
           hip_cm?: number | null
           id?: string
@@ -459,6 +467,10 @@ export type Database = {
           abdomen_cm?: number | null
           adherence_rating?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          edited_at?: string | null
+          edited_by?: string | null
           height_cm_snapshot?: number | null
           hip_cm?: number | null
           id?: string

@@ -162,7 +162,9 @@ function PatientOnboardingPage() {
               submitting={submitting}
               onSubmit={handleSubmit}
               submitLabel="Enviar anamnese"
+              enableDbDraft
             />
+
 
             {error && (
               <p className="text-xs text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">

@@ -71,7 +71,14 @@ export const submitInitialAnamnesis = createServerFn({ method: "POST" })
       origin: "online",
     });
 
-    // 3) calcula próxima version (paciente já pode ter draft)
+    // 3a) limpa quaisquer rascunhos pendentes deste paciente (autosave)
+    await supabaseAdmin
+      .from("anamneses")
+      .delete()
+      .eq("patient_id", patient.id)
+      .eq("review_status", "draft");
+
+    // 3b) calcula próxima version (considerando submetidas/aprovadas)
     const { data: prev } = await supabaseAdmin
       .from("anamneses")
       .select("id, version")
@@ -105,6 +112,7 @@ export const submitInitialAnamnesis = createServerFn({ method: "POST" })
     if (aErr || !created) {
       throw new Error(aErr?.message ?? "ANAMNESIS_INSERT_FAILED");
     }
+
 
     // 5) vincula consents recentes a essa anamnese (se ainda sem anamnesis_id)
     await supabaseAdmin

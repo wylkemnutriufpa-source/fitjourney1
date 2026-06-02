@@ -141,6 +141,7 @@ export const listMyFeedbacks = createServerFn({ method: "GET" })
       .from("patient_feedbacks")
       .select(SELECT_COLS)
       .eq("patient_id", patient.id)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error(error.message);
@@ -193,9 +194,11 @@ export const getMyFeedbackStatus = createServerFn({ method: "GET" })
       .from("patient_feedbacks")
       .select("created_at")
       .eq("patient_id", patient.id)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
+
 
     const lastAt: string | null = last?.created_at ?? null;
     let daysSince: number | null = null;
@@ -231,11 +234,82 @@ export const listPatientFeedbacks = createServerFn({ method: "GET" })
       .from("patient_feedbacks")
       .select(SELECT_COLS)
       .eq("patient_id", data.patientId)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error(error.message);
     return (rows ?? []).map(rowToDto);
   });
+
+// ------------------------------------------------------------------
+// editPatientFeedback — nutri edita campos clínicos (com auditoria)
+// ------------------------------------------------------------------
+
+const EditInput = z.object({
+  id: z.string().uuid(),
+  weightKg: z.number().min(20).max(400).nullable().optional(),
+  waistCm: z.number().min(30).max(250).nullable().optional(),
+  abdomenCm: z.number().min(30).max(250).nullable().optional(),
+  hipCm: z.number().min(30).max(250).nullable().optional(),
+  adherenceRating: AdherenceEnum.optional(),
+  resultRating: ResultEnum.nullable().optional(),
+  notes: z.string().trim().max(2000).nullable().optional(),
+});
+
+export const editPatientFeedback = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => EditInput.parse(input))
+  .handler(async ({ data, context }): Promise<FeedbackDTO> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+    const patch: Record<string, any> = {
+      edited_at: new Date().toISOString(),
+      edited_by: userId,
+    };
+    if (data.weightKg !== undefined) patch.weight_kg = data.weightKg;
+    if (data.waistCm !== undefined) patch.waist_cm = data.waistCm;
+    if (data.abdomenCm !== undefined) patch.abdomen_cm = data.abdomenCm;
+    if (data.hipCm !== undefined) patch.hip_cm = data.hipCm;
+    if (data.adherenceRating !== undefined)
+      patch.adherence_rating = data.adherenceRating;
+    if (data.resultRating !== undefined)
+      patch.result_rating = data.resultRating;
+    if (data.notes !== undefined)
+      patch.notes = data.notes?.trim() || null;
+
+    const { data: row, error } = await supabase
+      .from("patient_feedbacks")
+      .update(patch)
+      .eq("id", data.id)
+      .is("deleted_at", null)
+      .select(SELECT_COLS)
+      .single();
+    if (error) throw new Error(error.message);
+    return rowToDto(row);
+  });
+
+// ------------------------------------------------------------------
+// softDeletePatientFeedback — nutri arquiva feedback (preserva histórico)
+// ------------------------------------------------------------------
+
+const DeleteInput = z.object({ id: z.string().uuid() });
+
+export const softDeletePatientFeedback = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => DeleteInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+    const { error } = await supabase
+      .from("patient_feedbacks")
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: userId,
+      })
+      .eq("id", data.id)
+      .is("deleted_at", null);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 
 // ------------------------------------------------------------------
 // Configuração da frequência de feedback (lado nutri)
