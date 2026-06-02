@@ -58,6 +58,7 @@ const SaveInput = z.object({ answers: AnswersSchema });
 export const saveAnamnesisDraft = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => SaveInput.parse(input))
+  .handler(async ({ data, context }) => {
   .handler(async ({ data, context }): Promise<{ updatedAt: string }> => {
     const { supabase, userId } = context as { supabase: any; userId: string };
     const { data: patient, error: pErr } = await supabase
