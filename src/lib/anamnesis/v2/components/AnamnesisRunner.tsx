@@ -94,6 +94,7 @@ export function AnamnesisRunner({
   const hasUnsavedChanges = useRef(false);
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [submitBlockedMsg, setSubmitBlockedMsg] = useState<string | null>(null);
 
   // 1) Hidrata do DB se enableDbDraft e ainda sem respostas significativas.
   useEffect(() => {
@@ -223,7 +224,31 @@ export function AnamnesisRunner({
     if (blockHasErrors) return;
 
     if (isLast) {
-      if (allIssues.length > 0) return;
+      if (allIssues.length > 0) {
+        // Marca TODAS as visíveis como touched para revelar erros em todos os blocos
+        const allTouched: Record<string, boolean> = { ...next };
+        visible.forEach((v) => (allTouched[v.question.id] = true));
+        setTouched(allTouched);
+
+        // Navega para o primeiro bloco que contém erro
+        const firstBadId = allIssues[0].questionId;
+        const targetIdx = catalog.blocks.findIndex((b) =>
+          visible.some(
+            (v) => v.blockId === b.id && v.question.id === firstBadId,
+          ),
+        );
+        if (targetIdx >= 0) setBlockIdx(targetIdx);
+
+        const badQ = visible.find((v) => v.question.id === firstBadId);
+        setSubmitBlockedMsg(
+          `Não foi possível enviar: ${allIssues.length} resposta(s) precisam de ajuste. ` +
+            (badQ
+              ? `Comece por “${badQ.question.title}” — ${allIssues[0].message}.`
+              : ""),
+        );
+        return;
+      }
+      setSubmitBlockedMsg(null);
       // Garante salvamento final do DB antes do submit (cancela debounce).
       if (dbTimer.current) clearTimeout(dbTimer.current);
       if (enableDbDraft) {
@@ -236,8 +261,6 @@ export function AnamnesisRunner({
       await onSubmit(answers);
       clearLocalDraft();
       hasUnsavedChanges.current = false;
-      // O servidor já apaga o draft no submitInitialAnamnesis,
-      // mas chamamos discard para garantir caso submit seja custom.
       if (enableDbDraft) {
         try {
           await discardDraftFn();
@@ -335,11 +358,23 @@ export function AnamnesisRunner({
             key={question.id}
             question={question}
             value={answers[question.id]}
-            onChange={(v) => setAnswers((p) => ({ ...p, [question.id]: v }))}
+            onChange={(v) => {
+              setAnswers((p) => ({ ...p, [question.id]: v }));
+              if (submitBlockedMsg) setSubmitBlockedMsg(null);
+            }}
             error={touched[question.id] ? issueMap.get(question.id) : undefined}
           />
         ))}
       </div>
+
+      {submitBlockedMsg && (
+        <div
+          role="alert"
+          className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive"
+        >
+          {submitBlockedMsg}
+        </div>
+      )}
 
       <div className="flex items-center justify-between pt-4 border-t border-border gap-3 flex-wrap">
         <div className="flex items-center gap-3">
