@@ -791,7 +791,7 @@ function Landing() {
                   className="focus:outline-none cursor-pointer"
                   title="Ver intro"
                 >
-                  <LogoOrbital size="size-14" />
+                  <LogoOrbital slot="landing-footer" />
                 </button>
                 <Link to="/" className="font-display font-bold text-lg">FitJourney</Link>
               </div>
