@@ -147,11 +147,24 @@ export function LogoOrbital({
         </span>
       )}
 
-      {useVideo ? (
+      {customIsVideo ? (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          src={customUrl!}
+          className={`relative z-10 object-contain ${sizeClass}`}
+          style={{ background: "transparent", ...(sizeStyle ?? {}) }}
+          aria-label="Logo"
+        />
+      ) : useVideo ? (
         <LogoVideo className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} />
       ) : (
         <LogoMark className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} src={customUrl} />
       )}
+
     </span>
   );
 }
