@@ -197,12 +197,14 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     staleTime: 60_000,
     enabled: mounted && !!user?.id,
   });
-  const isResolvingIdentity = !mounted || authLoading || (!!user?.id && !identity);
-  const isPatient = identity?.role === "patient";
+  const knownProfessionalByRole = isAdmin;
+  const effectiveRole = identity?.role ?? (knownProfessionalByRole ? "nutritionist" : null);
+  const isResolvingIdentity = !mounted || authLoading || (!!user?.id && !identity && !knownProfessionalByRole);
+  const isPatient = effectiveRole === "patient";
   const roleRouteMismatch = Boolean(
-    identity?.state === "S3" &&
-      ((identity.role === "patient" && !isPatientArea) ||
-        (identity.role !== "patient" && isPatientArea)),
+    effectiveRole &&
+      ((effectiveRole === "patient" && !isPatientArea) ||
+        (effectiveRole !== "patient" && isPatientArea)),
   );
   const baseNav = isPatient ? patientNav : nutritionistNav;
   const nav = !isPatient && isAdmin
@@ -235,10 +237,10 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   useEffect(() => {
     if (!roleRouteMismatch) return;
     navigate({
-      to: identity?.role === "patient" ? "/my-dashboard" : "/dashboard",
+      to: effectiveRole === "patient" ? "/my-dashboard" : "/dashboard",
       replace: true,
     });
-  }, [identity?.role, navigate, roleRouteMismatch]);
+  }, [effectiveRole, navigate, roleRouteMismatch]);
 
   if (isResolvingIdentity || roleRouteMismatch) {
     return <AccessGateSplash />;
