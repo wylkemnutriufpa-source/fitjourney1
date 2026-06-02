@@ -202,6 +202,7 @@ interface SlotCardProps {
   context: "landing" | "app";
   def: SlotConfig;
   error?: string;
+  info?: string;
   onUpload: (slot: LogoSlot, f: File) => void;
   onUpdate: (patch: Partial<SlotConfig>) => void;
   onResetSlot: () => void;
@@ -216,6 +217,7 @@ function SlotCard({
   context,
   def,
   error,
+  info,
   onUpload,
   onUpdate,
   onResetSlot,
@@ -234,10 +236,10 @@ function SlotCard({
         <button
           type="button"
           onClick={onResetSlot}
-          className="text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-          title="Restaurar padrão desta seção"
+          className="text-xs font-mono uppercase tracking-widest px-3 py-1.5 rounded-md border border-border hover:border-primary/60 hover:text-primary transition inline-flex items-center gap-1.5"
+          title={`Restaurar "${label}" ao padrão (não afeta outros slots)`}
         >
-          <RotateCcw className="size-3" /> padrão
+          <RotateCcw className="size-3" /> Resetar este slot
         </button>
       </div>
 
