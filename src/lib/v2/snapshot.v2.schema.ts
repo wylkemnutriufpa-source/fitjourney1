@@ -1,5 +1,4 @@
-// Piloto V2 — schema de snapshot. Superset compatível com V1.
-// Snapshots V1 atuais passam sem alteração (passthrough + campos novos opcionais).
+// Piloto V2 — schema de snapshot serializado. Renderer-burro contract.
 // NÃO substitui src/lib/plans/snapshot.schema.ts.
 
 import { z } from "zod";
@@ -27,8 +26,6 @@ const SubstitutionV2Schema = z
   })
   .passthrough();
 
-// Item aceita o mínimo V1 (id, foodKey, name, qty, unit, kcal, scaleGroup)
-// e os campos soberanos V2 como opcionais. Tudo via passthrough.
 const ItemV2Schema = z
   .object({
     id: z.string().min(1),
@@ -37,47 +34,43 @@ const ItemV2Schema = z
     qty: z.number().nonnegative(),
     unit: z.string().min(1),
     kcal: z.number().nonnegative(),
-    scaleGroup: z.string().min(1),
-    // V2 opcional
+    proteinG: z.number().nonnegative(),
+    carbG: z.number().nonnegative(),
+    fatG: z.number().nonnegative(),
+    scaleGroup: z.enum(["protein", "carb", "fat", "mixed"]),
     measures: z.array(MeasureV2Schema).optional(),
     substitutions: z.array(SubstitutionV2Schema).optional(),
     notes: z.string().optional(),
   })
   .passthrough();
 
-const MealOptionV2Schema = z
-  .object({
-    id: z.string().min(1),
-    title: z.string().min(1),
-    imageKey: z.string().min(1),
-    items: z.array(ItemV2Schema).min(1),
-    recipe: z.string().optional(),
-  })
-  .passthrough();
-
-// Refeição V2 aceita DUAS formas:
-//  - V1: { main, equivalents } (legado, intocado)
-//  - V2: { items, notes } (composição soberana)
-// Ambos os blocos são opcionais para que snapshots V1 e V2 validem.
 const MealV2Schema = z
   .object({
     id: z.string().min(1),
     time: z.string().min(1),
     label: z.string().min(1),
-    main: MealOptionV2Schema.optional(),
-    equivalents: z.array(MealOptionV2Schema).optional(),
-    items: z.array(ItemV2Schema).optional(),
+    items: z.array(ItemV2Schema).min(1),
     notes: z.string().optional(),
     heroKey: z.string().optional(),
   })
   .passthrough();
 
+const DayV2Schema = z
+  .object({
+    id: z.enum(["seg", "ter", "qua", "qui", "sex", "sab", "dom"]),
+    label: z.string().min(1),
+    meals: z.array(MealV2Schema).min(1),
+  })
+  .passthrough();
+
 export const SnapshotV2Schema = z
   .object({
+    schemaVersion: z.literal("v2.pilot.1"),
     id: z.string().min(1),
     name: z.string().min(1),
     kcal: z.number().nonnegative(),
-    meals: z.array(MealV2Schema).min(1),
+    generatedAt: z.string().min(1),
+    days: z.array(DayV2Schema).length(7),
   })
   .passthrough();
 
