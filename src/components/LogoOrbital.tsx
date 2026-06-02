@@ -1,6 +1,6 @@
 import { LogoMark } from "@/components/LogoMark";
 
-export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle" | "lines";
+export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle" | "lines" | "halo";
 
 interface LogoOrbitalProps {
   size?: string;
@@ -15,7 +15,7 @@ interface LogoOrbitalProps {
 export function LogoOrbital({
   size = "size-16",
   className = "",
-  effect = "lines",
+  effect = "halo",
 }: LogoOrbitalProps) {
   return (
     <span
@@ -96,6 +96,15 @@ export function LogoOrbital({
             <path d="M -50 30 C -25 20, 25 -20, 50 -30" />
             <path d="M 50 35 C 20 25, -20 -25, -50 -35" />
           </svg>
+        </span>
+      )}
+
+      {effect === "halo" && (
+        <span className="fj-halo" aria-hidden>
+          <span className="fj-halo-ring fj-halo-ring-1" />
+          <span className="fj-halo-ring fj-halo-ring-2" />
+          <span className="fj-halo-wisp fj-halo-wisp-l" />
+          <span className="fj-halo-wisp fj-halo-wisp-r" />
         </span>
       )}
 
