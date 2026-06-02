@@ -58,7 +58,7 @@
   --radius: 0.5rem;
 
   /* Base: preto profundo com leve viés verde-azulado (cinza metálico) */
-  --background: oklch(0.14 0.012 165);
+  --background: #000000;
   --foreground: oklch(0.97 0.008 165);
   --surface: oklch(0.18 0.014 165);
 
