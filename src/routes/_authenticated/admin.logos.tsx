@@ -13,19 +13,28 @@ import {
 } from "@/lib/logo-settings";
 import type { LogoEffect } from "@/components/LogoOrbital";
 import { RotateCcw, Upload, Trash2, ImageIcon } from "lucide-react";
+import { uploadLandingAsset } from "@/lib/landing/landing-content";
 
 export const Route = createFileRoute("/_authenticated/admin/logos")({
   component: LogosAdminPage,
 });
 
 const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (imagem — igual avatar)
-const MAX_VIDEO_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (vídeo curto estilo boomerang)
-const MAX_VIDEO_DURATION_S = 6; // s — vídeo "boomerang" curto
-const MAX_DIMENSION = 1024; // px — comprime automaticamente acima disso
-const MIN_DIMENSION = 32; // px — abaixo disso é pequeno demais p/ logo
-const MAX_ASPECT_RATIO = 6; // razão maior:menor
-const MAX_STORED_BYTES = 1.5 * 1024 * 1024; // 1.5 MB após compressão (limite localStorage)
+const MAX_VIDEO_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB
+const MAX_VIDEO_DURATION_S = 6;
+const MAX_DIMENSION = 1024;
+const MIN_DIMENSION = 32;
+const MAX_ASPECT_RATIO = 6;
 const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm"];
+
+function dataUrlToBlob(dataUrl: string): Blob {
+  const [meta, b64] = dataUrl.split(",");
+  const mime = /data:([^;]+);base64/.exec(meta)?.[1] ?? "application/octet-stream";
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
 
 
 function readAsDataUrl(file: Blob): Promise<string> {
@@ -100,7 +109,6 @@ function LogosAdminPage() {
       }
       try {
         const dataUrl = await readAsDataUrl(file);
-        // valida duração
         const duration = await new Promise<number>((resolve, reject) => {
           const v = document.createElement("video");
           v.preload = "metadata";
@@ -116,18 +124,12 @@ function LogosAdminPage() {
           }));
           return;
         }
-        try {
-          update(slot, { customUrl: dataUrl, variant: "orbital" });
-        } catch {
-          setErrorBySlot((s) => ({
-            ...s,
-            [slot]: "Não foi possível salvar no navegador (storage cheio). Use um vídeo menor.",
-          }));
-          return;
-        }
+        setInfoBySlot((s) => ({ ...s, [slot]: "Enviando vídeo…" }));
+        const publicUrl = await uploadLandingAsset(file);
+        update(slot, { customUrl: publicUrl, variant: "orbital" });
         setInfoBySlot((s) => ({
           ...s,
-          [slot]: `Pronto: vídeo ${duration.toFixed(1)}s · ${(file.size / 1024).toFixed(0)} KB. Reproduz em loop automático.`,
+          [slot]: `Pronto: vídeo ${duration.toFixed(1)}s · ${(file.size / 1024).toFixed(0)} KB. Salvo no servidor — reflete em todo o sistema.`,
         }));
       } catch (e: any) {
         setErrorBySlot((s) => ({ ...s, [slot]: e?.message ?? "Falha ao processar vídeo." }));
@@ -165,23 +167,12 @@ function LogosAdminPage() {
         }
       }
 
-      if (bytes > MAX_STORED_BYTES) {
-        setErrorBySlot((s) => ({
-          ...s,
-          [slot]: `Mesmo após compressão ficou grande (${(bytes / 1024 / 1024).toFixed(2)} MB). Use uma imagem mais simples.`,
-        }));
-        return;
-      }
-
-      try {
-        update(slot, { customUrl: dataUrl, variant: "orbital" });
-      } catch {
-        setErrorBySlot((s) => ({
-          ...s,
-          [slot]: "Não foi possível salvar no navegador (storage cheio). Tente uma imagem menor.",
-        }));
-        return;
-      }
+      setInfoBySlot((s) => ({ ...s, [slot]: "Enviando imagem…" }));
+      const blob = dataUrlToBlob(dataUrl);
+      const ext = (blob.type.split("/")[1] || "png").replace("svg+xml", "svg");
+      const uploadFile = new File([blob], `logo.${ext}`, { type: blob.type });
+      const publicUrl = await uploadLandingAsset(uploadFile);
+      update(slot, { customUrl: publicUrl, variant: "orbital" });
 
       const compressedKb = (bytes / 1024).toFixed(0);
       const originalKb = (file.size / 1024).toFixed(0);
@@ -189,8 +180,8 @@ function LogosAdminPage() {
         ...s,
         [slot]:
           width > 0
-            ? `Pronto: ${width}×${height}px · ${compressedKb} KB (original ${originalKb} KB).`
-            : `Pronto: SVG ${originalKb} KB.`,
+            ? `Pronto: ${width}×${height}px · ${compressedKb} KB (original ${originalKb} KB). Salvo no servidor — reflete em todo o sistema.`
+            : `Pronto: SVG ${originalKb} KB. Salvo no servidor.`,
       }));
     } catch (e: any) {
       setErrorBySlot((s) => ({
@@ -207,7 +198,7 @@ function LogosAdminPage() {
         <div>
           <h2 className="text-lg font-semibold">Logos — Tamanho, Efeitos, Upload & Espaçamento</h2>
           <p className="text-sm text-muted-foreground">
-            Ajuste cada logo com preview ao vivo no contexto real (landing / app). Configurações salvas no navegador.
+            Ajuste cada logo com preview ao vivo no contexto real (landing / app). Salvo no servidor — reflete em todo o sistema (incluindo o app do paciente em qualquer dispositivo).
           </p>
         </div>
         <button
@@ -325,7 +316,7 @@ function SlotCard({
             <div className="flex items-center gap-2">
               <div className="size-10 rounded-md bg-background border border-border grid place-items-center overflow-hidden shrink-0">
                 {cfg.customUrl ? (
-                  /^data:video\//i.test(cfg.customUrl) ? (
+                  /^data:video\//i.test(cfg.customUrl) || /\.(mp4|webm)(\?|$)/i.test(cfg.customUrl) ? (
                     <video
                       src={cfg.customUrl}
                       autoPlay
@@ -417,7 +408,7 @@ function SlotCard({
                 <option key={v.value} value={v.value}>{v.label}</option>
               ))}
             </select>
-            {cfg.customUrl && cfg.variant === "video" && !/^data:video\//i.test(cfg.customUrl) && (
+            {cfg.customUrl && cfg.variant === "video" && !(/^data:video\//i.test(cfg.customUrl) || /\.(mp4|webm)(\?|$)/i.test(cfg.customUrl)) && (
               <p className="text-[10px] text-muted-foreground/70 mt-1">
                 Logo customizada (imagem) usa a versão estática mesmo com variante "vídeo". Para animar, faça upload de um vídeo curto.
               </p>

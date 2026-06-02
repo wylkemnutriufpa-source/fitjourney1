@@ -29,7 +29,7 @@ export function LogoOrbital({
   const finalEffect: LogoEffect = cfg?.variant === "static" ? ("none" as any) : cfg?.effect ?? effect;
   const finalSizePx = cfg?.sizePx ?? sizePx;
   const customUrl = cfg?.customUrl ?? null;
-  const customIsVideo = !!customUrl && /^data:video\//i.test(customUrl);
+  const customIsVideo = !!customUrl && (/^data:video\//i.test(customUrl) || /\.(mp4|webm)(\?|$)/i.test(customUrl));
   const useVideo = cfg?.variant === "video" && !customUrl;
 
 
