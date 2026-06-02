@@ -109,7 +109,6 @@ function LogosAdminPage() {
       }
       try {
         const dataUrl = await readAsDataUrl(file);
-        // valida duração
         const duration = await new Promise<number>((resolve, reject) => {
           const v = document.createElement("video");
           v.preload = "metadata";
@@ -125,18 +124,12 @@ function LogosAdminPage() {
           }));
           return;
         }
-        try {
-          update(slot, { customUrl: dataUrl, variant: "orbital" });
-        } catch {
-          setErrorBySlot((s) => ({
-            ...s,
-            [slot]: "Não foi possível salvar no navegador (storage cheio). Use um vídeo menor.",
-          }));
-          return;
-        }
+        setInfoBySlot((s) => ({ ...s, [slot]: "Enviando vídeo…" }));
+        const publicUrl = await uploadLandingAsset(file);
+        update(slot, { customUrl: publicUrl, variant: "orbital" });
         setInfoBySlot((s) => ({
           ...s,
-          [slot]: `Pronto: vídeo ${duration.toFixed(1)}s · ${(file.size / 1024).toFixed(0)} KB. Reproduz em loop automático.`,
+          [slot]: `Pronto: vídeo ${duration.toFixed(1)}s · ${(file.size / 1024).toFixed(0)} KB. Salvo no servidor — reflete em todo o sistema.`,
         }));
       } catch (e: any) {
         setErrorBySlot((s) => ({ ...s, [slot]: e?.message ?? "Falha ao processar vídeo." }));
