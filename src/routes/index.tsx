@@ -190,7 +190,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* ══════════ NAV ══════════ */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${navScrolled ? "glass border-b border-border/30 shadow-card" : "bg-transparent"}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${navScrolled ? "glass border-b border-border/40 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.4)]" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <button
@@ -214,12 +214,13 @@ function Landing() {
             <button
               type="button"
               onClick={() => setContactOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md border border-border/60 bg-card/40 backdrop-blur-sm hover:border-primary/60 hover:text-foreground transition-colors text-muted-foreground"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full border border-border/50 bg-card/30 backdrop-blur-md hover:border-primary/50 hover:text-foreground hover:bg-primary/5 transition-all text-muted-foreground"
+              title="Fale com a gente"
             >
-              <MessageCircle className="w-3.5 h-3.5" /> Fale com a gente
+              <MessageCircle className="w-3.5 h-3.5" /> Contato
             </button>
-            <Link to="/app" className="px-3 py-1.5 text-sm font-medium rounded-md hover:bg-muted transition-colors">Entrar</Link>
-            <Link to="/signup/nutritionist" className="inline-flex items-center gap-1.5 gradient-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity">
+            <Link to="/app" className="px-3 py-1.5 text-sm font-medium rounded-full hover:bg-muted/60 transition-colors">Entrar</Link>
+            <Link to="/signup/nutritionist" className="inline-flex items-center gap-1.5 gradient-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-semibold shadow-glow hover:shadow-[0_0_24px_-4px_var(--primary-glow)] hover:scale-[1.03] active:scale-[0.97] transition-all">
               Começar Grátis <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -247,20 +248,6 @@ function Landing() {
             <div className="flex gap-2 pt-2">
               <Link to="/app" className="flex-1 inline-flex items-center justify-center border border-border rounded-md px-3 py-2 text-sm font-semibold">Entrar</Link>
               <Link to="/signup/nutritionist" className="flex-1 inline-flex items-center justify-center gradient-primary text-primary-foreground rounded-md px-3 py-2 text-sm font-semibold shadow-glow">Criar Conta</Link>
-            </div>
-            <div className="pt-3 mt-2 border-t border-border/30">
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Fale com a gente</p>
-              <div className="flex items-center gap-2">
-                <a href={CONTACT_WHATSAPP} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card/50 px-3 py-2 text-sm hover:border-primary/60 transition-colors">
-                  <WhatsAppIcon className="w-4 h-4 text-[#25D366]" /> WhatsApp
-                </a>
-                <a href={CONTACT_INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card/50 px-3 py-2 text-sm hover:border-primary/60 transition-colors">
-                  <Instagram className="w-4 h-4" /> Instagram
-                </a>
-                <a href={`mailto:${CONTACT_EMAIL}`} aria-label="E-mail" className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card/50 px-3 py-2 text-sm hover:border-primary/60 transition-colors">
-                  <Mail className="w-4 h-4" /> E-mail
-                </a>
-              </div>
             </div>
           </motion.div>
         )}
