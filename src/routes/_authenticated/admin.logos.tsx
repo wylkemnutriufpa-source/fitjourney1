@@ -78,10 +78,64 @@ function LogosAdminPage() {
     setErrorBySlot((s) => ({ ...s, [slot]: undefined }));
     setInfoBySlot((s) => ({ ...s, [slot]: undefined }));
 
-    if (!file.type.startsWith("image/")) {
-      setErrorBySlot((s) => ({ ...s, [slot]: "Arquivo precisa ser uma imagem (PNG, JPG, WebP ou SVG)." }));
+    const isVideo = ACCEPTED_VIDEO_TYPES.includes(file.type);
+    const isImage = file.type.startsWith("image/");
+
+    if (!isVideo && !isImage) {
+      setErrorBySlot((s) => ({
+        ...s,
+        [slot]: "Arquivo precisa ser imagem (PNG, JPG, WebP, SVG) ou vídeo curto (MP4, WebM).",
+      }));
       return;
     }
+
+    // ===== VÍDEO (boomerang curto) =====
+    if (isVideo) {
+      if (file.size > MAX_VIDEO_UPLOAD_BYTES) {
+        setErrorBySlot((s) => ({
+          ...s,
+          [slot]: `Vídeo muito grande (${(file.size / 1024 / 1024).toFixed(2)} MB). Máximo: 4 MB.`,
+        }));
+        return;
+      }
+      try {
+        const dataUrl = await readAsDataUrl(file);
+        // valida duração
+        const duration = await new Promise<number>((resolve, reject) => {
+          const v = document.createElement("video");
+          v.preload = "metadata";
+          v.muted = true;
+          v.onloadedmetadata = () => resolve(v.duration || 0);
+          v.onerror = () => reject(new Error("Não foi possível ler o vídeo."));
+          v.src = dataUrl;
+        });
+        if (duration > MAX_VIDEO_DURATION_S + 0.5) {
+          setErrorBySlot((s) => ({
+            ...s,
+            [slot]: `Vídeo longo demais (${duration.toFixed(1)}s). Máximo: ${MAX_VIDEO_DURATION_S}s — use um clipe curto estilo boomerang.`,
+          }));
+          return;
+        }
+        try {
+          update(slot, { customUrl: dataUrl, variant: "orbital" });
+        } catch {
+          setErrorBySlot((s) => ({
+            ...s,
+            [slot]: "Não foi possível salvar no navegador (storage cheio). Use um vídeo menor.",
+          }));
+          return;
+        }
+        setInfoBySlot((s) => ({
+          ...s,
+          [slot]: `Pronto: vídeo ${duration.toFixed(1)}s · ${(file.size / 1024).toFixed(0)} KB. Reproduz em loop automático.`,
+        }));
+      } catch (e: any) {
+        setErrorBySlot((s) => ({ ...s, [slot]: e?.message ?? "Falha ao processar vídeo." }));
+      }
+      return;
+    }
+
+    // ===== IMAGEM =====
     if (file.size > MAX_UPLOAD_BYTES) {
       setErrorBySlot((s) => ({
         ...s,
@@ -145,6 +199,7 @@ function LogosAdminPage() {
       }));
     }
   }
+
 
   return (
     <div className="space-y-4">
