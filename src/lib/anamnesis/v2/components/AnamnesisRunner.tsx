@@ -358,7 +358,10 @@ export function AnamnesisRunner({
             key={question.id}
             question={question}
             value={answers[question.id]}
-            onChange={(v) => setAnswers((p) => ({ ...p, [question.id]: v }))}
+            onChange={(v) => {
+              setAnswers((p) => ({ ...p, [question.id]: v }));
+              if (submitBlockedMsg) setSubmitBlockedMsg(null);
+            }}
             error={touched[question.id] ? issueMap.get(question.id) : undefined}
           />
         ))}
