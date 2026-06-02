@@ -18,11 +18,15 @@ export const Route = createFileRoute("/_authenticated/admin/logos")({
   component: LogosAdminPage,
 });
 
-const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (igual avatar)
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (imagem — igual avatar)
+const MAX_VIDEO_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (vídeo curto estilo boomerang)
+const MAX_VIDEO_DURATION_S = 6; // s — vídeo "boomerang" curto
 const MAX_DIMENSION = 1024; // px — comprime automaticamente acima disso
 const MIN_DIMENSION = 32; // px — abaixo disso é pequeno demais p/ logo
 const MAX_ASPECT_RATIO = 6; // razão maior:menor
 const MAX_STORED_BYTES = 1.5 * 1024 * 1024; // 1.5 MB após compressão (limite localStorage)
+const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm"];
+
 
 function readAsDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
