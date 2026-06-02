@@ -1,6 +1,6 @@
 import { LogoMark } from "@/components/LogoMark";
 
-export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle" | "lines";
+export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle" | "lines" | "halo";
 
 interface LogoOrbitalProps {
   size?: string;
