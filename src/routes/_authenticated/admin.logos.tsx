@@ -212,19 +212,54 @@ function LogosAdminPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-lg font-semibold">Logos — Tamanho, Efeitos, Upload & Espaçamento</h2>
+          <h2 className="text-lg font-semibold">Logos — Tamanho, Efeitos, Upload, Wordmark & Espaçamento</h2>
           <p className="text-sm text-muted-foreground">
-            Ajuste cada logo com preview ao vivo no contexto real (landing / app). Salvo no servidor — reflete em todo o sistema (incluindo o app do paciente em qualquer dispositivo).
+            Ajuste cada logo com preview ao vivo. Mudanças ficam em rascunho local — clique em <strong>Salvar e publicar</strong> para refletir em todo o sistema (landing pública + app do paciente em qualquer dispositivo).
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => reset()}
-          className="text-xs font-mono uppercase tracking-widest px-3 py-2 rounded-md border border-border hover:border-primary/60 hover:text-primary transition inline-flex items-center gap-2"
-        >
-          <RotateCcw className="size-3" /> Resetar tudo
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => reset()}
+            className="text-xs font-mono uppercase tracking-widest px-3 py-2 rounded-md border border-border hover:border-primary/60 hover:text-primary transition inline-flex items-center gap-2"
+          >
+            <RotateCcw className="size-3" /> Resetar tudo
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || (!dirty && savedAt === null)}
+            className={
+              "text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-md transition inline-flex items-center gap-2 " +
+              (dirty
+                ? "bg-primary text-primary-foreground hover:opacity-90"
+                : "bg-muted text-muted-foreground border border-border")
+            }
+            title={dirty ? "Publicar mudanças no servidor" : "Sem alterações para salvar"}
+          >
+            {saving ? (
+              <><Save className="size-3 animate-pulse" /> Salvando…</>
+            ) : dirty ? (
+              <><Save className="size-3" /> Salvar e publicar</>
+            ) : (
+              <><Check className="size-3" /> {savedAt ? "Salvo" : "Sem alterações"}</>
+            )}
+          </button>
+        </div>
       </div>
+
+      {dirty && (
+        <div className="text-xs text-primary bg-primary/10 border border-primary/30 rounded px-3 py-2">
+          Você tem alterações em rascunho. Elas aparecem aqui no preview, mas só vão para o app do paciente quando você clicar em <strong>Salvar e publicar</strong>.
+        </div>
+      )}
+      {saveError && (
+        <div className="text-xs text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
+          {saveError}
+        </div>
+      )}
+
+
 
       <div className="grid grid-cols-1 gap-4">
         {slots.map((slot) => {
