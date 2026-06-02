@@ -27,7 +27,7 @@ import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { applyTheme, getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
-import { LogoVideo } from "@/components/LogoVideo";
+
 import { LogoOrbital } from "@/components/LogoOrbital";
 import { BrandLockup } from "@/components/BrandLockup";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
