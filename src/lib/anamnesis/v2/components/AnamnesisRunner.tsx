@@ -1,8 +1,8 @@
 // Runner UI — paciente online e (Fase 2) nutricionista manual usam o MESMO.
 // Sem lógica clínica embutida. Apenas renderiza o catálogo.
 
-import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Loader2, Save } from "lucide-react";
 import { loadCatalog } from "../catalog/loader";
 import type { Answers } from "../catalog/types";
 import {
@@ -17,17 +17,44 @@ interface Props {
   onSubmit: (answers: Answers) => Promise<void> | void;
   submitting?: boolean;
   submitLabel?: string;
+  /**
+   * Chave de autosave local (localStorage). Rascunho apenas — não é verdade
+   * clínica. Limpo automaticamente após submit bem-sucedido.
+   * Default: "fj:anamnesis-draft:v1".
+   */
+  draftKey?: string;
 }
+
+const DEFAULT_DRAFT_KEY = "fj:anamnesis-draft:v1";
 
 export function AnamnesisRunner({
   initialAnswers,
   onSubmit,
   submitting,
   submitLabel = "Finalizar anamnese",
+  draftKey = DEFAULT_DRAFT_KEY,
 }: Props) {
   const catalog = useMemo(() => loadCatalog(), []);
-  const [answers, setAnswers] = useState<Answers>(initialAnswers ?? {});
+
+  // Carrega rascunho local (se houver) na montagem.
+  const [answers, setAnswers] = useState<Answers>(() => {
+    if (initialAnswers && Object.keys(initialAnswers).length > 0) {
+      return initialAnswers;
+    }
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = window.localStorage.getItem(draftKey);
+      if (!raw) return {};
+      const parsed = JSON.parse(raw) as { answers?: Answers };
+      return parsed.answers ?? {};
+    } catch {
+      return {};
+    }
+  });
   const [blockIdx, setBlockIdx] = useState(0);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const visible = useMemo(
@@ -50,6 +77,36 @@ export function AnamnesisRunner({
   const isLast = blockIdx === catalog.blocks.length - 1;
   const progress = Math.round(((blockIdx + 1) / catalog.blocks.length) * 100);
 
+  // Autosave local (debounced 400ms). Rascunho — não verdade clínica.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (Object.keys(answers).length === 0) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      try {
+        window.localStorage.setItem(
+          draftKey,
+          JSON.stringify({ answers, updatedAt: Date.now() }),
+        );
+        setSavedAt(Date.now());
+      } catch {
+        // quota cheia / privacy mode — silenciar; rascunho é best-effort
+      }
+    }, 400);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [answers, draftKey]);
+
+  function clearDraft() {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.removeItem(draftKey);
+    } catch {
+      /* ignore */
+    }
+  }
+
   function setAnswer(id: string, v: Answers[string]) {
     setAnswers((prev) => ({ ...prev, [id]: v }));
   }
@@ -64,10 +121,12 @@ export function AnamnesisRunner({
     if (isLast) {
       if (allIssues.length > 0) return;
       await onSubmit(answers);
+      clearDraft();
       return;
     }
     setBlockIdx((i) => i + 1);
   }
+
 
   function handleBack() {
     setBlockIdx((i) => Math.max(0, i - 1));
@@ -80,7 +139,15 @@ export function AnamnesisRunner({
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Bloco {blockIdx + 1} de {catalog.blocks.length}
           </p>
-          <p className="text-[10px] font-mono text-muted-foreground">{progress}%</p>
+          <div className="flex items-center gap-2">
+            {savedAt && (
+              <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <Save className="size-3" />
+                Rascunho salvo
+              </span>
+            )}
+            <p className="text-[10px] font-mono text-muted-foreground">{progress}%</p>
+          </div>
         </div>
         <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           <div
@@ -89,6 +156,7 @@ export function AnamnesisRunner({
           />
         </div>
       </div>
+
 
       <div>
         <h2 className="text-2xl font-bold tracking-tight">{block.title}</h2>
