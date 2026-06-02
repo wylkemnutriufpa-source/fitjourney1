@@ -11,8 +11,10 @@ import { DAY_ORDER_V2, DAY_LABEL_V2 } from "./template.v2.types";
 
 // ---------- Catálogo interno (foods homologados + macros) ----------
 
-type Food = Omit<PlannerFoodItemV2, "id" | "qty" | "kcal" | "proteinG" | "carbG" | "fatG"> & {
-  // macros por 100g
+type Food = {
+  foodKey: string;
+  name: string;
+  scaleGroup: PlannerFoodItemV2["scaleGroup"];
   kcal100: number;
   p100: number;
   c100: number;
