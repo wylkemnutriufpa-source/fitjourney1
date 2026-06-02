@@ -184,11 +184,6 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     enabled: mounted && !!user?.id,
   });
   const isResolvingIdentity = !mounted || authLoading || (!!user?.id && !identity);
-  const isPatientRoute =
-    path === "/my-dashboard" ||
-    path.startsWith("/my-dashboard/") ||
-    path === "/my-plan" ||
-    path.startsWith("/my-plan/");
   const isPatient = identity?.role === "patient";
   const baseNav = isPatient ? patientNav : nutritionistNav;
   const nav = !isPatient && isAdmin
