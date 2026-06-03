@@ -25,6 +25,7 @@ import {
 import { runNutritionEngines } from "@/lib/clinical/run-nutrition-engines";
 import { validatePlan, type DailyTotals, type FoodOccurrence } from "@/lib/engine/clinical-gate";
 import { ENGINE_VERSION, GATE_VERSION } from "@/lib/engine/version";
+import { generateDraftPlanFromApproval } from "@/lib/plans/draft-auto-plan";
 
 export type AnamnesisStatusLite =
   | "approved"
@@ -147,6 +148,117 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
         autoDraft: autoByPatient.get(p.id) ?? null,
       };
     });
+  });
+
+const EnsureDraftInput = z.object({
+  patientId: z.string().uuid(),
+});
+
+export type EnsureDraftPlanResult = {
+  planId: string;
+  created: boolean;
+  templateKey: string | null;
+  reason: string | null;
+};
+
+export const ensureDraftPlanForPatient = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => EnsureDraftInput.parse(input))
+  .handler(async ({ context, data }): Promise<EnsureDraftPlanResult> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+
+    const { data: nutri, error: nErr } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (nErr) throw new Error(nErr.message);
+    if (!nutri) throw new Error("Perfil de nutricionista não encontrado.");
+
+    const { data: patient, error: pErr } = await supabase
+      .from("patients")
+      .select("id")
+      .eq("id", data.patientId)
+      .eq("nutritionist_id", nutri.id)
+      .maybeSingle();
+    if (pErr) throw new Error(pErr.message);
+    if (!patient) throw new Error("Paciente não pertence a você.");
+
+    const readLatestDraft = async () => {
+      const { data: rows, error } = await supabase
+        .from("plans")
+        .select("id, source_template_key, snapshot, updated_at")
+        .eq("patient_id", data.patientId)
+        .eq("nutritionist_id", nutri.id)
+        .eq("status", "draft")
+        .order("updated_at", { ascending: false })
+        .limit(1);
+      if (error) throw new Error(error.message);
+      return rows?.[0] ?? null;
+    };
+
+    const existing = await readLatestDraft();
+    if (existing) {
+      const snap = (existing.snapshot ?? {}) as any;
+      const router = snap.meta?.router ?? snap.meta?.matcher ?? {};
+      return {
+        planId: existing.id,
+        created: false,
+        templateKey: (existing.source_template_key as string | null) ?? null,
+        reason: typeof router.reason === "string" ? router.reason : null,
+      };
+    }
+
+    const { data: approved, error: aErr } = await supabase
+      .from("anamneses")
+      .select("id")
+      .eq("patient_id", data.patientId)
+      .eq("nutritionist_id", nutri.id)
+      .eq("review_status", "approved")
+      .not("approved_at", "is", null)
+      .order("approved_at", { ascending: false })
+      .limit(1);
+    if (aErr) throw new Error(aErr.message);
+    if (!approved?.length) {
+      throw new Error("Paciente ainda não tem anamnese aprovada para gerar pré-plano.");
+    }
+
+    const outcome = await generateDraftPlanFromApproval(
+      supabase as never,
+      data.patientId,
+      nutri.id,
+    );
+
+    if (outcome.kind === "created") {
+      return {
+        planId: outcome.planId,
+        created: true,
+        templateKey: outcome.selectedTemplateKey,
+        reason: outcome.reason,
+      };
+    }
+
+    if (outcome.kind === "skipped" && outcome.reason === "existing_draft") {
+      const draft = await readLatestDraft();
+      if (draft) {
+        return {
+          planId: draft.id,
+          created: false,
+          templateKey: (draft.source_template_key as string | null) ?? null,
+          reason: null,
+        };
+      }
+    }
+
+    if (outcome.kind === "skipped" && outcome.reason === "no_clinical_context") {
+      throw new Error("Anamnese aprovada sem dados clínicos suficientes para montar o pré-plano.");
+    }
+
+    throw new Error(
+      outcome.kind === "error"
+        ? outcome.message
+        : "Não foi possível gerar o pré-plano para este paciente.",
+    );
   });
 
 const PublishInput = z.object({

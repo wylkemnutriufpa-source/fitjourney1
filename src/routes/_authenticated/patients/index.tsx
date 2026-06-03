@@ -3,10 +3,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
+import { ensureDraftPlanForPatient, listMyPatientsForPlan } from "@/lib/plans/plans.functions";
 import { Plus, Search, FileText, Share2 } from "lucide-react";
 import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 import { VideoLoader } from "@/components/VideoLoader";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
   head: () => ({ meta: [{ title: "Pacientes — FitJourney" }] }),
@@ -72,6 +73,7 @@ function Patients() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const fetchPatients = useServerFn(listMyPatientsForPlan);
+  const ensureDraft = useServerFn(ensureDraftPlanForPatient);
   const { data: patients = [], isLoading, error } = useQuery({
     queryKey: ["patients-index"],
     queryFn: () => fetchPatients(),
@@ -81,6 +83,20 @@ function Patients() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<PatientFilter>(search.filter ?? "all");
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [openingDraftFor, setOpeningDraftFor] = useState<string | null>(null);
+
+  const openPrePlan = async (patientId: string) => {
+    if (openingDraftFor) return;
+    setOpeningDraftFor(patientId);
+    try {
+      const draft = await ensureDraft({ data: { patientId } });
+      window.location.assign(`/templates?draftPlanId=${encodeURIComponent(draft.planId)}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao gerar pré-plano.");
+    } finally {
+      setOpeningDraftFor(null);
+    }
+  };
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -266,22 +282,28 @@ function Patients() {
                         <span className={"size-1.5 rounded-full " + (p.planStatus === "delivered" ? "bg-emerald-400" : "bg-amber-400")} />
                         {p.planStatus === "delivered" ? "Plano entregue" : "Plano pendente"}
                       </span>
-                      {p.autoDraft && (
-                        <Link
-                          to="/templates"
-                          search={{ draftPlanId: p.autoDraft.planId }}
-                          onClick={(e) => e.stopPropagation()}
+                      {p.anamnesisStatus === "approved" && (
+                        <a
+                          href={p.autoDraft ? `/templates?draftPlanId=${encodeURIComponent(p.autoDraft.planId)}` : "#"}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!p.autoDraft) {
+                              e.preventDefault();
+                              void openPrePlan(p.id);
+                            }
+                          }}
+                          aria-disabled={openingDraftFor === p.id}
                           className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase text-primary hover:text-primary/80 transition-colors"
-                          title={p.autoDraft.reason ?? "Pré-plano sugerido"}
+                          title={p.autoDraft?.reason ?? "Gerar ou abrir pré-plano sugerido"}
                         >
                           <span className="size-1.5 rounded-full bg-primary" />
-                          Abrir pré-plano
-                          {p.autoDraft.templateName && (
+                          {openingDraftFor === p.id ? "Abrindo pré-plano…" : p.autoDraft ? "Abrir pré-plano" : "Gerar pré-plano"}
+                          {p.autoDraft?.templateName && (
                             <span className="text-muted-foreground normal-case font-normal">
                               · {p.autoDraft.templateName}
                             </span>
                           )}
-                        </Link>
+                        </a>
                       )}
                     </div>
                   </td>
