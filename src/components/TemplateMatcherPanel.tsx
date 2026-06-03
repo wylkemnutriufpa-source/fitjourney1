@@ -23,6 +23,13 @@ function clinicalGoalToEngine(kind: string | undefined): EngineGoal {
   return "maintain";
 }
 
+function templateGoalToEngine(tag: string | undefined): EngineGoal | null {
+  if (tag === "cut" || tag === "bulk" || tag === "maintain") return tag;
+  if (tag === "performance") return "bulk";
+  if (tag === "health") return "maintain";
+  return null;
+}
+
 function toMeta(t: (typeof systemTemplates)[number]): TemplateMeta {
   return {
     id: t.id,
@@ -35,7 +42,7 @@ function toMeta(t: (typeof systemTemplates)[number]): TemplateMeta {
     fatGTarget: t.fatGTarget ?? null,
     mealsPerDay: t.meals.length,
     constraintsTags: t.tags ?? [],
-    goalTag: t.goalTag ?? null,
+    goalTag: templateGoalToEngine(t.goalTag),
   };
 }
 
