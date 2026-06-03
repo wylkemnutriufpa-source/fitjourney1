@@ -677,6 +677,87 @@ export type Database = {
           },
         ]
       }
+      physical_assessments: {
+        Row: {
+          abdomen_cm: number | null
+          arm_contracted_cm: number | null
+          arm_relaxed_cm: number | null
+          assessed_at: string
+          body_fat_pct: number | null
+          calf_cm: number | null
+          chest_cm: number | null
+          created_at: string
+          created_by: string | null
+          fat_mass_kg: number | null
+          forearm_cm: number | null
+          height_cm: number | null
+          hip_cm: number | null
+          id: string
+          lean_mass_kg: number | null
+          neck_cm: number | null
+          notes: string | null
+          nutritionist_id: string
+          patient_id: string
+          thigh_cm: number | null
+          updated_at: string
+          visceral_fat: number | null
+          waist_cm: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          abdomen_cm?: number | null
+          arm_contracted_cm?: number | null
+          arm_relaxed_cm?: number | null
+          assessed_at?: string
+          body_fat_pct?: number | null
+          calf_cm?: number | null
+          chest_cm?: number | null
+          created_at?: string
+          created_by?: string | null
+          fat_mass_kg?: number | null
+          forearm_cm?: number | null
+          height_cm?: number | null
+          hip_cm?: number | null
+          id?: string
+          lean_mass_kg?: number | null
+          neck_cm?: number | null
+          notes?: string | null
+          nutritionist_id: string
+          patient_id: string
+          thigh_cm?: number | null
+          updated_at?: string
+          visceral_fat?: number | null
+          waist_cm?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          abdomen_cm?: number | null
+          arm_contracted_cm?: number | null
+          arm_relaxed_cm?: number | null
+          assessed_at?: string
+          body_fat_pct?: number | null
+          calf_cm?: number | null
+          chest_cm?: number | null
+          created_at?: string
+          created_by?: string | null
+          fat_mass_kg?: number | null
+          forearm_cm?: number | null
+          height_cm?: number | null
+          hip_cm?: number | null
+          id?: string
+          lean_mass_kg?: number | null
+          neck_cm?: number | null
+          notes?: string | null
+          nutritionist_id?: string
+          patient_id?: string
+          thigh_cm?: number | null
+          updated_at?: string
+          visceral_fat?: number | null
+          waist_cm?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       plans: {
         Row: {
           created_at: string
