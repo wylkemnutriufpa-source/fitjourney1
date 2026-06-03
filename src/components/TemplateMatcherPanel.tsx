@@ -30,12 +30,12 @@ function toMeta(t: (typeof systemTemplates)[number]): TemplateMeta {
     kcalTarget: t.kcal,
     kcalRangeMin: Math.round(t.kcal * (1 - KCAL_TOLERANCE)),
     kcalRangeMax: Math.round(t.kcal * (1 + KCAL_TOLERANCE)),
-    proteinGTarget: null,
-    carbGTarget: null,
-    fatGTarget: null,
+    proteinGTarget: t.proteinGTarget ?? null,
+    carbGTarget: t.carbGTarget ?? null,
+    fatGTarget: t.fatGTarget ?? null,
     mealsPerDay: t.meals.length,
     constraintsTags: t.tags ?? [],
-    goalTag: null,
+    goalTag: t.goalTag ?? null,
   };
 }
 
