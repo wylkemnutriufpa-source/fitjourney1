@@ -47,13 +47,13 @@ function SignupNutritionistPage() {
   }
 
   return (
-    <div className="min-h-screen grid place-items-center bg-background text-foreground px-4">
-      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-7">
+    <div className="min-h-screen flex items-start sm:items-center justify-center bg-background text-foreground px-5 sm:px-6 py-8 sm:py-12">
+      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-6 sm:space-y-7">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Cadastro
           </p>
-          <h2 className="text-3xl font-bold tracking-tight mt-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mt-2">
             Criar conta de nutricionista
           </h2>
           <p className="text-xs text-muted-foreground mt-2">
