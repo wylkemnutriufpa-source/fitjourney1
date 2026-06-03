@@ -231,15 +231,23 @@ function Login() {
             </div>
           </div>
 
-          <label className="flex items-center gap-2 cursor-pointer select-none -mt-3">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="size-4 rounded border-border bg-surface text-primary focus:ring-primary accent-primary"
-            />
-            <span className="text-xs text-muted-foreground">Manter conectado</span>
-          </label>
+          <div className="flex items-center justify-between -mt-3">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="size-4 rounded border-border bg-surface text-primary focus:ring-primary accent-primary"
+              />
+              <span className="text-xs text-muted-foreground">Manter conectado</span>
+            </label>
+            <Link
+              to="/forgot-password"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              Esqueci minha senha
+            </Link>
+          </div>
 
           {error && (
             <p className="text-xs font-mono text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
