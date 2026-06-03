@@ -41,6 +41,12 @@ export type PatientLite = {
   createdAt: string;
   anamnesisStatus: AnamnesisStatusLite;
   anamnesisUpdatedAt: string | null;
+  autoDraft: {
+    planId: string;
+    score: number;
+    confidence: "high" | "medium";
+    selectedTemplateKey: string | null;
+  } | null;
 };
 
 export const listMyPatientsForPlan = createServerFn({ method: "GET" })
