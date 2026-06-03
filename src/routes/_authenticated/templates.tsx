@@ -758,6 +758,7 @@ function TemplateEditor({
     { patientId: string; patientName: string } | null
   >(null);
   const publishPlan = useServerFn(publishPlanToPatient);
+  const publishDraft = useServerFn(publishDraftPlan);
 
   async function doPublish(
     patientId: string,
@@ -767,26 +768,33 @@ function TemplateEditor({
     setApplyBusy(true);
     setApplyError(null);
     try {
-      await publishPlan({
-        data: {
-          patientId,
-          snapshot: JSON.parse(JSON.stringify(currentForShare)),
-          // Rastreabilidade: sempre registra o slug do template-base. Templates do
-          // sistema usam slug (ex: "esp-hipertrofia"); templates salvos do nutri
-          // usam UUID — nesse caso também populamos sourceTemplateId.
-          sourceTemplateKey: original.id,
-          sourceTemplateId: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(original.id)
-            ? original.id
-            : undefined,
-          overrideMissingClinical: opts?.overrideMissingClinical || undefined,
-        },
-      });
+      if (draftPlanId) {
+        // Fluxo Sprint 3: promove draft existente em vez de criar plano novo.
+        await publishDraft({
+          data: {
+            planId: draftPlanId,
+            snapshot: JSON.parse(JSON.stringify(currentForShare)),
+            overrideMissingClinical: opts?.overrideMissingClinical || undefined,
+          },
+        });
+      } else {
+        await publishPlan({
+          data: {
+            patientId,
+            snapshot: JSON.parse(JSON.stringify(currentForShare)),
+            sourceTemplateKey: original.id,
+            sourceTemplateId: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(original.id)
+              ? original.id
+              : undefined,
+            overrideMissingClinical: opts?.overrideMissingClinical || undefined,
+          },
+        });
+      }
       setApplyDone(patientName);
       setMissingAnamneseFor(null);
     } catch (e: any) {
       const msg = e?.message ?? "Falha ao publicar plano.";
       if (msg.includes("CLINICAL_CONTEXT_INCOMPLETE") && !opts?.overrideMissingClinical) {
-        // Trava virou confirmação: pergunta se nutri quer publicar mesmo assim.
         setMissingAnamneseFor({ patientId, patientName });
       } else {
         setApplyError(msg);
@@ -795,6 +803,7 @@ function TemplateEditor({
       setApplyBusy(false);
     }
   }
+
 
   function setMeals(updater: (meals: PlannerMeal[]) => PlannerMeal[]) {
     setDraft((d) => {
