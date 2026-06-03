@@ -312,6 +312,12 @@ function MyDashboardPage() {
             title="Minha anamnese"
             description="Veja as respostas da sua última anamnese aprovada."
           />
+          <NavTile
+            to="/my-plan/physical-assessment"
+            icon={Activity}
+            title="Avaliação física"
+            description="Sua avaliação atual e histórico de evolução."
+          />
         </section>
       </div>
     </AppShell>
