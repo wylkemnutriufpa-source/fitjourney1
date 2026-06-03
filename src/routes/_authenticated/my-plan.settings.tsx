@@ -94,7 +94,7 @@ function PatientSettings() {
   useEffect(() => {
     if (data) {
       setFullName(data.fullName ?? "");
-      setPhone(data.phone ?? "");
+      setPhone(maskPhoneBR(data.phone ?? ""));
       
       setAvatarUrl(data.avatarUrl ?? null);
     }
