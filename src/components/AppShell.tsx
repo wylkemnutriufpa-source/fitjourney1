@@ -191,6 +191,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     () => __sidebarOpenCache ?? true,
   );
   const [mounted, setMounted] = useState(false);
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
 
   useEffect(() => {
     __sidebarOpenCache = sidebarOpen;
