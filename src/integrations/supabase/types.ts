@@ -906,10 +906,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      patient_keeps_existing_nutritionist_link: {
-        Args: { _nutritionist_id: string; _patient_id: string }
-        Returns: boolean
-      }
     }
     Enums: {
       app_role: "admin" | "user"
