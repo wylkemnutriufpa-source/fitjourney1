@@ -78,16 +78,17 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { RealPatientPicker } from "@/components/RealPatientPicker";
-import { publishPlanToPatient, type PatientLite } from "@/lib/plans/plans.functions";
+import { publishPlanToPatient, publishDraftPlan, getDraftPlanForEdit, type PatientLite } from "@/lib/plans/plans.functions";
 import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
   head: () => ({ meta: [{ title: "Templates — FitJourney" }] }),
-  validateSearch: (search: Record<string, unknown>): { blank?: number; patientId?: string; patientName?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { blank?: number; patientId?: string; patientName?: string; draftPlanId?: string } => ({
     blank: search.blank === "1" || search.blank === 1 ? 1 : undefined,
     patientId: typeof search.patientId === "string" ? search.patientId : undefined,
     patientName: typeof search.patientName === "string" ? search.patientName : undefined,
+    draftPlanId: typeof search.draftPlanId === "string" ? search.draftPlanId : undefined,
   }),
   component: TemplatesPage,
 });
@@ -306,7 +307,7 @@ function TemplatesPage() {
   const search = Route.useSearch();
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
-  const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: StoredTemplate } | null>(null);
+  const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: StoredTemplate; draftPlanId?: string; draftPatient?: { id: string; name: string } } | null>(null);
 
   const qc = useQueryClient();
   const listFn = useServerFn(listMyTemplates);
