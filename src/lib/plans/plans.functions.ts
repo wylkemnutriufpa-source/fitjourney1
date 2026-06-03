@@ -41,6 +41,8 @@ export type PatientLite = {
   createdAt: string;
   anamnesisStatus: AnamnesisStatusLite;
   anamnesisUpdatedAt: string | null;
+  planStatus: "delivered" | "pending";
+  latestPublishedPlanAt: string | null;
   autoDraft: {
     planId: string;
     templateKey: string | null;
@@ -105,7 +107,8 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
       if (autoByPatient.has(d.patient_id)) continue;
       const snap = (d.snapshot ?? {}) as any;
       const meta = snap.meta;
-      if (!meta?.autoSuggested) continue;
+      const autoSuggested = meta?.autoSuggested === true || snap.autoSuggested === true;
+      if (!autoSuggested && !d.source_template_key) continue;
       const router = meta.router ?? meta.matcher ?? {};
       autoByPatient.set(d.patient_id, {
         planId: d.id,
@@ -113,6 +116,20 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
         templateName: typeof snap.name === "string" ? snap.name : null,
         reason: typeof router.reason === "string" ? router.reason : null,
       });
+    }
+
+    const { data: publishedPlans } = await supabase
+      .from("plans")
+      .select("patient_id, published_at")
+      .in("patient_id", patientIds)
+      .eq("status", "published")
+      .not("published_at", "is", null)
+      .order("published_at", { ascending: false });
+    const publishedByPatient = new Map<string, string>();
+    for (const plan of publishedPlans ?? []) {
+      if (!publishedByPatient.has(plan.patient_id)) {
+        publishedByPatient.set(plan.patient_id, plan.published_at as string);
+      }
     }
 
     return patients.map((p: any) => {
@@ -125,6 +142,8 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
         createdAt: p.created_at,
         anamnesisStatus: info?.status ?? "none",
         anamnesisUpdatedAt: info?.updatedAt ?? null,
+        planStatus: publishedByPatient.has(p.id) ? "delivered" : "pending",
+        latestPublishedPlanAt: publishedByPatient.get(p.id) ?? null,
         autoDraft: autoByPatient.get(p.id) ?? null,
       };
     });
