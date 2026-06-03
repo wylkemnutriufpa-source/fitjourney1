@@ -360,6 +360,32 @@ function TemplatesPage() {
     }
   }, [search.blank, editing]);
 
+  // Entrada "?draftPlanId=…" abre o editor já carregado com o pré-plano sugerido.
+  const getDraftFn = useServerFn(getDraftPlanForEdit);
+  const draftHandled = useRef<string | null>(null);
+  useEffect(() => {
+    const id = search.draftPlanId;
+    if (!id || draftHandled.current === id || editing) return;
+    draftHandled.current = id;
+    (async () => {
+      try {
+        const draft = await getDraftFn({ data: { planId: id } });
+        if (!draft) {
+          toast.error("Pré-plano não encontrado ou já publicado.");
+          return;
+        }
+        setEditing({
+          tpl: draft.snapshot as PlannerTemplate,
+          isMine: false,
+          draftPlanId: draft.id,
+          draftPatient: { id: draft.patientId, name: draft.patientName },
+        });
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Falha ao abrir pré-plano.");
+      }
+    })();
+  }, [search.draftPlanId, editing, getDraftFn]);
+
   const filteredSystem = useMemo(
     () =>
       category === "Todos"
