@@ -113,7 +113,7 @@ function PatientSignupPage() {
 
   if (validating) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background text-foreground px-4">
+      <div className="min-h-screen grid place-items-center bg-background text-foreground px-5 sm:px-6">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           Validando convite…
@@ -124,7 +124,7 @@ function PatientSignupPage() {
 
   if (codeError) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background text-foreground px-4">
+      <div className="min-h-screen grid place-items-center bg-background text-foreground px-5 sm:px-6">
         <div className="max-w-sm space-y-4 text-center">
           <p className="text-[10px] font-mono uppercase tracking-widest text-destructive">
             Convite inválido
@@ -142,8 +142,8 @@ function PatientSignupPage() {
   }
 
   return (
-    <div className="min-h-screen grid place-items-center bg-background text-foreground px-4 py-10">
-      <form onSubmit={onSubmit} className="w-full max-w-md space-y-7">
+    <div className="min-h-screen flex items-start sm:items-center justify-center bg-background text-foreground px-5 sm:px-6 py-8 sm:py-12">
+      <form onSubmit={onSubmit} className="w-full max-w-md space-y-6 sm:space-y-7">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
             <CheckCircle2 className="size-3.5 text-primary" />
