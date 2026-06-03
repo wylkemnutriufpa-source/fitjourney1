@@ -146,6 +146,19 @@ function MyDashboardPage() {
           )}
         </header>
 
+        {/* Cronômetro do próximo feedback — só aparece se o paciente tem nutricionista vinculado */}
+        {fbStatus?.hasNutritionist && (
+          <Link to="/my-plan/feedback" className="block group">
+            <FeedbackCountdown
+              frequencyDays={fbStatus.frequencyDays}
+              lastFeedbackAt={fbStatus.lastFeedbackAt}
+              daysSinceLast={fbStatus.daysSinceLast}
+            />
+          </Link>
+        )}
+
+
+
         {/* Estado clínico */}
         <section
           aria-labelledby="clinical-state"
