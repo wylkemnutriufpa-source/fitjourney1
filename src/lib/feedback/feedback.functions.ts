@@ -290,7 +290,9 @@ export const listFeedbacksForNutritionist = createServerFn({ method: "GET" })
     const { data: patients } = patientIds.length
       ? await supabase.from("patients").select("id, full_name, email").in("id", patientIds)
       : { data: [] as Array<{ id: string; full_name: string; email: string }> };
-    const pmap = new Map((patients ?? []).map((p: any) => [p.id, p]));
+    const pmap = new Map<string, { full_name: string; email: string }>(
+      (patients ?? []).map((p: any) => [p.id, { full_name: p.full_name, email: p.email }]),
+    );
 
     return (rows ?? []).map((r: any) => {
       const dto = rowToDto(r);
