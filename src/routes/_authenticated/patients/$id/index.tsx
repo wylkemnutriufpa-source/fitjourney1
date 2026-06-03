@@ -5,6 +5,8 @@ import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
+import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
+import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
 import { VideoLoader } from "@/components/VideoLoader";
 import {
   ArrowLeft,
@@ -19,6 +21,8 @@ import {
   Loader2,
   CheckCircle2,
   Eye,
+  Pencil,
+  AlertTriangle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
