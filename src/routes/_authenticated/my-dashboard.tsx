@@ -21,6 +21,8 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { FeedbackCountdown } from "@/components/feedback/FeedbackCountdown";
+import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
 import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { getMyClinicalContext } from "@/lib/clinical/context.functions";
@@ -86,6 +88,12 @@ function MyDashboardPage() {
     queryFn: () => fetchSubscription(),
     staleTime: 30_000,
   });
+  const fetchFbStatus = useServerFn(getMyFeedbackStatus);
+  const { data: fbStatus } = useQuery({
+    queryKey: ["patient-feedback-status-dashboard"],
+    queryFn: () => fetchFbStatus(),
+    staleTime: 30_000,
+  });
 
   // Saudação depende do horário/local do cliente → calcular só após mount
   // evita hydration mismatch (React #418) que apagava a tela.
@@ -137,6 +145,19 @@ function MyDashboardPage() {
             </>
           )}
         </header>
+
+        {/* Cronômetro do próximo feedback — só aparece se o paciente tem nutricionista vinculado */}
+        {fbStatus?.hasNutritionist && (
+          <Link to="/my-plan/feedback" className="block group">
+            <FeedbackCountdown
+              frequencyDays={fbStatus.frequencyDays}
+              lastFeedbackAt={fbStatus.lastFeedbackAt}
+              daysSinceLast={fbStatus.daysSinceLast}
+            />
+          </Link>
+        )}
+
+
 
         {/* Estado clínico */}
         <section
