@@ -1047,6 +1047,16 @@ export const templates: DietTemplate[] = [
   },
 ];
 
+// Aplica metadados do matcher (goalTag + macros alvo) in-place nos 20
+// templates do sistema. Mantém a identidade do array (mesmo objeto) — todos
+// os consumidores existentes continuam funcionando sem mudança.
+for (const t of templates) {
+  const meta = TEMPLATE_METADATA[t.id];
+  if (meta) Object.assign(t, meta);
+}
+
+
+
 
 export const categories: DietTemplate["category"][] = [
   "Esportivo",
