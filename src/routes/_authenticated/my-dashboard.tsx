@@ -88,6 +88,12 @@ function MyDashboardPage() {
     queryFn: () => fetchSubscription(),
     staleTime: 30_000,
   });
+  const fetchFbStatus = useServerFn(getMyFeedbackStatus);
+  const { data: fbStatus } = useQuery({
+    queryKey: ["patient-feedback-status-dashboard"],
+    queryFn: () => fetchFbStatus(),
+    staleTime: 30_000,
+  });
 
   // Saudação depende do horário/local do cliente → calcular só após mount
   // evita hydration mismatch (React #418) que apagava a tela.
