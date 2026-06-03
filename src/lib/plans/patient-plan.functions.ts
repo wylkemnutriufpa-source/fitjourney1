@@ -15,6 +15,35 @@ export type ActivePlanDTO = {
   snapshot: any;
 } | null;
 
+/**
+ * Filtra snapshot para exposição ao paciente.
+ * Remove metadados técnicos (template info, clinical audit) que não são
+ * relevantes para o paciente. Mantém apenas dados de consumo: refeições,
+ * horários, alimentos, orientações e medidas caseiras.
+ */
+function sanitizeSnapshotForPatient(snapshot: any): any {
+  if (!snapshot || typeof snapshot !== "object") return {};
+
+  return {
+    // Conteúdo visível: refeições e estrutura de consumo
+    id: snapshot.id,
+    name: snapshot.name,
+    kcal: snapshot.kcal,
+    meals: snapshot.meals,
+    orientacoes: snapshot.orientacoes,
+    description: snapshot.description,
+    category: snapshot.category,
+    tags: snapshot.tags,
+
+    // Explicitamente excluídos (metadados técnicos):
+    // - template (decisão do profissional, não para paciente)
+    // - goal_tag (contexto clínico)
+    // - clinical_review (auditoria)
+    // - clinicalAudit (estado clínico snapshot)
+    // - meta (roteador interno)
+  };
+}
+
 export const getMyActivePlan = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ActivePlanDTO> => {
@@ -42,11 +71,15 @@ export const getMyActivePlan = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!plan) return null;
 
+    // Sanitizar snapshot antes de retornar ao paciente
+    // Remove metadados técnicos (template, contexto clínico, auditoria)
+    const sanitizedSnapshot = sanitizeSnapshotForPatient(plan.snapshot ?? {});
+
     return {
       id: plan.id,
       publishedAt: plan.published_at,
       schemaVersion: plan.schema_version,
-      snapshot: plan.snapshot ?? {},
+      snapshot: sanitizedSnapshot,
     };
   });
 
