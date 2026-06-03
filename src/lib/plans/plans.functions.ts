@@ -528,7 +528,8 @@ export type DraftPlanForEdit = {
   id: string;
   patientId: string;
   patientName: string;
-  snapshot: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  snapshot: any;
   sourceTemplateKey: string | null;
   updatedAt: string;
 };
