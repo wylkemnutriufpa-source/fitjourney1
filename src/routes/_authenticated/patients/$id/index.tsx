@@ -13,7 +13,7 @@ import {
   ArrowLeft,
   FileText,
   Sparkles,
-  Activity,
+  
   Mail,
   Phone,
   Calendar,
