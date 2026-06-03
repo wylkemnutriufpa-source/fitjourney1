@@ -90,10 +90,7 @@ function Patients() {
     setOpeningDraftFor(patientId);
     try {
       const draft = await ensureDraft({ data: { patientId } });
-      await navigate({
-        to: "/templates",
-        search: { draftPlanId: draft.planId },
-      });
+      window.location.assign(`/templates?draftPlanId=${encodeURIComponent(draft.planId)}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao gerar pré-plano.");
     } finally {
