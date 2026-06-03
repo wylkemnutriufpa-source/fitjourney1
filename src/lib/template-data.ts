@@ -23,6 +23,8 @@ export type MealSlot = {
   heroKey?: string;
 };
 
+export type TemplateGoalTag = "cut" | "bulk" | "maintain" | "performance" | "health";
+
 export type DietTemplate = {
   id: string;
   name: string;
@@ -39,6 +41,50 @@ export type DietTemplate = {
   meals: MealSlot[];
   /** Orientações nutricionais editáveis — vão junto no PDF/WhatsApp. */
   orientacoes?: string;
+  // ---- Metadados para o matcher (Phase 2). Opcionais por contrato. ----
+  /** Objetivo clínico mapeado para o motor. */
+  goalTag?: TemplateGoalTag;
+  /** Proteína alvo em gramas. */
+  proteinGTarget?: number;
+  /** Carboidrato alvo em gramas. */
+  carbGTarget?: number;
+  /** Gordura alvo em gramas. */
+  fatGTarget?: number;
+};
+
+/**
+ * Metadados nutricionais por template do sistema.
+ * Mantidos como mapa separado para revisão clínica fácil e auditoria.
+ * Aplicados aos 20 templates após a declaração — sem CRUD, sem migration.
+ */
+export const TEMPLATE_METADATA: Record<
+  string,
+  Pick<DietTemplate, "goalTag" | "proteinGTarget" | "carbGTarget" | "fatGTarget">
+> = {
+  // Esportivos
+  "esp-hipertrofia": { goalTag: "bulk",        proteinGTarget: 180, carbGTarget: 380, fatGTarget: 85 },
+  "esp-endurance":   { goalTag: "performance", proteinGTarget: 130, carbGTarget: 500, fatGTarget: 75 },
+  "esp-cutting":     { goalTag: "cut",         proteinGTarget: 170, carbGTarget: 160, fatGTarget: 60 },
+  // Clínicos
+  "cli-lowcarb":     { goalTag: "cut",    proteinGTarget: 140, carbGTarget: 90,  fatGTarget: 105 },
+  "cli-diabetes":    { goalTag: "health", proteinGTarget: 130, carbGTarget: 200, fatGTarget: 70 },
+  "cli-colesterol":  { goalTag: "health", proteinGTarget: 110, carbGTarget: 240, fatGTarget: 55 },
+  "cli-figado":      { goalTag: "health", proteinGTarget: 120, carbGTarget: 210, fatGTarget: 55 },
+  "cli-hipertensao": { goalTag: "health", proteinGTarget: 100, carbGTarget: 260, fatGTarget: 55 },
+  "cli-renais":      { goalTag: "health", proteinGTarget: 90,  carbGTarget: 290, fatGTarget: 55 },
+  "cli-vesicula":    { goalTag: "health", proteinGTarget: 100, carbGTarget: 240, fatGTarget: 35 },
+  "cli-sem-gluten":         { goalTag: "maintain", proteinGTarget: 110, carbGTarget: 270, fatGTarget: 65 },
+  "cli-sem-lactose":        { goalTag: "maintain", proteinGTarget: 110, carbGTarget: 270, fatGTarget: 65 },
+  "cli-sem-gluten-lactose": { goalTag: "maintain", proteinGTarget: 110, carbGTarget: 260, fatGTarget: 65 },
+  "cli-fodmap":      { goalTag: "health", proteinGTarget: 110, carbGTarget: 240, fatGTarget: 65 },
+  "cli-gastrite":    { goalTag: "health", proteinGTarget: 110, carbGTarget: 240, fatGTarget: 55 },
+  // Pré/Pós-op
+  "po-pre-op":       { goalTag: "maintain", proteinGTarget: 110, carbGTarget: 270, fatGTarget: 60 },
+  "po-pos-op":       { goalTag: "maintain", proteinGTarget: 90,  carbGTarget: 210, fatGTarget: 50 },
+  // Gestante / Bariátrica / Regional
+  "ges-gestante":       { goalTag: "maintain", proteinGTarget: 110, carbGTarget: 310, fatGTarget: 75 },
+  "bar-pos-bariatrica": { goalTag: "maintain", proteinGTarget: 90,  carbGTarget: 100, fatGTarget: 35 },
+  "reg-paraense":       { goalTag: "maintain", proteinGTarget: 130, carbGTarget: 320, fatGTarget: 75 },
 };
 
 /** Texto padrão de Orientações Nutricionais por categoria — base editável. */
