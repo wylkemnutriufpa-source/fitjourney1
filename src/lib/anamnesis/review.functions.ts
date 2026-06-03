@@ -315,7 +315,7 @@ export const reviewAnamnesis = createServerFn({ method: "POST" })
 
     const { data: current, error: cErr } = await supabase
       .from("anamneses")
-      .select("id, review_status, nutritionist_id")
+      .select("id, review_status, nutritionist_id, patient_id")
       .eq("id", data.anamnesisId)
       .maybeSingle();
     if (cErr) throw new Error(cErr.message);
