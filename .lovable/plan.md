@@ -1,130 +1,158 @@
+## Continuação Lote 1 → Lote 2 → Lote 3
 
-## Status do que já foi feito
-
-Honestidade primeiro: até agora **só rodei a auditoria de segurança** (0 findings) e investiguei o bug `15→7` do `feedback_frequency_days` (conclusão: cache do React Query, não bug de código). **Nenhum item de produto foi implementado.** Este plano executa de fato.
-
-Aprovação registrada: `APPROVED FOR EXECUTION`, ordem Lote 1 → 2 → 3, **trigger `plans_snapshot_immutable` será afrouxado** para permitir colunas de entrega (item 4 do Lote 2).
+Foco: terminar o que falta, incluindo o **modal do avatar** que você destacou (resumo + atalhos diferenciados por papel).
 
 ---
 
-## Decisões assumidas (confirmar se divergir)
+### Bloco A — Fechar Lote 1 (rápido, baixo risco)
 
-- **"Plano pendente"** = anamnese aprovada **+ nenhum `plans` com `status='published'`** para o paciente. (Por enquanto. Quando entrega virar campo no Lote 2, o filtro passa a usar `delivered_at IS NULL`.)
-- **Entrega (Lote 2)** vive em `plans` mesmo, com trigger afrouxado, conforme sua ordem ("AFROUXA O Trigger imutavel").
-- **Countdown 15 dias** usa `nutritionists.feedback_frequency_days` como base (configurável), não hardcoded 15. Texto exibido: "Próximo feedback em X dias" / "Atrasado há X dias".
+**A.1 Modal do Avatar (substitui o atalho atual para Configurações)**
 
----
+- Local: `src/components/layout/AppShell.tsx` (botão do avatar no header).
+- Mudança: clicar no avatar **não navega mais** para `/configuracoes`. Abre um `Dialog` (shadcn) com:
+  - **Cabeçalho:** avatar + nome + email + papel (Nutricionista / Paciente / Admin).
+  - **Resumo (paciente):** plano ativo (nome + dias restantes da assinatura), próxima janela de feedback (reaproveita lógica do `FeedbackCountdown`), status da anamnese (rascunho / aguardando revisão / aprovada).
+  - **Resumo (profissional/nutricionista):** total de pacientes, pacientes com plano pendente, feedbacks pendentes de leitura nos últimos 7 dias.
+  - **Atalhos paciente:** "Meu plano", "Feedback", "Minha anamnese", "Configurações", "Sair".
+  - **Atalhos profissional:** "Dashboard", "Pacientes", "Configurações", **"Copiar link da minha landing"** (`/n/{slug}`), **"Gerar link de convite"** (`/c/{slug}` ou `/c/{slug}/{code}` se já houver código ativo), "Sair".
+  - **Admin:** mantém atalhos atuais + "Sair".
+- Dados: usa server fns já existentes (`getMyActiveSubscription`, `getMyFeedbackStatus`, `listPatients`, `getMyNutritionistProfile` para `slug`). Sem migração.
+- Invariantes: não toca vínculo paciente↔nutricionista, não toca snapshot, não toca anamnese.
 
-## LOTE 1 — Rápido, baixo risco
+**A.2 Normalização de telefone**
 
-### 1.1 Sidebar mobile fecha após navegação
-- Arquivo: `src/components/AppShell.tsx`.
-- Hook `useEffect` em `pathname` (de `useRouterState`) chama `setOpenMobile(false)` quando `isMobile`.
-- Sem alteração desktop.
+- `src/lib/phone-mask.ts`: adicionar `normalizeBRPhone(raw)` (puro, sem efeito colateral).
+- Aplicar **apenas em runtime** nos pontos de entrada (form de cadastro de paciente, edição de perfil). Não roda backfill aqui (vai pro Bloco B).
 
-### 1.2 Countdown de feedback no Patient App (URGENTE pelo usuário)
-- Arquivo: `src/routes/_authenticated/my-plan.feedback.tsx` (topo da página) + reutiliza `getMyFeedbackStatus` que já retorna `lastFeedbackAt` e `frequencyDays`.
-- Componente novo `<FeedbackCountdown>` em `src/components/feedback/FeedbackCountdown.tsx`:
-  - Calcula `nextDue = lastFeedbackAt + frequencyDays` (se sem feedback: "Envie seu primeiro feedback").
-  - Mostra contador grande "Faltam **X dias**" ou "Atrasado há **X dias**" (vermelho).
-  - Barra de progresso visual (0 → frequencyDays).
-- Sem DB. Sem server fn nova.
+**A.3 Validação visual do Lote 1**
 
-### 1.3 Anamnese no perfil do paciente com espaço de edição (URGENTE pelo usuário)
-- Arquivo: `src/routes/_authenticated/patients/$id/index.tsx` — nova seção "Anamnese clínica" abaixo de "Dados básicos".
-- Reusa `AnamnesisAnswersView` (já existe) para render read-only da última anamnese aprovada.
-- Botão **"Editar anamnese"** abre `/anamneses/$id` (rota já existe).
-- Respeita invariante: anamnese aprovada é imutável — edição cria **nova versão** (`supersedes_id`) via fluxo existente em `review.functions.ts`. Nenhuma mudança de schema.
-- Se não houver anamnese aprovada: mostra status atual + CTA "Abrir anamnese pendente".
-
-### 1.4 Bug `feedback_frequency_days` 15→7
-- Investigação confirmou: DB tem 15, fn lê correto. Causa = cache stale.
-- Fix: em `src/routes/_authenticated/my-plan.feedback.tsx` e `AppShell.tsx`, reduzir `staleTime` do query de feedback status para `0` + `refetchOnMount: 'always'` (igual já fazemos em patient-detail).
-- Garantia: ao salvar `feedback_frequency_days` no settings do nutricionista, invalidar query `['my-feedback-status']` (se aplicável via cross-user, basta forçar refetch on mount).
-
-### 1.5 Filtro "Planos pendentes" correto
-- Arquivo: `src/lib/plans/plans.functions.ts` — `listMyPatientsForPlan`.
-- Critério novo: `anamnesisStatus === 'approved' && !hasPublishedPlan`.
-- Hoje usa "entregue" (campo que nem existe). Corrigir para `published`.
-
-### 1.6 Normalização de telefone (additive)
-- Util novo `src/lib/phone-mask.ts` ganha `normalizeBRPhone(raw): string` (E.164 sem `+`, ex: `5511999998888`).
-- Aplicar em todos os `wa.me/{normalized}` (busca: `wa.me/`).
-- **Sem migration neste lote** — usar normalização runtime na leitura. Backfill DB fica para Lote 2 se necessário.
-
-### 1.7 Dashboard paciente — plano contratado + countdown assinatura
-- Arquivo: `src/routes/_authenticated/my-dashboard.tsx`.
-- Card novo lendo `patient_subscriptions` ativo: mostra `plan_kind`, `ends_at`, dias restantes.
-- Server fn: reusa `getMyActiveSubscription` se existir; senão criar simples em `src/lib/finance/subscriptions.functions.ts`.
-
-### 1.8 Modal de atalhos no avatar (Lote 1 parcial — só estrutura)
-- Arquivo: `src/components/AppShell.tsx` — header avatar vira Popover com: Configurações, Sair, (futuro: indicadores assinatura).
-- Indicadores de assinatura ficam para Lote 2 (item 10) para não inflar este.
+- Verificar no preview: countdown na página de feedback, seção de anamnese no perfil do paciente, modal do avatar abrindo com resumo correto por papel.
 
 ---
 
-## LOTE 2 — Médio risco
+### Bloco B — Lote 2 (médio, requer migração)
 
-### 2.1 Plano publicado editável (versionamento) — item P0.1
-- Nova fn `reopenPublishedPlanAsDraft(planId)` em `plans.functions.ts`: clona snapshot do publicado em novo row `status='draft'`. **Não altera o publicado.**
-- UI: botão "Editar plano" no perfil/diet do paciente → abre editor com draft clonado.
-- Decisão de UX (você definiu): nutricionista enxerga "um único plano vivo" — UI esconde a distinção draft/publicado/republicado. Internamente seguimos versionando (auditoria + rollback).
+**B.1 Trigger `plans_snapshot_immutable` — afrouxamento controlado**
 
-### 2.2 Botão "Plano entregue" + trigger afrouxado — item P0.4
-- **Migration**: adiciona `plans.delivered_at`, `plans.delivered_by`, `plans.delivery_channel`, `plans.delivery_message`.
-- **Migration trigger**: reescreve `plans_snapshot_immutable` — bloqueia mudança em `snapshot/schema_version/patient_id/published_at`, **permite** UPDATE em `delivered_*`.
-- Matriz de impacto:
-  - Publicados continuam visíveis no Patient App ✓ (snapshot intocado)
-  - PDF inalterado ✓
-  - Histórico intacto ✓
-  - **Risco residual**: qualquer fn que faça `UPDATE plans` precisa não tocar snapshot. Auditar `patient-plan.functions.ts`, `plans.functions.ts`, `draft-auto-plan.ts`.
-- Fn nova `markPlanAsDelivered({ planId, channel, message })`.
-- UI: botão no perfil do paciente quando há `published` sem `delivered_at`.
-- Template de mensagem WhatsApp em constante + textarea editável.
+- Migração: reescrever o trigger para permitir UPDATE **apenas** nas colunas `delivered_at`, `delivered_by`, `delivered_note`. Qualquer outra coluna continua imutável após `published`.
+- Adicionar colunas `delivered_at timestamptz`, `delivered_by uuid`, `delivered_note text` em `plans`.
 
-### 2.3 Backfill telefone normalizado
-- Migration additive: `patients.phone_normalized`, `nutritionists.phone_normalized` + backfill via SQL.
+**B.2 Botão "Marcar plano como entregue"**
 
-### 2.4 Card de acompanhamento (avatar + gráfico evolução) — item P1.8
-- Novo componente reusa `FeedbackChart` existente.
-- Render no perfil do paciente.
+- `src/lib/plans.functions.ts`: nova `markPlanAsDelivered({ planId })` com `requireSupabaseAuth`, valida que o usuário é o nutricionista dono e que o plano está `published` sem `delivered_at`.
+- UI: botão na tela de detalhe do plano (visível só ao nutricionista, só quando `status='published'` e `delivered_at IS NULL`).
 
-### 2.5 Indicadores de assinatura no avatar — item P2.10
-- Popover do Lote 1.8 ganha badge: "Plano X · vence em Y dias". Escondido para admin.
+**B.3 Reabrir plano publicado como rascunho**
 
----
+- `reopenPublishedPlanAsDraft({ planId })`: clona o snapshot para nova linha `status='draft'`, **preserva** a linha publicada (sem editar). Patient app continua vendo a versão entregue até a próxima publicação.
+- UI: botão "Editar como novo rascunho" no plano publicado.
 
-## LOTE 3 — Discovery + alto risco
+**B.4 Filtro "Planos pendentes" — refinar**
 
-### 3.1 Avaliação Física unificada — item P1.5
-- **Bloqueado por discovery**. Antes de tocar:
-  - Mapear todas as fontes atuais de AF (anamnese vs. patient_profile vs. `physical_assessments` se existir).
-  - Decidir tabela canônica.
-  - Matriz de impacto completa (ClinicalContext, motores, timeline).
-- Reportar findings antes de qualquer migration.
+- Atualizar critério para `anamnesisStatus='approved' AND NOT EXISTS plan WHERE status IN ('published') AND delivered_at IS NOT NULL`. Agora usa o `delivered_at` real (substitui o proxy do Lote 1).
 
-### 3.2 Auditoria UX contínua — item P2.11 (parte)
-- Tarefa aberta, não-blocante. Lista de inconsistências reportadas semanalmente.
+**B.5 Backfill telefone normalizado**
+
+- Migração aditiva: coluna `phone_normalized` em `patients`, populada via `UPDATE`. Sem remover `phone` original.
+
+**B.6 Indicadores de assinatura no modal do avatar**
+
+- Após B.1 estar de pé, adicionar badge "vence em X dias" no resumo do paciente (já preparado em A.1, só liga o dado).
 
 ---
 
-## Ordem de execução
+### Bloco C — Lote 3 (discovery)
 
-1. **Lote 1.2** (countdown feedback) e **1.3** (anamnese no perfil) primeiro — marcados URGENTE.
-2. Demais itens do Lote 1 em paralelo onde independentes.
-3. Validação visual em cada item antes de declarar pronto (regra do user-memory).
-4. Pausa para review antes de iniciar Lote 2 (envolve migration + trigger).
-5. Lote 3 só após discovery aprovada.
+**C.1 Avaliação Física unificada**
 
-## Invariantes preservadas
-- AF não bloqueia nada (Lote 3 manterá).
-- Motores só consomem ClinicalContext.
-- Anamnese aprovada imutável (edição = nova versão).
-- Snapshot de plano publicado imutável (trigger só libera campos de entrega).
+- **Bloqueado por discovery.** Antes de qualquer código, mapear:
+  - Tabela canônica (ou se precisa criar `physical_assessments`).
+  - De onde vêm os dados hoje (anamnese? feedback? campo solto no plano?).
+  - Quem escreve, quem lê, como entra no snapshot.
+- Entrego um sub-plano específico depois do mapeamento.
+
+---
+
+### Ordem de execução
+
+1. Bloco A inteiro (modal avatar + telefone runtime + validação visual).
+2. Bloco B (migração primeiro, depois código).
+3. Bloco C (discovery → sub-plano → execução).
+
+### Invariantes preservadas
+
+- Anamnese aprovada imutável (edição cria nova versão).
+- Snapshot V3 imutável exceto pelos 3 campos `delivered_*` no Bloco B.
 - Vínculo paciente↔nutricionista intocado.
-- Sem CASCADE em FK.
+- Patient App permanece read-only.
+- Sem CASCADE, sem fallback silencioso, sem refactor não solicitado.
 
-## Confirmações pendentes antes de codar
-- Confirma que **"plano pendente" = sem `published`** (até Lote 2 trazer `delivered_at`)?
-- Confirma que **countdown usa `feedback_frequency_days` do nutricionista** (não hardcoded 15)?
-- Posso começar pelo Lote 1 imediatamente após o "Implement plan"?
+### Decisões pendentes (preciso de confirmação antes do Bloco B)
+
+1. **Link de convite no modal do avatar (A.1)**: gerar um código novo a cada clique, ou reusar o último código ativo do nutricionista? (recomendo: reusar se existir ativo, senão gerar).
+2. **Reabrir publicado (B.3)**: o draft clonado deve aparecer na lista de planos do paciente? (recomendo: **não**, só aparece pro nutricionista até publicar).
+3. **Marcar entregue (B.2)**: precisa de campo de observação obrigatório, opcional, ou nenhum? (recomendo: opcional). Eu faria um ajuste importante antes de você dar o "Implement plan".
+  O item mais perigoso desse plano é justamente o 2.1 Plano publicado editável (versionamento).
+  Porque ele ainda está pensando como engenheiro.
+  Você está pensando como nutricionista.
+  São duas coisas diferentes.
+  Hoje ele propõe:
+  > Publicado → Clona → Cria Draft → Edita Draft → Republica
+  Você está pedindo:
+  > Publicado → Edita → Salva
+  Sem intermediários.
+  ---
+  O que eu mandaria para ele antes de autorizar:
+  Antes de iniciar o Lote 2 preciso alinhar uma mudança de direção.
+  Não quero que a edição de um plano publicado gere automaticamente um novo draft, clone ou fluxo paralelo.
+  A regra de negócio do FitJourney é:
+  - O nutricionista pode editar qualquer plano do próprio paciente a qualquer momento.
+  - O paciente sempre vê a versão mais recente salva.
+  - O sistema não deve obrigar o nutricionista a recriar plano, clonar plano ou republicar plano para fazer ajustes.
+  Se houver necessidade técnica de histórico, versionamento ou auditoria, isso deve acontecer em segundo plano, invisível para o usuário.
+  Para o nutricionista existe apenas um conceito:
+  "Plano do paciente".
+  Ele abre.
+  Edita.
+  Salva.
+  Fim.
+  Antes de implementar o item 2.1 quero uma proposta arquitetural baseada nesse princípio.
+  Não quero reproduzir o problema do sistema 1.0 onde o profissional era constantemente bloqueado por triggers, snapshots, drafts, estados ou regras técnicas.
+  O sistema deve proteger os dados.
+  Não deve controlar o nutricionista.
+  ---
+  Sobre o restante do plano:
+  Eu aprovaria imediatamente
+  Sidebar fechar após navegação
+  Countdown de feedback
+  Anamnese dentro do perfil do paciente
+  Correção do filtro de planos pendentes
+  Normalização de telefone
+  Dashboard com plano contratado
+  Modal do avatar
+  Tudo isso é melhoria real de UX.
+  ---
+  Eu seguraria
+  Afrouxar trigger de plano publicado
+  Clone de plano publicado
+  ReopenPublishedPlanAsDraft
+  Qualquer coisa envolvendo draft/republicação
+  Porque vocês acabaram de descobrir que o fluxo mais simples funciona melhor:
+  Anamnese
+  ↓
+  Sugestão
+  ↓
+  Nutricionista ajusta
+  ↓
+  Salvar
+  ↓
+  Paciente vê
+  Toda vez que aparece:
+  draft
+  clone
+  reopen
+  republish
+  é um sinal de que a arquitetura está começando a servir ao sistema em vez de servir ao profissional.
+  E pelo histórico que você contou do FitJourney 1.0, esse foi exatamente o caminho que levou ao excesso de travas e à perda de velocidade operacional.
+
+Confirma o plano e responde as 3 decisões para eu seguir com `APPROVED FOR EXECUTION`? 
