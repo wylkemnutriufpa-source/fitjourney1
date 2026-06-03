@@ -300,6 +300,7 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
       snapshot: snapshotWithAudit,
     };
     if (data.sourceTemplateId) insertRow.source_template_id = data.sourceTemplateId;
+    if (data.sourceTemplateKey) insertRow.source_template_key = data.sourceTemplateKey;
 
     const { data: plan, error } = await supabase
       .from("plans")
