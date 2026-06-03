@@ -1,0 +1,3 @@
+ALTER TABLE public.plans ADD COLUMN IF NOT EXISTS source_template_key text;
+CREATE INDEX IF NOT EXISTS idx_plans_source_template_key ON public.plans (source_template_key) WHERE source_template_key IS NOT NULL;
+COMMENT ON COLUMN public.plans.source_template_key IS 'Slug do template do sistema (ex: esp-hipertrofia) usado como base do plano. Complementa source_template_id (UUID) que aponta apenas para templates salvos pelo nutricionista.';
