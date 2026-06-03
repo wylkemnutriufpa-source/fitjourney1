@@ -233,7 +233,7 @@ function Landing() {
           aria-hidden="true"
         />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[92px] flex items-center justify-between">
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
@@ -313,7 +313,7 @@ function Landing() {
       </motion.nav>
 
       {/* ══════════ HERO ══════════ */}
-      <section ref={heroRef} className="relative pt-28 pb-20 md:pt-36 md:pb-28 px-4 overflow-hidden noise-overlay">
+      <section ref={heroRef} className="relative pt-36 pb-20 md:pt-44 md:pb-28 px-4 overflow-hidden noise-overlay">
         <div className="absolute inset-0 -z-10 dot-grid opacity-40" />
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute top-10 -left-32 w-[600px] h-[600px] bg-primary/[0.06] blur-[120px] morph-orb" />
