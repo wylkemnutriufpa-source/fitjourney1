@@ -219,9 +219,9 @@ function PatientSettings() {
                 <input
                   className={inputCls}
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(maskPhoneBR(e.target.value))}
                   disabled={saving}
-                  placeholder="+55 11 99999-9999"
+                  placeholder="+55 (11) 99999-9999"
                   inputMode="tel"
                   maxLength={32}
                 />
