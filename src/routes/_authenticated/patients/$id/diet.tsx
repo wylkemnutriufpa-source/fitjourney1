@@ -1,35 +1,36 @@
-// Nutri — visualiza o plano vigente do paciente (read-only) + histórico
-// de planos publicados. Snapshot V3 é IMUTÁVEL após published_at.
-// Para editar: publica nova versão a partir de um template (CTA → /templates).
+// Nutri — "Plano do paciente". UMA entidade. Abre, edita, salva.
+// Paciente vê. Fim. Sem draft, sem versão, sem republicar.
 //
-// Invariantes respeitadas:
-//   - Render BURRO: lê snapshot.meals direto, sem normalizar / hidratar /
-//     recalcular.
-//   - Patient App read-only (esta tela é a visão do NUTRI, mas sobre o
-//     mesmo snapshot que o paciente vê — mesma fonte, mesma forma).
-//   - Pipeline soberano: edição clínica acontece ANTES da publicação,
-//     no fluxo de template em /templates.
+// Implementação: cada save INSERE nova linha publicada (saveEditedPlan).
+// Histórico técnico fica no banco mas NÃO aparece na UI.
+// Invariante de imutabilidade do snapshot preservada (nunca damos UPDATE).
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { VideoLoader } from "@/components/VideoLoader";
+import { FoodPickerDialog } from "@/components/FoodPickerDialog";
+import type { CatalogFood } from "@/lib/food-catalog";
 import {
   ArrowLeft,
   Clock,
-  FileText,
-  History,
   Loader2,
+  Plus,
+  Save,
   Send,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 import {
   listPatientPlansForNutri,
   type PatientPlanFull,
-  type PatientPlanSummary,
 } from "@/lib/plans/patient-plan.functions";
+import { saveEditedPlan } from "@/lib/plans/plans.functions";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
@@ -37,23 +38,55 @@ export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   component: PatientPlanPage,
 });
 
-function formatDateTime(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(iso));
+// ---------- Tipos locais (passthrough do snapshot) ----------
+type EditItem = {
+  id: string;
+  foodKey: string;
+  name: string;
+  qty: number;
+  unit: string;
+  kcal: number;
+  scaleGroup: string;
+  [k: string]: any;
+};
+type EditMeal = {
+  id: string;
+  time: string;
+  label: string;
+  main: {
+    id: string;
+    title: string;
+    imageKey: string;
+    items: EditItem[];
+    [k: string]: any;
+  };
+  equivalents: any[];
+  [k: string]: any;
+};
+type EditSnapshot = {
+  id: string;
+  name: string;
+  kcal: number;
+  meals: EditMeal[];
+  [k: string]: any;
+};
+
+function uid() {
+  return `id-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function cloneSnapshot(s: any): EditSnapshot {
+  return JSON.parse(JSON.stringify(s ?? {}));
 }
 
 function PatientPlanPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const qc = useQueryClient();
 
   const fetchPlans = useServerFn(listPatientPlansForNutri);
   const fetchDetail = useServerFn(getPatientForNutritionist);
+  const saveFn = useServerFn(saveEditedPlan);
 
   const { data: detail } = useQuery({
     queryKey: ["patient-detail", id],
@@ -78,17 +111,8 @@ function PatientPlanPage() {
   }
 
   return (
-    <AppShell
-      header={
-        <div className="flex gap-2">
-          <Button size="sm" onClick={publishNew}>
-            <Send className="size-3.5" />
-            Publicar novo plano
-          </Button>
-        </div>
-      }
-    >
-      <div className="space-y-8">
+    <AppShell>
+      <div className="space-y-6">
         <div className="space-y-3">
           <Link
             to="/patients/$id"
@@ -103,40 +127,38 @@ function PatientPlanPage() {
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                 {patientName}
               </p>
-              <h1 className="text-3xl font-bold tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
                 Plano do paciente
               </h1>
-              <p className="text-xs text-muted-foreground">
-                Snapshot publicado é imutável. Para alterar, publique uma nova
-                versão a partir de um template.
-              </p>
             </div>
           </div>
         </div>
 
-        {isLoading && (
-          <VideoLoader size="md" label="Carregando planos…" />
-        )}
+        {isLoading && <VideoLoader size="md" label="Carregando plano…" />}
 
         {error && (
           <div
             role="alert"
             className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
           >
-            Erro ao carregar planos: {(error as Error).message}
+            Erro ao carregar plano: {(error as Error).message}
           </div>
         )}
 
         {!isLoading && !error && data && (
           <>
             {data.active ? (
-              <ActivePlanView plan={data.active} />
+              <PlanEditor
+                key={data.active.id}
+                plan={data.active}
+                onSave={async (snapshot) => {
+                  await saveFn({ data: { patientId: id, snapshot } });
+                  await qc.invalidateQueries({ queryKey: ["patient-plans", id] });
+                  toast.success("Plano salvo. O paciente já está vendo a nova versão.");
+                }}
+              />
             ) : (
               <EmptyPlanState onPublish={publishNew} />
-            )}
-
-            {data.history.length > 0 && (
-              <HistoryList history={data.history} />
             )}
           </>
         )}
@@ -147,199 +169,370 @@ function PatientPlanPage() {
 
 function EmptyPlanState({ onPublish }: { readonly onPublish: () => void }) {
   return (
-    <div className="bg-surface border border-dashed border-border rounded-lg p-10 text-center space-y-4">
+    <div className="bg-surface border border-dashed border-border rounded-lg p-8 sm:p-10 text-center space-y-4">
       <div className="mx-auto size-12 grid place-items-center rounded-full bg-primary/10 border border-primary/30">
         <Sparkles className="size-5 text-primary" />
       </div>
       <div className="space-y-1">
         <h2 className="text-lg font-semibold">Sem plano publicado</h2>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">
-          Este paciente ainda não tem um plano vigente. Escolha um template e
-          publique para que ele apareça no app do paciente.
+          Crie o primeiro plano deste paciente a partir de um template. Depois,
+          você poderá editar tudo direto aqui.
         </p>
       </div>
       <Button onClick={onPublish}>
         <Send className="size-3.5" />
-        Publicar a partir de um template
+        Criar a partir de um template
       </Button>
     </div>
   );
 }
 
-function ActivePlanView({ plan }: { readonly plan: PatientPlanFull }) {
-  const snap: any = plan.snapshot ?? {};
-  const meals: any[] = Array.isArray(snap.meals) ? snap.meals : [];
-  const totalKcal: number = meals.reduce((acc, m) => {
-    const items: any[] = Array.isArray(m?.main?.items) ? m.main.items : [];
-    return (
-      acc +
-      items.reduce(
-        (s, it) => s + (Number.isFinite(it?.kcal) ? Number(it.kcal) : 0),
-        0,
-      )
+// ============================================================
+// EDITOR
+// ============================================================
+function PlanEditor({
+  plan,
+  onSave,
+}: {
+  readonly plan: PatientPlanFull;
+  readonly onSave: (snapshot: EditSnapshot) => Promise<void>;
+}) {
+  const initial = useMemo(() => cloneSnapshot(plan.snapshot), [plan]);
+  const [draft, setDraft] = useState<EditSnapshot>(initial);
+  const [dirty, setDirty] = useState(false);
+  const [picker, setPicker] = useState<{ mealId: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setDraft(initial);
+    setDirty(false);
+  }, [initial]);
+
+  function patch(next: EditSnapshot) {
+    setDraft(next);
+    setDirty(true);
+  }
+
+  function updateMeal(mealId: string, fn: (m: EditMeal) => EditMeal) {
+    patch({
+      ...draft,
+      meals: draft.meals.map((m) => (m.id === mealId ? fn(m) : m)),
+    });
+  }
+
+  function removeMeal(mealId: string) {
+    patch({ ...draft, meals: draft.meals.filter((m) => m.id !== mealId) });
+  }
+
+  function addMeal() {
+    const newMeal: EditMeal = {
+      id: uid(),
+      time: "12:00",
+      label: "Nova refeição",
+      main: {
+        id: uid(),
+        title: "Refeição",
+        imageKey: "generic",
+        items: [],
+      },
+      equivalents: [],
+    };
+    patch({ ...draft, meals: [...draft.meals, newMeal] });
+  }
+
+  function removeItem(mealId: string, itemId: string) {
+    updateMeal(mealId, (m) => ({
+      ...m,
+      main: {
+        ...m.main,
+        items: m.main.items.filter((it) => it.id !== itemId),
+      },
+    }));
+  }
+
+  function updateItem(
+    mealId: string,
+    itemId: string,
+    fn: (it: EditItem) => EditItem,
+  ) {
+    updateMeal(mealId, (m) => ({
+      ...m,
+      main: {
+        ...m.main,
+        items: m.main.items.map((it) => (it.id === itemId ? fn(it) : it)),
+      },
+    }));
+  }
+
+  function addFoodToMeal(mealId: string, food: CatalogFood) {
+    updateMeal(mealId, (m) => ({
+      ...m,
+      main: {
+        ...m.main,
+        items: [
+          ...m.main.items,
+          {
+            id: uid(),
+            foodKey: food.foodKey,
+            name: food.name,
+            qty: food.qty,
+            unit: food.unit,
+            kcal: food.kcal,
+            scaleGroup: food.scaleGroup,
+          },
+        ],
+      },
+    }));
+  }
+
+  const totalKcal = useMemo(() => {
+    return draft.meals.reduce(
+      (acc, m) =>
+        acc +
+        m.main.items.reduce(
+          (s, it) => s + (Number.isFinite(it.kcal) ? Number(it.kcal) : 0),
+          0,
+        ),
+      0,
     );
-  }, 0);
-  const review = snap.clinical_review;
-  const audit = snap.clinicalAudit;
+  }, [draft]);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const snapshotToPersist: EditSnapshot = {
+        ...draft,
+        kcal: Math.round(totalKcal),
+      };
+      await onSave(snapshotToPersist);
+      setDirty(false);
+    } catch (e) {
+      toast.error(
+        `Não consegui salvar: ${(e as Error).message ?? "erro desconhecido"}`,
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
-    <section className="space-y-5">
-      <div className="flex items-center justify-between border-b border-border pb-3">
-        <div className="flex items-center gap-2">
-          <FileText className="size-4 text-primary" />
-          <h2 className="text-lg font-semibold">Plano vigente</h2>
-          <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-            Publicado
+    <section className="space-y-4 pb-28">
+      {/* Cabeçalho do plano */}
+      <div className="bg-surface border border-border rounded-lg p-4 space-y-3">
+        <label className="block space-y-1">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Nome do plano
+          </span>
+          <Input
+            value={draft.name ?? ""}
+            onChange={(e) => patch({ ...draft, name: e.target.value })}
+          />
+        </label>
+        <div className="flex items-baseline justify-between border-t border-border pt-3">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Total
+          </span>
+          <span className="text-2xl font-bold font-mono text-primary">
+            {Math.round(totalKcal)} kcal
           </span>
         </div>
-        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-          {formatDateTime(plan.publishedAt)}
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
-        <div className="space-y-4">
-          {meals.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Snapshot sem refeições.
-            </p>
-          ) : (
-            meals.map((m: any, i: number) => {
-              const items: any[] = Array.isArray(m?.main?.items)
-                ? m.main.items
-                : [];
-              const kcal = items.reduce(
-                (s, it) =>
-                  s + (Number.isFinite(it?.kcal) ? Number(it.kcal) : 0),
-                0,
-              );
-              return (
-                <div
-                  key={(m?.id ?? "") + i}
-                  className="bg-surface border border-border rounded-lg p-5 space-y-3"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-0.5">
-                      <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-                        <Clock className="size-3" />
-                        {m?.time ?? "—"} · {m?.label ?? "—"}
-                      </p>
-                      <h3 className="font-semibold">
-                        {m?.main?.title ?? "Refeição"}
-                      </h3>
-                    </div>
-                    <span className="text-sm font-mono text-primary whitespace-nowrap">
-                      {Math.round(kcal)} kcal
-                    </span>
-                  </div>
-                  <ul className="space-y-1.5">
-                    {items.map((it: any, j: number) => (
-                      <li
-                        key={(it?.id ?? "") + j}
-                        className="flex justify-between text-sm"
-                      >
-                        <span>{it?.name ?? "—"}</span>
-                        <span className="font-mono text-muted-foreground text-xs">
-                          {it?.qty ?? ""} {it?.unit ?? ""}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  {Array.isArray(m?.equivalents) &&
-                    m.equivalents.length > 0 && (
-                      <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground pt-2 border-t border-border">
-                        {m.equivalents.length} opções equivalentes
-                      </p>
-                    )}
-                </div>
-              );
-            })
-          )}
-        </div>
+      {/* Refeições */}
+      {draft.meals.map((meal) => (
+        <MealCard
+          key={meal.id}
+          meal={meal}
+          onChange={(fn) => updateMeal(meal.id, fn)}
+          onRemove={() => removeMeal(meal.id)}
+          onAddItem={() => setPicker({ mealId: meal.id })}
+          onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
+          onUpdateItem={(itemId, fn) => updateItem(meal.id, itemId, fn)}
+        />
+      ))}
 
-        <aside className="space-y-4">
-          <div className="sticky top-24 space-y-4">
-            <div className="bg-surface border border-border rounded-lg p-5 space-y-3">
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                Totais do snapshot
-              </p>
-              <div className="flex justify-between items-baseline">
-                <span className="text-xs font-mono text-primary uppercase">
-                  Kcal
-                </span>
-                <span className="text-3xl font-bold font-mono text-primary">
-                  {Math.round(totalKcal)}
-                </span>
-              </div>
-              {audit?.engineOutput?.target && (
-                <div className="pt-3 border-t border-border space-y-1.5">
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                    Alvo clínico (motor)
-                  </p>
-                  <p className="text-xs font-mono">
-                    {audit.engineOutput.target.kcal} kcal · P{" "}
-                    {audit.engineOutput.target.proteinG}g · C{" "}
-                    {audit.engineOutput.target.carbG}g · G{" "}
-                    {audit.engineOutput.target.fatG}g
-                  </p>
-                </div>
-              )}
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground pt-2 border-t border-border">
-                {meals.length} refeições
-              </p>
-            </div>
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={addMeal}
+        type="button"
+      >
+        <Plus className="size-3.5" />
+        Adicionar refeição
+      </Button>
 
-            {review?.clinical_warnings?.length > 0 && (
-              <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-3 text-xs space-y-1">
-                <p className="font-medium text-amber-400">Observações</p>
-                <ul className="space-y-1 text-amber-200/90">
-                  {review.clinical_warnings.map((w: string, i: number) => (
-                    <li key={i}>• {w}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+      {/* Barra fixa de salvar */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="mx-auto max-w-3xl px-4 py-3 flex items-center justify-between gap-3">
+          <div className="text-xs text-muted-foreground">
+            {dirty ? "Alterações não salvas" : "Tudo salvo"}
           </div>
-        </aside>
+          <Button onClick={handleSave} disabled={!dirty || saving}>
+            {saving ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <Save className="size-3.5" />
+            )}
+            Salvar alterações
+          </Button>
+        </div>
       </div>
+
+      {picker && (
+        <FoodPickerDialog
+          open={!!picker}
+          onOpenChange={(o) => !o && setPicker(null)}
+          onPick={(food) => {
+            addFoodToMeal(picker.mealId, food);
+            setPicker(null);
+          }}
+        />
+      )}
     </section>
   );
 }
 
-function HistoryList({
-  history,
+function MealCard({
+  meal,
+  onChange,
+  onRemove,
+  onAddItem,
+  onRemoveItem,
+  onUpdateItem,
 }: {
-  readonly history: PatientPlanSummary[];
+  readonly meal: EditMeal;
+  readonly onChange: (fn: (m: EditMeal) => EditMeal) => void;
+  readonly onRemove: () => void;
+  readonly onAddItem: () => void;
+  readonly onRemoveItem: (itemId: string) => void;
+  readonly onUpdateItem: (
+    itemId: string,
+    fn: (it: EditItem) => EditItem,
+  ) => void;
 }) {
+  const kcal = meal.main.items.reduce(
+    (s, it) => s + (Number.isFinite(it.kcal) ? Number(it.kcal) : 0),
+    0,
+  );
+
   return (
-    <section className="space-y-3">
-      <div className="flex items-center gap-2 border-b border-border pb-2">
-        <History className="size-4 text-muted-foreground" />
-        <h2 className="text-sm font-semibold">Histórico de planos</h2>
-        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-          {history.length} versão{history.length === 1 ? "" : "es"}
-        </span>
+    <div className="bg-surface border border-border rounded-lg p-4 space-y-3">
+      <div className="flex items-start gap-2">
+        <Clock className="size-3.5 mt-2 text-muted-foreground shrink-0" />
+        <div className="grid grid-cols-[80px_1fr] gap-2 flex-1">
+          <Input
+            value={meal.time}
+            onChange={(e) =>
+              onChange((m) => ({ ...m, time: e.target.value }))
+            }
+            placeholder="08:00"
+            className="text-xs font-mono"
+          />
+          <Input
+            value={meal.label}
+            onChange={(e) =>
+              onChange((m) => ({ ...m, label: e.target.value }))
+            }
+            placeholder="Café da manhã"
+            className="text-xs"
+          />
+        </div>
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          onClick={onRemove}
+          aria-label="Remover refeição"
+          className="shrink-0"
+        >
+          <Trash2 className="size-3.5 text-destructive" />
+        </Button>
       </div>
+
+      <Input
+        value={meal.main.title}
+        onChange={(e) =>
+          onChange((m) => ({
+            ...m,
+            main: { ...m.main, title: e.target.value },
+          }))
+        }
+        placeholder="Título da refeição"
+        className="font-medium"
+      />
+
       <ul className="space-y-2">
-        {history.map((p) => (
+        {meal.main.items.map((it) => (
           <li
-            key={p.id}
-            className="flex items-center justify-between bg-surface border border-border rounded-md px-4 py-3 text-sm"
+            key={it.id}
+            className="grid grid-cols-[1fr_64px_56px_64px_auto] gap-2 items-center"
           >
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                Publicado
-              </span>
-              <span className="font-mono text-xs">
-                {formatDateTime(p.publishedAt)}
-              </span>
-            </div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              v{p.schemaVersion}
-            </span>
+            <Input
+              value={it.name}
+              onChange={(e) =>
+                onUpdateItem(it.id, (x) => ({ ...x, name: e.target.value }))
+              }
+              className="text-sm"
+            />
+            <Input
+              type="number"
+              inputMode="decimal"
+              value={it.qty}
+              onChange={(e) =>
+                onUpdateItem(it.id, (x) => ({
+                  ...x,
+                  qty: Number(e.target.value) || 0,
+                }))
+              }
+              className="text-xs font-mono"
+            />
+            <Input
+              value={it.unit}
+              onChange={(e) =>
+                onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
+              }
+              className="text-xs font-mono"
+            />
+            <Input
+              type="number"
+              inputMode="numeric"
+              value={it.kcal}
+              onChange={(e) =>
+                onUpdateItem(it.id, (x) => ({
+                  ...x,
+                  kcal: Number(e.target.value) || 0,
+                }))
+              }
+              className="text-xs font-mono"
+            />
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={() => onRemoveItem(it.id)}
+              aria-label="Remover item"
+            >
+              <Trash2 className="size-3.5 text-destructive" />
+            </Button>
           </li>
         ))}
       </ul>
-    </section>
+
+      <div className="flex items-center justify-between border-t border-border pt-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onAddItem}
+        >
+          <Plus className="size-3.5" />
+          Adicionar alimento
+        </Button>
+        <span className="text-xs font-mono text-primary">
+          {Math.round(kcal)} kcal
+        </span>
+      </div>
+    </div>
   );
 }
