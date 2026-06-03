@@ -177,7 +177,7 @@ function PatientSignupPage() {
               </div>
             </div>
           )}
-          <h2 className="text-3xl font-bold tracking-tight mt-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mt-4">
             Cadastro de paciente
           </h2>
           {validatedNutri && (
