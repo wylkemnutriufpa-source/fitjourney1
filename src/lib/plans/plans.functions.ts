@@ -905,3 +905,119 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
     if (uErr) throw new Error(uErr.message);
     return { id: updated.id, publishedAt: updated.published_at };
   });
+
+// ─────────────────────────────────────────────────────────────────
+// saveEditedPlan — edição direta de plano publicado.
+//
+// PRINCÍPIO: para o nutricionista existe APENAS "Plano do paciente".
+// Ele abre, edita, salva. Internamente, cada save INSERE uma nova linha
+// status='published'. As linhas anteriores permanecem como histórico
+// técnico (invisível na UI), preservando a invariante de imutabilidade
+// do snapshot — nunca damos UPDATE em snapshot publicado.
+//
+// A query patient/nutri sempre retorna o publicado mais recente, então
+// "current = MAX(published_at)" é a regra. Auditoria registra
+// `manualEdit:true` + `supersedesPlanId` para lineage.
+// ─────────────────────────────────────────────────────────────────
+
+const SaveEditedPlanInput = z.object({
+  patientId: z.string().uuid(),
+  snapshot: z.record(z.any()),
+});
+
+export const saveEditedPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SaveEditedPlanInput.parse(d))
+  .handler(async ({ context, data }): Promise<PublishPlanResult> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+
+    const { data: nutri, error: nErr } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (nErr) throw new Error(nErr.message);
+    if (!nutri) throw new Error("Perfil de nutricionista não encontrado.");
+
+    // Confirma ownership do paciente.
+    const { data: pat, error: pErr } = await supabase
+      .from("patients")
+      .select("id")
+      .eq("id", data.patientId)
+      .eq("nutritionist_id", nutri.id)
+      .maybeSingle();
+    if (pErr) throw new Error(pErr.message);
+    if (!pat) throw new Error("Paciente não pertence a você.");
+
+    // Carrega plano publicado vigente (para herdar audit + template).
+    const { data: prev, error: prevErr } = await supabase
+      .from("plans")
+      .select("id, snapshot, source_template_id, source_template_key")
+      .eq("patient_id", data.patientId)
+      .eq("nutritionist_id", nutri.id)
+      .eq("status", "published")
+      .not("published_at", "is", null)
+      .order("published_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (prevErr) throw new Error(prevErr.message);
+    if (!prev) {
+      throw new Error(
+        "Nenhum plano publicado encontrado para editar. Publique um plano a partir de um template primeiro.",
+      );
+    }
+
+    const prevSnap = (prev.snapshot ?? {}) as Record<string, any>;
+    const prevAudit = (prevSnap.clinicalAudit ?? null) as
+      | Record<string, any>
+      | null;
+
+    // Estrutura: warn-only.
+    const { snapshot, review } = validateSnapshot(data.snapshot);
+
+    // Auditoria: preserva audit clínico original (alvo do motor permanece
+    // como referência) e adiciona marca de edição manual + lineage.
+    const editedAt = new Date().toISOString();
+    const mergedAudit = prevAudit
+      ? {
+          ...prevAudit,
+          manualEdit: true,
+          manualEditAt: editedAt,
+          supersedesPlanId: prev.id,
+        }
+      : {
+          manualEdit: true,
+          manualEditAt: editedAt,
+          supersedesPlanId: prev.id,
+          engineVersion: ENGINE_VERSION,
+          gateVersion: GATE_VERSION,
+          publishedAt: editedAt,
+        };
+
+    const finalSnapshot = {
+      ...snapshot,
+      clinical_review: review,
+      clinicalAudit: mergedAudit,
+    };
+
+    const insertRow: Record<string, any> = {
+      patient_id: data.patientId,
+      nutritionist_id: nutri.id,
+      schema_version: 3,
+      status: "published",
+      snapshot: finalSnapshot,
+    };
+    if (prev.source_template_id)
+      insertRow.source_template_id = prev.source_template_id;
+    if (prev.source_template_key)
+      insertRow.source_template_key = prev.source_template_key;
+
+    const { data: inserted, error: iErr } = await supabase
+      .from("plans")
+      .insert(insertRow)
+      .select("id, published_at")
+      .single();
+    if (iErr) throw new Error(iErr.message);
+
+    return { id: inserted.id, publishedAt: inserted.published_at };
+  });
