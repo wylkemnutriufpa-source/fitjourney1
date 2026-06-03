@@ -13,6 +13,7 @@ import {
   validateReferralCode,
   consumeReferralCodeAndCreatePatient,
 } from "@/lib/signup/patient-signup.functions";
+import { maskPhoneBR, normalizePhoneE164, isValidPhoneBR } from "@/lib/phone-mask";
 
 const SearchSchema = z.object({
   code: z.string().trim().toUpperCase().optional(),
@@ -85,10 +86,14 @@ function PatientSignupPage() {
     e.preventDefault();
     if (!code) return;
     setError(null);
+    if (!isValidPhoneBR(phone)) {
+      setError("Informe um WhatsApp válido com DDD.");
+      return;
+    }
     setSubmitting(true);
     try {
       await consume({
-        data: { code, fullName, email, password, phone: normalizePhone(phone) },
+        data: { code, fullName, email, password, phone: normalizePhoneE164(phone) },
       });
       // login automático
       const { error: signInErr } = await supabase.auth.signInWithPassword({
@@ -108,7 +113,7 @@ function PatientSignupPage() {
 
   if (validating) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background text-foreground px-4">
+      <div className="min-h-screen grid place-items-center bg-background text-foreground px-5 sm:px-6">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           Validando convite…
@@ -119,7 +124,7 @@ function PatientSignupPage() {
 
   if (codeError) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background text-foreground px-4">
+      <div className="min-h-screen grid place-items-center bg-background text-foreground px-5 sm:px-6">
         <div className="max-w-sm space-y-4 text-center">
           <p className="text-[10px] font-mono uppercase tracking-widest text-destructive">
             Convite inválido
@@ -137,8 +142,8 @@ function PatientSignupPage() {
   }
 
   return (
-    <div className="min-h-screen grid place-items-center bg-background text-foreground px-4 py-10">
-      <form onSubmit={onSubmit} className="w-full max-w-md space-y-7">
+    <div className="min-h-screen flex items-start sm:items-center justify-center bg-background text-foreground px-5 sm:px-6 py-8 sm:py-12">
+      <form onSubmit={onSubmit} className="w-full max-w-md space-y-6 sm:space-y-7">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
             <CheckCircle2 className="size-3.5 text-primary" />
@@ -172,7 +177,7 @@ function PatientSignupPage() {
               </div>
             </div>
           )}
-          <h2 className="text-3xl font-bold tracking-tight mt-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mt-4">
             Cadastro de paciente
           </h2>
           {validatedNutri && (
@@ -217,11 +222,11 @@ function PatientSignupPage() {
           <input
             required
             type="tel"
-            inputMode="tel"
+            inputMode="numeric"
             autoComplete="tel"
-            placeholder="+55 11 99999-9999"
+            placeholder="+55 (11) 99999-9999"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhone(maskPhoneBR(e.target.value))}
             className="w-full bg-surface border border-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-primary"
           />
           <p className="text-[10px] text-muted-foreground/70 font-mono">
@@ -304,8 +309,3 @@ function translateCodeError(msg: string): string {
   return msg;
 }
 
-function normalizePhone(input: string): string {
-  const digits = input.replace(/\D/g, "");
-  if (!digits) return "";
-  return input.trim().startsWith("+") ? `+${digits}` : `+${digits}`;
-}
