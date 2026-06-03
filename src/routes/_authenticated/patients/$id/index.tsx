@@ -358,61 +358,29 @@ function PatientProfile() {
           </p>
         </section>
 
-        {/* Plano vigente publicado */}
+        {/* Plano alimentar — entidade única, sem listar versões. */}
         {publishedPlans && publishedPlans.length > 0 && (
-          <section className="bg-surface border border-emerald-500/30 rounded-lg p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[10px] font-mono uppercase tracking-widest text-emerald-400">
-                  Plano vigente
-                </p>
-                <h3 className="text-lg font-semibold mt-1 flex items-center gap-2">
-                  <CheckCircle2 className="size-5 text-emerald-400" />
-                  {publishedPlans.length === 1
-                    ? "1 plano publicado"
-                    : `${publishedPlans.length} planos publicados`}
-                </h3>
-              </div>
-              <Link
-                to="/patients/$id/diet"
-                params={{ id: p.id }}
-                className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
-              >
-                <Eye className="size-3.5" />
-                Visualizar
-              </Link>
+          <section className="bg-surface border border-emerald-500/30 rounded-lg p-6 flex items-center justify-between gap-4 flex-wrap">
+            <div className="space-y-1">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-emerald-400">
+                Plano alimentar
+              </p>
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <CheckCircle2 className="size-5 text-emerald-400" />
+                Plano ativo · atualizado em {formatDate(publishedPlans[0].publishedAt)}
+              </h3>
+              <p className="text-[11px] text-muted-foreground">
+                O paciente já visualiza este plano no app.
+              </p>
             </div>
-            <ul className="space-y-2">
-              {publishedPlans.slice(0, 5).map((plan, idx) => (
-                <li key={plan.id}>
-                  <Link
-                    to="/patients/$id/diet"
-                    params={{ id: p.id }}
-                    className="flex items-center justify-between text-xs border border-border rounded-md px-3 py-2 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-muted-foreground">
-                        {formatDate(plan.publishedAt)}
-                      </span>
-                      {idx === 0 && (
-                        <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono uppercase">
-                          atual
-                        </span>
-                      )}
-                      <span className="text-muted-foreground">
-                        v{plan.schemaVersion}
-                      </span>
-                    </div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                      {plan.id.slice(0, 8)}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <p className="text-[11px] text-muted-foreground">
-              O paciente já visualiza este plano no app. Publique um novo plano abaixo para substituí-lo.
-            </p>
+            <Link
+              to="/patients/$id/diet"
+              params={{ id: p.id }}
+              className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+            >
+              <Pencil className="size-3.5" />
+              Abrir e editar
+            </Link>
           </section>
         )}
 
