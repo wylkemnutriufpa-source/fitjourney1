@@ -8,11 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 
 export const Route = createFileRoute("/_authenticated")({
+  // Rotas protegidas dependem da sessão persistida no browser. Renderizar esse
+  // subtree no servidor causa HTML sem sessão + hidratação com sessão, gerando
+  // mismatch React #418 e chamadas serverFn sem Authorization em hard reload.
+  ssr: false,
   beforeLoad: async ({ location }) => {
-    // SSR não enxerga a sessão persistida no browser. Se redirecionar aqui,
-    // um hard reload em /dashboard vira 307 -> / e o iframe do preview pode
-    // alternar entre / e /dashboard indefinidamente. O guard autoritativo
-    // continua rodando no client antes da navegação/renderização interativa.
+    // Defesa extra caso este guard rode fora do browser em algum ambiente.
     if (typeof window === "undefined") {
       return;
     }
