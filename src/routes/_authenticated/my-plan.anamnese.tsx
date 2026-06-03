@@ -5,7 +5,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ClipboardList, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ClipboardList, CheckCircle2, Pencil } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
 import { getMyApprovedAnamnesisFull } from "@/lib/anamnesis/review.functions";
@@ -91,9 +91,29 @@ function MyAnamnesePage() {
         )}
 
         {data && (
-          <div className="bg-surface border border-border rounded-lg p-5">
-            <AnamnesisAnswersView rawJson={data.rawAnswersJson} />
-          </div>
+          <>
+            <div className="bg-surface border border-border rounded-lg p-5">
+              <AnamnesisAnswersView rawJson={data.rawAnswersJson} />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4">
+              <div className="space-y-1 max-w-md">
+                <p className="text-sm font-semibold flex items-center gap-2">
+                  <Pencil className="size-3.5 text-primary" /> Algo mudou?
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Crie uma nova versão da sua anamnese. O histórico anterior é
+                  preservado e seu nutricionista revisa antes de virar verdade
+                  clínica.
+                </p>
+              </div>
+              <Link
+                to="/my-plan/update-health-profile"
+                className="text-xs font-semibold py-2 px-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2"
+              >
+                <Pencil className="size-3.5" /> Atualizar minha anamnese
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </AppShell>
