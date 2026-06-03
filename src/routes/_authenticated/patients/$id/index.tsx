@@ -5,6 +5,8 @@ import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
+import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
+import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
 import { VideoLoader } from "@/components/VideoLoader";
 import {
   ArrowLeft,
@@ -19,6 +21,8 @@ import {
   Loader2,
   CheckCircle2,
   Eye,
+  Pencil,
+  AlertTriangle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
@@ -77,6 +81,7 @@ function PatientProfile() {
   const navigate = useNavigate();
   const fetchDetail = useServerFn(getPatientForNutritionist);
   const fetchPlans = useServerFn(listPublishedPlansForPatient);
+  const fetchAnamnesis = useServerFn(getAnamnesisForReview);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient-detail", id],
@@ -87,6 +92,14 @@ function PatientProfile() {
   const { data: publishedPlans } = useQuery({
     queryKey: ["patient-published-plans", id],
     queryFn: () => fetchPlans({ data: { patientId: id } }),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const anamnesisId = data?.anamnesis?.id ?? null;
+  const { data: anamnesisFull, isLoading: anamnesisLoading } = useQuery({
+    queryKey: ["patient-anamnesis-full", anamnesisId],
+    queryFn: () => fetchAnamnesis({ data: { anamnesisId: anamnesisId! } }),
+    enabled: !!anamnesisId,
     staleTime: 0,
     refetchOnMount: "always",
   });
@@ -253,6 +266,75 @@ function PatientProfile() {
             </dl>
           </div>
         </section>
+
+        {/* Anamnese clínica — visível no perfil + atalho para revisão/edição */}
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="space-y-1">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Anamnese clínica
+              </p>
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <ClipboardList className="size-5 text-muted-foreground" />
+                {hasApprovedAnamnesis
+                  ? "Anamnese aprovada"
+                  : p.anamnesis
+                    ? st.label
+                    : "Sem anamnese ainda"}
+                {p.anamnesis && (
+                  <span className="text-[10px] font-mono uppercase text-muted-foreground">
+                    v{p.anamnesis.version}
+                  </span>
+                )}
+              </h3>
+            </div>
+            {p.anamnesis && (
+              <Link
+                to="/anamneses/$id"
+                params={{ id: p.anamnesis.id }}
+                className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-primary/40 text-primary hover:bg-primary/10"
+              >
+                <Pencil className="size-3.5" />
+                {hasApprovedAnamnesis ? "Revisar / Nova versão" : "Abrir para edição"}
+              </Link>
+            )}
+          </div>
+
+          {hasApprovedAnamnesis && (
+            <div className="text-[11px] text-muted-foreground border-l-2 border-emerald-500/40 pl-3 py-1">
+              Anamnese aprovada é imutável por contrato clínico. Para alterar,
+              uma nova versão é criada preservando todo o histórico.
+            </div>
+          )}
+
+          {!p.anamnesis && (
+            <p className="text-xs text-muted-foreground">
+              Nenhuma anamnese foi iniciada para este paciente. Peça que ele
+              acesse o app e preencha a anamnese clínica, ou crie em nome dele
+              pelo módulo de Anamneses.
+            </p>
+          )}
+
+          {p.anamnesis && anamnesisLoading && (
+            <div className="py-4">
+              <VideoLoader size="sm" label="Carregando respostas…" />
+            </div>
+          )}
+
+          {p.anamnesis && anamnesisFull && !anamnesisLoading && (
+            <div className="pt-2">
+              <AnamnesisAnswersView rawJson={anamnesisFull.rawAnswersJson} />
+            </div>
+          )}
+
+          {p.anamnesis && !anamnesisLoading && !anamnesisFull && (
+            <p className="text-xs text-amber-500 flex items-center gap-2">
+              <AlertTriangle className="size-3.5" />
+              Não foi possível carregar as respostas da anamnese.
+            </p>
+          )}
+        </section>
+
 
         {/* Plano contratado */}
         <section>
