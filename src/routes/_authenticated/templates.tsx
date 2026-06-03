@@ -439,12 +439,20 @@ function TemplatesPage() {
 
         {tab === "biblioteca" && (
           <>
-            <TemplateMatcherPanel
-              onPickTemplate={(id) => {
-                const t = systemTemplates.find((x) => x.id === id);
-                if (t) setEditing({ tpl: toPlannerTemplate(t), isMine: false });
-              }}
-            />
+            {/* Sprint 3: matcher manual virou debug-only. O fluxo principal é
+                anamnese aprovada → draft automático → botão "Abrir pré-plano"
+                no card do paciente. Para inspecionar o ranking, abra com
+                ?debug=matcher. */}
+            {typeof window !== "undefined" &&
+              new URLSearchParams(window.location.search).get("debug") === "matcher" && (
+                <TemplateMatcherPanel
+                  onPickTemplate={(id) => {
+                    const t = systemTemplates.find((x) => x.id === id);
+                    if (t) setEditing({ tpl: toPlannerTemplate(t), isMine: false });
+                  }}
+                />
+              )}
+
 
             <div className="flex gap-2 flex-wrap">
               {(["Todos", ...categories] as const).map((c) => (
