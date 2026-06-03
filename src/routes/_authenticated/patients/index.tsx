@@ -165,6 +165,34 @@ function Patients() {
           </div>
         </div>
 
+        <div className="flex flex-wrap gap-2">
+          {filterTabs.map((tab) => {
+            const active = filter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  setFilter(tab.id);
+                  navigate({
+                    to: "/patients",
+                    search: tab.id === "all" ? {} : { filter: tab.id },
+                    replace: true,
+                  });
+                }}
+                className={
+                  "rounded-full border px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-colors " +
+                  (active
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground")
+                }
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="bg-surface border border-border rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
@@ -230,6 +258,13 @@ function Patients() {
                       <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase ${statusMeta.cls}`}>
                         <span className={`size-1.5 rounded-full ${statusMeta.dot}`} />
                         {statusMeta.label}
+                      </span>
+                      <span className={
+                        "inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " +
+                        (p.planStatus === "delivered" ? "text-emerald-400" : "text-amber-400")
+                      }>
+                        <span className={"size-1.5 rounded-full " + (p.planStatus === "delivered" ? "bg-emerald-400" : "bg-amber-400")} />
+                        {p.planStatus === "delivered" ? "Plano entregue" : "Plano pendente"}
                       </span>
                       {p.autoDraft && (
                         <Link
