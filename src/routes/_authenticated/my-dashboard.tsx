@@ -10,7 +10,6 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   Utensils,
   MessageSquare,
-  History,
   AlertCircle,
   CheckCircle2,
   Scale,
@@ -308,10 +307,10 @@ function MyDashboardPage() {
             description="Compartilhe peso, fotos e como foi a semana."
           />
           <NavTile
-            icon={History}
-            title="Histórico"
-            description="Linha do tempo da sua jornada."
-            comingSoon
+            to="/my-plan/anamnese"
+            icon={ClipboardList}
+            title="Minha anamnese"
+            description="Veja as respostas da sua última anamnese aprovada."
           />
         </section>
       </div>

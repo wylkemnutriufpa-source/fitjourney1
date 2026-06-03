@@ -43,6 +43,7 @@ import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './route
 import { Route as AuthenticatedMyPlanUpdateHealthProfileRouteImport } from './routes/_authenticated/my-plan.update-health-profile'
 import { Route as AuthenticatedMyPlanSettingsRouteImport } from './routes/_authenticated/my-plan.settings'
 import { Route as AuthenticatedMyPlanFeedbackRouteImport } from './routes/_authenticated/my-plan.feedback'
+import { Route as AuthenticatedMyPlanAnamneseRouteImport } from './routes/_authenticated/my-plan.anamnese'
 import { Route as AuthenticatedAnamnesesIdRouteImport } from './routes/_authenticated/anamneses.$id'
 import { Route as AuthenticatedAdminProfissionaisRouteImport } from './routes/_authenticated/admin.profissionais'
 import { Route as AuthenticatedAdminPacientesRouteImport } from './routes/_authenticated/admin.pacientes'
@@ -233,6 +234,12 @@ const AuthenticatedMyPlanFeedbackRoute =
     path: '/feedback',
     getParentRoute: () => AuthenticatedMyPlanRoute,
   } as any)
+const AuthenticatedMyPlanAnamneseRoute =
+  AuthenticatedMyPlanAnamneseRouteImport.update({
+    id: '/anamnese',
+    path: '/anamnese',
+    getParentRoute: () => AuthenticatedMyPlanRoute,
+  } as any)
 const AuthenticatedAnamnesesIdRoute =
   AuthenticatedAnamnesesIdRouteImport.update({
     id: '/anamneses/$id',
@@ -317,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
+  '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
@@ -361,6 +369,7 @@ export interface FileRoutesByTo {
   '/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
+  '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
@@ -407,6 +416,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/_authenticated/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/_authenticated/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
+  '/_authenticated/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/_authenticated/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/_authenticated/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/_authenticated/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
@@ -453,6 +463,7 @@ export interface FileRouteTypes {
     | '/admin/pacientes'
     | '/admin/profissionais'
     | '/anamneses/$id'
+    | '/my-plan/anamnese'
     | '/my-plan/feedback'
     | '/my-plan/settings'
     | '/my-plan/update-health-profile'
@@ -497,6 +508,7 @@ export interface FileRouteTypes {
     | '/admin/pacientes'
     | '/admin/profissionais'
     | '/anamneses/$id'
+    | '/my-plan/anamnese'
     | '/my-plan/feedback'
     | '/my-plan/settings'
     | '/my-plan/update-health-profile'
@@ -542,6 +554,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/pacientes'
     | '/_authenticated/admin/profissionais'
     | '/_authenticated/anamneses/$id'
+    | '/_authenticated/my-plan/anamnese'
     | '/_authenticated/my-plan/feedback'
     | '/_authenticated/my-plan/settings'
     | '/_authenticated/my-plan/update-health-profile'
@@ -813,6 +826,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyPlanFeedbackRouteImport
       parentRoute: typeof AuthenticatedMyPlanRoute
     }
+    '/_authenticated/my-plan/anamnese': {
+      id: '/_authenticated/my-plan/anamnese'
+      path: '/anamnese'
+      fullPath: '/my-plan/anamnese'
+      preLoaderRoute: typeof AuthenticatedMyPlanAnamneseRouteImport
+      parentRoute: typeof AuthenticatedMyPlanRoute
+    }
     '/_authenticated/anamneses/$id': {
       id: '/_authenticated/anamneses/$id'
       path: '/anamneses/$id'
@@ -899,12 +919,14 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedMyPlanRouteChildren {
+  AuthenticatedMyPlanAnamneseRoute: typeof AuthenticatedMyPlanAnamneseRoute
   AuthenticatedMyPlanFeedbackRoute: typeof AuthenticatedMyPlanFeedbackRoute
   AuthenticatedMyPlanSettingsRoute: typeof AuthenticatedMyPlanSettingsRoute
   AuthenticatedMyPlanUpdateHealthProfileRoute: typeof AuthenticatedMyPlanUpdateHealthProfileRoute
 }
 
 const AuthenticatedMyPlanRouteChildren: AuthenticatedMyPlanRouteChildren = {
+  AuthenticatedMyPlanAnamneseRoute: AuthenticatedMyPlanAnamneseRoute,
   AuthenticatedMyPlanFeedbackRoute: AuthenticatedMyPlanFeedbackRoute,
   AuthenticatedMyPlanSettingsRoute: AuthenticatedMyPlanSettingsRoute,
   AuthenticatedMyPlanUpdateHealthProfileRoute:
