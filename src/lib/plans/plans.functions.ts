@@ -204,6 +204,7 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
         snapshot: snapshotOverride,
       };
       if (data.sourceTemplateId) insertRowOverride.source_template_id = data.sourceTemplateId;
+      if (data.sourceTemplateKey) insertRowOverride.source_template_key = data.sourceTemplateKey;
 
       const { data: planOv, error: errOv } = await supabase
         .from("plans")
