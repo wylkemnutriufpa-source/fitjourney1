@@ -48,6 +48,39 @@ function PatientSettings() {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [saving, setSaving] = useState(false);
   const [theme, setThemeState] = useState<ThemeMode>("system");
+  const [sendingReset, setSendingReset] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleSendPasswordReset() {
+    if (!data?.email) return;
+    setSendingReset(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Link de redefinição enviado para seu email");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao enviar link");
+    } finally {
+      setSendingReset(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true);
+    try {
+      await deleteAccount();
+      await supabase.auth.signOut();
+      toast.success("Conta excluída");
+      navigate({ to: "/", replace: true });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao excluir conta");
+      setDeleting(false);
+    }
+  }
 
   useEffect(() => {
     setThemeState(getStoredTheme());
