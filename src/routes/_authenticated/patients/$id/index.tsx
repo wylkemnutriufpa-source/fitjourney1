@@ -81,6 +81,7 @@ function PatientProfile() {
   const navigate = useNavigate();
   const fetchDetail = useServerFn(getPatientForNutritionist);
   const fetchPlans = useServerFn(listPublishedPlansForPatient);
+  const fetchAnamnesis = useServerFn(getAnamnesisForReview);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient-detail", id],
@@ -91,6 +92,14 @@ function PatientProfile() {
   const { data: publishedPlans } = useQuery({
     queryKey: ["patient-published-plans", id],
     queryFn: () => fetchPlans({ data: { patientId: id } }),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const anamnesisId = data?.anamnesis?.id ?? null;
+  const { data: anamnesisFull, isLoading: anamnesisLoading } = useQuery({
+    queryKey: ["patient-anamnesis-full", anamnesisId],
+    queryFn: () => fetchAnamnesis({ data: { anamnesisId: anamnesisId! } }),
+    enabled: !!anamnesisId,
     staleTime: 0,
     refetchOnMount: "always",
   });
