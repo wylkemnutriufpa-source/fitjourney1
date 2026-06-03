@@ -106,6 +106,12 @@ const PublishInput = z.object({
   snapshot: z.record(z.any()), // PlannerTemplate serializável
   sourceTemplateId: z.string().uuid().optional(),
   /**
+   * Slug do template do sistema usado como base (ex: "esp-hipertrofia").
+   * Complementa `sourceTemplateId` (UUID, apenas templates salvos pelo nutri).
+   * Permite rastrear adesão/abandono por template do sistema.
+   */
+  sourceTemplateKey: z.string().min(1).max(120).optional(),
+  /**
    * Quando true, permite publicar mesmo sem ClinicalContext calculável
    * (paciente sem anamnese aprovada). Motor + gate clínico são pulados;
    * snapshot é salvo como está com flag `publishedWithoutClinicalContext`.
@@ -198,6 +204,7 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
         snapshot: snapshotOverride,
       };
       if (data.sourceTemplateId) insertRowOverride.source_template_id = data.sourceTemplateId;
+      if (data.sourceTemplateKey) insertRowOverride.source_template_key = data.sourceTemplateKey;
 
       const { data: planOv, error: errOv } = await supabase
         .from("plans")
@@ -293,6 +300,7 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
       snapshot: snapshotWithAudit,
     };
     if (data.sourceTemplateId) insertRow.source_template_id = data.sourceTemplateId;
+    if (data.sourceTemplateKey) insertRow.source_template_key = data.sourceTemplateKey;
 
     const { data: plan, error } = await supabase
       .from("plans")

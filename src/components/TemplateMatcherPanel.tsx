@@ -23,6 +23,13 @@ function clinicalGoalToEngine(kind: string | undefined): EngineGoal {
   return "maintain";
 }
 
+function templateGoalToEngine(tag: string | undefined): EngineGoal | null {
+  if (tag === "cut" || tag === "bulk" || tag === "maintain") return tag;
+  if (tag === "performance") return "bulk";
+  if (tag === "health") return "maintain";
+  return null;
+}
+
 function toMeta(t: (typeof systemTemplates)[number]): TemplateMeta {
   return {
     id: t.id,
@@ -30,12 +37,12 @@ function toMeta(t: (typeof systemTemplates)[number]): TemplateMeta {
     kcalTarget: t.kcal,
     kcalRangeMin: Math.round(t.kcal * (1 - KCAL_TOLERANCE)),
     kcalRangeMax: Math.round(t.kcal * (1 + KCAL_TOLERANCE)),
-    proteinGTarget: null,
-    carbGTarget: null,
-    fatGTarget: null,
+    proteinGTarget: t.proteinGTarget ?? null,
+    carbGTarget: t.carbGTarget ?? null,
+    fatGTarget: t.fatGTarget ?? null,
     mealsPerDay: t.meals.length,
     constraintsTags: t.tags ?? [],
-    goalTag: null,
+    goalTag: templateGoalToEngine(t.goalTag),
   };
 }
 

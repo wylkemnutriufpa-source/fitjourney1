@@ -687,6 +687,7 @@ export type Database = {
           schema_version: number
           snapshot: Json
           source_template_id: string | null
+          source_template_key: string | null
           status: Database["public"]["Enums"]["plan_status"]
           updated_at: string
         }
@@ -699,6 +700,7 @@ export type Database = {
           schema_version?: number
           snapshot: Json
           source_template_id?: string | null
+          source_template_key?: string | null
           status?: Database["public"]["Enums"]["plan_status"]
           updated_at?: string
         }
@@ -711,6 +713,7 @@ export type Database = {
           schema_version?: number
           snapshot?: Json
           source_template_id?: string | null
+          source_template_key?: string | null
           status?: Database["public"]["Enums"]["plan_status"]
           updated_at?: string
         }
