@@ -33,6 +33,12 @@ export type FeedbackDTO = {
   createdAt: string;
 };
 
+export type NutritionistFeedbackItem = FeedbackDTO & {
+  patientName: string;
+  patientEmail: string;
+  reviewed: boolean;
+};
+
 const SELECT_COLS =
   "id, patient_id, nutritionist_id, weight_kg, height_cm_snapshot, waist_cm, abdomen_cm, hip_cm, adherence_rating, result_rating, notes, photo_front_path, photo_side_path, photo_back_path, created_at";
 
@@ -239,6 +245,63 @@ export const listPatientFeedbacks = createServerFn({ method: "GET" })
       .limit(200);
     if (error) throw new Error(error.message);
     return (rows ?? []).map(rowToDto);
+  });
+
+export const getMyPendingFeedbacksCount = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ pendingCount: number }> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!nutri) return { pendingCount: 0 };
+    const { count } = await supabase
+      .from("patient_feedbacks")
+      .select("id", { count: "exact", head: true })
+      .eq("nutritionist_id", nutri.id)
+      .is("deleted_at", null)
+      .is("edited_at", null);
+    return { pendingCount: count ?? 0 };
+  });
+
+export const listFeedbacksForNutritionist = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<NutritionistFeedbackItem[]> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!nutri) return [];
+
+    const { data: rows, error } = await supabase
+      .from("patient_feedbacks")
+      .select(`${SELECT_COLS}, edited_at`)
+      .eq("nutritionist_id", nutri.id)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+
+    const patientIds = Array.from(new Set((rows ?? []).map((r: any) => r.patient_id)));
+    const { data: patients } = patientIds.length
+      ? await supabase.from("patients").select("id, full_name, email").in("id", patientIds)
+      : { data: [] as Array<{ id: string; full_name: string; email: string }> };
+    const pmap = new Map((patients ?? []).map((p: any) => [p.id, p]));
+
+    return (rows ?? []).map((r: any) => {
+      const dto = rowToDto(r);
+      const patient = pmap.get(dto.patientId);
+      return {
+        ...dto,
+        patientName: patient?.full_name ?? "—",
+        patientEmail: patient?.email ?? "",
+        reviewed: Boolean(r.edited_at),
+      };
+    });
   });
 
 // ------------------------------------------------------------------
