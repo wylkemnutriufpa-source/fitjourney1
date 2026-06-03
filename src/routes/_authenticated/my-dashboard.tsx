@@ -21,6 +21,8 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { FeedbackCountdown } from "@/components/feedback/FeedbackCountdown";
+import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
 import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { getMyClinicalContext } from "@/lib/clinical/context.functions";
