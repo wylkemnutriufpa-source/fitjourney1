@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
+import { PhysicalAssessmentCard } from "@/components/patient/PhysicalAssessmentCard";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
 import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
@@ -341,22 +342,8 @@ function PatientProfile() {
           <SubscriptionEditor patientId={p.id} />
         </section>
 
-        {/* Avaliação física — placeholder soberano */}
-        <section className="bg-surface border border-border rounded-lg p-6 space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                Avaliação física
-              </p>
-              <h3 className="text-lg font-semibold mt-1">Em breve</h3>
-            </div>
-            <Activity className="size-5 text-muted-foreground" />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            O módulo de avaliação física (composição corporal, perímetros, dobras) será integrado
-            ao perfil do paciente em uma próxima sprint.
-          </p>
-        </section>
+        {/* Avaliação Física — entidade única com histórico */}
+        <PhysicalAssessmentCard patientId={p.id} />
 
         {/* Plano alimentar — entidade única, sem listar versões. */}
         {publishedPlans && publishedPlans.length > 0 && (
