@@ -43,9 +43,9 @@ export type PatientLite = {
   anamnesisUpdatedAt: string | null;
   autoDraft: {
     planId: string;
-    score: number;
-    confidence: "high" | "medium";
-    selectedTemplateKey: string | null;
+    templateKey: string | null;
+    templateName: string | null;
+    reason: string | null;
   } | null;
 };
 
@@ -93,7 +93,7 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
       }
     }
 
-    // Drafts auto-sugeridos por paciente (Sprint 2). 1 query batch.
+    // Drafts auto-sugeridos por paciente (Sprint 2.5). 1 query batch.
     const { data: drafts } = await supabase
       .from("plans")
       .select("id, patient_id, source_template_key, snapshot, updated_at")
@@ -103,14 +103,15 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
     const autoByPatient = new Map<string, PatientLite["autoDraft"]>();
     for (const d of drafts ?? []) {
       if (autoByPatient.has(d.patient_id)) continue;
-      const meta = (d.snapshot as any)?.meta;
+      const snap = (d.snapshot ?? {}) as any;
+      const meta = snap.meta;
       if (!meta?.autoSuggested) continue;
-      const m = meta.matcher ?? {};
+      const router = meta.router ?? meta.matcher ?? {};
       autoByPatient.set(d.patient_id, {
         planId: d.id,
-        score: typeof m.score === "number" ? m.score : 0,
-        confidence: m.confidence === "high" ? "high" : "medium",
-        selectedTemplateKey: (d.source_template_key as string | null) ?? null,
+        templateKey: (d.source_template_key as string | null) ?? null,
+        templateName: typeof snap.name === "string" ? snap.name : null,
+        reason: typeof router.reason === "string" ? router.reason : null,
       });
     }
 
