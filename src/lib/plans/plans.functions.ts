@@ -106,6 +106,12 @@ const PublishInput = z.object({
   snapshot: z.record(z.any()), // PlannerTemplate serializável
   sourceTemplateId: z.string().uuid().optional(),
   /**
+   * Slug do template do sistema usado como base (ex: "esp-hipertrofia").
+   * Complementa `sourceTemplateId` (UUID, apenas templates salvos pelo nutri).
+   * Permite rastrear adesão/abandono por template do sistema.
+   */
+  sourceTemplateKey: z.string().min(1).max(120).optional(),
+  /**
    * Quando true, permite publicar mesmo sem ClinicalContext calculável
    * (paciente sem anamnese aprovada). Motor + gate clínico são pulados;
    * snapshot é salvo como está com flag `publishedWithoutClinicalContext`.
