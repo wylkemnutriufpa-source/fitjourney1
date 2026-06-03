@@ -33,8 +33,8 @@ const filterTabs: Array<{ id: PatientFilter; label: string }> = [
   { id: "all", label: "Todos" },
   { id: "approved", label: "Anamnese aprovada" },
   { id: "anamnesis_pending", label: "Anamnese pendente" },
-  { id: "plans_delivered", label: "Planos entregues" },
-  { id: "plans_pending", label: "Planos pendentes" },
+  { id: "plans_delivered", label: "Com plano publicado" },
+  { id: "plans_pending", label: "Sem plano publicado" },
 ];
 
 function initialsFromName(name: string): string {
