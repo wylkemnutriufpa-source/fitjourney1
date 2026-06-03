@@ -3,7 +3,7 @@ import { LogoMark } from "@/components/LogoMark";
 import { LogoVideo } from "@/components/LogoVideo";
 import { useLogoSettings, type LogoSlot } from "@/lib/logo-settings";
 
-export type LogoEffect = "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle" | "lines" | "halo";
+export type LogoEffect = "none" | "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle" | "lines" | "halo";
 
 interface LogoOrbitalProps {
   size?: string;
