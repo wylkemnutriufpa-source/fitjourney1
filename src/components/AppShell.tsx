@@ -23,7 +23,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
-import { getMyFeedbackStatus } from "@/lib/feedback/feedback.functions";
+import { getMyFeedbackStatus, getMyPendingFeedbacksCount } from "@/lib/feedback/feedback.functions";
 import { applyTheme, getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
@@ -70,6 +70,7 @@ const nutritionistNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/patients", label: "Pacientes", icon: Users },
   { to: "/anamneses", label: "Anamneses", icon: ClipboardList, badgeKey: "pending-anamneses" as const },
+  { to: "/feedbacks", label: "Feedbacks", icon: MessageSquareHeart, badgeKey: "pending-feedbacks" as const },
   { to: "/templates", label: "Templates", icon: FileStack },
   { to: "/financeiro", label: "Financeiro", icon: DollarSign },
   { to: "/settings", label: "Configurações", icon: Settings },
@@ -245,6 +246,14 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     enabled: mounted && !!user?.id && !isPatient,
   });
 
+  const fetchPendingFeedbacks = useServerFn(getMyPendingFeedbacksCount);
+  const { data: pendingFeedbacks } = useQuery({
+    queryKey: ["nav", "pending-feedbacks", user?.id ?? "anonymous"],
+    queryFn: () => fetchPendingFeedbacks(),
+    staleTime: 30_000,
+    enabled: mounted && !!user?.id && !isPatient,
+  });
+
   // Badge de feedback pendente (paciente).
   const fetchFbStatus = useServerFn(getMyFeedbackStatus);
   const { data: fbStatus } = useQuery({
@@ -317,6 +326,8 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
             const badgeCount =
               badgeKey === "pending-anamneses"
                 ? pending?.pendingCount ?? 0
+                : badgeKey === "pending-feedbacks"
+                  ? pendingFeedbacks?.pendingCount ?? 0
                 : 0;
             const showDot =
               badgeKey === "feedback-pending" && !!fbStatus?.isPending && !!fbStatus.hasNutritionist;
