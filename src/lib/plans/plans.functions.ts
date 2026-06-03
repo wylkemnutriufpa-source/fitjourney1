@@ -485,7 +485,7 @@ async function loadClinicalContext(
   supabase: any,
   patientId: string,
 ): Promise<ClinicalContext> {
-  const [anamnesesRes, feedbacksRes] = await Promise.all([
+  const [anamnesesRes, feedbacksRes, paRes] = await Promise.all([
     supabase
       .from("anamneses")
       .select("id, approved_at, data")
@@ -499,9 +499,16 @@ async function loadClinicalContext(
       .eq("patient_id", patientId)
       .not("weight_kg", "is", null)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("physical_assessments")
+      .select("id, assessed_at, weight_kg")
+      .eq("patient_id", patientId)
+      .not("weight_kg", "is", null)
+      .order("assessed_at", { ascending: false }),
   ]);
   if (anamnesesRes.error) throw new Error(anamnesesRes.error.message);
   if (feedbacksRes.error) throw new Error(feedbacksRes.error.message);
+  if (paRes.error) throw new Error(paRes.error.message);
 
   const approvedAnamneses: ApprovedAnamnesisInput[] = [];
   for (const row of anamnesesRes.data ?? []) {
@@ -523,6 +530,15 @@ async function loadClinicalContext(
       weightKg: Number(f.weight_kg),
       measuredAt: f.created_at,
       sourceId: f.id,
+    });
+  }
+  for (const pa of paRes.data ?? []) {
+    if (pa.weight_kg == null) continue;
+    weightReadings.push({
+      source: "physical_assessment",
+      weightKg: Number(pa.weight_kg),
+      measuredAt: pa.assessed_at,
+      sourceId: pa.id,
     });
   }
   for (const a of approvedAnamneses) {

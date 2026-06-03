@@ -18,6 +18,7 @@ import {
   Wallet,
   Sparkles,
   ClipboardList,
+  Activity,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { FeedbackCountdown } from "@/components/feedback/FeedbackCountdown";
@@ -311,6 +312,12 @@ function MyDashboardPage() {
             icon={ClipboardList}
             title="Minha anamnese"
             description="Veja as respostas da sua última anamnese aprovada."
+          />
+          <NavTile
+            to="/my-plan/physical-assessment"
+            icon={Activity}
+            title="Avaliação física"
+            description="Sua avaliação atual e histórico de evolução."
           />
         </section>
       </div>
