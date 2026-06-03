@@ -13,6 +13,7 @@ import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SuporteRouteImport } from './routes/suporte'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as LogoTestRouteImport } from './routes/logo-test'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -68,6 +69,11 @@ const PrivacidadeRoute = PrivacidadeRouteImport.update({
 const LogoTestRoute = LogoTestRouteImport.update({
   id: '/logo-test',
   path: '/logo-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -271,6 +277,7 @@ const AuthenticatedPatientsIdDietRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/logo-test': typeof LogoTestRoute
   '/privacidade': typeof PrivacidadeRoute
   '/suporte': typeof SuporteRoute
@@ -312,6 +319,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/logo-test': typeof LogoTestRoute
   '/privacidade': typeof PrivacidadeRoute
   '/suporte': typeof SuporteRoute
@@ -355,6 +363,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/app': typeof AppRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/logo-test': typeof LogoTestRoute
   '/privacidade': typeof PrivacidadeRoute
   '/suporte': typeof SuporteRoute
@@ -398,6 +407,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/forgot-password'
     | '/logo-test'
     | '/privacidade'
     | '/suporte'
@@ -439,6 +449,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/app'
+    | '/forgot-password'
     | '/logo-test'
     | '/privacidade'
     | '/suporte'
@@ -481,6 +492,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/app'
+    | '/forgot-password'
     | '/logo-test'
     | '/privacidade'
     | '/suporte'
@@ -524,6 +536,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AppRoute: typeof AppRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LogoTestRoute: typeof LogoTestRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SuporteRoute: typeof SuporteRoute
@@ -563,6 +576,13 @@ declare module '@tanstack/react-router' {
       path: '/logo-test'
       fullPath: '/logo-test'
       preLoaderRoute: typeof LogoTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -918,6 +938,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AppRoute: AppRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LogoTestRoute: LogoTestRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SuporteRoute: SuporteRoute,
@@ -931,13 +952,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
