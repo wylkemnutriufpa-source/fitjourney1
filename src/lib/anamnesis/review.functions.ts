@@ -348,5 +348,26 @@ export const reviewAnamnesis = createServerFn({ method: "POST" })
       .eq("id", data.anamnesisId);
     if (upErr) throw new Error(upErr.message);
 
-    return { ok: true, newStatus: data.decision };
+    // Sprint 2 — pós-aprovação: tenta gerar pré-plano automaticamente.
+    // NUNCA bloqueia a aprovação; qualquer erro fica em log e a resposta
+    // ao nutri continua sendo "approved" puro.
+    let draftOutcome: Awaited<ReturnType<typeof generateDraftPlanFromApproval>> | null = null;
+    if (data.decision === "approved") {
+      try {
+        draftOutcome = await generateDraftPlanFromApproval(
+          supabase as never,
+          current.patient_id as string,
+          nutri.id,
+        );
+        if (draftOutcome.kind === "error") {
+          console.error("[reviewAnamnesis] draft auto-plan error:", draftOutcome.message);
+        } else {
+          console.info("[reviewAnamnesis] draft auto-plan:", draftOutcome);
+        }
+      } catch (e) {
+        console.error("[reviewAnamnesis] draft auto-plan threw:", e);
+      }
+    }
+
+    return { ok: true, newStatus: data.decision, draft: draftOutcome };
   });
