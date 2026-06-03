@@ -67,7 +67,7 @@ export const DEFAULTS: Record<LogoSlot, SlotConfig> = {
 };
 
 export const EFFECT_OPTIONS: LogoEffect[] = [
-  "halo", "orbit", "aura", "sparkle", "ripple", "comet", "dust", "energy", "lines",
+  "none", "halo", "orbit", "aura", "sparkle", "ripple", "comet", "dust", "energy", "lines",
 ];
 
 export const VARIANT_OPTIONS: { value: LogoVariant; label: string }[] = [
