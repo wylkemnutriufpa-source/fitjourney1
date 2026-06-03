@@ -4,14 +4,37 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
-import { Plus, Search, FileText, Share2, Loader2 } from "lucide-react";
+import { Plus, Search, FileText, Share2 } from "lucide-react";
 import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 import { VideoLoader } from "@/components/VideoLoader";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
   head: () => ({ meta: [{ title: "Pacientes — FitJourney" }] }),
+  validateSearch: (search: Record<string, unknown>): { filter?: PatientFilter } => ({
+    filter: isPatientFilter(search.filter) ? search.filter : undefined,
+  }),
   component: Patients,
 });
+
+type PatientFilter = "all" | "approved" | "anamnesis_pending" | "plans_delivered" | "plans_pending";
+
+function isPatientFilter(value: unknown): value is PatientFilter {
+  return (
+    value === "all" ||
+    value === "approved" ||
+    value === "anamnesis_pending" ||
+    value === "plans_delivered" ||
+    value === "plans_pending"
+  );
+}
+
+const filterTabs: Array<{ id: PatientFilter; label: string }> = [
+  { id: "all", label: "Todos" },
+  { id: "approved", label: "Anamnese aprovada" },
+  { id: "anamnesis_pending", label: "Anamnese pendente" },
+  { id: "plans_delivered", label: "Planos entregues" },
+  { id: "plans_pending", label: "Planos pendentes" },
+];
 
 function initialsFromName(name: string): string {
   return name
@@ -47,6 +70,7 @@ function anamnesisStatusMeta(status: string): { label: string; cls: string; dot:
 
 function Patients() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const { data: patients = [], isLoading, error } = useQuery({
     queryKey: ["patients-index"],
@@ -55,11 +79,19 @@ function Patients() {
     refetchOnMount: "always",
   });
   const [q, setQ] = useState("");
+  const [filter, setFilter] = useState<PatientFilter>(search.filter ?? "all");
   const [inviteOpen, setInviteOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
     return patients.filter((p) => {
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "approved" && p.anamnesisStatus === "approved") ||
+        (filter === "anamnesis_pending" && p.anamnesisStatus === "submitted") ||
+        (filter === "plans_delivered" && p.planStatus === "delivered") ||
+        (filter === "plans_pending" && p.planStatus === "pending");
+      if (!matchesFilter) return false;
       if (!term) return true;
       return (
         p.fullName.toLowerCase().includes(term) ||
@@ -67,7 +99,7 @@ function Patients() {
         (p.phone ?? "").toLowerCase().includes(term)
       );
     });
-  }, [patients, q]);
+  }, [patients, q, filter]);
 
   return (
     <AppShell
@@ -131,6 +163,34 @@ function Patients() {
               className="w-full bg-surface border border-border rounded-md pl-10 pr-3 py-2.5 text-sm focus:outline-none focus:border-primary"
             />
           </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {filterTabs.map((tab) => {
+            const active = filter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  setFilter(tab.id);
+                  navigate({
+                    to: "/patients",
+                    search: tab.id === "all" ? {} : { filter: tab.id },
+                    replace: true,
+                  });
+                }}
+                className={
+                  "rounded-full border px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-colors " +
+                  (active
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground")
+                }
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
         <div className="bg-surface border border-border rounded-lg overflow-hidden">
@@ -198,6 +258,13 @@ function Patients() {
                       <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase ${statusMeta.cls}`}>
                         <span className={`size-1.5 rounded-full ${statusMeta.dot}`} />
                         {statusMeta.label}
+                      </span>
+                      <span className={
+                        "inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " +
+                        (p.planStatus === "delivered" ? "text-emerald-400" : "text-amber-400")
+                      }>
+                        <span className={"size-1.5 rounded-full " + (p.planStatus === "delivered" ? "bg-emerald-400" : "bg-amber-400")} />
+                        {p.planStatus === "delivered" ? "Plano entregue" : "Plano pendente"}
                       </span>
                       {p.autoDraft && (
                         <Link

@@ -31,6 +31,7 @@ import { Route as AuthenticatedMyPlanRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMyDashboardRouteImport } from './routes/_authenticated/my-dashboard'
 import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
+import { Route as AuthenticatedFeedbacksRouteImport } from './routes/_authenticated/feedbacks'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients/index'
@@ -164,6 +165,11 @@ const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
   path: '/financeiro',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFeedbacksRoute = AuthenticatedFeedbacksRouteImport.update({
+  id: '/feedbacks',
+  path: '/feedbacks',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -291,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/termos': typeof TermosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/feedbacks': typeof AuthenticatedFeedbacksRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/insights': typeof AuthenticatedInsightsRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
@@ -334,6 +341,7 @@ export interface FileRoutesByTo {
   '/termos': typeof TermosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/feedbacks': typeof AuthenticatedFeedbacksRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/insights': typeof AuthenticatedInsightsRoute
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
@@ -379,6 +387,7 @@ export interface FileRoutesById {
   '/termos': typeof TermosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/feedbacks': typeof AuthenticatedFeedbacksRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/my-dashboard': typeof AuthenticatedMyDashboardRoute
@@ -424,6 +433,7 @@ export interface FileRouteTypes {
     | '/termos'
     | '/admin'
     | '/dashboard'
+    | '/feedbacks'
     | '/financeiro'
     | '/insights'
     | '/my-dashboard'
@@ -467,6 +477,7 @@ export interface FileRouteTypes {
     | '/termos'
     | '/admin'
     | '/dashboard'
+    | '/feedbacks'
     | '/financeiro'
     | '/insights'
     | '/my-dashboard'
@@ -511,6 +522,7 @@ export interface FileRouteTypes {
     | '/termos'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/feedbacks'
     | '/_authenticated/financeiro'
     | '/_authenticated/insights'
     | '/_authenticated/my-dashboard'
@@ -717,6 +729,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceiroRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/feedbacks': {
+      id: '/_authenticated/feedbacks'
+      path: '/feedbacks'
+      fullPath: '/feedbacks'
+      preLoaderRoute: typeof AuthenticatedFeedbacksRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -898,6 +917,7 @@ const AuthenticatedMyPlanRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFeedbacksRoute: typeof AuthenticatedFeedbacksRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedMyDashboardRoute: typeof AuthenticatedMyDashboardRoute
@@ -920,6 +940,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFeedbacksRoute: AuthenticatedFeedbacksRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedMyDashboardRoute: AuthenticatedMyDashboardRoute,

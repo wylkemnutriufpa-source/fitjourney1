@@ -25,6 +25,7 @@ function Kpi({
   accent,
   icon: Icon,
   to,
+  search,
 }: {
   label: string;
   value: string;
@@ -32,6 +33,7 @@ function Kpi({
   accent?: boolean;
   icon: typeof Users;
   to?: "/patients" | "/anamneses" | "/financeiro" | "/insights";
+  search?: Record<string, string>;
 }) {
   const inner = (
     <>
@@ -67,7 +69,7 @@ function Kpi({
     (to ? (accent ? "hover:bg-primary/90 cursor-pointer" : "hover:border-primary/50 hover:bg-accent/30 cursor-pointer") : "");
   if (to) {
     return (
-      <Link to={to} className={cls + " block focus:outline-none focus:ring-2 focus:ring-primary/40"}>
+      <Link to={to} search={search} className={cls + " block focus:outline-none focus:ring-2 focus:ring-primary/40"}>
         {inner}
       </Link>
     );
@@ -154,6 +156,7 @@ function Dashboard() {
             hint={totalPatients > 0 ? `${Math.round((approvedCount / totalPatients) * 100)}% da base` : "—"}
             icon={Activity}
             to="/patients"
+            search={{ filter: "approved" }}
           />
           <Kpi
             label="Adesão Média"
