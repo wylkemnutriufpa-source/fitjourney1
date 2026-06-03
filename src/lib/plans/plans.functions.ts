@@ -43,9 +43,9 @@ export type PatientLite = {
   anamnesisUpdatedAt: string | null;
   autoDraft: {
     planId: string;
-    score: number;
-    confidence: "high" | "medium";
-    selectedTemplateKey: string | null;
+    templateKey: string | null;
+    templateName: string | null;
+    reason: string | null;
   } | null;
 };
 
@@ -93,7 +93,7 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
       }
     }
 
-    // Drafts auto-sugeridos por paciente (Sprint 2). 1 query batch.
+    // Drafts auto-sugeridos por paciente (Sprint 2.5). 1 query batch.
     const { data: drafts } = await supabase
       .from("plans")
       .select("id, patient_id, source_template_key, snapshot, updated_at")
@@ -103,14 +103,15 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
     const autoByPatient = new Map<string, PatientLite["autoDraft"]>();
     for (const d of drafts ?? []) {
       if (autoByPatient.has(d.patient_id)) continue;
-      const meta = (d.snapshot as any)?.meta;
+      const snap = (d.snapshot ?? {}) as any;
+      const meta = snap.meta;
       if (!meta?.autoSuggested) continue;
-      const m = meta.matcher ?? {};
+      const router = meta.router ?? meta.matcher ?? {};
       autoByPatient.set(d.patient_id, {
         planId: d.id,
-        score: typeof m.score === "number" ? m.score : 0,
-        confidence: m.confidence === "high" ? "high" : "medium",
-        selectedTemplateKey: (d.source_template_key as string | null) ?? null,
+        templateKey: (d.source_template_key as string | null) ?? null,
+        templateName: typeof snap.name === "string" ? snap.name : null,
+        reason: typeof router.reason === "string" ? router.reason : null,
       });
     }
 
@@ -514,4 +515,262 @@ export const listPublishedPlansForPatient = createServerFn({ method: "GET" })
       schemaVersion: r.schema_version,
       sourceTemplateId: r.source_template_id,
     }));
+  });
+
+// ─────────────────────────────────────────────────────────────────
+// Sprint 3 — Draft editável end-to-end.
+// getDraftPlanForEdit → carrega snapshot do draft para abrir no editor.
+// updateDraftPlan     → salva edições no snapshot (UPDATE, status='draft').
+// publishDraftPlan    → roda pipeline clínico e promove draft → published.
+// ─────────────────────────────────────────────────────────────────
+
+export type DraftPlanForEdit = {
+  id: string;
+  patientId: string;
+  patientName: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  snapshot: any;
+  sourceTemplateKey: string | null;
+  updatedAt: string;
+};
+
+export const getDraftPlanForEdit = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ planId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ context, data }): Promise<DraftPlanForEdit | null> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!nutri) return null;
+
+    const { data: plan, error } = await supabase
+      .from("plans")
+      .select("id, patient_id, snapshot, source_template_key, updated_at, status")
+      .eq("id", data.planId)
+      .eq("nutritionist_id", nutri.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!plan || plan.status !== "draft") return null;
+
+    const { data: pat } = await supabase
+      .from("patients")
+      .select("full_name")
+      .eq("id", plan.patient_id)
+      .maybeSingle();
+
+    return {
+      id: plan.id,
+      patientId: plan.patient_id,
+      patientName: pat?.full_name ?? "",
+      snapshot: plan.snapshot ?? {},
+      sourceTemplateKey: plan.source_template_key ?? null,
+      updatedAt: plan.updated_at,
+    };
+  });
+
+const UpdateDraftInput = z.object({
+  planId: z.string().uuid(),
+  snapshot: z.record(z.any()),
+});
+
+export const updateDraftPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => UpdateDraftInput.parse(d))
+  .handler(async ({ context, data }): Promise<{ ok: true }> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!nutri) throw new Error("Perfil de nutricionista não encontrado.");
+
+    const { error } = await supabase
+      .from("plans")
+      .update({
+        snapshot: JSON.parse(JSON.stringify(data.snapshot)),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", data.planId)
+      .eq("nutritionist_id", nutri.id)
+      .eq("status", "draft");
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+const PublishDraftInput = z.object({
+  planId: z.string().uuid(),
+  snapshot: z.record(z.any()),
+  overrideMissingClinical: z.boolean().optional(),
+});
+
+export const publishDraftPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => PublishDraftInput.parse(d))
+  .handler(async ({ context, data }): Promise<PublishPlanResult> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!nutri) throw new Error("Perfil de nutricionista não encontrado.");
+
+    // Confere draft + ownership.
+    const { data: draft, error: dErr } = await supabase
+      .from("plans")
+      .select("id, patient_id, status")
+      .eq("id", data.planId)
+      .eq("nutritionist_id", nutri.id)
+      .maybeSingle();
+    if (dErr) throw new Error(dErr.message);
+    if (!draft) throw new Error("Pré-plano não encontrado.");
+    if (draft.status !== "draft") {
+      throw new Error("Este plano já foi publicado.");
+    }
+
+    // ---- Pipeline clínico (mesma lógica de publishPlanToPatient) ----
+    const ctx = await loadClinicalContext(supabase, draft.patient_id);
+    const publishedAt = new Date().toISOString();
+
+    if (!ctx.calculable) {
+      if (!data.overrideMissingClinical) {
+        throw new Error(
+          `CLINICAL_CONTEXT_INCOMPLETE: missing=[${ctx.missingForCalc.join(",")}]`,
+        );
+      }
+      const { snapshot: snapOnly, review: reviewOnly } = validateSnapshot(
+        data.snapshot,
+      );
+      const auditOverride = {
+        clinicalContextSnapshot: {
+          currentWeight: null,
+          currentGoal: null,
+          demographics: {
+            sex: ctx.demographics.sex,
+            ageYears: ctx.demographics.ageYears,
+            heightCm: ctx.demographics.heightCm,
+            activity: ctx.demographics.activity,
+            sourceAnamnesisId: ctx.demographics.sourceAnamnesisId,
+          },
+          calculable: false,
+        },
+        engineOutput: null,
+        gateWarnings: [],
+        engineVersion: ENGINE_VERSION,
+        gateVersion: GATE_VERSION,
+        publishedAt,
+        publishedWithoutClinicalContext: true,
+        missingForCalc: ctx.missingForCalc,
+      } as unknown as ClinicalAudit;
+
+      const finalSnapshot = {
+        ...snapOnly,
+        clinical_review: reviewOnly,
+        clinicalAudit: auditOverride,
+      };
+      const { data: updated, error: uErr } = await supabase
+        .from("plans")
+        .update({
+          status: "published",
+          snapshot: finalSnapshot,
+        })
+        .eq("id", data.planId)
+        .eq("nutritionist_id", nutri.id)
+        .eq("status", "draft")
+        .select("id, published_at")
+        .single();
+      if (uErr) throw new Error(uErr.message);
+      return { id: updated.id, publishedAt: updated.published_at };
+    }
+
+    const engineOut = runNutritionEngines(ctx);
+    if (!engineOut) {
+      throw new Error("CLINICAL_CONTEXT_INCOMPLETE: engines returned null");
+    }
+
+    const { snapshot, review } = validateSnapshot(data.snapshot);
+    const dailyTotals = deriveDailyTotalsFromSnapshot(snapshot);
+    const foodOccurrences = deriveFoodOccurrencesFromSnapshot(snapshot);
+    const gate = validatePlan({
+      weightKg: ctx.currentWeight!.weightKg,
+      tdee: engineOut.tdee,
+      target: engineOut.target,
+      dailyTotals,
+      foodOccurrences,
+    });
+    if (gate.blockers.length > 0) {
+      throw new Error(
+        `CLINICAL_GATE_BLOCKED: ${gate.blockers.map((b) => b.code).join(",")}`,
+      );
+    }
+
+    const clinicalAudit: ClinicalAudit = {
+      clinicalContextSnapshot: {
+        currentWeight: ctx.currentWeight
+          ? {
+              weightKg: ctx.currentWeight.weightKg,
+              observedAt: ctx.currentWeight.measuredAt,
+              source: ctx.currentWeight.source,
+              sourceId: ctx.currentWeight.sourceId,
+            }
+          : null,
+        currentGoal: ctx.currentGoal
+          ? {
+              kind: ctx.currentGoal.kind,
+              sourceAnamnesisId: ctx.currentGoal.sourceAnamnesisId,
+            }
+          : null,
+        demographics: {
+          sex: ctx.demographics.sex,
+          ageYears: ctx.demographics.ageYears,
+          heightCm: ctx.demographics.heightCm,
+          activity: ctx.demographics.activity,
+          sourceAnamnesisId: ctx.demographics.sourceAnamnesisId,
+        },
+        calculable: true,
+      },
+      engineOutput: {
+        tmb: engineOut.tmb,
+        tdee: engineOut.tdee,
+        target: engineOut.target,
+        clinicalGoalKind: engineOut.clinicalGoalKind,
+        engineGoal: engineOut.engineGoal,
+      },
+      gateWarnings: gate.warnings.map((w) => ({
+        code: w.code,
+        message: w.message,
+      })),
+      engineVersion: ENGINE_VERSION,
+      gateVersion: GATE_VERSION,
+      publishedAt,
+    };
+
+    const snapshotWithAudit = {
+      ...snapshot,
+      clinical_review: review,
+      clinicalAudit,
+    };
+
+    const { data: updated, error: uErr } = await supabase
+      .from("plans")
+      .update({
+        status: "published",
+        snapshot: snapshotWithAudit,
+      })
+      .eq("id", data.planId)
+      .eq("nutritionist_id", nutri.id)
+      .eq("status", "draft")
+      .select("id, published_at")
+      .single();
+    if (uErr) throw new Error(uErr.message);
+    return { id: updated.id, publishedAt: updated.published_at };
   });

@@ -200,23 +200,21 @@ function Patients() {
                         {statusMeta.label}
                       </span>
                       {p.autoDraft && (
-                        <span
-                          className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase ${
-                            p.autoDraft.confidence === "high"
-                              ? "text-emerald-600"
-                              : "text-amber-600"
-                          }`}
-                          title={`Template sugerido: ${p.autoDraft.selectedTemplateKey ?? "?"} — score ${p.autoDraft.score}`}
+                        <Link
+                          to="/templates"
+                          search={{ draftPlanId: p.autoDraft.planId }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase text-primary hover:text-primary/80 transition-colors"
+                          title={p.autoDraft.reason ?? "Pré-plano sugerido"}
                         >
-                          <span
-                            className={`size-1.5 rounded-full ${
-                              p.autoDraft.confidence === "high"
-                                ? "bg-emerald-500"
-                                : "bg-amber-500"
-                            }`}
-                          />
-                          Pré-plano · {p.autoDraft.score}
-                        </span>
+                          <span className="size-1.5 rounded-full bg-primary" />
+                          Abrir pré-plano
+                          {p.autoDraft.templateName && (
+                            <span className="text-muted-foreground normal-case font-normal">
+                              · {p.autoDraft.templateName}
+                            </span>
+                          )}
+                        </Link>
                       )}
                     </div>
                   </td>

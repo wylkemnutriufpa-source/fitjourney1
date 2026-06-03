@@ -78,16 +78,17 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { RealPatientPicker } from "@/components/RealPatientPicker";
-import { publishPlanToPatient, type PatientLite } from "@/lib/plans/plans.functions";
+import { publishPlanToPatient, publishDraftPlan, getDraftPlanForEdit, type PatientLite } from "@/lib/plans/plans.functions";
 import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
   head: () => ({ meta: [{ title: "Templates — FitJourney" }] }),
-  validateSearch: (search: Record<string, unknown>): { blank?: number; patientId?: string; patientName?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { blank?: number; patientId?: string; patientName?: string; draftPlanId?: string } => ({
     blank: search.blank === "1" || search.blank === 1 ? 1 : undefined,
     patientId: typeof search.patientId === "string" ? search.patientId : undefined,
     patientName: typeof search.patientName === "string" ? search.patientName : undefined,
+    draftPlanId: typeof search.draftPlanId === "string" ? search.draftPlanId : undefined,
   }),
   component: TemplatesPage,
 });
@@ -306,7 +307,7 @@ function TemplatesPage() {
   const search = Route.useSearch();
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
-  const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: StoredTemplate } | null>(null);
+  const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: StoredTemplate; draftPlanId?: string; draftPatient?: { id: string; name: string } } | null>(null);
 
   const qc = useQueryClient();
   const listFn = useServerFn(listMyTemplates);
@@ -358,6 +359,32 @@ function TemplatesPage() {
       setEditing({ tpl: createEmptyTemplate(), isMine: false });
     }
   }, [search.blank, editing]);
+
+  // Entrada "?draftPlanId=…" abre o editor já carregado com o pré-plano sugerido.
+  const getDraftFn = useServerFn(getDraftPlanForEdit);
+  const draftHandled = useRef<string | null>(null);
+  useEffect(() => {
+    const id = search.draftPlanId;
+    if (!id || draftHandled.current === id || editing) return;
+    draftHandled.current = id;
+    (async () => {
+      try {
+        const draft = await getDraftFn({ data: { planId: id } });
+        if (!draft) {
+          toast.error("Pré-plano não encontrado ou já publicado.");
+          return;
+        }
+        setEditing({
+          tpl: draft.snapshot as PlannerTemplate,
+          isMine: false,
+          draftPlanId: draft.id,
+          draftPatient: { id: draft.patientId, name: draft.patientName },
+        });
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Falha ao abrir pré-plano.");
+      }
+    })();
+  }, [search.draftPlanId, editing, getDraftFn]);
 
   const filteredSystem = useMemo(
     () =>
@@ -504,8 +531,11 @@ function TemplatesPage() {
           original={editing.tpl}
           isMine={editing.isMine}
           existingMine={editing.mine}
+          draftPlanId={editing.draftPlanId}
           patientContext={
-            search.patientId
+            editing.draftPatient
+              ? { id: editing.draftPatient.id, name: editing.draftPatient.name }
+              : search.patientId
               ? { id: search.patientId, name: search.patientName ?? "este paciente" }
               : null
           }
@@ -684,6 +714,7 @@ function TemplateEditor({
   isMine,
   existingMine,
   patientContext,
+  draftPlanId,
   onClose,
   onSave,
 }: {
@@ -691,6 +722,7 @@ function TemplateEditor({
   isMine: boolean;
   existingMine?: StoredTemplate;
   patientContext?: { id: string; name: string } | null;
+  draftPlanId?: string;
   onClose: () => void;
   onSave: (input: {
     id?: string;
