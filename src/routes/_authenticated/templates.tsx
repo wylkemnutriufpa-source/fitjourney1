@@ -531,8 +531,11 @@ function TemplatesPage() {
           original={editing.tpl}
           isMine={editing.isMine}
           existingMine={editing.mine}
+          draftPlanId={editing.draftPlanId}
           patientContext={
-            search.patientId
+            editing.draftPatient
+              ? { id: editing.draftPatient.id, name: editing.draftPatient.name }
+              : search.patientId
               ? { id: search.patientId, name: search.patientName ?? "este paciente" }
               : null
           }
@@ -711,6 +714,7 @@ function TemplateEditor({
   isMine,
   existingMine,
   patientContext,
+  draftPlanId,
   onClose,
   onSave,
 }: {
@@ -718,6 +722,7 @@ function TemplateEditor({
   isMine: boolean;
   existingMine?: StoredTemplate;
   patientContext?: { id: string; name: string } | null;
+  draftPlanId?: string;
   onClose: () => void;
   onSave: (input: {
     id?: string;
