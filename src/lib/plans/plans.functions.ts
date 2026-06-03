@@ -568,7 +568,7 @@ export const getDraftPlanForEdit = createServerFn({ method: "GET" })
       id: plan.id,
       patientId: plan.patient_id,
       patientName: pat?.full_name ?? "",
-      snapshot: (plan.snapshot ?? {}) as Record<string, unknown>,
+      snapshot: plan.snapshot ?? {},
       sourceTemplateKey: plan.source_template_key ?? null,
       updatedAt: plan.updated_at,
     };
