@@ -194,10 +194,31 @@ function Patients() {
                     {formatDate(p.createdAt)}
                   </td>
                   <td className="p-4">
-                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase ${statusMeta.cls}`}>
-                      <span className={`size-1.5 rounded-full ${statusMeta.dot}`} />
-                      {statusMeta.label}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase ${statusMeta.cls}`}>
+                        <span className={`size-1.5 rounded-full ${statusMeta.dot}`} />
+                        {statusMeta.label}
+                      </span>
+                      {p.autoDraft && (
+                        <span
+                          className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase ${
+                            p.autoDraft.confidence === "high"
+                              ? "text-emerald-600"
+                              : "text-amber-600"
+                          }`}
+                          title={`Template sugerido: ${p.autoDraft.selectedTemplateKey ?? "?"} — score ${p.autoDraft.score}`}
+                        >
+                          <span
+                            className={`size-1.5 rounded-full ${
+                              p.autoDraft.confidence === "high"
+                                ? "bg-emerald-500"
+                                : "bg-amber-500"
+                            }`}
+                          />
+                          Pré-plano · {p.autoDraft.score}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="p-4" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1">
