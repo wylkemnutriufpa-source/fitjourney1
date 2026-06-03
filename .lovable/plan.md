@@ -1,158 +1,164 @@
-## Continuação Lote 1 → Lote 2 → Lote 3
+## Plano único editável — versionamento invisível
 
-Foco: terminar o que falta, incluindo o **modal do avatar** que você destacou (resumo + atalhos diferenciados por papel).
+Princípio: para o nutricionista existe **uma** entidade — "Plano do paciente". Abre, edita, salva. Paciente vê. Fim. Nada de draft, clone, republicar, marcar entregue.
 
----
-
-### Bloco A — Fechar Lote 1 (rápido, baixo risco)
-
-**A.1 Modal do Avatar (substitui o atalho atual para Configurações)**
-
-- Local: `src/components/layout/AppShell.tsx` (botão do avatar no header).
-- Mudança: clicar no avatar **não navega mais** para `/configuracoes`. Abre um `Dialog` (shadcn) com:
-  - **Cabeçalho:** avatar + nome + email + papel (Nutricionista / Paciente / Admin).
-  - **Resumo (paciente):** plano ativo (nome + dias restantes da assinatura), próxima janela de feedback (reaproveita lógica do `FeedbackCountdown`), status da anamnese (rascunho / aguardando revisão / aprovada).
-  - **Resumo (profissional/nutricionista):** total de pacientes, pacientes com plano pendente, feedbacks pendentes de leitura nos últimos 7 dias.
-  - **Atalhos paciente:** "Meu plano", "Feedback", "Minha anamnese", "Configurações", "Sair".
-  - **Atalhos profissional:** "Dashboard", "Pacientes", "Configurações", **"Copiar link da minha landing"** (`/n/{slug}`), **"Gerar link de convite"** (`/c/{slug}` ou `/c/{slug}/{code}` se já houver código ativo), "Sair".
-  - **Admin:** mantém atalhos atuais + "Sair".
-- Dados: usa server fns já existentes (`getMyActiveSubscription`, `getMyFeedbackStatus`, `listPatients`, `getMyNutritionistProfile` para `slug`). Sem migração.
-- Invariantes: não toca vínculo paciente↔nutricionista, não toca snapshot, não toca anamnese.
-
-**A.2 Normalização de telefone**
-
-- `src/lib/phone-mask.ts`: adicionar `normalizeBRPhone(raw)` (puro, sem efeito colateral).
-- Aplicar **apenas em runtime** nos pontos de entrada (form de cadastro de paciente, edição de perfil). Não roda backfill aqui (vai pro Bloco B).
-
-**A.3 Validação visual do Lote 1**
-
-- Verificar no preview: countdown na página de feedback, seção de anamnese no perfil do paciente, modal do avatar abrindo com resumo correto por papel.
+A arquitetura cumpre isso **sem violar a invariante do snapshot imutável**: cada "salvar" insere uma nova linha `status='published'` no banco. As linhas antigas permanecem como histórico técnico, invisíveis ao usuário. A query do paciente (`patient-plan.functions.ts`) já retorna sempre a mais recente — o comportamento já está pronto, só precisamos da UI de edição e do save.
 
 ---
 
-### Bloco B — Lote 2 (médio, requer migração)
+### Bloco 1 — Edição direta do plano (UX única)
 
-**B.1 Trigger `plans_snapshot_immutable` — afrouxamento controlado**
+**1.1 Tela única** `/_authenticated/patients/$id/diet`
 
-- Migração: reescrever o trigger para permitir UPDATE **apenas** nas colunas `delivered_at`, `delivered_by`, `delivered_note`. Qualquer outra coluna continua imutável após `published`.
-- Adicionar colunas `delivered_at timestamptz`, `delivered_by uuid`, `delivered_note text` em `plans`.
+Hoje é read-only com CTA para "Publicar a partir de template". Vai virar editor inline:
 
-**B.2 Botão "Marcar plano como entregue"**
+- Se **não há plano publicado** → mantém o estado vazio atual com CTA "Criar a partir de template" (primeiro plano precisa de origem clínica).
+- Se **há plano publicado** → renderiza o snapshot em modo edição direta:
+  - Cada refeição é editável (horário, label, título).
+  - Cada item editável (nome, qty, unit, kcal/macros) usando `FoodPickerDialog` já existente.
+  - Adicionar/remover refeição. Adicionar/remover item. Reordenar.
+  - Barra fixa com totais (kcal/macros) recalculados em runtime apenas para a UI — **não** persiste cálculo derivado.
+- Botão único: **Salvar alterações**. Sem "publicar", sem "draft", sem "entregue".
+- Sem aviso de "vai criar nova versão". Sem histórico exposto. A seção "Histórico de planos" da tela atual será **removida** do contexto do nutricionista (continua existindo no banco para auditoria).
 
-- `src/lib/plans.functions.ts`: nova `markPlanAsDelivered({ planId })` com `requireSupabaseAuth`, valida que o usuário é o nutricionista dono e que o plano está `published` sem `delivered_at`.
-- UI: botão na tela de detalhe do plano (visível só ao nutricionista, só quando `status='published'` e `delivered_at IS NULL`).
+**1.2 Server fn** `saveEditedPlan({ patientId, snapshot })`
 
-**B.3 Reabrir plano publicado como rascunho**
+Em `src/lib/plans/plans.functions.ts`:
 
-- `reopenPublishedPlanAsDraft({ planId })`: clona o snapshot para nova linha `status='draft'`, **preserva** a linha publicada (sem editar). Patient app continua vendo a versão entregue até a próxima publicação.
-- UI: botão "Editar como novo rascunho" no plano publicado.
+- Auth: `requireSupabaseAuth` + dono do paciente (nutricionista).
+- Valida snapshot com `snapshotV3Schema` já existente.
+- Preserva `clinicalAudit` e `clinical_review` do snapshot anterior (não roda motor de novo — esta é edição manual; auditoria registra `editedFromPlanId`).
+- INSERT nova linha `plans` com `status='published'`, `published_at=now()`, `source_template_id` herdado, `schema_version=3`.
+- Não toca em linhas antigas. Trigger `plans_snapshot_immutable` continua intocado — invariante preservada.
+- Retorna `{ id, publishedAt }`.
 
-**B.4 Filtro "Planos pendentes" — refinar**
+**1.3 Cliente: substitui CTA "Publicar novo"**
 
-- Atualizar critério para `anamnesisStatus='approved' AND NOT EXISTS plan WHERE status IN ('published') AND delivered_at IS NOT NULL`. Agora usa o `delivered_at` real (substitui o proxy do Lote 1).
-
-**B.5 Backfill telefone normalizado**
-
-- Migração aditiva: coluna `phone_normalized` em `patients`, populada via `UPDATE`. Sem remover `phone` original.
-
-**B.6 Indicadores de assinatura no modal do avatar**
-
-- Após B.1 estar de pé, adicionar badge "vence em X dias" no resumo do paciente (já preparado em A.1, só liga o dado).
-
----
-
-### Bloco C — Lote 3 (discovery)
-
-**C.1 Avaliação Física unificada**
-
-- **Bloqueado por discovery.** Antes de qualquer código, mapear:
-  - Tabela canônica (ou se precisa criar `physical_assessments`).
-  - De onde vêm os dados hoje (anamnese? feedback? campo solto no plano?).
-  - Quem escreve, quem lê, como entra no snapshot.
-- Entrego um sub-plano específico depois do mapeamento.
+Botão "Publicar novo plano" (que leva pra `/templates`) só aparece quando **não há plano publicado**. Quando há, vira "Editar plano" inline na própria tela.
 
 ---
 
-### Ordem de execução
+### Bloco 2 — Remover conceito de "entregue"
 
-1. Bloco A inteiro (modal avatar + telefone runtime + validação visual).
-2. Bloco B (migração primeiro, depois código).
-3. Bloco C (discovery → sub-plano → execução).
+- **Não cria** colunas `delivered_at` / `delivered_by` / `delivered_note`.
+- **Não afrouxa** trigger `plans_snapshot_immutable`. Permanece como está.
+- Filtro "Planos pendentes" em `listPatients`: critério passa a ser `anamnesisStatus='approved' AND NOT EXISTS plan WHERE status='published'`. Já é o comportamento atual (`hasPublishedPlan`) — só remove o vocabulário "delivered" do código.
+- Modal do avatar (nutri): "feedbacks pendentes" e "pacientes sem plano" usam o mesmo critério.
 
-### Invariantes preservadas
+---
 
-- Anamnese aprovada imutável (edição cria nova versão).
-- Snapshot V3 imutável exceto pelos 3 campos `delivered_*` no Bloco B.
-- Vínculo paciente↔nutricionista intocado.
-- Patient App permanece read-only.
-- Sem CASCADE, sem fallback silencioso, sem refactor não solicitado.
+### Bloco 3 — Próximas tarefas (na ordem que você pediu)
 
-### Decisões pendentes (preciso de confirmação antes do Bloco B)
+3.1 **Filtros de pacientes** — revisar a listagem `/patients` para usar o mesmo critério unificado ("sem plano publicado") e adicionar atalho "Pacientes pendentes".
 
-1. **Link de convite no modal do avatar (A.1)**: gerar um código novo a cada clique, ou reusar o último código ativo do nutricionista? (recomendo: reusar se existir ativo, senão gerar).
-2. **Reabrir publicado (B.3)**: o draft clonado deve aparecer na lista de planos do paciente? (recomendo: **não**, só aparece pro nutricionista até publicar).
-3. **Marcar entregue (B.2)**: precisa de campo de observação obrigatório, opcional, ou nenhum? (recomendo: opcional). Eu faria um ajuste importante antes de você dar o "Implement plan".
-  O item mais perigoso desse plano é justamente o 2.1 Plano publicado editável (versionamento).
-  Porque ele ainda está pensando como engenheiro.
-  Você está pensando como nutricionista.
-  São duas coisas diferentes.
-  Hoje ele propõe:
-  > Publicado → Clona → Cria Draft → Edita Draft → Republica
-  Você está pedindo:
-  > Publicado → Edita → Salva
-  Sem intermediários.
-  ---
-  O que eu mandaria para ele antes de autorizar:
-  Antes de iniciar o Lote 2 preciso alinhar uma mudança de direção.
-  Não quero que a edição de um plano publicado gere automaticamente um novo draft, clone ou fluxo paralelo.
-  A regra de negócio do FitJourney é:
-  - O nutricionista pode editar qualquer plano do próprio paciente a qualquer momento.
-  - O paciente sempre vê a versão mais recente salva.
-  - O sistema não deve obrigar o nutricionista a recriar plano, clonar plano ou republicar plano para fazer ajustes.
-  Se houver necessidade técnica de histórico, versionamento ou auditoria, isso deve acontecer em segundo plano, invisível para o usuário.
-  Para o nutricionista existe apenas um conceito:
-  "Plano do paciente".
-  Ele abre.
-  Edita.
-  Salva.
-  Fim.
-  Antes de implementar o item 2.1 quero uma proposta arquitetural baseada nesse princípio.
-  Não quero reproduzir o problema do sistema 1.0 onde o profissional era constantemente bloqueado por triggers, snapshots, drafts, estados ou regras técnicas.
-  O sistema deve proteger os dados.
-  Não deve controlar o nutricionista.
-  ---
-  Sobre o restante do plano:
-  Eu aprovaria imediatamente
-  Sidebar fechar após navegação
-  Countdown de feedback
-  Anamnese dentro do perfil do paciente
-  Correção do filtro de planos pendentes
-  Normalização de telefone
-  Dashboard com plano contratado
-  Modal do avatar
-  Tudo isso é melhoria real de UX.
-  ---
-  Eu seguraria
-  Afrouxar trigger de plano publicado
-  Clone de plano publicado
-  ReopenPublishedPlanAsDraft
-  Qualquer coisa envolvendo draft/republicação
-  Porque vocês acabaram de descobrir que o fluxo mais simples funciona melhor:
-  Anamnese
-  ↓
-  Sugestão
-  ↓
-  Nutricionista ajusta
-  ↓
-  Salvar
-  ↓
-  Paciente vê
-  Toda vez que aparece:
-  draft
-  clone
-  reopen
-  republish
-  é um sinal de que a arquitetura está começando a servir ao sistema em vez de servir ao profissional.
-  E pelo histórico que você contou do FitJourney 1.0, esse foi exatamente o caminho que levou ao excesso de travas e à perda de velocidade operacional.
+3.2 **Avaliação física unificada** — discovery (bloqueado até mapear fonte canônica). Entrego sub-plano depois.
 
-Confirma o plano e responde as 3 decisões para eu seguir com `APPROVED FOR EXECUTION`? 
+3.3 **Navegação mobile** — auditar sidebar/sheet em telas <768px, fechar ao navegar (já validado parcialmente), adicionar bottom-nav se necessário.
+
+3.4 **Dashboard do paciente** — revisar hierarquia: plano contratado, próxima janela de feedback, atalho rápido para refeição atual.
+
+---
+
+### Detalhes técnicos
+
+- **Migração**: nenhuma. Zero DDL. Zero alteração de trigger/RLS.
+- **Arquivos novos**: nenhum componente novo — reaproveita `FoodPickerDialog`, `NutritionTargetCard`.
+- **Arquivos alterados**:
+  - `src/lib/plans/plans.functions.ts` — adicionar `saveEditedPlan`.
+  - `src/routes/_authenticated/patients/$id/diet.tsx` — transformar em editor.
+  - `src/lib/plans/patient-plan.functions.ts` — sem mudança (já retorna o mais recente).
+- **Invariantes preservadas** (todas):
+  - Snapshot V3 imutável após published_at ✓ (nunca damos UPDATE).
+  - Anamnese aprovada é verdade clínica ✓ (não tocamos).
+  - Vínculo paciente↔nutricionista intocado ✓.
+  - Patient App read-only ✓.
+  - Sem CASCADE, sem fallback silencioso, sem refactor cross-módulo ✓.
+- **Auditoria invisível**: cada edição vira nova linha `plans`. Histórico continua acessível via SQL/admin se algum dia precisar — só não aparece na UI do nutricionista.
+
+---
+
+### Decisão pendente (1 só)
+
+**Confirmação do princípio:** edição manual **não re-roda** o motor clínico (TDEE/macros/matcher). O nutricionista é soberano: o que ele salvar, é o que vai pro paciente. O snapshot novo herda `clinicalAudit` do anterior + marca `manualEdit: true` na auditoria, mas alvo clínico do motor original fica preservado para referência. **OK?**
+
+Se sim, respondo `APPROVED FOR EXECUTION` e executo Bloco 1+2 em sequência. Bloco 3 vem depois com sub-planos separados. 
+
+&nbsp;
+
+&nbsp;
+
+Uma observação que eu adicionaria para ele:
+
+Não esconda apenas o histórico.
+
+Esconda também o conceito de versão.
+
+Porque se aparecer:
+
+Plain text
+
+Plano v1
+
+Plano v2
+
+Plano v3
+
+Plano v4
+
+o nutricionista vai começar a perguntar:
+
+Qual eu devo editar?
+
+E você recria o problema.
+
+Para ele deve existir apenas:
+
+Plain text
+
+Plano Atual
+
+Internamente pode ter 500 versões.
+
+Ele nunca precisa saber.
+
+Minha única alteração no plano dele:
+
+No saveEditedPlan, ao criar a nova linha publicada, marcar a anterior como substituída.
+
+Exemplo:
+
+JSON
+
+{
+
+  "supersededBy": "novoPlanId"
+
+}
+
+ou
+
+JSON
+
+{
+
+  "isCurrent": false
+
+}
+
+Porque daqui a 1 ano um paciente pode ter:
+
+27 versões publicadas
+
+14 ajustes
+
+3 reformulações
+
+e você vai querer identificar instantaneamente qual é a versão ativa sem depender apenas de published_at.
+
+Fora isso, o plano está alinhado com o que você vem defendendo desde o começo:
+
+o sistema sugere, o nutricionista decide.
+
+E principalmente:
+
+nenhuma regra técnica pode obrigar o nutricionista a refazer trabalho.
