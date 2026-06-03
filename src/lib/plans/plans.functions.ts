@@ -93,6 +93,27 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
       }
     }
 
+    // Drafts auto-sugeridos por paciente (Sprint 2). 1 query batch.
+    const { data: drafts } = await supabase
+      .from("plans")
+      .select("id, patient_id, source_template_key, snapshot, updated_at")
+      .in("patient_id", patientIds)
+      .eq("status", "draft")
+      .order("updated_at", { ascending: false });
+    const autoByPatient = new Map<string, PatientLite["autoDraft"]>();
+    for (const d of drafts ?? []) {
+      if (autoByPatient.has(d.patient_id)) continue;
+      const meta = (d.snapshot as any)?.meta;
+      if (!meta?.autoSuggested) continue;
+      const m = meta.matcher ?? {};
+      autoByPatient.set(d.patient_id, {
+        planId: d.id,
+        score: typeof m.score === "number" ? m.score : 0,
+        confidence: m.confidence === "high" ? "high" : "medium",
+        selectedTemplateKey: (d.source_template_key as string | null) ?? null,
+      });
+    }
+
     return patients.map((p: any) => {
       const info = byPatient.get(p.id);
       return {
@@ -103,6 +124,7 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
         createdAt: p.created_at,
         anamnesisStatus: info?.status ?? "none",
         anamnesisUpdatedAt: info?.updatedAt ?? null,
+        autoDraft: autoByPatient.get(p.id) ?? null,
       };
     });
   });
