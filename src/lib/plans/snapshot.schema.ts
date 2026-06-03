@@ -104,7 +104,10 @@ export const ClinicalAuditSchema = z
     gateWarnings: z.array(
       z.object({
         code: z.string(),
+        severity: z.enum(["warning", "error"]).optional(),
         message: z.string(),
+        details: z.record(z.any()).optional(),
+        suggestedAction: z.string().optional(),
       }),
     ),
     engineVersion: z.string(),

@@ -385,9 +385,11 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     // ---- 4) Estrutura do snapshot (warn-only) ----
     const { snapshot, review } = validateSnapshot(data.snapshot);
 
-    // ---- 5) Gate clínico — bloqueia APENAS em blockers (severity=error).
-    // Warnings (monotonia, etc.) NÃO impedem publicação — entram em
-    // snapshot.clinicalAudit.gateWarnings.
+    // ---- 5) Gate clínico — alertas apenas (nunca bloqueia).
+    // Todos os issues entram em snapshot.clinicalAudit.gateWarnings para auditoria
+    // clínica e decisão documentada do nutricionista. Severidade "error" ou
+    // "warning" afeta apenas display; publicação NUNCA é impedida por gate.
+    // Filosofia: "sistema sugere, nutricionista decide."
     const dailyTotals = deriveDailyTotalsFromSnapshot(snapshot);
     const foodOccurrences = deriveFoodOccurrencesFromSnapshot(snapshot);
     const gate = validatePlan({
@@ -397,11 +399,8 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
       dailyTotals,
       foodOccurrences,
     });
-    if (gate.blockers.length > 0) {
-      throw new Error(
-        `CLINICAL_GATE_BLOCKED: ${gate.blockers.map((b) => b.code).join(",")}`,
-      );
-    }
+    // Note: gate.blockers will now be empty since all clinical rules are warnings.
+    // This is intentional: gate serves as audit trail, not gatekeeper.
 
     // ---- 6) Auditoria clínica imutável anexada ao snapshot ----
     const publishedAt = new Date().toISOString();
@@ -437,9 +436,12 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
         clinicalGoalKind: engineOut.clinicalGoalKind,
         engineGoal: engineOut.engineGoal,
       },
-      gateWarnings: gate.warnings.map((w) => ({
+      gateWarnings: gate.issues.map((w) => ({
         code: w.code,
+        severity: w.severity,
         message: w.message,
+        details: w.details,
+        suggestedAction: w.suggestedAction,
       })),
       engineVersion: ENGINE_VERSION,
       gateVersion: GATE_VERSION,
@@ -892,9 +894,12 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
         clinicalGoalKind: engineOut.clinicalGoalKind,
         engineGoal: engineOut.engineGoal,
       },
-      gateWarnings: gate.warnings.map((w) => ({
+      gateWarnings: gate.issues.map((w) => ({
         code: w.code,
+        severity: w.severity,
         message: w.message,
+        details: w.details,
+        suggestedAction: w.suggestedAction,
       })),
       engineVersion: ENGINE_VERSION,
       gateVersion: GATE_VERSION,

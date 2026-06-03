@@ -68,6 +68,7 @@ export interface GateIssue {
   readonly severity: GateSeverity;
   readonly message: string;
   readonly details?: Readonly<Record<string, unknown>>;
+  readonly suggestedAction?: string;
 }
 
 export interface GateResult {

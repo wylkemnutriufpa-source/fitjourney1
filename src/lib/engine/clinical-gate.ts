@@ -57,9 +57,10 @@ export function validatePlan(input: GateInput): GateResult {
   if (offenders.length > 0) {
     issues.push({
       code: "PROTEIN_OVER_LIMIT",
-      severity: "error",
-      message: `Proteína acima de ${PROTEIN_HARD_LIMIT_G_PER_KG} g/kg em ${offenders.length} dia(s).`,
+      severity: "warning",
+      message: `Proteína acima de ${PROTEIN_HARD_LIMIT_G_PER_KG} g/kg em ${offenders.length} dia(s). Confirme se apropriado para objetivo de hipertrofia agressiva.`,
       details: { offenders },
+      suggestedAction: "Revisar com paciente se objetivo clínico justifica proteína elevada.",
     });
   }
 
@@ -69,9 +70,10 @@ export function validatePlan(input: GateInput): GateResult {
     if (deficitPct > CALORIC_DEFICIT_HARD_PCT) {
       issues.push({
         code: "CALORIC_DEFICIT_HIGH",
-        severity: "error",
-        message: `Déficit calórico de ${Math.round(deficitPct * 100)}% em ${d.dayLabel} (TDEE ${tdee} vs plano ${d.kcal}).`,
+        severity: "warning",
+        message: `Déficit calórico de ${Math.round(deficitPct * 100)}% em ${d.dayLabel} (TDEE ${tdee} vs plano ${d.kcal}). Confirme se é perda de peso agressiva planejada.`,
         details: { day: d.dayLabel, deficitPct, tdee, kcal: d.kcal },
+        suggestedAction: "Se objetivo é perda acelerada, pode ser apropriado. Revisar com paciente.",
       });
     }
   }
@@ -94,9 +96,10 @@ export function validatePlan(input: GateInput): GateResult {
   if (deviations.length > 0) {
     issues.push({
       code: "MACRO_DEVIATION",
-      severity: "error",
-      message: `Desvio acima de ${Math.round(MACRO_DEVIATION_HARD_PCT * 100)}% no alvo semanal: ${deviations.map((d) => `${d.macro} ${Math.round(d.deviationPct * 100)}%`).join(", ")}.`,
+      severity: "warning",
+      message: `Desvio acima de ${Math.round(MACRO_DEVIATION_HARD_PCT * 100)}% no alvo semanal: ${deviations.map((d) => `${d.macro} ${Math.round(d.deviationPct * 100)}%`).join(", ")}. Ajuste quantidades ou confirme clinicamente.`,
       details: { deviations },
+      suggestedAction: "Revisar porções de itens principais ou confirmar se objetivo justifica desvio.",
     });
   }
 
