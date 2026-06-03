@@ -174,8 +174,8 @@ function Login() {
         <div className="absolute -top-24 -left-24 size-72 rounded-full bg-[var(--gold)]/5 blur-3xl" />
       </div>
 
-      <div className="flex items-center justify-center p-8">
-        <form onSubmit={submit} className="w-full max-w-sm space-y-7">
+      <div className="flex items-start sm:items-center justify-center px-5 sm:px-6 py-8 sm:py-12">
+        <form onSubmit={submit} className="w-full max-w-sm space-y-6 sm:space-y-7">
           <div className="lg:hidden -mt-2 mb-4 flex justify-center">
             <BrandLockup
               slot="auth-hero"
@@ -188,7 +188,7 @@ function Login() {
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Acesso
             </p>
-            <h2 className="text-3xl font-bold tracking-tight mt-2">Entrar no painel</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mt-2">Entrar no painel</h2>
           </div>
 
           <div className="space-y-2">
