@@ -309,8 +309,3 @@ function translateCodeError(msg: string): string {
   return msg;
 }
 
-function normalizePhone(input: string): string {
-  const digits = input.replace(/\D/g, "");
-  if (!digits) return "";
-  return input.trim().startsWith("+") ? `+${digits}` : `+${digits}`;
-}
