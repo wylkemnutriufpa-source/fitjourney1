@@ -294,7 +294,95 @@ function PatientSettings() {
             pela anamnese. Em breve você poderá atualizar diretamente daqui.
           </p>
         </section>
+
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
+            04 · Segurança
+          </h2>
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="space-y-1 min-w-0">
+              <p className="text-sm font-medium">Alterar senha</p>
+              <p className="text-xs text-muted-foreground">
+                Enviamos um link de redefinição para o seu email cadastrado.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleSendPasswordReset}
+              disabled={sendingReset || !data?.email}
+              className="inline-flex items-center gap-2 text-xs font-semibold py-2 px-3 rounded-md border border-border hover:border-primary hover:text-primary transition-colors disabled:opacity-60"
+            >
+              {sendingReset ? <Loader2 className="size-3.5 animate-spin" /> : <KeyRound className="size-3.5" />}
+              {sendingReset ? "Enviando..." : "Enviar link"}
+            </button>
+          </div>
+        </section>
+
+        <section className="bg-surface border border-destructive/40 rounded-lg p-6 space-y-4">
+          <h2 className="text-sm font-mono uppercase tracking-widest text-destructive">
+            05 · Excluir conta
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Ao excluir sua conta você perde acesso ao app e ao seu plano. Seu
+            histórico clínico permanece com seu nutricionista por obrigação
+            legal (LGPD — guarda de prontuário).
+          </p>
+          <button
+            type="button"
+            onClick={() => setConfirmDelete(true)}
+            className="inline-flex items-center gap-2 text-xs font-semibold py-2 px-3 rounded-md border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <Trash2 className="size-3.5" />
+            Excluir minha conta
+          </button>
+        </section>
       </div>
+
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 backdrop-blur-sm p-4">
+          <div className="bg-surface border border-destructive/40 rounded-lg max-w-md w-full p-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="size-9 rounded-full bg-destructive/15 grid place-items-center shrink-0">
+                <AlertTriangle className="size-4 text-destructive" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-semibold">Excluir conta?</h3>
+                <p className="text-xs text-muted-foreground">
+                  Essa ação encerra seu acesso imediatamente. Para confirmar,
+                  digite <span className="font-mono text-foreground">EXCLUIR</span> abaixo.
+                </p>
+              </div>
+            </div>
+            <input
+              className={inputCls}
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="EXCLUIR"
+              autoFocus
+            />
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => { setConfirmDelete(false); setDeleteConfirmText(""); }}
+                disabled={deleting}
+                className="text-xs font-semibold py-2 px-3 rounded-md border border-border hover:text-foreground text-muted-foreground"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleting || deleteConfirmText.trim().toUpperCase() !== "EXCLUIR"}
+                className="inline-flex items-center gap-2 text-xs font-semibold py-2 px-3 rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60"
+              >
+                {deleting ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+                {deleting ? "Excluindo..." : "Excluir definitivamente"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <AvatarCropDialog
         file={pendingFile}
         open={!!pendingFile}
