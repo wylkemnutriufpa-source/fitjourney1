@@ -29,6 +29,9 @@ const inputCls =
 function PatientSettings() {
   const fetchProfile = useServerFn(getMyPatientProfile);
   const updateProfile = useServerFn(updateMyPatientProfile);
+  const deleteAccount = useServerFn(softDeleteMyPatientAccount);
+  const navigate = useNavigate();
+
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["my-patient-profile"],
