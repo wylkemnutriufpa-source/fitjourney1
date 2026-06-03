@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "name": "Auto-commit ao salvar arquivo",
+  "description": "Faz commit automático sempre que um arquivo de código é salvo para não perder nenhuma mudança",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "docs/**/*.md",
+      ".kiro/specs/**/*.md"
+    ]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "cd \"c:\\Users\\55919\\Downloads\\fitjourney1_audit\" && git add -A && git diff --cached --quiet || (git commit -m \"auto: commit de mudança em arquivo [skip ci]\" && git push origin main)",
+    "timeout": 30
+  }
+}

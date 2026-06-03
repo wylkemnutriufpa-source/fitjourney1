@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "Auto-commit e push a cada 30 minutos",
+  "description": "Faz commit de todas as mudanças a cada 30 minutos e faz push para o GitHub para capturar mudanças na arquitetura em tempo real",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "cd \"c:\\Users\\55919\\Downloads\\fitjourney1_audit\" && git add -A && git diff --cached --quiet || (git commit -m \"auto: sincronização automática de mudanças na arquitetura [skip ci]\" && git push origin main) && echo \"✅ Auto-commit e push concluído em $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')\"",
+    "timeout": 60
+  }
+}
