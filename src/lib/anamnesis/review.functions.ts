@@ -12,6 +12,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { loadCatalog } from "@/lib/anamnesis/v2/catalog/loader";
 import { toCanonical } from "@/lib/anamnesis/v2/to-canonical";
 import type { Answers } from "@/lib/anamnesis/v2/catalog/types";
+import { generateDraftPlanFromApproval } from "@/lib/plans/draft-auto-plan";
 
 // ---------------- getMyLatestAnamnesisSummary ----------------
 // Paciente. SEMPRE retorna a última versão APROVADA. Nunca submitted/draft.
