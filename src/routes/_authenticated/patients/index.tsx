@@ -280,7 +280,7 @@ function Patients() {
                         (p.planStatus === "delivered" ? "text-emerald-400" : "text-amber-400")
                       }>
                         <span className={"size-1.5 rounded-full " + (p.planStatus === "delivered" ? "bg-emerald-400" : "bg-amber-400")} />
-                        {p.planStatus === "delivered" ? "Plano entregue" : "Plano pendente"}
+                        {p.planStatus === "delivered" ? "Com plano" : "Sem plano"}
                       </span>
                       {p.anamnesisStatus === "approved" && (
                         <a
