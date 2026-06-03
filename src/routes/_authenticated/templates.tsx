@@ -739,6 +739,13 @@ function TemplateEditor({
         data: {
           patientId,
           snapshot: JSON.parse(JSON.stringify(currentForShare)),
+          // Rastreabilidade: sempre registra o slug do template-base. Templates do
+          // sistema usam slug (ex: "esp-hipertrofia"); templates salvos do nutri
+          // usam UUID — nesse caso também populamos sourceTemplateId.
+          sourceTemplateKey: original.id,
+          sourceTemplateId: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(original.id)
+            ? original.id
+            : undefined,
           overrideMissingClinical: opts?.overrideMissingClinical || undefined,
         },
       });
