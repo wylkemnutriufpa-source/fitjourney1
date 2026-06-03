@@ -23,6 +23,7 @@ import {
   type ResultRating,
 } from "@/lib/feedback/copy";
 import { FeedbackChart } from "@/components/feedback/FeedbackChart";
+import { FeedbackCountdown } from "@/components/feedback/FeedbackCountdown";
 import {
   CheckCircle2,
   Clock,
@@ -77,7 +78,8 @@ function FeedbackPage() {
   const { data: status } = useQuery({
     queryKey: ["my-feedback-status"],
     queryFn: () => fetchStatus(),
-    staleTime: 30_000,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
   const { data: profile } = useQuery({
     queryKey: ["my-patient-profile"],
@@ -253,15 +255,12 @@ function FeedbackPage() {
           </div>
         )}
 
-        {status?.hasNutritionist && status.isPending && (
-          <div className="rounded-md border border-primary/40 bg-primary/5 p-3 text-xs flex items-center gap-2">
-            <Clock className="size-4 text-primary" />
-            <span className="flex-1">
-              Você combinou enviar feedback a cada{" "}
-              <strong>{status.frequencyDays} dias</strong>. Último envio:{" "}
-              <strong>{fmtRelative(status.daysSinceLast)}</strong>.
-            </span>
-          </div>
+        {status?.hasNutritionist && (
+          <FeedbackCountdown
+            frequencyDays={status.frequencyDays}
+            lastFeedbackAt={status.lastFeedbackAt}
+            daysSinceLast={status.daysSinceLast}
+          />
         )}
 
         {/* Tabs */}
