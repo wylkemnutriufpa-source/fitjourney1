@@ -371,3 +371,43 @@ export const reviewAnamnesis = createServerFn({ method: "POST" })
 
     return { ok: true, newStatus: data.decision, draft: draftOutcome };
   });
+
+// ---------------- getMyApprovedAnamnesisFull ----------------
+// Paciente lê as próprias respostas da última anamnese APROVADA.
+// Mesmo shape de rawAnswersJson de getAnamnesisForReview — para reuso
+// direto do componente AnamnesisAnswersView no Patient App.
+// RLS: policy "patient reads own anamnese" garante o escopo.
+
+export const getMyApprovedAnamnesisFull = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+
+    const { data: patient } = await supabase
+      .from("patients")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!patient) return null;
+
+    const { data: row, error } = await supabase
+      .from("anamneses")
+      .select("id, version, review_status, approved_at, submitted_at, catalog_version, data")
+      .eq("patient_id", patient.id)
+      .eq("review_status", "approved")
+      .order("approved_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) return null;
+
+    const json = (row.data ?? {}) as { raw?: unknown };
+    return {
+      id: row.id as string,
+      version: row.version as number,
+      approvedAt: (row.approved_at as string | null) ?? null,
+      submittedAt: (row.submitted_at as string | null) ?? null,
+      catalogVersion: (row.catalog_version as string | null) ?? null,
+      rawAnswersJson: JSON.stringify(json.raw ?? {}),
+    };
+  });
