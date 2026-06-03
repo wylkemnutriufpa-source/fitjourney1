@@ -415,8 +415,8 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
             </div>
             <button
               type="button"
-              onClick={() => navigate({ to: settingsHref })}
-              title="Abrir configurações"
+              onClick={() => setAvatarMenuOpen(true)}
+              title="Abrir menu da conta"
               className="size-9 sm:size-10 rounded-full bg-surface border border-border overflow-hidden grid place-items-center text-xs font-mono shrink-0 hover:border-primary/60 transition-colors"
             >
               {avatarUrl ? (
@@ -425,6 +425,17 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 <span>{initials}</span>
               )}
             </button>
+            <AvatarMenuDialog
+              open={avatarMenuOpen}
+              onOpenChange={setAvatarMenuOpen}
+              role={isAdmin ? "admin" : isPatient ? "patient" : "nutritionist"}
+              email={email}
+              displayName={displayName}
+              avatarUrl={avatarUrl}
+              settingsHref={settingsHref}
+              onSignOut={handleSignOut}
+            />
+
           </div>
         </header>
         <main className="p-4 sm:p-8 max-w-7xl mx-auto">{children ?? <Outlet />}</main>
