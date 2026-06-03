@@ -284,7 +284,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
       <aside
         className={
-          "fixed left-0 top-0 z-50 h-full w-64 border-r border-border/60 bg-sidebar/60 backdrop-blur-xl supports-[backdrop-filter]:bg-sidebar/50 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.35)] px-4 py-6 flex flex-col transition-transform duration-200 " +
+          "fixed left-0 top-0 z-50 h-full w-64 border-r border-border/40 bg-sidebar/40 backdrop-blur-2xl supports-[backdrop-filter]:bg-sidebar/30 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.35)] px-4 py-6 flex flex-col transition-transform duration-200 " +
           (sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0 md:w-0 md:px-0 md:border-r-0 md:overflow-hidden")
         }
       >
@@ -297,14 +297,16 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
             }}
           />
 
-          <button
-            onClick={() => setSidebarOpen(false)}
-            title="Recolher menu"
-            aria-label="Recolher menu"
-            className="p-1.5 rounded-md border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
-          >
-            <ChevronLeft className="size-4" />
-          </button>
+          {sidebarOpen && (
+            <button
+              onClick={() => setSidebarOpen(false)}
+              title="Recolher menu"
+              aria-label="Recolher menu"
+              className="p-1.5 rounded-md border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+          )}
         </div>
 
         <nav className="space-y-1 flex-1">
