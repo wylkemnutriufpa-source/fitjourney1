@@ -32,6 +32,7 @@ import { LogoOrbital } from "@/components/LogoOrbital";
 import { BrandLockup } from "@/components/BrandLockup";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
 import { VideoLoaderFullscreen } from "@/components/VideoLoader";
+import { AvatarMenuDialog } from "@/components/layout/AvatarMenuDialog";
 
 // Cache module-level do estado do sidebar — sobrevive a remounts do AppShell.
 let __sidebarOpenCache: boolean | null = null;
