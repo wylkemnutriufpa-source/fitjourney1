@@ -13,6 +13,7 @@ import {
   validateReferralCode,
   consumeReferralCodeAndCreatePatient,
 } from "@/lib/signup/patient-signup.functions";
+import { maskPhoneBR, normalizePhoneE164, isValidPhoneBR } from "@/lib/phone-mask";
 
 const SearchSchema = z.object({
   code: z.string().trim().toUpperCase().optional(),
