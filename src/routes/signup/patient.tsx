@@ -86,10 +86,14 @@ function PatientSignupPage() {
     e.preventDefault();
     if (!code) return;
     setError(null);
+    if (!isValidPhoneBR(phone)) {
+      setError("Informe um WhatsApp válido com DDD.");
+      return;
+    }
     setSubmitting(true);
     try {
       await consume({
-        data: { code, fullName, email, password, phone: normalizePhone(phone) },
+        data: { code, fullName, email, password, phone: normalizePhoneE164(phone) },
       });
       // login automático
       const { error: signInErr } = await supabase.auth.signInWithPassword({
