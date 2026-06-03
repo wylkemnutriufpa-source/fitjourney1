@@ -29,7 +29,7 @@ async function loadContextForPatient(
   supabase: Sb,
   patientId: string,
 ): Promise<ClinicalContext> {
-  const [anamnesesRes, feedbacksRes] = await Promise.all([
+  const [anamnesesRes, feedbacksRes, paRes] = await Promise.all([
     supabase
       .from("anamneses")
       .select("id, approved_at, data")
@@ -43,6 +43,12 @@ async function loadContextForPatient(
       .eq("patient_id", patientId)
       .not("weight_kg", "is", null)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("physical_assessments")
+      .select("id, assessed_at, weight_kg")
+      .eq("patient_id", patientId)
+      .not("weight_kg", "is", null)
+      .order("assessed_at", { ascending: false }),
   ]);
 
   if (anamnesesRes.error) {
@@ -53,6 +59,11 @@ async function loadContextForPatient(
   if (feedbacksRes.error) {
     throw new Error(
       `clinical context: failed to load feedbacks (${feedbacksRes.error.message})`,
+    );
+  }
+  if (paRes.error) {
+    throw new Error(
+      `clinical context: failed to load physical_assessments (${paRes.error.message})`,
     );
   }
 
@@ -76,6 +87,16 @@ async function loadContextForPatient(
       weightKg: Number(f.weight_kg),
       measuredAt: f.created_at,
       sourceId: f.id,
+    });
+  }
+  // Avaliação Física: fonte clínica de peso (resolução por recência).
+  for (const pa of paRes.data ?? []) {
+    if (pa.weight_kg == null) continue;
+    weightReadings.push({
+      source: "physical_assessment",
+      weightKg: Number(pa.weight_kg),
+      measuredAt: pa.assessed_at,
+      sourceId: pa.id,
     });
   }
   // Anamneses aprovadas também contam como leitura de peso (basics.weightKg).
