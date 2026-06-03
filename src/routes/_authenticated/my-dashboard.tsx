@@ -18,6 +18,7 @@ import {
   Wallet,
   Sparkles,
   ClipboardList,
+  Activity,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { FeedbackCountdown } from "@/components/feedback/FeedbackCountdown";
