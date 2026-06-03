@@ -42,6 +42,7 @@ import { Route as AuthenticatedOnboardingPatientRouteImport } from './routes/_au
 import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './routes/_authenticated/onboarding/nutritionist'
 import { Route as AuthenticatedMyPlanUpdateHealthProfileRouteImport } from './routes/_authenticated/my-plan.update-health-profile'
 import { Route as AuthenticatedMyPlanSettingsRouteImport } from './routes/_authenticated/my-plan.settings'
+import { Route as AuthenticatedMyPlanPhysicalAssessmentRouteImport } from './routes/_authenticated/my-plan.physical-assessment'
 import { Route as AuthenticatedMyPlanFeedbackRouteImport } from './routes/_authenticated/my-plan.feedback'
 import { Route as AuthenticatedMyPlanAnamneseRouteImport } from './routes/_authenticated/my-plan.anamnese'
 import { Route as AuthenticatedAnamnesesIdRouteImport } from './routes/_authenticated/anamneses.$id'
@@ -228,6 +229,12 @@ const AuthenticatedMyPlanSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedMyPlanRoute,
   } as any)
+const AuthenticatedMyPlanPhysicalAssessmentRoute =
+  AuthenticatedMyPlanPhysicalAssessmentRouteImport.update({
+    id: '/physical-assessment',
+    path: '/physical-assessment',
+    getParentRoute: () => AuthenticatedMyPlanRoute,
+  } as any)
 const AuthenticatedMyPlanFeedbackRoute =
   AuthenticatedMyPlanFeedbackRouteImport.update({
     id: '/feedback',
@@ -326,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
+  '/my-plan/physical-assessment': typeof AuthenticatedMyPlanPhysicalAssessmentRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
@@ -371,6 +379,7 @@ export interface FileRoutesByTo {
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
+  '/my-plan/physical-assessment': typeof AuthenticatedMyPlanPhysicalAssessmentRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
@@ -418,6 +427,7 @@ export interface FileRoutesById {
   '/_authenticated/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/_authenticated/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/_authenticated/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
+  '/_authenticated/my-plan/physical-assessment': typeof AuthenticatedMyPlanPhysicalAssessmentRoute
   '/_authenticated/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/_authenticated/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
@@ -465,6 +475,7 @@ export interface FileRouteTypes {
     | '/anamneses/$id'
     | '/my-plan/anamnese'
     | '/my-plan/feedback'
+    | '/my-plan/physical-assessment'
     | '/my-plan/settings'
     | '/my-plan/update-health-profile'
     | '/onboarding/nutritionist'
@@ -510,6 +521,7 @@ export interface FileRouteTypes {
     | '/anamneses/$id'
     | '/my-plan/anamnese'
     | '/my-plan/feedback'
+    | '/my-plan/physical-assessment'
     | '/my-plan/settings'
     | '/my-plan/update-health-profile'
     | '/onboarding/nutritionist'
@@ -556,6 +568,7 @@ export interface FileRouteTypes {
     | '/_authenticated/anamneses/$id'
     | '/_authenticated/my-plan/anamnese'
     | '/_authenticated/my-plan/feedback'
+    | '/_authenticated/my-plan/physical-assessment'
     | '/_authenticated/my-plan/settings'
     | '/_authenticated/my-plan/update-health-profile'
     | '/_authenticated/onboarding/nutritionist'
@@ -819,6 +832,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyPlanSettingsRouteImport
       parentRoute: typeof AuthenticatedMyPlanRoute
     }
+    '/_authenticated/my-plan/physical-assessment': {
+      id: '/_authenticated/my-plan/physical-assessment'
+      path: '/physical-assessment'
+      fullPath: '/my-plan/physical-assessment'
+      preLoaderRoute: typeof AuthenticatedMyPlanPhysicalAssessmentRouteImport
+      parentRoute: typeof AuthenticatedMyPlanRoute
+    }
     '/_authenticated/my-plan/feedback': {
       id: '/_authenticated/my-plan/feedback'
       path: '/feedback'
@@ -921,6 +941,7 @@ const AuthenticatedAdminRouteWithChildren =
 interface AuthenticatedMyPlanRouteChildren {
   AuthenticatedMyPlanAnamneseRoute: typeof AuthenticatedMyPlanAnamneseRoute
   AuthenticatedMyPlanFeedbackRoute: typeof AuthenticatedMyPlanFeedbackRoute
+  AuthenticatedMyPlanPhysicalAssessmentRoute: typeof AuthenticatedMyPlanPhysicalAssessmentRoute
   AuthenticatedMyPlanSettingsRoute: typeof AuthenticatedMyPlanSettingsRoute
   AuthenticatedMyPlanUpdateHealthProfileRoute: typeof AuthenticatedMyPlanUpdateHealthProfileRoute
 }
@@ -928,6 +949,8 @@ interface AuthenticatedMyPlanRouteChildren {
 const AuthenticatedMyPlanRouteChildren: AuthenticatedMyPlanRouteChildren = {
   AuthenticatedMyPlanAnamneseRoute: AuthenticatedMyPlanAnamneseRoute,
   AuthenticatedMyPlanFeedbackRoute: AuthenticatedMyPlanFeedbackRoute,
+  AuthenticatedMyPlanPhysicalAssessmentRoute:
+    AuthenticatedMyPlanPhysicalAssessmentRoute,
   AuthenticatedMyPlanSettingsRoute: AuthenticatedMyPlanSettingsRoute,
   AuthenticatedMyPlanUpdateHealthProfileRoute:
     AuthenticatedMyPlanUpdateHealthProfileRoute,
