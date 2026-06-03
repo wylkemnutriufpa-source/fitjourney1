@@ -94,3 +94,17 @@ export const updateMyPatientProfile = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// Soft delete: marca deleted_at. Histórico clínico permanece com o profissional
+// (LGPD: dever legal de guarda do prontuário). RLS bloqueia acesso após isso.
+export const softDeleteMyPatientAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { error } = await supabase
+      .from("patients")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("auth_user_id", userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

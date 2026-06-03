@@ -187,8 +187,32 @@ function Landing() {
   });
   const c = data ?? DEFAULT_LANDING_CONTENT;
 
+  // Fade-in ao rolar: aplica .reveal/.is-visible automaticamente em todas as
+  // <section> da landing (exceto o hero, que já tem seu próprio efeito parallax).
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const sections = Array.from(root.querySelectorAll<HTMLElement>("section"));
+    const targets = sections.filter((el) => el !== heroRef.current);
+    targets.forEach((el) => el.classList.add("reveal"));
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-visible");
+            obs.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+    );
+    targets.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div ref={rootRef} className="min-h-screen bg-background overflow-x-hidden">
       {/* ══════════ NAV — Premium Reveal ══════════ */}
       <motion.nav
         initial={{ y: -32, opacity: 0 }}
