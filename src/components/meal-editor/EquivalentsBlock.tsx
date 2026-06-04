@@ -3,8 +3,8 @@
 // Componente compartilhado: o editor de template e o editor de plano do paciente
 // passam o mesmo PlannerFoodItem base + onChange para materializar.
 
-import { useEffect, useMemo, useRef } from "react";
-import { RefreshCw, Plus } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { RefreshCw, Plus, ChevronDown, ChevronRight, Shuffle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -55,6 +55,7 @@ export function EquivalentsBlock({
   const candidates = useTacoCandidates();
   const criterion: BlockCriterion = value?.criterion ?? "auto";
   const options = value?.options ?? [];
+  const [open, setOpen] = useState(false);
 
   const canRecalc = useMemo(() => {
     return candidates.length > 0 && base.foodKey.length > 0;
@@ -129,76 +130,127 @@ export function EquivalentsBlock({
     onChange({ ...value, options: nextOptions, generatedAt: new Date().toISOString() });
   };
 
+  const summaryLabel =
+    options.length === 0
+      ? "Nenhuma opção gerada"
+      : `${options.length} ${options.length === 1 ? "opção equivalente" : "opções equivalentes"}`;
+
   return (
-    <div className="space-y-3 rounded-lg border border-dashed border-border bg-muted/30 p-3">
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="flex-1 min-w-[180px]">
-          <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
-            Critério de equivalência
-          </Label>
-          <Select
-            value={criterion}
-            onValueChange={(v) => handleCriterionChange(v as BlockCriterion)}
-            disabled={disabled}
-          >
-            <SelectTrigger className="h-8 text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(CRITERION_LABEL) as BlockCriterion[]).map((k) => (
-                <SelectItem key={k} value={k}>
-                  {CRITERION_LABEL[k]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <div className="rounded-lg border border-dashed border-border bg-muted/30">
+      {/* Header colapsável */}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          {open ? (
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          ) : (
+            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          )}
+          <Shuffle className="h-3.5 w-3.5 text-primary shrink-0" />
+          <span className="text-xs font-medium text-foreground truncate">
+            Equivalências
+          </span>
+          <span className="text-[11px] text-muted-foreground truncate">
+            · {summaryLabel}
+          </span>
         </div>
-
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={handleRecalc}
-          disabled={disabled || !canRecalc}
-        >
-          <RefreshCw className="mr-2 h-3.5 w-3.5" />
-          Recalcular bloco
-        </Button>
-      </div>
-
-      {options.length === 0 ? (
-        <div className="flex items-center justify-between rounded-md border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground">
-          <span>Nenhuma opção gerada ainda.</span>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={handleRecalc}
-            disabled={disabled || !canRecalc}
+        {options.length === 0 && canRecalc && !open ? (
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRecalc();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.stopPropagation();
+                handleRecalc();
+              }
+            }}
+            className="inline-flex h-7 items-center justify-center rounded-md border border-input bg-background px-2 text-[11px] font-medium text-foreground transition-colors hover:bg-accent"
           >
-            <Plus className="mr-1 h-3.5 w-3.5" />
+            <Plus className="mr-1 h-3 w-3" />
             Gerar
-          </Button>
-        </div>
-      ) : (
-        <div className="grid gap-2 md:grid-cols-2">
-          {options.map((o, idx) => (
-            <EquivalentsOptionCard
-              key={`${o.foodKey}-${idx}`}
-              value={o}
-              onChange={(next) => handleOptionChange(idx, next)}
-              onRemove={() => handleOptionRemove(idx)}
-              disabled={disabled}
-            />
-          ))}
-        </div>
-      )}
+          </span>
+        ) : null}
+      </button>
 
-      {value?.generatedAt && options.length > 0 ? (
-        <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-          Materializado em {new Date(value.generatedAt).toLocaleString("pt-BR")} ·
-          catálogo {value.catalogVersion || "—"}
-        </p>
+      {open ? (
+        <div className="space-y-3 border-t border-border/60 p-3">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-[180px]">
+              <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                Critério de equivalência
+              </Label>
+              <Select
+                value={criterion}
+                onValueChange={(v) => handleCriterionChange(v as BlockCriterion)}
+                disabled={disabled}
+              >
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(CRITERION_LABEL) as BlockCriterion[]).map((k) => (
+                    <SelectItem key={k} value={k}>
+                      {CRITERION_LABEL[k]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={handleRecalc}
+              disabled={disabled || !canRecalc}
+            >
+              <RefreshCw className="mr-2 h-3.5 w-3.5" />
+              Recalcular bloco
+            </Button>
+          </div>
+
+          {options.length === 0 ? (
+            <div className="flex items-center justify-between rounded-md border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground">
+              <span>Nenhuma opção gerada ainda.</span>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={handleRecalc}
+                disabled={disabled || !canRecalc}
+              >
+                <Plus className="mr-1 h-3.5 w-3.5" />
+                Gerar
+              </Button>
+            </div>
+          ) : (
+            <div className="grid gap-2 md:grid-cols-2">
+              {options.map((o, idx) => (
+                <EquivalentsOptionCard
+                  key={`${o.foodKey}-${idx}`}
+                  value={o}
+                  onChange={(next) => handleOptionChange(idx, next)}
+                  onRemove={() => handleOptionRemove(idx)}
+                  disabled={disabled}
+                />
+              ))}
+            </div>
+          )}
+
+          {value?.generatedAt && options.length > 0 ? (
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              Materializado em {new Date(value.generatedAt).toLocaleString("pt-BR")} ·
+              catálogo {value.catalogVersion || "—"}
+            </p>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );
