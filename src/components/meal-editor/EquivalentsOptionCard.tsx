@@ -32,7 +32,7 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
         type="button"
         onClick={onSwap}
         disabled={disabled || !onSwap}
-        className="group relative h-16 w-16 flex-none overflow-hidden rounded-md bg-muted disabled:cursor-default"
+        className="group relative h-20 w-20 flex-none overflow-hidden rounded-lg bg-muted ring-1 ring-border disabled:cursor-default"
         aria-label="Trocar alimento"
         title={onSwap ? "Clique para trocar este alimento" : undefined}
       >
