@@ -26,6 +26,24 @@ export type ItemSubstitutionV2 = {
   note?: string;
 };
 
+export type BlockCriterionV2 = "auto" | "protein" | "carb" | "energy";
+
+export type MaterializedEquivalentOptionV2 = {
+  foodKey: string;
+  name: string;
+  qty: number;
+  unit: string;
+  kcal: number;
+  imageSlug?: string;
+};
+
+export type MaterializedEquivalentsV2 = {
+  criterion: BlockCriterionV2;
+  generatedAt: string;
+  catalogVersion: string;
+  options: MaterializedEquivalentOptionV2[];
+};
+
 export type PlannerFoodItemV2 = {
   id: string;
   foodKey: string;
@@ -39,6 +57,8 @@ export type PlannerFoodItemV2 = {
   scaleGroup: ScaleGroupV2;
   measures?: ItemMeasureV2[];
   substitutions?: ItemSubstitutionV2[];
+  /** Templates Inteligentes Fase 1 — bloco de substituição materializado. */
+  materializedEquivalents?: MaterializedEquivalentsV2;
   notes?: string;
 };
 
