@@ -1322,6 +1322,35 @@ function MealEditor({
     onChange((m) => ({ ...m, equivalents: m.equivalents.filter((e) => e.id !== eqId) }));
   }
 
+  /**
+   * Sprint 6 A.3 — Recalcula bloco TACO com N opções (1..4) a partir do
+   * primeiro item da refeição principal que tenha cobertura no catálogo TACO.
+   * Substitui os equivalentes existentes pelos calculados.
+   */
+  function recalcTacoBlock(count: 1 | 2 | 3 | 4) {
+    const base = meal.main.items.find((it) =>
+      buildTacoEquivalents(it, 1) !== null,
+    );
+    if (!base) {
+      toast.error("Nenhum item da refeição está no catálogo TACO.");
+      return;
+    }
+    const opts = buildTacoEquivalents(base, count);
+    if (!opts || opts.length === 0) {
+      toast.error("Não foi possível calcular substitutos para este alimento.");
+      return;
+    }
+    onChange((m) => {
+      const withImages = opts.map((opt) => {
+        const first = opt.items[0];
+        const imageKey = first ? deriveImageKeyForFood(first) : undefined;
+        return { ...opt, imageKey: imageKey ?? opt.imageKey ?? "" };
+      });
+      return { ...m, equivalents: withImages };
+    });
+    toast.success(`Bloco TACO recalculado com ${opts.length} opções.`);
+  }
+
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-background">
       <div className="grid grid-cols-[140px_1fr] gap-0">
