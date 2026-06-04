@@ -96,7 +96,7 @@ export function FeedbackChart({
   fallbackHeightCm,
 }: {
   /** Em qualquer ordem; o componente ordena por created_at asc. */
-  feedbacks: ReadonlyArray<FeedbackDTO>;
+  feedbacks: ReadonlyArray<FeedbackDTO> | undefined;
   /** Usado pra calcular IMC quando o feedback não tem snapshot de altura. */
   fallbackHeightCm: number | null;
 }) {
