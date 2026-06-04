@@ -22,6 +22,15 @@ import {
 } from "@/lib/anamnesis/review.functions";
 import { describeFlag } from "@/lib/anamnesis/v2/alerts.catalog";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ClipboardEdit, ListChecks } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/anamneses/$id")({
   head: () => ({ meta: [{ title: "Revisão clínica — FitJourney" }] }),
