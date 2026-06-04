@@ -1484,7 +1484,30 @@ function MealEditor({
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1">
                 <Repeat2 className="size-3" /> Opções equivalentes ({meal.equivalents.length})
               </p>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <div className="inline-flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-background">
+                  <span className="text-[9px] font-mono uppercase text-muted-foreground px-1.5">Critério</span>
+                  {([
+                    { v: "auto", l: "Auto" },
+                    { v: "protein", l: "Prot" },
+                    { v: "carb", l: "Carb" },
+                    { v: "energy", l: "Kcal" },
+                  ] as const).map((opt) => (
+                    <button
+                      key={opt.v}
+                      type="button"
+                      onClick={() => setTacoCriterion(opt.v)}
+                      className={`text-[10px] font-medium px-2 py-0.5 rounded transition-colors ${
+                        tacoCriterion === opt.v
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                      title={`Casar substitutos por ${opt.l.toLowerCase()}`}
+                    >
+                      {opt.l}
+                    </button>
+                  ))}
+                </div>
                 <div className="inline-flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-background">
                   <span className="text-[9px] font-mono uppercase text-muted-foreground px-1.5">TACO</span>
                   {([1, 2, 3, 4] as const).map((n) => (
