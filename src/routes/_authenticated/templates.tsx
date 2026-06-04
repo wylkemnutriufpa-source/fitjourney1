@@ -1437,11 +1437,11 @@ function MealEditor({
       return;
     }
     if (result.kind === "uncovered") {
-      toast.error("Nenhum item da refeição está no catálogo TACO.");
+      toast.error("Nenhum item da refeição está no catálogo de equivalentes.");
       return;
     }
     onChange((m) => ({ ...m, equivalents: result.options }));
-    toast.success(`Bloco TACO recalculado com ${result.options.length} opções.`);
+    toast.success(`Equivalentes recalculados: ${result.options.length} opção(ões).`);
   }
 
 
