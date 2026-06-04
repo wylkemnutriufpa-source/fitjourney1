@@ -27,7 +27,7 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
   const patch = (p: Partial<MaterializedEquivalentOption>) => onChange({ ...value, ...p });
 
   return (
-    <div className="flex gap-3 rounded-lg border border-border bg-card p-3">
+    <div className="group/card flex gap-3 rounded-lg border border-border bg-card p-3 shadow-sm transition-all hover:border-primary/40 hover:shadow-md">
       <button
         type="button"
         onClick={onSwap}
