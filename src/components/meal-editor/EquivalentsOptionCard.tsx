@@ -20,7 +20,7 @@ type Props = {
   disabled?: boolean;
 };
 
-export function EquivalentsOptionCard({ value, onChange, onRemove, disabled }: Props) {
+export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disabled }: Props) {
   const [imgError, setImgError] = useState(false);
   const imgSrc = imgFor(value.imageSlug ?? value.foodKey, value.name);
 
