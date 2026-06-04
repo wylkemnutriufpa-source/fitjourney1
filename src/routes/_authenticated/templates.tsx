@@ -1349,7 +1349,7 @@ function MealEditor({
 
     // Para cada item: array de N substitutos (PlannerMealOption[]) ou null.
     const crit = tacoCriterion === "auto" ? undefined : tacoCriterion;
-    const perItem = items.map((it) => buildTacoEquivalents(it, count, crit));
+    const perItem = items.map((it) => buildTacoEquivalents(it, count, crit, candidates));
     const anyCovered = perItem.some((p) => p !== null && p.length > 0);
     if (!anyCovered) {
       toast.error("Nenhum item da refeição está no catálogo TACO.");
