@@ -37,18 +37,18 @@ function Kpi({
 }) {
   const inner = (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-3">
         <p
           className={
-            "text-[10px] font-mono uppercase tracking-widest " +
+            "min-w-0 text-[10px] font-mono uppercase tracking-widest leading-snug " +
             (accent ? "text-primary-foreground/70" : "text-muted-foreground")
           }
         >
           {label}
         </p>
-        <Icon className={"size-4 " + (accent ? "opacity-70" : "text-muted-foreground")} />
+        <Icon className={"size-4 shrink-0 " + (accent ? "opacity-70" : "text-muted-foreground")} />
       </div>
-      <p className="text-4xl font-bold tracking-tighter">{value}</p>
+      <p className="text-3xl font-bold tracking-tight sm:text-4xl">{value}</p>
       {hint && (
         <p
           className={
@@ -62,7 +62,7 @@ function Kpi({
     </>
   );
   const cls =
-    "p-5 rounded-lg border space-y-2 transition-colors " +
+    "min-h-[128px] p-4 sm:p-5 rounded-lg border space-y-2 transition-colors " +
     (accent
       ? "bg-primary text-primary-foreground border-primary "
       : "bg-surface border-border ") +
@@ -133,19 +133,20 @@ function Dashboard() {
       header={
         <Link
           to="/patients/new"
-          className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+          className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
         >
           <Plus className="size-3.5" />
-          Novo Paciente
+          <span className="hidden min-[390px]:inline">Novo Paciente</span>
+          <span className="min-[390px]:hidden">Novo</span>
         </Link>
       }
     >
-      <div className="space-y-10">
+      <div className="space-y-8 sm:space-y-10">
         <section className="space-y-2">
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             Olá, {greetingName}
           </p>
-          <h1 className="text-3xl font-bold tracking-tight">Visão Geral</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Visão Geral</h1>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -186,7 +187,7 @@ function Dashboard() {
                   Consultas e dietas geradas
                 </h3>
               </div>
-              <div className="flex gap-4 text-[10px] font-mono uppercase">
+              <div className="flex flex-wrap justify-end gap-x-4 gap-y-2 text-[10px] font-mono uppercase">
                 <span className="flex items-center gap-1.5">
                   <span className="size-2 rounded-full bg-primary" /> Consultas
                 </span>
@@ -195,7 +196,7 @@ function Dashboard() {
                 </span>
               </div>
             </div>
-            <div className="h-64">
+            <div className="h-56 sm:h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={weekly}>
                   <defs>
@@ -234,7 +235,7 @@ function Dashboard() {
             </div>
           </Link>
 
-          <div className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <div className="bg-surface border border-border rounded-lg p-4 space-y-4 sm:p-6">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Distribuição por Objetivo
             </p>
@@ -276,7 +277,7 @@ function Dashboard() {
 
 
         <section>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-end justify-between gap-3 mb-4">
             <div>
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                 Pacientes Recentes
@@ -285,7 +286,7 @@ function Dashboard() {
             </div>
             <Link
               to="/patients"
-              className="text-xs font-mono uppercase tracking-widest text-primary hover:underline flex items-center gap-1"
+              className="flex min-h-10 shrink-0 items-center gap-1 text-xs font-mono uppercase tracking-widest text-primary hover:underline"
             >
               Ver todos <ArrowUpRight className="size-3" />
             </Link>
@@ -310,21 +311,21 @@ function Dashboard() {
                   to="/patients/$id"
                   params={{ id: p.id }}
                   className={
-                    "flex items-center gap-4 p-4 hover:bg-accent/40 transition-colors " +
+                    "flex items-center gap-3 p-3 hover:bg-accent/40 transition-colors sm:gap-4 sm:p-4 " +
                     (i < recent.length - 1 ? "border-b border-border" : "")
                   }
                 >
-                  <div className="size-10 rounded-full bg-background border border-border grid place-items-center text-xs font-mono">
+                  <div className="size-10 shrink-0 rounded-full bg-background border border-border grid place-items-center text-xs font-mono">
                     {initials}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{p.fullName}</p>
                     <p className="text-xs text-muted-foreground font-mono truncate">{p.email}</p>
                   </div>
-                  <span className="text-[10px] font-mono uppercase px-2 py-1 rounded bg-background border border-border">
+                  <span className="hidden shrink-0 rounded border border-border bg-background px-2 py-1 text-[10px] font-mono uppercase sm:inline-flex">
                     {p.anamnesisStatus === "approved" ? "aprovada" : p.anamnesisStatus}
                   </span>
-                  <ArrowUpRight className="size-4 text-muted-foreground" />
+                  <ArrowUpRight className="size-4 shrink-0 text-muted-foreground" />
                 </Link>
               );
             })}
