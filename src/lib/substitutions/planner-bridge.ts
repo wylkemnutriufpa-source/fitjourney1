@@ -1,7 +1,7 @@
 // Ponte entre o motor puro de equivalentes TACO (src/lib/substitutions/equivalents.ts)
 // e o modelo do planner usado pelo editor de templates (PlannerMealOption[]).
 //
-// Sprint 6 — Fatia A.2.
+// Sprint 6 — Fatias A.2, A.4.3.
 
 import {
   calculateEquivalents,
@@ -10,7 +10,7 @@ import {
   type EquivalentOption,
   type MatchCriterion,
 } from "./equivalents";
-import { findTacoCandidate, tacoCatalog } from "./taco-catalog";
+import { findCandidateIn, tacoCatalog } from "./taco-catalog";
 import {
   createEmptyFoodItem,
   createEmptyMealOption,
@@ -23,8 +23,9 @@ export type SubstitutionCount = 1 | 2 | 3 | 4;
 
 /**
  * Constrói opções equivalentes para um item base do planner usando o catálogo TACO.
- * Retorna `null` quando o base não tem cobertura TACO — o chamador pode então
- * cair para o motor curado legado (`getSubstitutionsFor`).
+ * `candidates` permite injetar uma lista vinda do Cloud (A.4.3); por padrão
+ * cai no seed embutido (`tacoCatalog`) para garantir funcionamento offline/SSR.
+ * Retorna `null` quando o base não tem cobertura no catálogo escolhido.
  */
 export function buildTacoEquivalents(
   baseFood: PlannerFoodItem,
@@ -32,15 +33,21 @@ export function buildTacoEquivalents(
   criterion?: MatchCriterion,
   candidates: readonly EquivalentCandidate[] = tacoCatalog,
 ): PlannerMealOption[] | null {
-  const tacoBase = findTacoCandidate({ foodKey: baseFood.foodKey, name: baseFood.name });
+  const tacoBase = findCandidateIn(candidates, {
+    foodKey: baseFood.foodKey,
+    name: baseFood.name,
+  });
   if (!tacoBase) return null;
 
   const base: EquivalentBase = { ...tacoBase, qty: baseFood.qty || tacoBase.defaultQty };
   const options = calculateEquivalents(base, candidates, count, criterion);
-  return options.map(equivalentToPlannerOption);
+  return options.map((opt) => equivalentToPlannerOption(opt, candidates));
 }
 
-function equivalentToPlannerOption(opt: EquivalentOption): PlannerMealOption {
+function equivalentToPlannerOption(
+  opt: EquivalentOption,
+  candidates: readonly EquivalentCandidate[],
+): PlannerMealOption {
   return createEmptyMealOption({
     title: opt.name,
     imageKey: opt.foodKey,
@@ -51,15 +58,17 @@ function equivalentToPlannerOption(opt: EquivalentOption): PlannerMealOption {
         qty: opt.qty,
         unit: opt.unit,
         kcal: opt.kcal,
-        scaleGroup: tacoScaleGroupToPlanner(opt),
+        scaleGroup: tacoScaleGroupToPlanner(opt, candidates),
       }),
     ],
   });
 }
 
-function tacoScaleGroupToPlanner(opt: EquivalentOption): ScaleGroup {
-  // O EquivalentOption não carrega scaleGroup explicitamente; resolvemos pelo catálogo.
-  const cand = findTacoCandidate({ foodKey: opt.foodKey, name: opt.name });
+function tacoScaleGroupToPlanner(
+  opt: EquivalentOption,
+  candidates: readonly EquivalentCandidate[],
+): ScaleGroup {
+  const cand = findCandidateIn(candidates, { foodKey: opt.foodKey, name: opt.name });
   if (cand?.scaleGroup === "protein") return "protein";
   if (cand?.scaleGroup === "carb") return "carb";
   return (cand?.scaleGroup as ScaleGroup | undefined) ?? "mixed";

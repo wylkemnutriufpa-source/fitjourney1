@@ -57,6 +57,7 @@ import {
 import { detectMealKind, getSubstitutionsFor } from "@/lib/plans/substitution-rules";
 import { buildTacoEquivalents } from "@/lib/substitutions/planner-bridge";
 import type { MatchCriterion } from "@/lib/substitutions/equivalents";
+import { useTacoCandidates } from "@/lib/substitutions/use-taco-candidates";
 import {
   Plus,
   Save,
@@ -190,20 +191,111 @@ const STOP = new Set([
 ]);
 
 /**
+ * Sprint 6 A.4.4 — Botão que aplica o recálculo TACO (count=3, critério auto)
+ * a TODAS as refeições do template em um clique. Itens sem cobertura ficam
+ * inalterados; refeições vazias são puladas silenciosamente.
+ */
+function ApplyTacoAllButton({
+  draft,
+  setDraft,
+}: {
+  draft: PlannerTemplate;
+  setDraft: React.Dispatch<React.SetStateAction<PlannerTemplate>>;
+}) {
+  const candidates = useTacoCandidates();
+  function applyAll(count: 1 | 2 | 3 | 4) {
+    let touched = 0;
+    setDraft((d) => ({
+      ...d,
+      meals: d.meals.map((m) => {
+        const r = computeTacoBlock(m, count, undefined, candidates);
+        if (r.kind !== "ok") return m;
+        touched += 1;
+        return { ...m, equivalents: r.options };
+      }),
+    }));
+    if (touched === 0) toast.error("Nenhuma refeição tem itens cobertos pela TACO.");
+    else toast.success(`TACO aplicada a ${touched} refeição(ões) com ${count} opções.`);
+  }
+  return (
+    <div className="inline-flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-background">
+      <span className="text-[9px] font-mono uppercase text-muted-foreground px-1.5">
+        TACO em todas
+      </span>
+      {([1, 2, 3, 4] as const).map((n) => (
+        <button
+          key={n}
+          type="button"
+          onClick={() => applyAll(n)}
+          className="text-[10px] font-medium px-2 py-0.5 rounded hover:bg-primary/10 hover:text-primary transition-colors"
+          title={`Aplicar TACO ${n} a todas as refeições`}
+        >
+          {n}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Sprint 6 A.3/A.4.4 — Resultado puro do recálculo TACO de uma refeição.
+ * Permite que o componente do bloco e o pai (apply-all) compartilhem a
+ * mesma lógica determinística.
+ */
+type TacoBlockResult =
+  | { kind: "empty" }
+  | { kind: "uncovered" }
+  | { kind: "ok"; options: PlannerMealOption[] };
+
+function computeTacoBlock(
+  meal: PlannerMeal,
+  count: 1 | 2 | 3 | 4,
+  criterion: MatchCriterion | undefined,
+  candidates: readonly import("@/lib/substitutions/equivalents").EquivalentCandidate[],
+): TacoBlockResult {
+  const items = meal.main.items;
+  if (items.length === 0) return { kind: "empty" };
+
+  const perItem = items.map((it) => buildTacoEquivalents(it, count, criterion, candidates));
+  if (!perItem.some((p) => p !== null && p.length > 0)) return { kind: "uncovered" };
+
+  const firstCoveredIdx = perItem.findIndex((p) => p !== null && p.length > 0);
+  const options: PlannerMealOption[] = [];
+  for (let k = 0; k < count; k++) {
+    const optionItems = items.map((orig, i) => {
+      const subs = perItem[i];
+      if (!subs || subs.length === 0) return { ...orig };
+      const pick = subs[k % subs.length].items[0];
+      return { ...pick };
+    });
+    const heroItem = optionItems[firstCoveredIdx];
+    const imageKey = heroItem ? deriveImageKeyForFood(heroItem) ?? "" : "";
+    const title = heroItem?.name ?? `Opção ${k + 1}`;
+    options.push(createEmptyMealOption({ title, imageKey, items: optionItems }));
+  }
+  return { kind: "ok", options };
+}
+
+/**
  * Gera opções equivalentes automáticas para a refeição a partir do alimento
  * recém adicionado, usando o motor curado de substituições. Evita duplicar
  * opções já existentes (comparando títulos normalizados) e o próprio item.
  */
-function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): PlannerMealOption[] {
+
+function buildAutoEquivalents(
+  meal: PlannerMeal,
+  food: PlannerFoodItem,
+  candidates?: readonly import("@/lib/substitutions/equivalents").EquivalentCandidate[],
+): PlannerMealOption[] {
   const taken = new Set<string>([
     normalizeTitle(food.name),
     ...meal.equivalents.map((e) => normalizeTitle(e.title)),
     ...meal.equivalents.flatMap((e) => e.items.map((i) => normalizeTitle(i.name))),
   ]);
 
-  // 1) Tenta a fórmula TACO (Sprint 6 A.2): proteína/carbo/energia por critério,
-  //    arredondado a múltiplos de 5g. Cobre carnes, peixes, arroz, massas, etc.
-  const tacoOpts = buildTacoEquivalents(food, 3);
+  // 1) Tenta a fórmula TACO (Sprint 6 A.2/A.4.3): catálogo carregado do Cloud
+  //    (com fallback ao seed embutido) atravessa `candidates`.
+  const tacoOpts = buildTacoEquivalents(food, 3, undefined, candidates);
   if (tacoOpts && tacoOpts.length > 0) {
     const out: PlannerMealOption[] = [];
     for (const opt of tacoOpts) {
@@ -217,6 +309,7 @@ function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): Planner
     }
     if (out.length > 0) return out;
   }
+
 
   // 2) Fallback: motor curado por tipo de refeição.
   const kind = detectMealKind(meal.label, meal.time);
@@ -945,12 +1038,16 @@ function TemplateEditor({
           <div className="p-6 space-y-4">
             {editorTab === "refeicoes" && (
               <>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <h3 className="text-sm font-semibold">Esqueleto da dieta</h3>
-                  <Button size="sm" variant="outline" onClick={addMeal}>
-                    <Plus className="size-3.5" /> Refeição
-                  </Button>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <ApplyTacoAllButton draft={draft} setDraft={setDraft} />
+                    <Button size="sm" variant="outline" onClick={addMeal}>
+                      <Plus className="size-3.5" /> Refeição
+                    </Button>
+                  </div>
                 </div>
+
 
                 {draft.meals.map((m) => (
                   <MealEditor
@@ -1254,6 +1351,8 @@ function MealEditor({
   // Sprint 6 A.4.1 — critério manual de equivalência por bloco. "auto" usa
   // o defaultCriterionFor(scaleGroup) embutido no motor TACO.
   const [tacoCriterion, setTacoCriterion] = useState<MatchCriterion | "auto">("auto");
+  // Sprint 6 A.4.3 — catálogo TACO vivo do Cloud com fallback ao seed local.
+  const candidates = useTacoCandidates();
 
   function changeMainItem(itemId: string, updater: (i: PlannerFoodItem) => PlannerFoodItem) {
     onChange((m) => updateMainItemWithScaling(m, itemId, updater));
@@ -1281,7 +1380,7 @@ function MealEditor({
       // Auto-injeção de equivalentes só dispara no primeiro alimento da refeição.
       // Alimentos seguintes entram apenas na opção principal — sem amontoar substituições.
       const auto = isFirst
-        ? buildAutoEquivalents({ ...m, main: nextMain, heroKey }, food)
+        ? buildAutoEquivalents({ ...m, main: nextMain, heroKey }, food, candidates)
         : [];
       return {
         ...m,
@@ -1327,61 +1426,24 @@ function MealEditor({
   }
 
   /**
-   * Sprint 6 A.3 — Recalcula bloco TACO com N opções (1..4) considerando
-   * TODOS os itens da refeição principal. Para cada item com cobertura
-   * TACO, calcula N substitutos; itens sem cobertura são repetidos
-   * inalterados em cada opção. A imagem hero usa o 1º item coberto.
+   * Sprint 6 A.3/A.4.4 — Recalcula bloco TACO desta refeição usando o critério
+   * e count escolhidos, com o catálogo do Cloud (ou seed fallback).
    */
   function recalcTacoBlock(count: 1 | 2 | 3 | 4) {
-    const items = meal.main.items;
-    if (items.length === 0) {
+    const crit = tacoCriterion === "auto" ? undefined : tacoCriterion;
+    const result = computeTacoBlock(meal, count, crit, candidates);
+    if (result.kind === "empty") {
       toast.error("Refeição sem itens para calcular substitutos.");
       return;
     }
-
-    // Para cada item: array de N substitutos (PlannerMealOption[]) ou null.
-    const crit = tacoCriterion === "auto" ? undefined : tacoCriterion;
-    const perItem = items.map((it) => buildTacoEquivalents(it, count, crit));
-    const anyCovered = perItem.some((p) => p !== null && p.length > 0);
-    if (!anyCovered) {
+    if (result.kind === "uncovered") {
       toast.error("Nenhum item da refeição está no catálogo TACO.");
       return;
     }
-
-    const firstCoveredIdx = perItem.findIndex((p) => p !== null && p.length > 0);
-
-    // Monta N opções paralelas: opção k = um item substituto por posição.
-    const newOptions: PlannerMealOption[] = [];
-    for (let k = 0; k < count; k++) {
-      const optionItems = items.map((orig, i) => {
-        const subs = perItem[i];
-        if (!subs || subs.length === 0) {
-          // Sem cobertura → repete o original.
-          return { ...orig };
-        }
-        const pick = subs[k % subs.length].items[0];
-        return { ...pick };
-      });
-
-      // Imagem da opção: 1º item coberto desta opção (regra premium).
-      const heroItem = optionItems[firstCoveredIdx];
-      const imageKey = heroItem ? deriveImageKeyForFood(heroItem) ?? "" : "";
-
-      // Título da opção = nome do item hero (1º coberto) desta variação.
-      const title = heroItem?.name ?? `Opção ${k + 1}`;
-
-      newOptions.push(
-        createEmptyMealOption({
-          title,
-          imageKey,
-          items: optionItems,
-        }),
-      );
-    }
-
-    onChange((m) => ({ ...m, equivalents: newOptions }));
-    toast.success(`Bloco TACO recalculado com ${newOptions.length} opções.`);
+    onChange((m) => ({ ...m, equivalents: result.options }));
+    toast.success(`Bloco TACO recalculado com ${result.options.length} opções.`);
   }
+
 
 
   return (

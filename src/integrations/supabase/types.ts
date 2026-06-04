@@ -873,6 +873,57 @@ export type Database = {
           },
         ]
       }
+      taco_foods: {
+        Row: {
+          carb_per_100g: number
+          created_at: string
+          default_qty: number
+          display_order: number
+          fat_per_100g: number
+          food_key: string
+          id: string
+          is_active: boolean
+          kcal_per_100g: number
+          name: string
+          protein_per_100g: number
+          scale_group: string
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          carb_per_100g?: number
+          created_at?: string
+          default_qty?: number
+          display_order?: number
+          fat_per_100g?: number
+          food_key: string
+          id?: string
+          is_active?: boolean
+          kcal_per_100g: number
+          name: string
+          protein_per_100g?: number
+          scale_group: string
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          carb_per_100g?: number
+          created_at?: string
+          default_qty?: number
+          display_order?: number
+          fat_per_100g?: number
+          food_key?: string
+          id?: string
+          is_active?: boolean
+          kcal_per_100g?: number
+          name?: string
+          protein_per_100g?: number
+          scale_group?: string
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       templates: {
         Row: {
           carb_g_target: number | null
