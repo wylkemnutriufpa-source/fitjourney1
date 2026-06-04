@@ -80,14 +80,10 @@ function fromSubscription(s: Subscription): FormState {
 
 export function SubscriptionEditor({ patientId }: { patientId: string }) {
   const qc = useQueryClient();
-  const list = useServerFn(listPatientSubscriptions);
-  const create = useServerFn(createSubscription);
-  const update = useServerFn(updateSubscription);
-  const del = useServerFn(deleteSubscription);
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["finance", "subscriptions", patientId],
-    queryFn: () => list({ data: { patientId } }),
+    queryFn: () => listPatientSubscriptions({ data: { patientId } }),
     staleTime: 30_000,
   });
 
