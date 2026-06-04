@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { ensureDraftPlanForPatient, listMyPatientsForPlan } from "@/lib/plans/plans.functions";
-import { Plus, Search, FileText, Share2 } from "lucide-react";
+import { setPatientActiveStatus } from "@/lib/patients/patient-detail.functions";
+import { Plus, Search, FileText, Share2, Power } from "lucide-react";
 import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 import { VideoLoader } from "@/components/VideoLoader";
 import { toast } from "sonner";
@@ -69,9 +70,11 @@ function anamnesisStatusMeta(status: string): { label: string; cls: string; dot:
 
 function Patients() {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const search = Route.useSearch();
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const ensureDraft = useServerFn(ensureDraftPlanForPatient);
+  const setActiveStatus = useServerFn(setPatientActiveStatus);
   const { data: patients = [], isLoading, error } = useQuery({
     queryKey: ["patients-index"],
     queryFn: () => fetchPatients(),
@@ -82,6 +85,16 @@ function Patients() {
   const [filter, setFilter] = useState<PatientFilter>(search.filter ?? "all");
   const [inviteOpen, setInviteOpen] = useState(false);
   const [openingDraftFor, setOpeningDraftFor] = useState<string | null>(null);
+  const activeMutation = useMutation({
+    mutationFn: ({ patientId, isActive }: { patientId: string; isActive: boolean }) =>
+      setActiveStatus({ data: { patientId, isActive } }),
+    onSuccess: async (_result, vars) => {
+      toast.success(vars.isActive ? "Paciente reativado." : "Paciente inativado.");
+      await qc.invalidateQueries({ queryKey: ["patients-index"] });
+      await qc.invalidateQueries({ queryKey: ["patient-detail", vars.patientId] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao atualizar status."),
+  });
 
   const openPrePlan = async (patientId: string) => {
     if (openingDraftFor) return;
@@ -238,7 +251,7 @@ function Patients() {
                 <tr
                   key={p.id}
                   onClick={() => navigate({ to: "/patients/$id", params: { id: p.id } })}
-                  className="border-b border-border last:border-0 hover:bg-accent/30 cursor-pointer"
+                  className={"border-b border-border last:border-0 hover:bg-accent/30 cursor-pointer " + (!p.isActive ? "opacity-60" : "")}
                 >
                   <td className="p-4">
                     <Link
@@ -271,6 +284,10 @@ function Patients() {
                       <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase ${statusMeta.cls}`}>
                         <span className={`size-1.5 rounded-full ${statusMeta.dot}`} />
                         {statusMeta.label}
+                      </span>
+                      <span className={"inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " + (p.isActive ? "text-emerald-400" : "text-muted-foreground")}>
+                        <span className={"size-1.5 rounded-full " + (p.isActive ? "bg-emerald-400" : "bg-muted-foreground")} />
+                        {p.isActive ? "Ativo" : "Inativo"}
                       </span>
                       <span className={
                         "inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " +
@@ -306,6 +323,15 @@ function Patients() {
                   </td>
                   <td className="p-4" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        disabled={activeMutation.isPending}
+                        onClick={() => activeMutation.mutate({ patientId: p.id, isActive: !p.isActive })}
+                        className="size-8 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent/50 disabled:opacity-50"
+                        title={p.isActive ? "Inativar paciente" : "Reativar paciente"}
+                      >
+                        <Power className="size-4" />
+                      </button>
                       <Link
                         to="/patients/$id"
                         params={{ id: p.id }}
