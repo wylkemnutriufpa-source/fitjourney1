@@ -36,13 +36,12 @@ export function validatePlan(input: GateInput): GateResult {
   const { weightKg, tdee, target, dailyTotals, foodOccurrences } = input;
 
   if (dailyTotals.length === 0) {
-    const onlyIssue: GateIssue = {
+    issues.push({
       code: "NO_DAILY_TOTALS",
-      severity: "error",
-      message: "Snapshot sem totais diários — não é possível validar.",
-    };
-    issues.push(onlyIssue);
-    return { issues, blockers: [onlyIssue], warnings: [], blocked: true };
+      severity: "warning",
+      message: "Plano sem totais diários. Confirme se as refeições e alimentos foram preenchidos corretamente.",
+    });
+    return { issues, blockers: [], warnings: issues, blocked: false };
   }
 
   // --- 1. Proteína > 2.5 g/kg ---
@@ -116,9 +115,9 @@ export function validatePlan(input: GateInput): GateResult {
     });
   }
 
-  const blockers = issues.filter((i) => i.severity === "error");
+  const blockers: GateIssue[] = []; // Clinical gate never blocks per canonical rule #1
   const warnings = issues.filter((i) => i.severity === "warning");
-  return { issues, blockers, warnings, blocked: blockers.length > 0 };
+  return { issues, blockers, warnings, blocked: false };
 }
 
 function averageMacros(

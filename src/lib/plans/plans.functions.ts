@@ -220,7 +220,34 @@ export const ensureDraftPlanForPatient = createServerFn({ method: "POST" })
       .limit(1);
     if (aErr) throw new Error(aErr.message);
     if (!approved?.length) {
-      throw new Error("Paciente ainda não tem anamnese aprovada para gerar pré-plano.");
+      // Rule #3: Operações que nunca podem ser bloqueadas.
+      // Se não há anamnese, gera um draft vazio para o nutri começar a trabalhar.
+      // O sistema alerta na publicação, mas não impede a criação.
+      const { data: newPlan, error: insErr } = await supabase
+        .from("plans")
+        .insert({
+          patient_id: data.patientId,
+          nutritionist_id: nutri.id,
+          status: "draft",
+          schema_version: 3,
+          snapshot: {
+            name: "Plano Inicial",
+            kcal: 0,
+            meals: [],
+            meta: { createdWithoutAnamnesis: true }
+          }
+        })
+        .select("id")
+        .single();
+      
+      if (insErr) throw new Error(insErr.message);
+      
+      return {
+        planId: newPlan.id,
+        created: true,
+        templateKey: null,
+        reason: "anamnesis_missing_manual_start"
+      };
     }
 
     const outcome = await generateDraftPlanFromApproval(
@@ -251,7 +278,32 @@ export const ensureDraftPlanForPatient = createServerFn({ method: "POST" })
     }
 
     if (outcome.kind === "skipped" && outcome.reason === "no_clinical_context") {
-      throw new Error("Anamnese aprovada sem dados clínicos suficientes para montar o pré-plano.");
+      // Rule #3: Não bloqueia. Cria draft manual se o auto-draft falhar por falta de dados.
+      const { data: manualPlan, error: manualErr } = await supabase
+        .from("plans")
+        .insert({
+          patient_id: data.patientId,
+          nutritionist_id: nutri.id,
+          status: "draft",
+          schema_version: 3,
+          snapshot: {
+            name: "Plano Alimentar",
+            kcal: 0,
+            meals: [],
+            meta: { autoSuggested: false, fallbackFromAutoDraft: true }
+          }
+        })
+        .select("id")
+        .single();
+        
+      if (manualErr) throw new Error(manualErr.message);
+      
+      return {
+        planId: manualPlan.id,
+        created: true,
+        templateKey: null,
+        reason: "fallback_to_manual"
+      };
     }
 
     throw new Error(
