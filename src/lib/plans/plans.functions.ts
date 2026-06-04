@@ -369,12 +369,8 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     // Com override=true, pula motor + gate e salva snapshot como está,
     // marcando auditoria com publishedWithoutClinicalContext.
     if (!ctx.calculable) {
-      if (!data.overrideMissingClinical) {
-        throw new Error(
-          `CLINICAL_CONTEXT_INCOMPLETE: missing=[${ctx.missingForCalc.join(",")}]`,
-        );
-      }
-
+      // Rule #1: Nunca bloqueia. Se dados clínicos faltam, publica sem motor.
+      // O sistema registra na auditoria que foi publicado sem contexto clínico.
       const { snapshot: snapOnly, review: reviewOnly } = validateSnapshot(data.snapshot);
       const publishedAtOverride = new Date().toISOString();
       // Snapshot de auditoria sem ClinicalContext (fora do schema estrito).
