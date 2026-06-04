@@ -1260,6 +1260,8 @@ function MealEditor({
   // Sprint 6 A.4.1 — critério manual de equivalência por bloco. "auto" usa
   // o defaultCriterionFor(scaleGroup) embutido no motor TACO.
   const [tacoCriterion, setTacoCriterion] = useState<MatchCriterion | "auto">("auto");
+  // Sprint 6 A.4.3 — catálogo TACO vivo do Cloud com fallback ao seed local.
+  const candidates = useTacoCandidates();
 
   function changeMainItem(itemId: string, updater: (i: PlannerFoodItem) => PlannerFoodItem) {
     onChange((m) => updateMainItemWithScaling(m, itemId, updater));
