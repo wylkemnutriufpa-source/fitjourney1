@@ -1571,7 +1571,7 @@ function MealEditor({
                   ))}
                 </div>
                 <div className="inline-flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-background">
-                  <span className="text-[9px] font-mono uppercase text-muted-foreground px-1.5">TACO</span>
+                  <span className="text-[9px] font-mono uppercase text-muted-foreground px-1.5">Equiv.</span>
                   {([1, 2, 3, 4] as const).map((n) => (
                     <button
                       key={n}
