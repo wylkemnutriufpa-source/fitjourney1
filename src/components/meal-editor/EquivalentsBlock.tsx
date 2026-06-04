@@ -240,6 +240,7 @@ export function EquivalentsBlock({
                   value={o}
                   onChange={(next) => handleOptionChange(idx, next)}
                   onRemove={() => handleOptionRemove(idx)}
+                  onSwap={() => setSwapIdx(idx)}
                   disabled={disabled}
                 />
               ))}
