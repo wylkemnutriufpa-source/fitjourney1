@@ -101,7 +101,8 @@ export function FeedbackChart({
   fallbackHeightCm: number | null;
 }) {
   const { points, hasWeight, hasImc, current, previous, total } = useMemo(() => {
-    const sorted = [...feedbacks].sort(
+    const safe = feedbacks ?? [];
+    const sorted = [...safe].sort(
       (a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     );
