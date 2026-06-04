@@ -12,6 +12,8 @@ import {
   getMyFeedbackStatus,
   submitFeedback,
   getSignedFeedbackPhotoUrl,
+  editMyFeedback,
+  type FeedbackDTO,
 } from "@/lib/feedback/feedback.functions";
 import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import {
