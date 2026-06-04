@@ -661,7 +661,7 @@ function TemplateCard({
   const hero = imgFor(tpl.meals[0]?.main.imageKey || "");
   return (
     <div className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all flex flex-col">
-      <button onClick={onOpen} className="text-left">
+      <button onClick={onOpen} className="text-left w-full block">
         <div className="relative aspect-[16/9] bg-muted overflow-hidden">
           {hero ? (
             <img
