@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { PhysicalAssessmentCard } from "@/components/patient/PhysicalAssessmentCard";
-import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
+import { getPatientForNutritionist, setPatientActiveStatus } from "@/lib/patients/patient-detail.functions";
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
 import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
@@ -24,7 +24,9 @@ import {
   Eye,
   Pencil,
   AlertTriangle,
+  Power,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
   head: () => ({ meta: [{ title: "Perfil do paciente — FitJourney" }] }),
@@ -80,9 +82,11 @@ function statusMeta(status: string | undefined) {
 function PatientProfile() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const fetchDetail = useServerFn(getPatientForNutritionist);
   const fetchPlans = useServerFn(listPublishedPlansForPatient);
   const fetchAnamnesis = useServerFn(getAnamnesisForReview);
+  const setActiveStatus = useServerFn(setPatientActiveStatus);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient-detail", id],
@@ -97,6 +101,15 @@ function PatientProfile() {
     refetchOnMount: "always",
   });
   const anamnesisId = data?.anamnesis?.id ?? null;
+  const activeMutation = useMutation({
+    mutationFn: (isActive: boolean) => setActiveStatus({ data: { patientId: id, isActive } }),
+    onSuccess: async (result) => {
+      toast.success(result.isActive ? "Paciente reativado." : "Paciente inativado.");
+      await qc.invalidateQueries({ queryKey: ["patient-detail", id] });
+      await qc.invalidateQueries({ queryKey: ["patients-index"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao atualizar status."),
+  });
   const { data: anamnesisFull, isLoading: anamnesisLoading } = useQuery({
     queryKey: ["patient-anamnesis-full", anamnesisId],
     queryFn: () => fetchAnamnesis({ data: { anamnesisId: anamnesisId! } }),
