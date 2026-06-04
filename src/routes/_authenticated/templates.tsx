@@ -1335,61 +1335,24 @@ function MealEditor({
   }
 
   /**
-   * Sprint 6 A.3 — Recalcula bloco TACO com N opções (1..4) considerando
-   * TODOS os itens da refeição principal. Para cada item com cobertura
-   * TACO, calcula N substitutos; itens sem cobertura são repetidos
-   * inalterados em cada opção. A imagem hero usa o 1º item coberto.
+   * Sprint 6 A.3/A.4.4 — Recalcula bloco TACO desta refeição usando o critério
+   * e count escolhidos, com o catálogo do Cloud (ou seed fallback).
    */
   function recalcTacoBlock(count: 1 | 2 | 3 | 4) {
-    const items = meal.main.items;
-    if (items.length === 0) {
+    const crit = tacoCriterion === "auto" ? undefined : tacoCriterion;
+    const result = computeTacoBlock(meal, count, crit, candidates);
+    if (result.kind === "empty") {
       toast.error("Refeição sem itens para calcular substitutos.");
       return;
     }
-
-    // Para cada item: array de N substitutos (PlannerMealOption[]) ou null.
-    const crit = tacoCriterion === "auto" ? undefined : tacoCriterion;
-    const perItem = items.map((it) => buildTacoEquivalents(it, count, crit, candidates));
-    const anyCovered = perItem.some((p) => p !== null && p.length > 0);
-    if (!anyCovered) {
+    if (result.kind === "uncovered") {
       toast.error("Nenhum item da refeição está no catálogo TACO.");
       return;
     }
-
-    const firstCoveredIdx = perItem.findIndex((p) => p !== null && p.length > 0);
-
-    // Monta N opções paralelas: opção k = um item substituto por posição.
-    const newOptions: PlannerMealOption[] = [];
-    for (let k = 0; k < count; k++) {
-      const optionItems = items.map((orig, i) => {
-        const subs = perItem[i];
-        if (!subs || subs.length === 0) {
-          // Sem cobertura → repete o original.
-          return { ...orig };
-        }
-        const pick = subs[k % subs.length].items[0];
-        return { ...pick };
-      });
-
-      // Imagem da opção: 1º item coberto desta opção (regra premium).
-      const heroItem = optionItems[firstCoveredIdx];
-      const imageKey = heroItem ? deriveImageKeyForFood(heroItem) ?? "" : "";
-
-      // Título da opção = nome do item hero (1º coberto) desta variação.
-      const title = heroItem?.name ?? `Opção ${k + 1}`;
-
-      newOptions.push(
-        createEmptyMealOption({
-          title,
-          imageKey,
-          items: optionItems,
-        }),
-      );
-    }
-
-    onChange((m) => ({ ...m, equivalents: newOptions }));
-    toast.success(`Bloco TACO recalculado com ${newOptions.length} opções.`);
+    onChange((m) => ({ ...m, equivalents: result.options }));
+    toast.success(`Bloco TACO recalculado com ${result.options.length} opções.`);
   }
+
 
 
   return (
