@@ -419,6 +419,7 @@ function MealCard({
   onAddItem,
   onRemoveItem,
   onUpdateItem,
+  onMoveItem,
 }: {
   readonly meal: EditMeal;
   readonly onChange: (fn: (m: EditMeal) => EditMeal) => void;
@@ -429,6 +430,7 @@ function MealCard({
     itemId: string,
     fn: (it: EditItem) => EditItem,
   ) => void;
+  readonly onMoveItem: (itemId: string, dir: -1 | 1) => void;
 }) {
   const kcal = meal.main.items.reduce(
     (s, it) => s + (Number.isFinite(it.kcal) ? Number(it.kcal) : 0),
