@@ -1598,7 +1598,7 @@ function MealEditor({
                       type="button"
                       onClick={() => recalcTacoBlock(n)}
                       className="text-[10px] font-medium px-2 py-0.5 rounded hover:bg-primary/10 hover:text-primary transition-colors"
-                      title={`Recalcular bloco TACO com ${n} opção(ões)`}
+                      title={`Recalcular bloco com ${n} opção(ões) do Banco de Dados`}
                     >
                       {n}
                     </button>
@@ -1791,12 +1791,12 @@ function FoodInfoPopover({
               {currentNutrition.fat}g
             </p>
             <p className="text-[10px]">
-              Base TACO/IBGE por 100g apenas como referência técnica.
+              Base do Banco de Dados por 100g apenas como referência técnica.
             </p>
           </div>
         ) : (
           <p className="text-[11px] text-muted-foreground italic border-t border-border pt-2">
-            Sem ficha no catálogo TACO. Editando manualmente.
+            Sem ficha no Banco de Dados. Editando manualmente.
           </p>
         )}
 

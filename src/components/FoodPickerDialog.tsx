@@ -109,7 +109,7 @@ export function FoodPickerDialog({
         <DialogHeader>
           <DialogTitle>Adicionar alimento</DialogTitle>
           <DialogDescription>
-            Catálogo TACO/IBGE. Escolha uma categoria e clique no alimento.
+            Banco de dados de alimentos. Escolha uma categoria e clique no alimento.
             {isError && " (usando catálogo offline)"}
           </DialogDescription>
         </DialogHeader>

@@ -122,7 +122,7 @@ const allFeaturesList = [
   "Dashboard inteligente", "Gestão de pacientes", "Anamnese com IA", "Planos alimentares",
   "Avaliação física completa", "Análise corporal por foto", "Protocolos reutilizáveis",
   "Programas em grupo", "Gamificação (XP/streaks)", "Desafios semanais", "Metas semanais",
-  "Chat em tempo real", "Receitas com IA", "Banco TACO 600+ alimentos",
+  "Chat em tempo real", "Receitas com IA", "Banco de dados com 600+ alimentos",
   "Lista de compras", "Suplementação", "Relatórios semanais", "Agenda de consultas",
   "Push notifications", "Branding personalizado", "Financeiro multi-gateway", "Feedbacks",
   "Dicas globais", "Biblioteca do paciente", "Calculadoras (peso/água)", "Health Check Quiz",
