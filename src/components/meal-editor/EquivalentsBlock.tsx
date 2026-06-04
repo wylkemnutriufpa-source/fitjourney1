@@ -255,6 +255,17 @@ export function EquivalentsBlock({
           ) : null}
         </div>
       ) : null}
+
+      {swapIdx !== null && options[swapIdx] ? (
+        <FoodSwapDialog
+          open={swapIdx !== null}
+          onOpenChange={(v) => { if (!v) setSwapIdx(null); }}
+          current={options[swapIdx]}
+          candidates={candidates}
+          scaleGroup={base.scaleGroup}
+          onPick={(next) => handleOptionChange(swapIdx, next)}
+        />
+      ) : null}
     </div>
   );
 }
