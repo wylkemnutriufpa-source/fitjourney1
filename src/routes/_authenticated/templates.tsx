@@ -83,6 +83,7 @@ import {
 import { RealPatientPicker } from "@/components/RealPatientPicker";
 import { publishPlanToPatient, publishDraftPlan, getDraftPlanForEdit, type PatientLite } from "@/lib/plans/plans.functions";
 import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
+import { EquivalentsBlock, ApplyEquivalentsAllButton } from "@/components/meal-editor";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
@@ -1521,16 +1522,35 @@ function MealEditor({
               </button>
             </div>
             {meal.main.items.map((item) => (
-              <FoodItemRow
-                key={item.id}
-                item={item}
-                primary
-                onChange={(updated) => changeMainItem(item.id, () => updated)}
-                onRemove={() => removeMainItem(item.id)}
-              />
+              <div key={item.id} className="space-y-1.5">
+                <FoodItemRow
+                  item={item}
+                  primary
+                  onChange={(updated) => changeMainItem(item.id, () => updated)}
+                  onRemove={() => removeMainItem(item.id)}
+                />
+                <EquivalentsBlock
+                  base={item}
+                  value={item.materializedEquivalents}
+                  onChange={(next) =>
+                    changeMainItem(item.id, (i) => ({ ...i, materializedEquivalents: next }))
+                  }
+                />
+              </div>
             ))}
             {meal.main.items.length === 0 && (
               <p className="text-[11px] text-muted-foreground italic">Sem alimentos.</p>
+            )}
+            {meal.main.items.length > 0 && (
+              <div className="pt-1">
+                <ApplyEquivalentsAllButton
+                  items={meal.main.items}
+                  onChange={(nextItems) =>
+                    updateMainOption((o) => ({ ...o, items: nextItems }))
+                  }
+                  label="Recalcular equivalentes de todos os itens"
+                />
+              </div>
             )}
           </div>
 
