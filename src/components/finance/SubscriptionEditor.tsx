@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { Plus, X, Pencil, Trash2 } from "lucide-react";
 import {
   createSubscription,
@@ -81,14 +80,10 @@ function fromSubscription(s: Subscription): FormState {
 
 export function SubscriptionEditor({ patientId }: { patientId: string }) {
   const qc = useQueryClient();
-  const list = useServerFn(listPatientSubscriptions);
-  const create = useServerFn(createSubscription);
-  const update = useServerFn(updateSubscription);
-  const del = useServerFn(deleteSubscription);
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["finance", "subscriptions", patientId],
-    queryFn: () => list({ data: { patientId } }),
+    queryFn: () => listPatientSubscriptions({ data: { patientId } }),
     staleTime: 30_000,
   });
 
@@ -104,7 +99,7 @@ export function SubscriptionEditor({ patientId }: { patientId: string }) {
 
   const createMut = useMutation({
     mutationFn: () =>
-      create({
+      createSubscription({
         data: {
           patientId,
           planKind: form.planKind,
@@ -126,7 +121,7 @@ export function SubscriptionEditor({ patientId }: { patientId: string }) {
   const updateMut = useMutation({
     mutationFn: () => {
       if (!editing || editing === "new") throw new Error("No subscription");
-      return update({
+      return updateSubscription({
         data: {
           id: editing.id,
           planKind: form.planKind,
@@ -147,7 +142,7 @@ export function SubscriptionEditor({ patientId }: { patientId: string }) {
   });
 
   const deleteMut = useMutation({
-    mutationFn: (id: string) => del({ data: { id } }),
+    mutationFn: (id: string) => deleteSubscription({ data: { id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["finance"] }),
   });
 
