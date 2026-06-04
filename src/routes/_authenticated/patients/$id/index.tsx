@@ -27,6 +27,8 @@ import {
   Pencil,
   AlertTriangle,
   Power,
+  MessageSquareHeart,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
