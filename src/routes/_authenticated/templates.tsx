@@ -237,7 +237,7 @@ function ApplyTacoAllButton({
   );
 }
 
-
+/**
  * Sprint 6 A.3/A.4.4 — Resultado puro do recálculo TACO de uma refeição.
  * Permite que o componente do bloco e o pai (apply-all) compartilhem a
  * mesma lógica determinística.
