@@ -367,6 +367,7 @@ function PlanEditor({
           onAddItem={() => setPicker({ mealId: meal.id })}
           onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
           onUpdateItem={(itemId, fn) => updateItem(meal.id, itemId, fn)}
+          onMoveItem={(itemId, dir) => moveItem(meal.id, itemId, dir)}
         />
       ))}
 
