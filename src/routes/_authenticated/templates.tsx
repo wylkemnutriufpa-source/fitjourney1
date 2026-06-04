@@ -397,13 +397,13 @@ function TemplatesPage() {
   return (
     <AppShell>
       <div className="space-y-8">
-        <div className="flex items-end justify-between border-b border-border pb-4">
-          <div className="space-y-1">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-border pb-4">
+          <div className="space-y-1 min-w-0">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Biblioteca de Protocolos
             </p>
-            <h1 className="text-3xl font-bold tracking-tight">Templates de Dieta</h1>
-            <p className="text-sm text-muted-foreground max-w-2xl">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Templates de Dieta</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl">
               Clique em uma refeição para abrir o canvas: cada alimento aparece desacoplado
               (pão, ovo, café…) com sua gramatura e kcal. Ao adicionar um alimento, opções
               equivalentes coerentes com a refeição entram automaticamente.
@@ -411,30 +411,36 @@ function TemplatesPage() {
           </div>
           <Button
             onClick={() => setEditing({ tpl: createEmptyTemplate(), isMine: false })}
-            className="gap-1.5"
+            className="gap-1.5 self-start sm:self-auto shrink-0"
           >
-            <Plus className="size-3.5" /> Plano do zero
+            <Plus className="size-3.5" /> <span className="hidden xs:inline">Plano do</span> zero
           </Button>
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-fit">
-          <TabBtn active={tab === "biblioteca"} onClick={() => setTab("biblioteca")}>
-            <Library className="size-3.5" />
-            Biblioteca do Sistema
-            <span className="text-[10px] font-mono opacity-60">{systemTemplates.length}</span>
-          </TabBtn>
-          <TabBtn active={tab === "meus"} onClick={() => setTab("meus")}>
-            <FolderHeart className="size-3.5" />
-            Meus Templates
-            <span className="text-[10px] font-mono opacity-60">{myList.length}</span>
-          </TabBtn>
-          <TabBtn active={tab === "pilotos"} onClick={() => setTab("pilotos")}>
-            <FlaskConical className="size-3.5" />
-            Pilotos / Testes
-            <span className="text-[10px] font-mono opacity-60">{pilotosCatalog.length}</span>
-          </TabBtn>
+        <div className="-mx-3 sm:mx-0 overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-max mx-3 sm:mx-0 sm:w-fit">
+            <TabBtn active={tab === "biblioteca"} onClick={() => setTab("biblioteca")}>
+              <Library className="size-3.5" />
+              <span className="hidden xs:inline">Biblioteca do Sistema</span>
+              <span className="xs:hidden">Sistema</span>
+              <span className="text-[10px] font-mono opacity-60">{systemTemplates.length}</span>
+            </TabBtn>
+            <TabBtn active={tab === "meus"} onClick={() => setTab("meus")}>
+              <FolderHeart className="size-3.5" />
+              <span className="hidden xs:inline">Meus Templates</span>
+              <span className="xs:hidden">Meus</span>
+              <span className="text-[10px] font-mono opacity-60">{myList.length}</span>
+            </TabBtn>
+            <TabBtn active={tab === "pilotos"} onClick={() => setTab("pilotos")}>
+              <FlaskConical className="size-3.5" />
+              <span className="hidden xs:inline">Pilotos / Testes</span>
+              <span className="xs:hidden">Pilotos</span>
+              <span className="text-[10px] font-mono opacity-60">{pilotosCatalog.length}</span>
+            </TabBtn>
+          </div>
         </div>
+
 
 
         {tab === "biblioteca" && (
