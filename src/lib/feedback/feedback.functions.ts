@@ -353,6 +353,50 @@ export const editPatientFeedback = createServerFn({ method: "POST" })
   });
 
 // ------------------------------------------------------------------
+// editMyFeedback — paciente corrige o próprio feedback enviado há até 24h
+// e que ainda não foi revisado pelo nutricionista. RLS reforça a regra.
+// Não toca em edited_at/edited_by (esses são marcadores de revisão do nutri).
+// ------------------------------------------------------------------
+
+export const editMyFeedback = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => EditInput.parse(input))
+  .handler(async ({ data, context }): Promise<FeedbackDTO> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+
+    const { data: patient, error: pErr } = await supabase
+      .from("patients")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (pErr) throw new Error(pErr.message);
+    if (!patient) throw new Error("PATIENT_NOT_FOUND");
+
+    const patch: Record<string, any> = {};
+    if (data.weightKg !== undefined) patch.weight_kg = data.weightKg;
+    if (data.waistCm !== undefined) patch.waist_cm = data.waistCm;
+    if (data.abdomenCm !== undefined) patch.abdomen_cm = data.abdomenCm;
+    if (data.hipCm !== undefined) patch.hip_cm = data.hipCm;
+    if (data.adherenceRating !== undefined)
+      patch.adherence_rating = data.adherenceRating;
+    if (data.resultRating !== undefined)
+      patch.result_rating = data.resultRating;
+    if (data.notes !== undefined)
+      patch.notes = data.notes?.trim() || null;
+
+    const { data: row, error } = await supabase
+      .from("patient_feedbacks")
+      .update(patch)
+      .eq("id", data.id)
+      .eq("patient_id", patient.id)
+      .is("deleted_at", null)
+      .select(SELECT_COLS)
+      .single();
+    if (error) throw new Error(error.message);
+    return rowToDto(row);
+  });
+
+// ------------------------------------------------------------------
 // softDeletePatientFeedback — nutri arquiva feedback (preserva histórico)
 // ------------------------------------------------------------------
 
