@@ -81,9 +81,11 @@ export function TemplateMatcherPanel({
   // ClinicalContext do paciente selecionado (RLS-aware).
   const fetchContext = useServerFn(getClinicalContext);
   const ctxQuery = useQuery({
-    queryKey: ["clinical-context", patient?.id],
-    queryFn: () =>
-      patient ? fetchContext({ data: { patientId: patient.id } }) : null,
+    queryKey: ["clinical-context", patient?.id ?? "none"],
+    queryFn: async () => {
+      if (!patient) throw new Error("no patient");
+      return fetchContext({ data: { patientId: patient.id } });
+    },
     enabled: !!patient,
     staleTime: 60_000,
   });
