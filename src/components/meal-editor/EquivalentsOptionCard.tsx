@@ -3,7 +3,7 @@
 // Burro: recebe value + onChange + onRemove. Sem estado de servidor.
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, ArrowRightLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ type Props = {
   value: MaterializedEquivalentOption;
   onChange: (next: MaterializedEquivalentOption) => void;
   onRemove?: () => void;
+  onSwap?: () => void;
   disabled?: boolean;
 };
 
