@@ -21,6 +21,7 @@ import type { PlannerFoodItem } from "@/lib/meal-planner";
 import { useTacoCandidates } from "@/lib/substitutions/use-taco-candidates";
 
 import { EquivalentsOptionCard } from "./EquivalentsOptionCard";
+import { FoodSwapDialog } from "./FoodSwapDialog";
 import { recalcMaterializedEquivalents } from "./recalc";
 import {
   type BlockCriterion,
