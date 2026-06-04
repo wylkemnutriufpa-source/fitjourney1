@@ -211,6 +211,25 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     applyTheme(getStoredTheme());
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let wasMobile = window.innerWidth < 768;
+    const onResize = () => {
+      const isMobile = window.innerWidth < 768;
+      if (isMobile === wasMobile) return;
+      wasMobile = isMobile;
+      if (isMobile) {
+        setSidebarOpen(false);
+        __sidebarOpenCache = false;
+      } else if (__sidebarOpenCache === false) {
+        setSidebarOpen(true);
+        __sidebarOpenCache = true;
+      }
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   // Fecha sidebar automaticamente ao navegar em telas mobile.
   useEffect(() => {
     if (mounted && typeof window !== "undefined" && window.innerWidth < 768) {
