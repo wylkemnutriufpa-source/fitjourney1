@@ -122,6 +122,11 @@ function PatientProfile() {
     staleTime: 0,
     refetchOnMount: "always",
   });
+  const { data: patientFeedbacks } = useQuery({
+    queryKey: ["patient-feedbacks", id],
+    queryFn: () => fetchFeedbacks({ data: { patientId: id } }),
+    staleTime: 10_000,
+  });
 
   if (isLoading) {
     return (
