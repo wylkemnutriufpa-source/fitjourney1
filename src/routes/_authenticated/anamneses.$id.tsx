@@ -252,6 +252,59 @@ function AnamnesisDetailPage() {
           </aside>
         </div>
       </div>
+
+      <Dialog
+        open={postApprove !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPostApprove(null);
+            navigate({ to: "/anamneses" });
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="size-5 text-emerald-600" />
+              Anamnese aprovada
+            </DialogTitle>
+            <DialogDescription>
+              O que você quer fazer agora? Você pode montar o plano alimentar
+              deste paciente ou voltar para a fila de revisões.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setPostApprove(null);
+                navigate({ to: "/anamneses" });
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
+            >
+              <ListChecks className="size-4" />
+              Voltar à fila
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const pid = postApprove?.patientId;
+                setPostApprove(null);
+                if (pid) {
+                  navigate({
+                    to: "/patients/$id/diet",
+                    params: { id: pid },
+                  });
+                }
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <ClipboardEdit className="size-4" />
+              Editar plano agora
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
