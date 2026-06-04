@@ -533,11 +533,22 @@ function FeedbackPage() {
                       <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
                         {fmtDateTime(f.createdAt)}
                       </p>
-                      {idx === 0 && (
-                        <span className="text-[9px] font-mono uppercase text-primary border border-primary/40 rounded px-1.5 py-0.5">
-                          mais recente
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {Date.now() - new Date(f.createdAt).getTime() < 24 * 60 * 60 * 1000 && (
+                          <button
+                            type="button"
+                            onClick={() => setEditing(f)}
+                            className="text-[10px] font-mono uppercase tracking-widest text-primary hover:underline inline-flex items-center gap-1"
+                          >
+                            <Pencil className="size-3" /> Editar
+                          </button>
+                        )}
+                        {idx === 0 && (
+                          <span className="text-[9px] font-mono uppercase text-primary border border-primary/40 rounded px-1.5 py-0.5">
+                            mais recente
+                          </span>
+                        )}
+                      </div>
                     </header>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                       <Field
