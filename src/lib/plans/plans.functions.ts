@@ -43,6 +43,7 @@ export type PatientLite = {
   email: string;
   phone: string | null;
   createdAt: string;
+  isActive: boolean;
   anamnesisStatus: AnamnesisStatusLite;
   anamnesisUpdatedAt: string | null;
   planStatus: "delivered" | "pending";
@@ -70,7 +71,7 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
 
     const { data, error } = await supabase
       .from("patients")
-      .select("id, full_name, email, phone, created_at")
+      .select("id, full_name, email, phone, is_active, created_at")
       .eq("nutritionist_id", nutri.id)
       .order("full_name", { ascending: true });
     if (error) throw new Error(error.message);
@@ -144,6 +145,7 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
         email: p.email,
         phone: p.phone ?? null,
         createdAt: p.created_at,
+        isActive: p.is_active ?? true,
         anamnesisStatus: info?.status ?? "none",
         anamnesisUpdatedAt: info?.updatedAt ?? null,
         planStatus: publishedByPatient.has(p.id) ? "delivered" : "pending",

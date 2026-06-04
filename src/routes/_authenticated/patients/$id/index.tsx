@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { PhysicalAssessmentCard } from "@/components/patient/PhysicalAssessmentCard";
-import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
+import { getPatientForNutritionist, setPatientActiveStatus } from "@/lib/patients/patient-detail.functions";
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
 import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
@@ -24,7 +24,9 @@ import {
   Eye,
   Pencil,
   AlertTriangle,
+  Power,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
   head: () => ({ meta: [{ title: "Perfil do paciente — FitJourney" }] }),
@@ -80,9 +82,11 @@ function statusMeta(status: string | undefined) {
 function PatientProfile() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const fetchDetail = useServerFn(getPatientForNutritionist);
   const fetchPlans = useServerFn(listPublishedPlansForPatient);
   const fetchAnamnesis = useServerFn(getAnamnesisForReview);
+  const setActiveStatus = useServerFn(setPatientActiveStatus);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient-detail", id],
@@ -97,6 +101,15 @@ function PatientProfile() {
     refetchOnMount: "always",
   });
   const anamnesisId = data?.anamnesis?.id ?? null;
+  const activeMutation = useMutation({
+    mutationFn: (isActive: boolean) => setActiveStatus({ data: { patientId: id, isActive } }),
+    onSuccess: async (result) => {
+      toast.success(result.isActive ? "Paciente reativado." : "Paciente inativado.");
+      await qc.invalidateQueries({ queryKey: ["patient-detail", id] });
+      await qc.invalidateQueries({ queryKey: ["patients-index"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao atualizar status."),
+  });
   const { data: anamnesisFull, isLoading: anamnesisLoading } = useQuery({
     queryKey: ["patient-anamnesis-full", anamnesisId],
     queryFn: () => fetchAnamnesis({ data: { anamnesisId: anamnesisId! } }),
@@ -177,17 +190,30 @@ function PatientProfile() {
                   <span className={"size-1.5 rounded-full " + st.dot} />
                   {st.label}
                 </span>
-                {p.anamnesis && (
-                  <span className="text-[10px] font-mono uppercase text-muted-foreground">
-                    · v{p.anamnesis.version}
-                  </span>
-                )}
+                <span className={"inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " + (p.isActive ? "text-emerald-400" : "text-muted-foreground")}>
+                  <span className={"size-1.5 rounded-full " + (p.isActive ? "bg-emerald-400" : "bg-muted-foreground")} />
+                  {p.isActive ? "Ativo" : "Inativo"}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Ações do paciente — toolbar dedicada para não competir por espaço no header */}
           <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              disabled={activeMutation.isPending}
+              onClick={() => activeMutation.mutate(!p.isActive)}
+              className={
+                "text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border transition-colors disabled:opacity-50 " +
+                (p.isActive
+                  ? "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+                  : "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10")
+              }
+            >
+              {activeMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Power className="size-3.5" />}
+              {p.isActive ? "Inativar" : "Reativar"}
+            </button>
             {p.anamnesis && (
               <Link
                 to="/anamneses/$id"
@@ -232,7 +258,7 @@ function PatientProfile() {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-surface border border-border rounded-lg p-6 space-y-4">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Contato
+              Contato · {p.isActive ? "Paciente ativo" : "Paciente inativo"}
             </p>
             <dl className="text-sm space-y-3">
               <div className="flex items-center gap-3">
@@ -282,11 +308,6 @@ function PatientProfile() {
                   : p.anamnesis
                     ? st.label
                     : "Sem anamnese ainda"}
-                {p.anamnesis && (
-                  <span className="text-[10px] font-mono uppercase text-muted-foreground">
-                    v{p.anamnesis.version}
-                  </span>
-                )}
               </h3>
             </div>
             {p.anamnesis && (
@@ -296,7 +317,7 @@ function PatientProfile() {
                 className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-primary/40 text-primary hover:bg-primary/10"
               >
                 <Pencil className="size-3.5" />
-                {hasApprovedAnamnesis ? "Revisar / Nova versão" : "Abrir para edição"}
+                {hasApprovedAnamnesis ? "Revisar anamnese" : "Abrir para edição"}
               </Link>
             )}
           </div>
@@ -304,7 +325,7 @@ function PatientProfile() {
           {hasApprovedAnamnesis && (
             <div className="text-[11px] text-muted-foreground border-l-2 border-emerald-500/40 pl-3 py-1">
               Anamnese aprovada é imutável por contrato clínico. Para alterar,
-              uma nova versão é criada preservando todo o histórico.
+              uma nova revisão é criada preservando todo o histórico.
             </div>
           )}
 
