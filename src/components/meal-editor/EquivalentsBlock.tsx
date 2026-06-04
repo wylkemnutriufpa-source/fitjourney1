@@ -75,6 +75,30 @@ export function EquivalentsBlock({
     onChange(next);
   };
 
+  // Recalc automático quando o item base muda (qty/unit/foodKey),
+  // somente se já existe um bloco materializado. Debounce 400ms.
+  const lastSigRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!value || value.options.length === 0) return;
+    if (!canRecalc) return;
+    const sig = `${base.foodKey}|${base.qty}|${base.unit}|${criterion}`;
+    if (lastSigRef.current === null) {
+      lastSigRef.current = sig;
+      return;
+    }
+    if (lastSigRef.current === sig) return;
+    const handle = setTimeout(() => {
+      const size = (value.options.length || defaultSize) as EquivalentsBlockSize;
+      const next = recalcMaterializedEquivalents({ base, criterion, size, candidates });
+      if (next) {
+        lastSigRef.current = sig;
+        onChange(next);
+      }
+    }, 400);
+    return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [base.foodKey, base.qty, base.unit, criterion, candidates]);
+
   const handleCriterionChange = (c: BlockCriterion) => {
     if (!value) {
       // Sem bloco ainda → criar bloco vazio com critério escolhido (sem opções).
