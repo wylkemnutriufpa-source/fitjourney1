@@ -464,62 +464,83 @@ function MealCard({
         className="font-medium"
       />
 
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {meal.main.items.map((it) => (
-          <li
-            key={it.id}
-            className="grid grid-cols-[1fr_64px_56px_64px_auto] gap-2 items-center"
-          >
-            <Input
-              value={it.name}
-              onChange={(e) =>
-                onUpdateItem(it.id, (x) => ({ ...x, name: e.target.value }))
+          <li key={it.id} className="space-y-2">
+            <div className="grid grid-cols-[1fr_64px_56px_64px_auto] gap-2 items-center">
+              <Input
+                value={it.name}
+                onChange={(e) =>
+                  onUpdateItem(it.id, (x) => ({ ...x, name: e.target.value }))
+                }
+                className="text-sm"
+              />
+              <Input
+                type="number"
+                inputMode="decimal"
+                value={it.qty}
+                onChange={(e) =>
+                  onUpdateItem(it.id, (x) => ({
+                    ...x,
+                    qty: Number(e.target.value) || 0,
+                  }))
+                }
+                className="text-xs font-mono"
+              />
+              <Input
+                value={it.unit}
+                onChange={(e) =>
+                  onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
+                }
+                className="text-xs font-mono"
+              />
+              <Input
+                type="number"
+                inputMode="numeric"
+                value={it.kcal}
+                onChange={(e) =>
+                  onUpdateItem(it.id, (x) => ({
+                    ...x,
+                    kcal: Number(e.target.value) || 0,
+                  }))
+                }
+                className="text-xs font-mono"
+              />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => onRemoveItem(it.id)}
+                aria-label="Remover item"
+              >
+                <Trash2 className="size-3.5 text-destructive" />
+              </Button>
+            </div>
+            <EquivalentsBlock
+              base={it as unknown as PlannerFoodItem}
+              value={(it as any).materializedEquivalents}
+              onChange={(next) =>
+                onUpdateItem(it.id, (x) => ({ ...x, materializedEquivalents: next }))
               }
-              className="text-sm"
             />
-            <Input
-              type="number"
-              inputMode="decimal"
-              value={it.qty}
-              onChange={(e) =>
-                onUpdateItem(it.id, (x) => ({
-                  ...x,
-                  qty: Number(e.target.value) || 0,
-                }))
-              }
-              className="text-xs font-mono"
-            />
-            <Input
-              value={it.unit}
-              onChange={(e) =>
-                onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
-              }
-              className="text-xs font-mono"
-            />
-            <Input
-              type="number"
-              inputMode="numeric"
-              value={it.kcal}
-              onChange={(e) =>
-                onUpdateItem(it.id, (x) => ({
-                  ...x,
-                  kcal: Number(e.target.value) || 0,
-                }))
-              }
-              className="text-xs font-mono"
-            />
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              onClick={() => onRemoveItem(it.id)}
-              aria-label="Remover item"
-            >
-              <Trash2 className="size-3.5 text-destructive" />
-            </Button>
           </li>
         ))}
       </ul>
+
+      {meal.main.items.length > 0 && (
+        <div className="pt-1">
+          <ApplyEquivalentsAllButton
+            items={meal.main.items as unknown as PlannerFoodItem[]}
+            onChange={(nextItems) =>
+              onChange((m) => ({
+                ...m,
+                main: { ...m.main, items: nextItems as unknown as EditItem[] },
+              }))
+            }
+            label="Recalcular equivalentes de todos os itens"
+          />
+        </div>
+      )}
 
       <div className="flex items-center justify-between border-t border-border pt-3">
         <Button
