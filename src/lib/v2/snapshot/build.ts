@@ -44,6 +44,12 @@ export function buildSnapshotV2(template: PlannerTemplateV2): SnapshotV2 {
           scaleGroup: it.scaleGroup,
           measures: it.measures?.map((m) => ({ ...m })),
           substitutions: it.substitutions?.map((s) => ({ ...s })),
+          materializedEquivalents: it.materializedEquivalents
+            ? {
+                ...it.materializedEquivalents,
+                options: it.materializedEquivalents.options.map((o) => ({ ...o })),
+              }
+            : undefined,
           notes: it.notes,
         })),
       })),
