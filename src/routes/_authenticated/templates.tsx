@@ -56,6 +56,7 @@ import {
 } from "@/lib/meal-planner";
 import { detectMealKind, getSubstitutionsFor } from "@/lib/plans/substitution-rules";
 import { buildTacoEquivalents } from "@/lib/substitutions/planner-bridge";
+import type { MatchCriterion } from "@/lib/substitutions/equivalents";
 import {
   Plus,
   Save,
@@ -1250,6 +1251,9 @@ function MealEditor({
   const kcal = mealKcalFromOption(meal.main);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [imagePickerOpen, setImagePickerOpen] = useState(false);
+  // Sprint 6 A.4.1 — critério manual de equivalência por bloco. "auto" usa
+  // o defaultCriterionFor(scaleGroup) embutido no motor TACO.
+  const [tacoCriterion, setTacoCriterion] = useState<MatchCriterion | "auto">("auto");
 
   function changeMainItem(itemId: string, updater: (i: PlannerFoodItem) => PlannerFoodItem) {
     onChange((m) => updateMainItemWithScaling(m, itemId, updater));
@@ -1336,7 +1340,8 @@ function MealEditor({
     }
 
     // Para cada item: array de N substitutos (PlannerMealOption[]) ou null.
-    const perItem = items.map((it) => buildTacoEquivalents(it, count));
+    const crit = tacoCriterion === "auto" ? undefined : tacoCriterion;
+    const perItem = items.map((it) => buildTacoEquivalents(it, count, crit));
     const anyCovered = perItem.some((p) => p !== null && p.length > 0);
     if (!anyCovered) {
       toast.error("Nenhum item da refeição está no catálogo TACO.");
@@ -1479,7 +1484,30 @@ function MealEditor({
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1">
                 <Repeat2 className="size-3" /> Opções equivalentes ({meal.equivalents.length})
               </p>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <div className="inline-flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-background">
+                  <span className="text-[9px] font-mono uppercase text-muted-foreground px-1.5">Critério</span>
+                  {([
+                    { v: "auto", l: "Auto" },
+                    { v: "protein", l: "Prot" },
+                    { v: "carb", l: "Carb" },
+                    { v: "energy", l: "Kcal" },
+                  ] as const).map((opt) => (
+                    <button
+                      key={opt.v}
+                      type="button"
+                      onClick={() => setTacoCriterion(opt.v)}
+                      className={`text-[10px] font-medium px-2 py-0.5 rounded transition-colors ${
+                        tacoCriterion === opt.v
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                      title={`Casar substitutos por ${opt.l.toLowerCase()}`}
+                    >
+                      {opt.l}
+                    </button>
+                  ))}
+                </div>
                 <div className="inline-flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-background">
                   <span className="text-[9px] font-mono uppercase text-muted-foreground px-1.5">TACO</span>
                   {([1, 2, 3, 4] as const).map((n) => (
