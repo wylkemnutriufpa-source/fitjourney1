@@ -200,7 +200,7 @@ describe("gate bloqueia apenas blockers", () => {
     expect(gate.warnings.some((w) => w.code === "FOOD_MONOTONY")).toBe(true);
   });
 
-  it("proteína > 2.5 g/kg ⇒ blocker", () => {
+  it("INVARIANTE: proteína > 2.5 g/kg gera warning, NUNCA blocker (Rule #1)", () => {
     const gate = validatePlan({
       weightKg: 80,
       tdee: 2750,
@@ -208,8 +208,24 @@ describe("gate bloqueia apenas blockers", () => {
       dailyTotals: [{ dayLabel: "d", kcal: 2200, proteinG: 220, carbG: 250, fatG: 60 }],
       foodOccurrences: [],
     });
-    expect(gate.blocked).toBe(true);
-    expect(gate.blockers.some((b) => b.code === "PROTEIN_OVER_LIMIT")).toBe(true);
+    expect(gate.blocked).toBe(false);
+    expect(gate.blockers.length).toBe(0);
+    expect(gate.warnings.some((w) => w.code === "PROTEIN_OVER_LIMIT")).toBe(true);
+  });
+
+  it("INVARIANTE: múltiplas violações severas continuam sem blocker", () => {
+    const gate = validatePlan({
+      weightKg: 80,
+      tdee: 2750,
+      target: { kcal: 2200, proteinG: 160, carbG: 250, fatG: 60 },
+      dailyTotals: [{ dayLabel: "d", kcal: 1500, proteinG: 240, carbG: 400, fatG: 60 }],
+      foodOccurrences: [
+        { foodKey: "arroz", displayName: "Arroz", weeklyCount: 10 },
+      ],
+    });
+    expect(gate.blocked).toBe(false);
+    expect(gate.blockers.length).toBe(0);
+    expect(gate.warnings.length).toBeGreaterThan(0);
   });
 });
 
