@@ -269,6 +269,20 @@ function PlanEditor({
     }));
   }
 
+  function moveItem(mealId: string, itemId: string, dir: -1 | 1) {
+    updateMeal(mealId, (m) => {
+      const items = m.main.items;
+      const idx = items.findIndex((it) => it.id === itemId);
+      if (idx < 0) return m;
+      const target = idx + dir;
+      if (target < 0 || target >= items.length) return m;
+      const next = items.slice();
+      const [moved] = next.splice(idx, 1);
+      next.splice(target, 0, moved);
+      return { ...m, main: { ...m.main, items: next } };
+    });
+  }
+
   function addFoodToMeal(mealId: string, food: CatalogFood) {
     updateMeal(mealId, (m) => ({
       ...m,
