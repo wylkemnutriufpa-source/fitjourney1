@@ -55,6 +55,7 @@ import {
   type PlannerFoodItem,
 } from "@/lib/meal-planner";
 import { detectMealKind, getSubstitutionsFor } from "@/lib/plans/substitution-rules";
+import { buildTacoEquivalents } from "@/lib/substitutions/planner-bridge";
 import {
   Plus,
   Save,
@@ -193,22 +194,38 @@ const STOP = new Set([
  * opções já existentes (comparando títulos normalizados) e o próprio item.
  */
 function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): PlannerMealOption[] {
-  const kind = detectMealKind(meal.label, meal.time);
-  const subs = getSubstitutionsFor(food.name, kind, food.kcal || 0);
-  if (subs.length === 0) return [];
   const taken = new Set<string>([
     normalizeTitle(food.name),
     ...meal.equivalents.map((e) => normalizeTitle(e.title)),
     ...meal.equivalents.flatMap((e) => e.items.map((i) => normalizeTitle(i.name))),
   ]);
+
+  // 1) Tenta a fórmula TACO (Sprint 6 A.2): proteína/carbo/energia por critério,
+  //    arredondado a múltiplos de 5g. Cobre carnes, peixes, arroz, massas, etc.
+  const tacoOpts = buildTacoEquivalents(food, 3);
+  if (tacoOpts && tacoOpts.length > 0) {
+    const out: PlannerMealOption[] = [];
+    for (const opt of tacoOpts) {
+      const key = normalizeTitle(opt.title);
+      if (taken.has(key)) continue;
+      taken.add(key);
+      // Resolve imagem do banco se houver match.
+      const first = opt.items[0];
+      const imageKey = first ? deriveImageKeyForFood(first) : undefined;
+      out.push({ ...opt, imageKey: imageKey ?? opt.imageKey ?? "" });
+    }
+    if (out.length > 0) return out;
+  }
+
+  // 2) Fallback: motor curado por tipo de refeição.
+  const kind = detectMealKind(meal.label, meal.time);
+  const subs = getSubstitutionsFor(food.name, kind, food.kcal || 0);
+  if (subs.length === 0) return [];
   const out: PlannerMealOption[] = [];
   for (const s of subs) {
     const key = normalizeTitle(s.name);
     if (taken.has(key)) continue;
     taken.add(key);
-    // Cada substituta tenta sua própria imagem (sem herdar a hero da principal,
-    // o que tornava todas visualmente iguais). Se não houver match, fica sem
-    // imagem e o profissional pode escolher manualmente pelo banco.
     const subImage = deriveImageKeyForFood({
       ...food,
       name: s.name,
