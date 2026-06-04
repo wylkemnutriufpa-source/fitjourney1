@@ -479,22 +479,7 @@ function PatientProfile() {
               : "Aprove a anamnese do paciente antes de elaborar o plano alimentar."}
           </p>
           <div className="flex flex-wrap gap-2 pt-2">
-            <Link
-              to="/templates"
-              search={{ patientId: p.id, patientName: p.fullName }}
-              className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
-            >
-              <FileText className="size-3.5" />
-              Usar template
-            </Link>
-            <Link
-              to="/templates"
-              search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
-              className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
-            >
-              <Sparkles className="size-3.5" />
-              Montar do zero
-            </Link>
+            <BuildPlanCTA patientId={p.id} patientName={p.fullName} />
           </div>
         </section>
       </div>
