@@ -413,7 +413,7 @@ function TemplatesPage() {
             onClick={() => setEditing({ tpl: createEmptyTemplate(), isMine: false })}
             className="gap-1.5 self-start sm:self-auto shrink-0"
           >
-            <Plus className="size-3.5" /> <span className="hidden xs:inline">Plano do</span> zero
+            <Plus className="size-3.5" /> <span className="hidden sm:inline">Plano do</span> zero
           </Button>
         </div>
 
@@ -422,20 +422,20 @@ function TemplatesPage() {
           <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-max mx-3 sm:mx-0 sm:w-fit">
             <TabBtn active={tab === "biblioteca"} onClick={() => setTab("biblioteca")}>
               <Library className="size-3.5" />
-              <span className="hidden xs:inline">Biblioteca do Sistema</span>
-              <span className="xs:hidden">Sistema</span>
+              <span className="hidden sm:inline">Biblioteca do Sistema</span>
+              <span className="sm:hidden">Sistema</span>
               <span className="text-[10px] font-mono opacity-60">{systemTemplates.length}</span>
             </TabBtn>
             <TabBtn active={tab === "meus"} onClick={() => setTab("meus")}>
               <FolderHeart className="size-3.5" />
-              <span className="hidden xs:inline">Meus Templates</span>
-              <span className="xs:hidden">Meus</span>
+              <span className="hidden sm:inline">Meus Templates</span>
+              <span className="sm:hidden">Meus</span>
               <span className="text-[10px] font-mono opacity-60">{myList.length}</span>
             </TabBtn>
             <TabBtn active={tab === "pilotos"} onClick={() => setTab("pilotos")}>
               <FlaskConical className="size-3.5" />
-              <span className="hidden xs:inline">Pilotos / Testes</span>
-              <span className="xs:hidden">Pilotos</span>
+              <span className="hidden sm:inline">Pilotos / Testes</span>
+              <span className="sm:hidden">Pilotos</span>
               <span className="text-[10px] font-mono opacity-60">{pilotosCatalog.length}</span>
             </TabBtn>
           </div>
