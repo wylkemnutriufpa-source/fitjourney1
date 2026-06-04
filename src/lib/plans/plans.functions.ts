@@ -838,11 +838,7 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
     const publishedAt = new Date().toISOString();
 
     if (!ctx.calculable) {
-      if (!data.overrideMissingClinical) {
-        throw new Error(
-          `CLINICAL_CONTEXT_INCOMPLETE: missing=[${ctx.missingForCalc.join(",")}]`,
-        );
-      }
+      // Rule #1: Nunca bloqueia.
       const { snapshot: snapOnly, review: reviewOnly } = validateSnapshot(
         data.snapshot,
       );
@@ -890,24 +886,19 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
 
     const engineOut = runNutritionEngines(ctx);
     if (!engineOut) {
-      throw new Error("CLINICAL_CONTEXT_INCOMPLETE: engines returned null");
+      console.error("Clinical audit (draft promotion): engines returned null for calculable context");
     }
 
     const { snapshot, review } = validateSnapshot(data.snapshot);
     const dailyTotals = deriveDailyTotalsFromSnapshot(snapshot);
     const foodOccurrences = deriveFoodOccurrencesFromSnapshot(snapshot);
     const gate = validatePlan({
-      weightKg: ctx.currentWeight!.weightKg,
-      tdee: engineOut.tdee,
-      target: engineOut.target,
+      weightKg: ctx.currentWeight?.weightKg ?? 0,
+      tdee: engineOut?.tdee ?? 0,
+      target: engineOut?.target ?? { kcal: 0, proteinG: 0, carbG: 0, fatG: 0 },
       dailyTotals,
       foodOccurrences,
     });
-    if (gate.blockers.length > 0) {
-      throw new Error(
-        `CLINICAL_GATE_BLOCKED: ${gate.blockers.map((b) => b.code).join(",")}`,
-      );
-    }
 
     const clinicalAudit: ClinicalAudit = {
       clinicalContextSnapshot: {
@@ -927,7 +918,20 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
           : null,
         demographics: {
           sex: ctx.demographics.sex,
-          ageYears: ctx.demographics.ageYears,
+        ageYears: ctx.demographics.ageYears,
+        heightCm: ctx.demographics.heightCm,
+        activity: ctx.demographics.activity,
+        sourceAnamnesisId: ctx.demographics.sourceAnamnesisId,
+      },
+      calculable: true,
+    },
+    engineOutput: engineOut ? {
+      tmb: engineOut.tmb,
+      tdee: engineOut.tdee,
+      target: engineOut.target,
+      clinicalGoalKind: engineOut.clinicalGoalKind,
+      engineGoal: engineOut.engineGoal,
+    } : null,
           heightCm: ctx.demographics.heightCm,
           activity: ctx.demographics.activity,
           sourceAnamnesisId: ctx.demographics.sourceAnamnesisId,
