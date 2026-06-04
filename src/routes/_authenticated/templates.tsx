@@ -114,7 +114,7 @@ const pilotosCatalog: Array<{
     kcal: espHipertrofiaV2Piloto.kcal,
     editorRoute: "/templates-v2-editor",
     previewRoute: "/my-plan-v2-preview",
-    badge: "V2 — Item Soberano",
+    badge: "Item soberano",
   },
 ];
 
@@ -518,9 +518,8 @@ function TemplatesPage() {
                   Área isolada de prova de conceito
                 </p>
                 <p className="text-xs text-amber-900/80 dark:text-amber-200/80 max-w-3xl">
-                  Templates aqui validam novas arquiteturas (ex.: V2 — item soberano) sem
-                  afetar a Biblioteca do Sistema nem os planos publicados. O V2 tem editor
-                  próprio de teste; o preview continua sendo somente leitura por contrato.
+                  Templates aqui validam novas experiências sem afetar a Biblioteca do Sistema
+                  nem os planos publicados. O preview continua sendo somente leitura por contrato.
                 </p>
               </div>
             </div>
@@ -1088,7 +1087,7 @@ function TemplateEditor({
           <DialogHeader>
             <DialogTitle>Plano publicado</DialogTitle>
             <DialogDescription>
-              Snapshot congelado e disponível para <strong>{applyDone}</strong>.
+              Plano publicado e disponível para <strong>{applyDone}</strong>.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -1131,7 +1130,7 @@ function TemplateEditor({
           <DialogHeader>
             <DialogTitle>Aplicar template a paciente</DialogTitle>
             <DialogDescription>
-              Escolha o paciente. O snapshot atual ({draft.meals.length} refeições · {totalKcal} kcal) será salvo no plano dele.
+              Escolha o paciente. O plano atual ({draft.meals.length} refeições · {totalKcal} kcal) será salvo para ele.
             </DialogDescription>
           </DialogHeader>
 
@@ -1144,7 +1143,7 @@ function TemplateEditor({
             <div className="py-2 space-y-3">
               <RealPatientPicker value={applyPatient} onChange={setApplyPatient} />
               <p className="text-[11px] text-muted-foreground">
-                Snapshot atual (com suas edições) é congelado no banco como plano publicado. Imutável após publicar.
+                Plano atual com suas edições será publicado e preservado no histórico clínico.
               </p>
               {applyError && (
                 <p className="text-[11px] text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
@@ -1186,7 +1185,7 @@ function TemplateEditor({
               <strong>{missingAnamneseFor?.patientName}</strong> ainda não tem
               uma anamnese aprovada — sem ela, o motor clínico não recalcula
               TMB/TDEE/macros e o gate de segurança fica indisponível. O
-              snapshot do template será publicado como está. Aplicar mesmo assim?
+               plano do template será publicado como está. Aplicar mesmo assim?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
