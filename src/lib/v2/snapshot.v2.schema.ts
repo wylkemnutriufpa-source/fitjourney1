@@ -26,6 +26,26 @@ const SubstitutionV2Schema = z
   })
   .passthrough();
 
+const MaterializedEquivalentOptionSchema = z
+  .object({
+    foodKey: z.string().min(1),
+    name: z.string().min(1),
+    qty: z.number().nonnegative(),
+    unit: z.string().min(1),
+    kcal: z.number().nonnegative(),
+    imageSlug: z.string().optional(),
+  })
+  .passthrough();
+
+const MaterializedEquivalentsSchema = z
+  .object({
+    criterion: z.enum(["auto", "protein", "carb", "energy"]),
+    generatedAt: z.string().min(1),
+    catalogVersion: z.string().min(1),
+    options: z.array(MaterializedEquivalentOptionSchema).min(1).max(4),
+  })
+  .passthrough();
+
 const ItemV2Schema = z
   .object({
     id: z.string().min(1),
@@ -40,6 +60,7 @@ const ItemV2Schema = z
     scaleGroup: z.enum(["protein", "carb", "fat", "mixed"]),
     measures: z.array(MeasureV2Schema).optional(),
     substitutions: z.array(SubstitutionV2Schema).optional(),
+    materializedEquivalents: MaterializedEquivalentsSchema.optional(),
     notes: z.string().optional(),
   })
   .passthrough();

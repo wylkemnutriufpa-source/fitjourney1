@@ -22,6 +22,37 @@ export type PlannerFoodItem = {
   unit: string;
   kcal: number;
   scaleGroup: ScaleGroup;
+  /**
+   * Templates Inteligentes — Fase 1.
+   * Substituições materializadas (congeladas no momento do save).
+   * `undefined` = item sem bloco de substituição (compat retroativa total).
+   * Tudo dentro é editável pelo profissional.
+   */
+  materializedEquivalents?: MaterializedEquivalents;
+};
+
+/** Critério escolhido pelo profissional no bloco. "auto" = derivado do scaleGroup. */
+export type BlockCriterion = "auto" | "protein" | "carb" | "energy";
+
+export type MaterializedEquivalentOption = {
+  foodKey: string;
+  name: string;
+  qty: number;
+  unit: string;
+  kcal: number;
+  /** Slug da imagem (default: foodKey). Editável pelo profissional. */
+  imageSlug?: string;
+};
+
+export type MaterializedEquivalents = {
+  /** Critério usado na última materialização. */
+  criterion: BlockCriterion;
+  /** ISO timestamp de quando as opções foram calculadas/editadas. */
+  generatedAt: string;
+  /** Versão do catálogo TACO usada (auditoria). */
+  catalogVersion: string;
+  /** 1–4 opções. Editáveis individualmente. */
+  options: MaterializedEquivalentOption[];
 };
 
 export type PlannerMealOption = {
