@@ -191,10 +191,50 @@ const STOP = new Set([
 ]);
 
 /**
+ * Sprint 6 A.3/A.4.4 — Resultado puro do recálculo TACO de uma refeição.
+ * Permite que o componente do bloco e o pai (apply-all) compartilhem a
+ * mesma lógica determinística.
+ */
+type TacoBlockResult =
+  | { kind: "empty" }
+  | { kind: "uncovered" }
+  | { kind: "ok"; options: PlannerMealOption[] };
+
+function computeTacoBlock(
+  meal: PlannerMeal,
+  count: 1 | 2 | 3 | 4,
+  criterion: MatchCriterion | undefined,
+  candidates: readonly import("@/lib/substitutions/equivalents").EquivalentCandidate[],
+): TacoBlockResult {
+  const items = meal.main.items;
+  if (items.length === 0) return { kind: "empty" };
+
+  const perItem = items.map((it) => buildTacoEquivalents(it, count, criterion, candidates));
+  if (!perItem.some((p) => p !== null && p.length > 0)) return { kind: "uncovered" };
+
+  const firstCoveredIdx = perItem.findIndex((p) => p !== null && p.length > 0);
+  const options: PlannerMealOption[] = [];
+  for (let k = 0; k < count; k++) {
+    const optionItems = items.map((orig, i) => {
+      const subs = perItem[i];
+      if (!subs || subs.length === 0) return { ...orig };
+      const pick = subs[k % subs.length].items[0];
+      return { ...pick };
+    });
+    const heroItem = optionItems[firstCoveredIdx];
+    const imageKey = heroItem ? deriveImageKeyForFood(heroItem) ?? "" : "";
+    const title = heroItem?.name ?? `Opção ${k + 1}`;
+    options.push(createEmptyMealOption({ title, imageKey, items: optionItems }));
+  }
+  return { kind: "ok", options };
+}
+
+/**
  * Gera opções equivalentes automáticas para a refeição a partir do alimento
  * recém adicionado, usando o motor curado de substituições. Evita duplicar
  * opções já existentes (comparando títulos normalizados) e o próprio item.
  */
+
 function buildAutoEquivalents(
   meal: PlannerMeal,
   food: PlannerFoodItem,
