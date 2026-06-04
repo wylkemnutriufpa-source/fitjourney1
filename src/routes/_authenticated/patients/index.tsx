@@ -219,7 +219,80 @@ function Patients() {
           })}
         </div>
 
-        <div className="bg-surface border border-border rounded-lg overflow-hidden">
+        <div className="space-y-3 md:hidden">
+          {isLoading && (
+            <div className="rounded-lg border border-border bg-surface p-8">
+              <VideoLoader size="md" label="Carregando pacientes…" />
+            </div>
+          )}
+          {error && !isLoading && (
+            <div className="rounded-lg border border-border bg-surface p-6 text-center text-sm text-destructive">
+              Erro ao carregar pacientes reais.
+            </div>
+          )}
+          {!isLoading && !error && filtered.map((p) => {
+            const statusMeta = anamnesisStatusMeta(p.anamnesisStatus);
+            return (
+              <div
+                key={p.id}
+                className={"rounded-lg border border-border bg-surface p-4 space-y-4 " + (!p.isActive ? "opacity-60" : "")}
+              >
+                <Link to="/patients/$id" params={{ id: p.id }} className="flex min-w-0 items-start gap-3">
+                  <div className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-background text-[10px] font-mono">
+                    {initialsFromName(p.fullName)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{p.fullName}</p>
+                    <p className="truncate text-xs font-mono text-muted-foreground">{p.email}</p>
+                    <p className="mt-1 text-[10px] font-mono uppercase text-muted-foreground">
+                      Cadastro {formatDate(p.createdAt)}
+                    </p>
+                  </div>
+                </Link>
+                <div className="flex flex-wrap gap-2">
+                  <span className={`inline-flex items-center gap-1.5 rounded-full border border-border px-2 py-1 text-[10px] font-mono uppercase ${statusMeta.cls}`}>
+                    <span className={`size-1.5 rounded-full ${statusMeta.dot}`} />
+                    {statusMeta.label}
+                  </span>
+                  <span className={"inline-flex items-center gap-1.5 rounded-full border border-border px-2 py-1 text-[10px] font-mono uppercase " + (p.isActive ? "text-emerald-400" : "text-muted-foreground")}>
+                    <span className={"size-1.5 rounded-full " + (p.isActive ? "bg-emerald-400" : "bg-muted-foreground")} />
+                    {p.isActive ? "Ativo" : "Inativo"}
+                  </span>
+                  <span className={"inline-flex items-center gap-1.5 rounded-full border border-border px-2 py-1 text-[10px] font-mono uppercase " + (p.planStatus === "delivered" ? "text-emerald-400" : "text-amber-400")}>
+                    <span className={"size-1.5 rounded-full " + (p.planStatus === "delivered" ? "bg-emerald-400" : "bg-amber-400")} />
+                    {p.planStatus === "delivered" ? "Com plano" : "Sem plano"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    disabled={activeMutation.isPending}
+                    onClick={() => activeMutation.mutate({ patientId: p.id, isActive: !p.isActive })}
+                    className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground disabled:opacity-50"
+                  >
+                    <Power className="size-4" />
+                    {p.isActive ? "Inativar" : "Reativar"}
+                  </button>
+                  <Link
+                    to="/patients/$id"
+                    params={{ id: p.id }}
+                    className="flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                  >
+                    <FileText className="size-4" />
+                    Perfil
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+          {!isLoading && !error && filtered.length === 0 && (
+            <div className="rounded-lg border border-border bg-surface p-8 text-center text-sm text-muted-foreground">
+              Nenhum paciente encontrado.
+            </div>
+          )}
+        </div>
+
+        <div className="hidden bg-surface border border-border rounded-lg overflow-hidden md:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
