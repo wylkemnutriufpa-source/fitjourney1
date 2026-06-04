@@ -52,17 +52,24 @@ function AnamnesisDetailPage() {
 
   const [notes, setNotes] = useState<string>("");
   const [actionError, setActionError] = useState<string | null>(null);
+  const [postApprove, setPostApprove] = useState<{ patientId: string } | null>(null);
 
   const mut = useMutation({
     mutationFn: (decision: "approved" | "needs_changes") =>
       review({ data: { anamnesisId: id, decision, notes: notes || null } }),
-    onSuccess: async () => {
+    onSuccess: async (_res, decision) => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["nutri", "anamneses"] }),
         qc.invalidateQueries({ queryKey: ["patients-index"] }),
         qc.invalidateQueries({ queryKey: ["patient-detail"] }),
       ]);
-      navigate({ to: "/anamneses" });
+      if (decision === "approved" && data?.patient?.id) {
+        // Regra Canônica #1: sistema sugere, nutri decide o próximo passo.
+        // Não auto-navega: abre escolha entre editar plano agora ou voltar à fila.
+        setPostApprove({ patientId: data.patient.id });
+      } else {
+        navigate({ to: "/anamneses" });
+      }
     },
     onError: (e: Error) => setActionError(e.message),
   });
