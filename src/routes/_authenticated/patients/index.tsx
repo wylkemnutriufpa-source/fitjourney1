@@ -17,15 +17,14 @@ export const Route = createFileRoute("/_authenticated/patients/")({
   component: Patients,
 });
 
-type PatientFilter = "all" | "approved" | "anamnesis_pending" | "plans_delivered" | "plans_pending";
+type PatientFilter = "all" | "approved" | "anamnesis_pending" | "plans_delivered";
 
 function isPatientFilter(value: unknown): value is PatientFilter {
   return (
     value === "all" ||
     value === "approved" ||
     value === "anamnesis_pending" ||
-    value === "plans_delivered" ||
-    value === "plans_pending"
+    value === "plans_delivered"
   );
 }
 
@@ -34,7 +33,6 @@ const filterTabs: Array<{ id: PatientFilter; label: string }> = [
   { id: "approved", label: "Anamnese aprovada" },
   { id: "anamnesis_pending", label: "Anamnese pendente" },
   { id: "plans_delivered", label: "Com plano publicado" },
-  { id: "plans_pending", label: "Sem plano publicado" },
 ];
 
 function initialsFromName(name: string): string {
@@ -105,8 +103,7 @@ function Patients() {
         filter === "all" ||
         (filter === "approved" && p.anamnesisStatus === "approved") ||
         (filter === "anamnesis_pending" && p.anamnesisStatus === "submitted") ||
-        (filter === "plans_delivered" && p.planStatus === "delivered") ||
-        (filter === "plans_pending" && p.planStatus === "pending");
+        (filter === "plans_delivered" && p.planStatus === "delivered");
       if (!matchesFilter) return false;
       if (!term) return true;
       return (
