@@ -99,7 +99,7 @@ export function SubscriptionEditor({ patientId }: { patientId: string }) {
 
   const createMut = useMutation({
     mutationFn: () =>
-      create({
+      createSubscription({
         data: {
           patientId,
           planKind: form.planKind,
@@ -121,7 +121,7 @@ export function SubscriptionEditor({ patientId }: { patientId: string }) {
   const updateMut = useMutation({
     mutationFn: () => {
       if (!editing || editing === "new") throw new Error("No subscription");
-      return update({
+      return updateSubscription({
         data: {
           id: editing.id,
           planKind: form.planKind,
@@ -142,7 +142,7 @@ export function SubscriptionEditor({ patientId }: { patientId: string }) {
   });
 
   const deleteMut = useMutation({
-    mutationFn: (id: string) => del({ data: { id } }),
+    mutationFn: (id: string) => deleteSubscription({ data: { id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["finance"] }),
   });
 
