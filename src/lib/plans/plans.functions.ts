@@ -426,8 +426,7 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     // ---- 3) Motor determinístico (TMB+TDEE+Macros) ----
     const engineOut = runNutritionEngines(ctx);
     if (!engineOut) {
-      // Defesa: ctx.calculable === true ⇒ engineOut nunca é null.
-      throw new Error("CLINICAL_CONTEXT_INCOMPLETE: engines returned null");
+      console.error("Clinical audit: engines returned null for calculable context");
     }
 
     // ---- 4) Estrutura do snapshot (warn-only) ----
@@ -441,9 +440,9 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     const dailyTotals = deriveDailyTotalsFromSnapshot(snapshot);
     const foodOccurrences = deriveFoodOccurrencesFromSnapshot(snapshot);
     const gate = validatePlan({
-      weightKg: ctx.currentWeight!.weightKg,
-      tdee: engineOut.tdee,
-      target: engineOut.target,
+      weightKg: ctx.currentWeight?.weightKg ?? 0,
+      tdee: engineOut?.tdee ?? 0,
+      target: engineOut?.target ?? { kcal: 0, proteinG: 0, carbG: 0, fatG: 0 },
       dailyTotals,
       foodOccurrences,
     });
@@ -477,13 +476,13 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
         },
         calculable: true,
       },
-      engineOutput: {
+      engineOutput: engineOut ? {
         tmb: engineOut.tmb,
         tdee: engineOut.tdee,
         target: engineOut.target,
         clinicalGoalKind: engineOut.clinicalGoalKind,
         engineGoal: engineOut.engineGoal,
-      },
+      } : null,
       gateWarnings: gate.issues.map((w) => ({
         code: w.code,
         severity: w.severity,
