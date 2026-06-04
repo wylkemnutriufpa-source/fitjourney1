@@ -1322,6 +1322,35 @@ function MealEditor({
     onChange((m) => ({ ...m, equivalents: m.equivalents.filter((e) => e.id !== eqId) }));
   }
 
+  /**
+   * Sprint 6 A.3 — Recalcula bloco TACO com N opções (1..4) a partir do
+   * primeiro item da refeição principal que tenha cobertura no catálogo TACO.
+   * Substitui os equivalentes existentes pelos calculados.
+   */
+  function recalcTacoBlock(count: 1 | 2 | 3 | 4) {
+    const base = meal.main.items.find((it) =>
+      buildTacoEquivalents(it, 1) !== null,
+    );
+    if (!base) {
+      toast.error("Nenhum item da refeição está no catálogo TACO.");
+      return;
+    }
+    const opts = buildTacoEquivalents(base, count);
+    if (!opts || opts.length === 0) {
+      toast.error("Não foi possível calcular substitutos para este alimento.");
+      return;
+    }
+    onChange((m) => {
+      const withImages = opts.map((opt) => {
+        const first = opt.items[0];
+        const imageKey = first ? deriveImageKeyForFood(first) : undefined;
+        return { ...opt, imageKey: imageKey ?? opt.imageKey ?? "" };
+      });
+      return { ...m, equivalents: withImages };
+    });
+    toast.success(`Bloco TACO recalculado com ${opts.length} opções.`);
+  }
+
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-background">
       <div className="grid grid-cols-[140px_1fr] gap-0">
@@ -1418,16 +1447,32 @@ function MealEditor({
 
           {/* Equivalentes (substituem a refeição inteira) */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1.5">
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1">
                 <Repeat2 className="size-3" /> Opções equivalentes ({meal.equivalents.length})
               </p>
-              <button
-                className="text-[10px] text-primary hover:underline"
-                onClick={addEquivalent}
-              >
-                + opção
-              </button>
+              <div className="flex items-center gap-1.5">
+                <div className="inline-flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-background">
+                  <span className="text-[9px] font-mono uppercase text-muted-foreground px-1.5">TACO</span>
+                  {([1, 2, 3, 4] as const).map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => recalcTacoBlock(n)}
+                      className="text-[10px] font-medium px-2 py-0.5 rounded hover:bg-primary/10 hover:text-primary transition-colors"
+                      title={`Recalcular bloco TACO com ${n} opção(ões)`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  className="text-[10px] text-primary hover:underline"
+                  onClick={addEquivalent}
+                >
+                  + opção
+                </button>
+              </div>
             </div>
             <div className="space-y-2">
               {meal.equivalents.map((eq) => (

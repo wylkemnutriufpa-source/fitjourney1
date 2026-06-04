@@ -45,9 +45,8 @@ describe("buildTacoEquivalents", () => {
     });
     const opts = buildTacoEquivalents(food, 4);
     expect(opts).not.toBeNull();
-    // Só temos 4 carbos no seed (arroz, macarrão, purê, macaxeira) → 3 substitutos possíveis.
-    expect(opts!.length).toBeGreaterThanOrEqual(2);
-    expect(opts!.length).toBeLessThanOrEqual(3);
+    // Catálogo TACO contém >= 4 carbos → ao pedir 4, esperamos 4.
+    expect(opts!.length).toBe(4);
     for (const o of opts!) {
       expect(o.items[0].scaleGroup).toBe("carb");
     }
