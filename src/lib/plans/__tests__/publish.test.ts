@@ -1,11 +1,17 @@
 // Testes da integração A1+A2 no pipeline de publicação.
 //
-// Foco: comportamento server-side de derivação + gate. Mock de Supabase
-// não é coberto aqui (E2E faz isso). Estes testes garantem que:
+// REGRA CANÔNICA #1 (não-regressão): "O sistema sugere. O nutricionista decide."
+//   - publishPlanToPatient e publishDraftPlan NUNCA lançam erro por motivo
+//     clínico, mesmo quando ctx.calculable === false ou quando o gate
+//     identifica violações severas.
+//   - gate.blockers é SEMPRE [] e gate.blocked é SEMPRE false.
+//   - issues clínicos viram warnings anexados ao snapshot.clinicalAudit,
+//     nunca throws.
+//
+// Mock de Supabase não é coberto aqui (E2E faz isso). Estes testes garantem:
 //   - derivações do snapshot são corretas
-//   - ctx.calculable controla o caminho de bloqueio
-//   - gate.blockers > 0 ⇒ erro CLINICAL_GATE_BLOCKED
-//   - gate.warnings NÃO bloqueia
+//   - ctx.calculable é detectado mas NÃO bloqueia
+//   - gate nunca produz blockers (invariante)
 //   - clinicalAudit é montado corretamente (formato + versões)
 
 import { describe, expect, it } from "vitest";
