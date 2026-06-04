@@ -256,36 +256,36 @@ function PatientProfile() {
 
         {/* Dados básicos / contato */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <div className="bg-surface border border-border rounded-lg p-5 space-y-4 sm:p-6">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Contato · {p.isActive ? "Paciente ativo" : "Paciente inativo"}
             </p>
             <dl className="text-sm space-y-3">
-              <div className="flex items-center gap-3">
-                <Mail className="size-4 text-muted-foreground" />
-                <span className="font-mono text-xs">{p.email}</span>
+              <div className="flex items-center gap-3 min-w-0">
+                <Mail className="size-4 shrink-0 text-muted-foreground" />
+                <span className="min-w-0 break-all font-mono text-xs">{p.email}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Phone className="size-4 text-muted-foreground" />
+              <div className="flex items-center gap-3 min-w-0">
+                <Phone className="size-4 shrink-0 text-muted-foreground" />
                 <span className="font-mono text-xs">{p.phone ?? "—"}</span>
               </div>
             </dl>
           </div>
 
-          <div className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <div className="bg-surface border border-border rounded-lg p-5 space-y-4 sm:p-6">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Dados básicos
             </p>
             <dl className="text-sm space-y-3">
-              <div className="flex items-center gap-3">
-                <Calendar className="size-4 text-muted-foreground" />
-                <span className="font-mono text-xs">
+              <div className="flex items-center gap-3 min-w-0">
+                <Calendar className="size-4 shrink-0 text-muted-foreground" />
+                <span className="min-w-0 font-mono text-xs">
                   Nascimento: {formatDate(p.birthDate)}
                   {age != null && <span className="text-muted-foreground"> · {age} anos</span>}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
-                <Ruler className="size-4 text-muted-foreground" />
+              <div className="flex items-center gap-3 min-w-0">
+                <Ruler className="size-4 shrink-0 text-muted-foreground" />
                 <span className="font-mono text-xs">
                   Altura: {p.heightCm != null ? `${p.heightCm} cm` : "—"}
                 </span>
