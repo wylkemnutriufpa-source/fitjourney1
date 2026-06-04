@@ -200,12 +200,13 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
   useEffect(() => {
     setMounted(true);
-    if (
-      typeof window !== "undefined" &&
-      window.innerWidth < 768 &&
-      __sidebarOpenCache === null
-    ) {
-      setSidebarOpen(false);
+    if (typeof window !== "undefined") {
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+        __sidebarOpenCache = false;
+      } else if (__sidebarOpenCache === null) {
+        setSidebarOpen(true);
+      }
     }
     applyTheme(getStoredTheme());
   }, []);
@@ -379,7 +380,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         </button>
       </aside>
 
-      <div className={sidebarOpen ? "min-w-0 md:pl-64" : "min-w-0 md:pl-0"}>
+      <div className={sidebarOpen ? "min-w-0 pl-0 md:pl-64" : "min-w-0 pl-0 md:pl-0"}>
         <ExpirationBanner />
         <header className="h-16 border-b border-border flex items-center justify-between gap-2 px-3 sm:gap-3 sm:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
