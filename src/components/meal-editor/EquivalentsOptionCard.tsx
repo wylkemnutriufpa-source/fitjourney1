@@ -28,13 +28,19 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
 
   return (
     <div className="flex gap-3 rounded-lg border border-border bg-card p-3">
-      <div className="h-16 w-16 flex-none overflow-hidden rounded-md bg-muted">
+      <button
+        type="button"
+        onClick={onSwap}
+        disabled={disabled || !onSwap}
+        className="group relative h-16 w-16 flex-none overflow-hidden rounded-md bg-muted disabled:cursor-default"
+        aria-label="Trocar alimento"
+        title={onSwap ? "Clique para trocar este alimento" : undefined}
+      >
         {imgSrc && !imgError ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imgSrc}
             alt={value.name}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -42,7 +48,12 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
             sem img
           </div>
         )}
-      </div>
+        {onSwap ? (
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition-all group-hover:bg-black/40 group-hover:opacity-100">
+            <ArrowRightLeft className="h-5 w-5" />
+          </span>
+        ) : null}
+      </button>
 
       <div className="flex flex-1 flex-col gap-2">
         <div className="flex items-start gap-2">
