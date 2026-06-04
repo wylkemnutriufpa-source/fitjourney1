@@ -55,6 +55,7 @@ export function EquivalentsBlock({
   const candidates = useTacoCandidates();
   const criterion: BlockCriterion = value?.criterion ?? "auto";
   const options = value?.options ?? [];
+  const [open, setOpen] = useState(false);
 
   const canRecalc = useMemo(() => {
     return candidates.length > 0 && base.foodKey.length > 0;
