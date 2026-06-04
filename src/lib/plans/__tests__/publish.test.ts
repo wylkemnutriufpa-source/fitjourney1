@@ -1,11 +1,17 @@
 // Testes da integração A1+A2 no pipeline de publicação.
 //
-// Foco: comportamento server-side de derivação + gate. Mock de Supabase
-// não é coberto aqui (E2E faz isso). Estes testes garantem que:
+// REGRA CANÔNICA #1 (não-regressão): "O sistema sugere. O nutricionista decide."
+//   - publishPlanToPatient e publishDraftPlan NUNCA lançam erro por motivo
+//     clínico, mesmo quando ctx.calculable === false ou quando o gate
+//     identifica violações severas.
+//   - gate.blockers é SEMPRE [] e gate.blocked é SEMPRE false.
+//   - issues clínicos viram warnings anexados ao snapshot.clinicalAudit,
+//     nunca throws.
+//
+// Mock de Supabase não é coberto aqui (E2E faz isso). Estes testes garantem:
 //   - derivações do snapshot são corretas
-//   - ctx.calculable controla o caminho de bloqueio
-//   - gate.blockers > 0 ⇒ erro CLINICAL_GATE_BLOCKED
-//   - gate.warnings NÃO bloqueia
+//   - ctx.calculable é detectado mas NÃO bloqueia
+//   - gate nunca produz blockers (invariante)
 //   - clinicalAudit é montado corretamente (formato + versões)
 
 import { describe, expect, it } from "vitest";
@@ -194,7 +200,7 @@ describe("gate bloqueia apenas blockers", () => {
     expect(gate.warnings.some((w) => w.code === "FOOD_MONOTONY")).toBe(true);
   });
 
-  it("proteína > 2.5 g/kg ⇒ blocker", () => {
+  it("INVARIANTE: proteína > 2.5 g/kg gera warning, NUNCA blocker (Rule #1)", () => {
     const gate = validatePlan({
       weightKg: 80,
       tdee: 2750,
@@ -202,8 +208,24 @@ describe("gate bloqueia apenas blockers", () => {
       dailyTotals: [{ dayLabel: "d", kcal: 2200, proteinG: 220, carbG: 250, fatG: 60 }],
       foodOccurrences: [],
     });
-    expect(gate.blocked).toBe(true);
-    expect(gate.blockers.some((b) => b.code === "PROTEIN_OVER_LIMIT")).toBe(true);
+    expect(gate.blocked).toBe(false);
+    expect(gate.blockers.length).toBe(0);
+    expect(gate.warnings.some((w) => w.code === "PROTEIN_OVER_LIMIT")).toBe(true);
+  });
+
+  it("INVARIANTE: múltiplas violações severas continuam sem blocker", () => {
+    const gate = validatePlan({
+      weightKg: 80,
+      tdee: 2750,
+      target: { kcal: 2200, proteinG: 160, carbG: 250, fatG: 60 },
+      dailyTotals: [{ dayLabel: "d", kcal: 1500, proteinG: 240, carbG: 400, fatG: 60 }],
+      foodOccurrences: [
+        { foodKey: "arroz", displayName: "Arroz", weeklyCount: 10 },
+      ],
+    });
+    expect(gate.blocked).toBe(false);
+    expect(gate.blockers.length).toBe(0);
+    expect(gate.warnings.length).toBeGreaterThan(0);
   });
 });
 

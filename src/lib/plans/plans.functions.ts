@@ -1,13 +1,16 @@
 // Plans — server fns para listar pacientes do nutri logado e publicar plano.
 // Snapshot é congelado no momento do insert (V3). RLS do banco protege tudo.
 //
-// PIPELINE DE PUBLICAÇÃO (A1+A2):
+// PIPELINE DE PUBLICAÇÃO (Regra Canônica #1: "Sistema sugere, nutri decide"):
 //   1. Carrega ClinicalContext server-side (peso por recência + anamnese
 //      aprovada mais recente).
-//   2. Bloqueia se ctx.calculable === false (CLINICAL_CONTEXT_INCOMPLETE).
-//   3. Roda motores nutricionais (TMB+TDEE+Macros) a partir do contexto.
+//   2. Se ctx.calculable === false → segue sem motores; snapshot é publicado
+//      assim mesmo. Anexa clinicalAudit.degraded para auditoria.
+//      NUNCA bloqueia por contexto incompleto.
+//   3. Quando calculable, roda motores nutricionais (TMB+TDEE+Macros).
 //   4. Deriva totais diários do snapshot e roda clinical-gate.
-//   5. Bloqueia se gate.blockers.length > 0 (CLINICAL_GATE_BLOCKED).
+//   5. Gate produz APENAS warnings (gate.blockers === [] sempre). NUNCA
+//      bloqueia publicação por motivo clínico — decisão é do nutricionista.
 //   6. Anexa snapshot.clinicalAudit (contexto+motor+warnings+versões)
 //      antes de persistir. Snapshot fica imutável após published_at.
 
