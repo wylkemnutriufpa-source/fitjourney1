@@ -203,7 +203,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
 ];
 
 /** Normaliza nome/foodKey para casamento aproximado. */
-function normalize(s: string): string {
+export function normalizeTacoName(s: string): string {
   return s
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -216,14 +216,37 @@ const indexByFoodKey = new Map<string, EquivalentCandidate>();
 const indexByNormalizedName = new Map<string, EquivalentCandidate>();
 for (const c of tacoCatalog) {
   indexByFoodKey.set(c.foodKey, c);
-  indexByNormalizedName.set(normalize(c.name), c);
+  indexByNormalizedName.set(normalizeTacoName(c.name), c);
 }
 
 /**
- * Resolve um item do planner para o candidato TACO correspondente.
- * Tenta: foodKey exato → nome normalizado → prefixo de palavra principal.
- * Retorna `null` quando o alimento não está coberto pela TACO seed (cabe ao
- * chamador degradar para regras curadas).
+ * Versão pura: resolve um item para o candidato correspondente dentro de
+ * uma lista de candidatos fornecida (ex: catálogo carregado do Cloud).
+ * Sprint 6 A.4.3.
+ */
+export function findCandidateIn(
+  candidates: readonly EquivalentCandidate[],
+  input: { foodKey?: string; name: string },
+): EquivalentCandidate | null {
+  if (input.foodKey) {
+    const hit = candidates.find((c) => c.foodKey === input.foodKey);
+    if (hit) return hit;
+  }
+  const norm = normalizeTacoName(input.name);
+  if (!norm) return null;
+  const exact = candidates.find((c) => normalizeTacoName(c.name) === norm);
+  if (exact) return exact;
+  for (const c of candidates) {
+    const candNorm = normalizeTacoName(c.name);
+    const firstWord = candNorm.split(" ")[0];
+    if (firstWord.length >= 4 && norm.includes(firstWord)) return c;
+  }
+  return null;
+}
+
+/**
+ * Atalho que resolve contra o seed embutido (`tacoCatalog`).
+ * Mantido para retrocompatibilidade com chamadas que não recebem a lista.
  */
 export function findTacoCandidate(input: {
   foodKey?: string;
@@ -233,15 +256,15 @@ export function findTacoCandidate(input: {
     const hit = indexByFoodKey.get(input.foodKey);
     if (hit) return hit;
   }
-  const norm = normalize(input.name);
+  const norm = normalizeTacoName(input.name);
   if (!norm) return null;
   const exact = indexByNormalizedName.get(norm);
   if (exact) return exact;
-  // Match por palavra-chave significativa (ex: "frango grelhado 100g" → frango).
   for (const c of tacoCatalog) {
-    const candNorm = normalize(c.name);
+    const candNorm = normalizeTacoName(c.name);
     const firstWord = candNorm.split(" ")[0];
     if (firstWord.length >= 4 && norm.includes(firstWord)) return c;
   }
   return null;
 }
+
