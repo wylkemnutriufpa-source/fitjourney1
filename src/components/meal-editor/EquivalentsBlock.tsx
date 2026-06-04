@@ -3,7 +3,7 @@
 // Componente compartilhado: o editor de template e o editor de plano do paciente
 // passam o mesmo PlannerFoodItem base + onChange para materializar.
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { RefreshCw, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
