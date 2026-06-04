@@ -21,7 +21,7 @@ type Props = {
 
 export function EquivalentsOptionCard({ value, onChange, onRemove, disabled }: Props) {
   const [imgError, setImgError] = useState(false);
-  const imgSrc = imgFor(value.imageSlug ?? value.foodKey);
+  const imgSrc = imgFor(value.imageSlug ?? value.foodKey, value.name);
 
   const patch = (p: Partial<MaterializedEquivalentOption>) => onChange({ ...value, ...p });
 
