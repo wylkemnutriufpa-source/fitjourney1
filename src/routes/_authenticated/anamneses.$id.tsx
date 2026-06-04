@@ -22,6 +22,15 @@ import {
 } from "@/lib/anamnesis/review.functions";
 import { describeFlag } from "@/lib/anamnesis/v2/alerts.catalog";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ClipboardEdit, ListChecks } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/anamneses/$id")({
   head: () => ({ meta: [{ title: "Revisão clínica — FitJourney" }] }),
@@ -43,17 +52,24 @@ function AnamnesisDetailPage() {
 
   const [notes, setNotes] = useState<string>("");
   const [actionError, setActionError] = useState<string | null>(null);
+  const [postApprove, setPostApprove] = useState<{ patientId: string } | null>(null);
 
   const mut = useMutation({
     mutationFn: (decision: "approved" | "needs_changes") =>
       review({ data: { anamnesisId: id, decision, notes: notes || null } }),
-    onSuccess: async () => {
+    onSuccess: async (_res, decision) => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["nutri", "anamneses"] }),
         qc.invalidateQueries({ queryKey: ["patients-index"] }),
         qc.invalidateQueries({ queryKey: ["patient-detail"] }),
       ]);
-      navigate({ to: "/anamneses" });
+      if (decision === "approved" && data?.patient?.id) {
+        // Regra Canônica #1: sistema sugere, nutri decide o próximo passo.
+        // Não auto-navega: abre escolha entre editar plano agora ou voltar à fila.
+        setPostApprove({ patientId: data.patient.id });
+      } else {
+        navigate({ to: "/anamneses" });
+      }
     },
     onError: (e: Error) => setActionError(e.message),
   });
@@ -236,6 +252,59 @@ function AnamnesisDetailPage() {
           </aside>
         </div>
       </div>
+
+      <Dialog
+        open={postApprove !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPostApprove(null);
+            navigate({ to: "/anamneses" });
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="size-5 text-emerald-600" />
+              Anamnese aprovada
+            </DialogTitle>
+            <DialogDescription>
+              O que você quer fazer agora? Você pode montar o plano alimentar
+              deste paciente ou voltar para a fila de revisões.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setPostApprove(null);
+                navigate({ to: "/anamneses" });
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
+            >
+              <ListChecks className="size-4" />
+              Voltar à fila
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const pid = postApprove?.patientId;
+                setPostApprove(null);
+                if (pid) {
+                  navigate({
+                    to: "/patients/$id/diet",
+                    params: { id: pid },
+                  });
+                }
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <ClipboardEdit className="size-4" />
+              Editar plano agora
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
