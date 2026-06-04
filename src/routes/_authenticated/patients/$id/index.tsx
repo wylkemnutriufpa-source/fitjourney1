@@ -154,33 +154,33 @@ function PatientProfile() {
         <button
           type="button"
           onClick={() => navigate({ to: "/patients" })}
-          className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+          className="hidden min-h-10 items-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground sm:flex"
         >
           <ArrowLeft className="size-3.5" />
-          <span className="hidden sm:inline">Pacientes</span>
+          <span>Pacientes</span>
         </button>
       }
     >
-      <div className="space-y-10">
+      <div className="space-y-8 sm:space-y-10">
         {/* Header */}
-        <div className="flex items-end justify-between border-b border-border pb-6 gap-6 flex-wrap">
-          <div className="flex items-center gap-5">
+        <div className="flex flex-wrap items-end justify-between gap-5 border-b border-border pb-6 sm:gap-6">
+          <div className="flex min-w-0 items-center gap-4 sm:gap-5">
             {p.avatarUrl ? (
               <img
                 src={p.avatarUrl}
                 alt={p.fullName}
-                className="size-16 rounded-full object-cover border border-border"
+                className="size-14 shrink-0 rounded-full border border-border object-cover sm:size-16"
               />
             ) : (
-              <div className="size-16 rounded-full bg-surface border border-border grid place-items-center text-lg font-mono">
+              <div className="grid size-14 shrink-0 place-items-center rounded-full border border-border bg-surface text-base font-mono sm:size-16 sm:text-lg">
                 {initialsFromName(p.fullName)}
               </div>
             )}
-            <div className="space-y-1">
+            <div className="min-w-0 space-y-1">
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                 Paciente desde {formatDate(p.createdAt)}
               </p>
-              <h1 className="text-3xl font-bold tracking-tight">{p.fullName}</h1>
+              <h1 className="break-words text-2xl font-bold tracking-tight sm:text-3xl">{p.fullName}</h1>
               <div className="flex items-center gap-2 pt-1 flex-wrap">
                 <span
                   className={
@@ -199,13 +199,13 @@ function PatientProfile() {
           </div>
 
           {/* Ações do paciente — toolbar dedicada para não competir por espaço no header */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
             <button
               type="button"
               disabled={activeMutation.isPending}
               onClick={() => activeMutation.mutate(!p.isActive)}
               className={
-                "text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border transition-colors disabled:opacity-50 " +
+                "flex min-h-10 items-center justify-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold transition-colors disabled:opacity-50 " +
                 (p.isActive
                   ? "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
                   : "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10")
@@ -218,7 +218,7 @@ function PatientProfile() {
               <Link
                 to="/anamneses/$id"
                 params={{ id: p.anamnesis.id }}
-                className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+                className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
               >
                 <ClipboardList className="size-3.5" />
                 Ver anamnese
@@ -228,7 +228,7 @@ function PatientProfile() {
               <Link
                 to="/patients/$id/diet"
                 params={{ id: p.id }}
-                className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+                className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-emerald-500/40 px-3 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/10"
               >
                 <Eye className="size-3.5" />
                 Ver plano vigente
@@ -237,7 +237,7 @@ function PatientProfile() {
             <Link
               to="/templates"
               search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
-              className="text-xs font-medium py-2 px-3 flex items-center gap-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+              className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
             >
               <Sparkles className="size-3.5" />
               Plano do zero
@@ -245,7 +245,7 @@ function PatientProfile() {
             <Link
               to="/templates"
               search={{ patientId: p.id, patientName: p.fullName }}
-              className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+              className="flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
               <FileText className="size-3.5" />
               {hasPublishedPlan ? "Novo plano" : "Elaborar plano"}
