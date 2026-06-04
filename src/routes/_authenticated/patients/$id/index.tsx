@@ -7,6 +7,8 @@ import { PhysicalAssessmentCard } from "@/components/patient/PhysicalAssessmentC
 import { getPatientForNutritionist, setPatientActiveStatus } from "@/lib/patients/patient-detail.functions";
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
 import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
+import { listPatientFeedbacks } from "@/lib/feedback/feedback.functions";
+import { adherenceLabel, resultLabel } from "@/lib/feedback/copy";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
 import { VideoLoader } from "@/components/VideoLoader";
 import {
