@@ -90,6 +90,7 @@ function PatientProfile() {
   const fetchDetail = useServerFn(getPatientForNutritionist);
   const fetchPlans = useServerFn(listPublishedPlansForPatient);
   const fetchAnamnesis = useServerFn(getAnamnesisForReview);
+  const fetchFeedbacks = useServerFn(listPatientFeedbacks);
   const setActiveStatus = useServerFn(setPatientActiveStatus);
 
   const { data, isLoading, error } = useQuery({
