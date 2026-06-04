@@ -991,12 +991,16 @@ function TemplateEditor({
           <div className="p-6 space-y-4">
             {editorTab === "refeicoes" && (
               <>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <h3 className="text-sm font-semibold">Esqueleto da dieta</h3>
-                  <Button size="sm" variant="outline" onClick={addMeal}>
-                    <Plus className="size-3.5" /> Refeição
-                  </Button>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <ApplyTacoAllButton draft={draft} setDraft={setDraft} />
+                    <Button size="sm" variant="outline" onClick={addMeal}>
+                      <Plus className="size-3.5" /> Refeição
+                    </Button>
+                  </div>
                 </div>
+
 
                 {draft.meals.map((m) => (
                   <MealEditor
