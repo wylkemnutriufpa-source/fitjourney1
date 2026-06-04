@@ -78,7 +78,22 @@ export const submitInitialAnamnesis = createServerFn({ method: "POST" })
       .eq("patient_id", patient.id)
       .eq("review_status", "draft");
 
-    // 3b) calcula próxima version (considerando submetidas/aprovadas)
+    // 3b) bloqueia double-submit: se já existe uma anamnese 'submitted'
+    // aguardando revisão para este paciente, não cria nova versão.
+    const { data: pending } = await supabaseAdmin
+      .from("anamneses")
+      .select("id")
+      .eq("patient_id", patient.id)
+      .eq("review_status", "submitted")
+      .limit(1)
+      .maybeSingle();
+    if (pending) {
+      throw new Error(
+        "ALREADY_SUBMITTED: Você já tem uma anamnese aguardando revisão do nutricionista.",
+      );
+    }
+
+    // 3c) calcula próxima version (considerando submetidas/aprovadas)
     const { data: prev } = await supabaseAdmin
       .from("anamneses")
       .select("id, version")

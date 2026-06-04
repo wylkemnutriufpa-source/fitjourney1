@@ -184,15 +184,34 @@ export const listAnamnesesForNutritionist = createServerFn({ method: "POST" })
       q = q.eq("review_status", data.status);
     }
 
-    const { data: rows, error } = await q;
+    const { data: rowsRaw, error } = await q;
     if (error) throw new Error(error.message);
 
-    // pendingCount sempre
-    const { count: pendingCount } = await supabase
+    // Dedup: para registros 'submitted', mantém apenas a maior version por
+    // paciente (evita duplicatas na fila quando paciente fez double-submit).
+    const submittedByPatient = new Map<string, typeof rowsRaw[number]>();
+    const others: typeof rowsRaw = [];
+    for (const r of rowsRaw ?? []) {
+      if (r.review_status === "submitted") {
+        const prev = submittedByPatient.get(r.patient_id as string);
+        if (!prev || (r.version as number) > (prev.version as number)) {
+          submittedByPatient.set(r.patient_id as string, r);
+        }
+      } else {
+        others.push(r);
+      }
+    }
+    const rows = [...submittedByPatient.values(), ...others].sort((a, b) =>
+      (b.updated_at as string).localeCompare(a.updated_at as string),
+    );
+
+    // pendingCount: conta pacientes distintos com submitted (não rows)
+    const { data: pendingRows } = await supabase
       .from("anamneses")
-      .select("id", { count: "exact", head: true })
+      .select("patient_id")
       .eq("nutritionist_id", nutri.id)
       .eq("review_status", "submitted");
+    const pendingCount = new Set((pendingRows ?? []).map((r) => r.patient_id)).size;
 
     // joina nomes de pacientes em batch
     const patientIds = Array.from(new Set((rows ?? []).map((r) => r.patient_id)));
