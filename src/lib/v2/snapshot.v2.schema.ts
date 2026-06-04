@@ -60,6 +60,7 @@ const ItemV2Schema = z
     scaleGroup: z.enum(["protein", "carb", "fat", "mixed"]),
     measures: z.array(MeasureV2Schema).optional(),
     substitutions: z.array(SubstitutionV2Schema).optional(),
+    materializedEquivalents: MaterializedEquivalentsSchema.optional(),
     notes: z.string().optional(),
   })
   .passthrough();
