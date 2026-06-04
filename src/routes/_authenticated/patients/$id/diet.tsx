@@ -32,7 +32,7 @@ import {
 } from "@/lib/plans/patient-plan.functions";
 import { saveEditedPlan } from "@/lib/plans/plans.functions";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
-import { EquivalentsBlock, ApplyEquivalentsAllButton } from "@/components/meal-editor";
+import { EquivalentsBlock, ApplyEquivalentsAllButton, toPlannerFoodItem, toPlannerFoodItems } from "@/components/meal-editor";
 import type { PlannerFoodItem } from "@/lib/meal-planner";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
@@ -517,7 +517,7 @@ function MealCard({
               </Button>
             </div>
             <EquivalentsBlock
-              base={it as unknown as PlannerFoodItem}
+              base={toPlannerFoodItem(it)}
               value={(it as any).materializedEquivalents}
               onChange={(next) =>
                 onUpdateItem(it.id, (x) => ({ ...x, materializedEquivalents: next }))
@@ -530,7 +530,7 @@ function MealCard({
       {meal.main.items.length > 0 && (
         <div className="pt-1">
           <ApplyEquivalentsAllButton
-            items={meal.main.items as unknown as PlannerFoodItem[]}
+            items={toPlannerFoodItems(meal.main.items)}
             onChange={(nextItems) =>
               onChange((m) => ({
                 ...m,
