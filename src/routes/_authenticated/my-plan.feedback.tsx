@@ -94,6 +94,7 @@ function FeedbackPage() {
   const [tab, setTab] = useState<Tab>(() =>
     list.length === 0 ? "novo" : "novo",
   );
+  const [editing, setEditing] = useState<FeedbackDTO | null>(null);
 
   // Form state
   const [weight, setWeight] = useState<string>("");
