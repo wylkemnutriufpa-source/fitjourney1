@@ -3,7 +3,7 @@
 // Burro: recebe value + onChange + onRemove. Sem estado de servidor.
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, ArrowRightLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,24 +16,31 @@ type Props = {
   value: MaterializedEquivalentOption;
   onChange: (next: MaterializedEquivalentOption) => void;
   onRemove?: () => void;
+  onSwap?: () => void;
   disabled?: boolean;
 };
 
-export function EquivalentsOptionCard({ value, onChange, onRemove, disabled }: Props) {
+export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disabled }: Props) {
   const [imgError, setImgError] = useState(false);
   const imgSrc = imgFor(value.imageSlug ?? value.foodKey, value.name);
 
   const patch = (p: Partial<MaterializedEquivalentOption>) => onChange({ ...value, ...p });
 
   return (
-    <div className="flex gap-3 rounded-lg border border-border bg-card p-3">
-      <div className="h-16 w-16 flex-none overflow-hidden rounded-md bg-muted">
+    <div className="group/card flex gap-3 rounded-lg border border-border bg-card p-3 shadow-sm transition-all hover:border-primary/40 hover:shadow-md">
+      <button
+        type="button"
+        onClick={onSwap}
+        disabled={disabled || !onSwap}
+        className="group relative h-20 w-20 flex-none overflow-hidden rounded-lg bg-muted ring-1 ring-border disabled:cursor-default"
+        aria-label="Trocar alimento"
+        title={onSwap ? "Clique para trocar este alimento" : undefined}
+      >
         {imgSrc && !imgError ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imgSrc}
             alt={value.name}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -41,7 +48,12 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, disabled }: P
             sem img
           </div>
         )}
-      </div>
+        {onSwap ? (
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition-all group-hover:bg-black/40 group-hover:opacity-100">
+            <ArrowRightLeft className="h-5 w-5" />
+          </span>
+        ) : null}
+      </button>
 
       <div className="flex flex-1 flex-col gap-2">
         <div className="flex items-start gap-2">

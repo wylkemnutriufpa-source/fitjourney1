@@ -21,6 +21,7 @@ import type { PlannerFoodItem } from "@/lib/meal-planner";
 import { useTacoCandidates } from "@/lib/substitutions/use-taco-candidates";
 
 import { EquivalentsOptionCard } from "./EquivalentsOptionCard";
+import { FoodSwapDialog } from "./FoodSwapDialog";
 import { recalcMaterializedEquivalents } from "./recalc";
 import {
   type BlockCriterion,
@@ -56,6 +57,7 @@ export function EquivalentsBlock({
   const criterion: BlockCriterion = value?.criterion ?? "auto";
   const options = value?.options ?? [];
   const [open, setOpen] = useState(false);
+  const [swapIdx, setSwapIdx] = useState<number | null>(null);
 
   const canRecalc = useMemo(() => {
     return candidates.length > 0 && base.foodKey.length > 0;
@@ -238,6 +240,7 @@ export function EquivalentsBlock({
                   value={o}
                   onChange={(next) => handleOptionChange(idx, next)}
                   onRemove={() => handleOptionRemove(idx)}
+                  onSwap={() => setSwapIdx(idx)}
                   disabled={disabled}
                 />
               ))}
@@ -251,6 +254,17 @@ export function EquivalentsBlock({
             </p>
           ) : null}
         </div>
+      ) : null}
+
+      {swapIdx !== null && options[swapIdx] ? (
+        <FoodSwapDialog
+          open={swapIdx !== null}
+          onOpenChange={(v) => { if (!v) setSwapIdx(null); }}
+          current={options[swapIdx]}
+          candidates={candidates}
+          scaleGroup={base.scaleGroup}
+          onPick={(next) => handleOptionChange(swapIdx, next)}
+        />
       ) : null}
     </div>
   );
