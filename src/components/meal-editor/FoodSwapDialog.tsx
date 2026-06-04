@@ -100,7 +100,7 @@ export function FoodSwapDialog({
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar na TACO…"
+              placeholder="Buscar no Banco de Dados…"
               className="h-9 pl-8 text-sm"
             />
           </div>
