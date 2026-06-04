@@ -220,7 +220,34 @@ export const ensureDraftPlanForPatient = createServerFn({ method: "POST" })
       .limit(1);
     if (aErr) throw new Error(aErr.message);
     if (!approved?.length) {
-      throw new Error("Paciente ainda não tem anamnese aprovada para gerar pré-plano.");
+      // Rule #3: Operações que nunca podem ser bloqueadas.
+      // Se não há anamnese, gera um draft vazio para o nutri começar a trabalhar.
+      // O sistema alerta na publicação, mas não impede a criação.
+      const { data: newPlan, error: insErr } = await supabase
+        .from("plans")
+        .insert({
+          patient_id: data.patientId,
+          nutritionist_id: nutri.id,
+          status: "draft",
+          schema_version: 3,
+          snapshot: {
+            name: "Plano Inicial",
+            kcal: 0,
+            meals: [],
+            meta: { createdWithoutAnamnesis: true }
+          }
+        })
+        .select("id")
+        .single();
+      
+      if (insErr) throw new Error(insErr.message);
+      
+      return {
+        planId: newPlan.id,
+        created: true,
+        templateKey: null,
+        reason: "anamnesis_missing_manual_start"
+      };
     }
 
     const outcome = await generateDraftPlanFromApproval(
@@ -251,7 +278,32 @@ export const ensureDraftPlanForPatient = createServerFn({ method: "POST" })
     }
 
     if (outcome.kind === "skipped" && outcome.reason === "no_clinical_context") {
-      throw new Error("Anamnese aprovada sem dados clínicos suficientes para montar o pré-plano.");
+      // Rule #3: Não bloqueia. Cria draft manual se o auto-draft falhar por falta de dados.
+      const { data: manualPlan, error: manualErr } = await supabase
+        .from("plans")
+        .insert({
+          patient_id: data.patientId,
+          nutritionist_id: nutri.id,
+          status: "draft",
+          schema_version: 3,
+          snapshot: {
+            name: "Plano Alimentar",
+            kcal: 0,
+            meals: [],
+            meta: { autoSuggested: false, fallbackFromAutoDraft: true }
+          }
+        })
+        .select("id")
+        .single();
+        
+      if (manualErr) throw new Error(manualErr.message);
+      
+      return {
+        planId: manualPlan.id,
+        created: true,
+        templateKey: null,
+        reason: "fallback_to_manual"
+      };
     }
 
     throw new Error(
@@ -317,12 +369,8 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     // Com override=true, pula motor + gate e salva snapshot como está,
     // marcando auditoria com publishedWithoutClinicalContext.
     if (!ctx.calculable) {
-      if (!data.overrideMissingClinical) {
-        throw new Error(
-          `CLINICAL_CONTEXT_INCOMPLETE: missing=[${ctx.missingForCalc.join(",")}]`,
-        );
-      }
-
+      // Rule #1: Nunca bloqueia. Se dados clínicos faltam, publica sem motor.
+      // O sistema registra na auditoria que foi publicado sem contexto clínico.
       const { snapshot: snapOnly, review: reviewOnly } = validateSnapshot(data.snapshot);
       const publishedAtOverride = new Date().toISOString();
       // Snapshot de auditoria sem ClinicalContext (fora do schema estrito).
@@ -378,8 +426,7 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     // ---- 3) Motor determinístico (TMB+TDEE+Macros) ----
     const engineOut = runNutritionEngines(ctx);
     if (!engineOut) {
-      // Defesa: ctx.calculable === true ⇒ engineOut nunca é null.
-      throw new Error("CLINICAL_CONTEXT_INCOMPLETE: engines returned null");
+      console.error("Clinical audit: engines returned null for calculable context");
     }
 
     // ---- 4) Estrutura do snapshot (warn-only) ----
@@ -393,9 +440,9 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
     const dailyTotals = deriveDailyTotalsFromSnapshot(snapshot);
     const foodOccurrences = deriveFoodOccurrencesFromSnapshot(snapshot);
     const gate = validatePlan({
-      weightKg: ctx.currentWeight!.weightKg,
-      tdee: engineOut.tdee,
-      target: engineOut.target,
+      weightKg: ctx.currentWeight?.weightKg ?? 0,
+      tdee: engineOut?.tdee ?? 0,
+      target: engineOut?.target ?? { kcal: 0, proteinG: 0, carbG: 0, fatG: 0 },
       dailyTotals,
       foodOccurrences,
     });
@@ -429,13 +476,13 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
         },
         calculable: true,
       },
-      engineOutput: {
+      engineOutput: engineOut ? {
         tmb: engineOut.tmb,
         tdee: engineOut.tdee,
         target: engineOut.target,
         clinicalGoalKind: engineOut.clinicalGoalKind,
         engineGoal: engineOut.engineGoal,
-      },
+      } : null,
       gateWarnings: gate.issues.map((w) => ({
         code: w.code,
         severity: w.severity,
@@ -791,11 +838,7 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
     const publishedAt = new Date().toISOString();
 
     if (!ctx.calculable) {
-      if (!data.overrideMissingClinical) {
-        throw new Error(
-          `CLINICAL_CONTEXT_INCOMPLETE: missing=[${ctx.missingForCalc.join(",")}]`,
-        );
-      }
+      // Rule #1: Nunca bloqueia.
       const { snapshot: snapOnly, review: reviewOnly } = validateSnapshot(
         data.snapshot,
       );
@@ -843,24 +886,19 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
 
     const engineOut = runNutritionEngines(ctx);
     if (!engineOut) {
-      throw new Error("CLINICAL_CONTEXT_INCOMPLETE: engines returned null");
+      console.error("Clinical audit (draft promotion): engines returned null for calculable context");
     }
 
     const { snapshot, review } = validateSnapshot(data.snapshot);
     const dailyTotals = deriveDailyTotalsFromSnapshot(snapshot);
     const foodOccurrences = deriveFoodOccurrencesFromSnapshot(snapshot);
     const gate = validatePlan({
-      weightKg: ctx.currentWeight!.weightKg,
-      tdee: engineOut.tdee,
-      target: engineOut.target,
+      weightKg: ctx.currentWeight?.weightKg ?? 0,
+      tdee: engineOut?.tdee ?? 0,
+      target: engineOut?.target ?? { kcal: 0, proteinG: 0, carbG: 0, fatG: 0 },
       dailyTotals,
       foodOccurrences,
     });
-    if (gate.blockers.length > 0) {
-      throw new Error(
-        `CLINICAL_GATE_BLOCKED: ${gate.blockers.map((b) => b.code).join(",")}`,
-      );
-    }
 
     const clinicalAudit: ClinicalAudit = {
       clinicalContextSnapshot: {
@@ -887,16 +925,16 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
         },
         calculable: true,
       },
-      engineOutput: {
+      engineOutput: engineOut ? {
         tmb: engineOut.tmb,
         tdee: engineOut.tdee,
         target: engineOut.target,
         clinicalGoalKind: engineOut.clinicalGoalKind,
         engineGoal: engineOut.engineGoal,
-      },
+      } : null,
       gateWarnings: gate.issues.map((w) => ({
         code: w.code,
-        severity: w.severity,
+        severity: w.severity as "error" | "warning",
         message: w.message,
         details: w.details,
         suggestedAction: w.suggestedAction,

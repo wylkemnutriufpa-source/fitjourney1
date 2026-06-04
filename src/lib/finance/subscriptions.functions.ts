@@ -185,6 +185,14 @@ export const createSubscription = createServerFn({ method: "POST" })
       throw new Error("PATIENT_NOT_LINKED");
     }
 
+    // Rule #5: Substituição Automática. Arquiva assinaturas ativas que sobrepõem o período.
+    const { error: updErr } = await supabase
+      .from("patient_subscriptions")
+      .update({ status: "cancelled", notes: "Substituído por nova assinatura em " + new Date().toLocaleDateString() })
+      .eq("patient_id", data.patientId)
+      .eq("status", "active");
+    if (updErr) console.error("Falha ao arquivar assinaturas anteriores:", updErr);
+
     const { data: row, error } = await supabase
       .from("patient_subscriptions")
       .insert({

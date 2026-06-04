@@ -1,0 +1,1 @@
+ALTER FUNCTION public.patient_subscriptions_no_overlap() SET search_path = public;

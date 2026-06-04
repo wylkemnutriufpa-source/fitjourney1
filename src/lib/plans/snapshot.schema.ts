@@ -100,7 +100,7 @@ export const ClinicalAuditSchema = z
       }),
       clinicalGoalKind: z.string(),
       engineGoal: z.string(),
-    }),
+    }).nullable(),
     gateWarnings: z.array(
       z.object({
         code: z.string(),
