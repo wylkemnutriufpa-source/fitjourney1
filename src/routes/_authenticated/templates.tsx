@@ -1289,7 +1289,7 @@ function MealEditor({
       // Auto-injeção de equivalentes só dispara no primeiro alimento da refeição.
       // Alimentos seguintes entram apenas na opção principal — sem amontoar substituições.
       const auto = isFirst
-        ? buildAutoEquivalents({ ...m, main: nextMain, heroKey }, food)
+        ? buildAutoEquivalents({ ...m, main: nextMain, heroKey }, food, candidates)
         : [];
       return {
         ...m,
