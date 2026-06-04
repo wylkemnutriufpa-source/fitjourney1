@@ -69,7 +69,7 @@ export function EquivalentsBlock({
       candidates,
     });
     if (!next) {
-      toast.error(`Sem equivalentes para "${base.name}" no catálogo TACO.`);
+      toast.error(`Não foi possível recalcular equivalentes para "${base.name}".`);
       return;
     }
     onChange(next);
@@ -168,7 +168,7 @@ export function EquivalentsBlock({
 
       {options.length === 0 ? (
         <div className="flex items-center justify-between rounded-md border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground">
-          <span>Nenhuma opção materializada.</span>
+          <span>Nenhuma opção gerada ainda.</span>
           <Button
             type="button"
             size="sm"

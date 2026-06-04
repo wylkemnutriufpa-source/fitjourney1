@@ -17,6 +17,15 @@ export const allFoodKeys = Object.keys(foodImages).sort();
 /** Fallbacks genéricos por categoria — quando o corte/tipo específico não tem foto,
  * caímos numa imagem representativa da família (UI premium, sem "sem img"). */
 const CATEGORY_FALLBACKS: Array<{ match: RegExp; key: string }> = [
+  { match: /banana/i, key: "banana-com-aveia" },
+  { match: /ma[cç][aã]|maca/i, key: "maca" },
+  { match: /laranja/i, key: "laranja" },
+  { match: /mam[aã]o|mamao/i, key: "mamao" },
+  { match: /pera/i, key: "pera" },
+  { match: /uva/i, key: "uva" },
+  { match: /abacaxi/i, key: "abacaxi" },
+  { match: /manga/i, key: "manga" },
+  { match: /morango/i, key: "morango" },
   // Bovinos
   { match: /(contrafil[eé]|patinho|alcatra|coxao|m[uú]sculo|fraldinha|cupim|ac[eé]m|bovin|carne\s*vermelha|bife)/i, key: "carne-grelhada" },
   // Suínos
@@ -34,7 +43,11 @@ const CATEGORY_FALLBACKS: Array<{ match: RegExp; key: string }> = [
 /** Resolve image by exact key, fallback to prefix match, then category by name, else undefined. */
 export function imgFor(key: string, name?: string): string | undefined {
   if (foodImages[key]) return foodImages[key];
-  const prefix = key.toLowerCase();
+  const normalizedKey = key
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  const prefix = normalizedKey;
   const match = allFoodKeys.find((k) => k.startsWith(prefix));
   if (match) return foodImages[match];
 

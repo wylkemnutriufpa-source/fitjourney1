@@ -30,6 +30,16 @@ function resolveCriterion(
   return block;
 }
 
+function equivalentQtyFromPlannerQty(base: PlannerFoodItem, anchor: EquivalentCandidate): number {
+  const qty = Number(base.qty);
+  if (!Number.isFinite(qty) || qty <= 0) return anchor.defaultQty;
+  if (base.unit === "g" || base.unit === "ml") return qty;
+  if (anchor.scaleGroup === "fruit" || anchor.foodKey === "ovo-galinha") {
+    return qty * anchor.defaultQty;
+  }
+  return qty;
+}
+
 /**
  * Calcula opções equivalentes para um item base e devolve a struct materializada
  * pronta para persistir no template/snapshot. Retorna `null` se o base não tem
@@ -62,7 +72,8 @@ export function recalcMaterializedEquivalents(args: {
 
   const eqBase: EquivalentBase = {
     ...anchor,
-    qty: base.qty || anchor.defaultQty,
+    qty: equivalentQtyFromPlannerQty(base, anchor),
+    originalUnit: base.unit,
   };
   const matchCriterion = resolveCriterion(criterion, base.scaleGroup);
   const options = calculateEquivalents(eqBase, candidates, size, matchCriterion);

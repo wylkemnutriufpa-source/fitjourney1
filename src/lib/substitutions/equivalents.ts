@@ -43,6 +43,8 @@ export type EquivalentCandidate = {
 export type EquivalentBase = EquivalentCandidate & {
   /** Quantidade efetiva no plano (na `unit` do alimento). */
   qty: number;
+  /** Unidade efetiva no plano antes da normalização para cálculo. */
+  originalUnit?: string;
 };
 
 export type EquivalentOption = {
@@ -62,6 +64,7 @@ export type EquivalentOption = {
 export function defaultCriterionFor(scaleGroup: string): MatchCriterion {
   if (scaleGroup === "protein") return "protein";
   if (scaleGroup === "carb") return "carb";
+  if (scaleGroup === "fruit") return "energy";
   return "energy";
 }
 

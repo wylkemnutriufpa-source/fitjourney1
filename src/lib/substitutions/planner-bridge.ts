@@ -5,6 +5,7 @@
 
 import {
   calculateEquivalents,
+  defaultCriterionFor,
   type EquivalentBase,
   type EquivalentCandidate,
   type EquivalentOption,
@@ -33,15 +34,37 @@ export function buildTacoEquivalents(
   criterion?: MatchCriterion,
   candidates: readonly EquivalentCandidate[] = tacoCatalog,
 ): PlannerMealOption[] | null {
-  const tacoBase = findCandidateIn(candidates, {
+  let tacoBase = findCandidateIn(candidates, {
     foodKey: baseFood.foodKey,
     name: baseFood.name,
   });
+  if (!tacoBase && baseFood.scaleGroup) {
+    tacoBase = candidates.find((c) => c.scaleGroup === baseFood.scaleGroup) ?? null;
+  }
   if (!tacoBase) return null;
 
-  const base: EquivalentBase = { ...tacoBase, qty: baseFood.qty || tacoBase.defaultQty };
-  const options = calculateEquivalents(base, candidates, count, criterion);
+  const base: EquivalentBase = {
+    ...tacoBase,
+    qty: equivalentQtyFromPlannerQty(baseFood, tacoBase),
+    originalUnit: baseFood.unit,
+  };
+  const options = calculateEquivalents(
+    base,
+    candidates,
+    count,
+    criterion ?? defaultCriterionFor(tacoBase.scaleGroup),
+  );
   return options.map((opt) => equivalentToPlannerOption(opt, candidates));
+}
+
+function equivalentQtyFromPlannerQty(baseFood: PlannerFoodItem, tacoBase: EquivalentCandidate): number {
+  const qty = Number(baseFood.qty);
+  if (!Number.isFinite(qty) || qty <= 0) return tacoBase.defaultQty;
+  if (baseFood.unit === "g" || baseFood.unit === "ml") return qty;
+  if (tacoBase.scaleGroup === "fruit" || tacoBase.foodKey === "ovo-galinha") {
+    return qty * tacoBase.defaultQty;
+  }
+  return qty;
 }
 
 function equivalentToPlannerOption(
