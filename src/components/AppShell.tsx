@@ -57,7 +57,7 @@ function ThemeToggle() {
       onClick={cycle}
       title={label}
       aria-label={label}
-      className="p-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+      className="grid size-10 place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
     >
       <Icon className="size-4" />
     </button>
@@ -187,9 +187,10 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   // Sidebar: cache module-level evita que cada remount do AppShell (cada rota
   // envolve <AppShell>) reabra o menu em mobile causando flash "expande/retrai"
   // que o usuário percebia como "não trocou de tela".
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(
-    () => __sidebarOpenCache ?? true,
-  );
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) return false;
+    return __sidebarOpenCache ?? true;
+  });
   const [mounted, setMounted] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
 
@@ -199,14 +200,34 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
   useEffect(() => {
     setMounted(true);
-    if (
-      typeof window !== "undefined" &&
-      window.innerWidth < 768 &&
-      __sidebarOpenCache === null
-    ) {
-      setSidebarOpen(false);
+    if (typeof window !== "undefined") {
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+        __sidebarOpenCache = false;
+      } else if (__sidebarOpenCache === null) {
+        setSidebarOpen(true);
+      }
     }
     applyTheme(getStoredTheme());
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let wasMobile = window.innerWidth < 768;
+    const onResize = () => {
+      const isMobile = window.innerWidth < 768;
+      if (isMobile === wasMobile) return;
+      wasMobile = isMobile;
+      if (isMobile) {
+        setSidebarOpen(false);
+        __sidebarOpenCache = false;
+      } else if (__sidebarOpenCache === false) {
+        setSidebarOpen(true);
+        __sidebarOpenCache = true;
+      }
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   // Fecha sidebar automaticamente ao navegar em telas mobile.
@@ -378,14 +399,14 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         </button>
       </aside>
 
-      <div className={sidebarOpen ? "md:pl-64" : "md:pl-0"}>
+      <div className={sidebarOpen ? "min-w-0 pl-0 md:pl-64" : "min-w-0 pl-0 md:pl-0"}>
         <ExpirationBanner />
-        <header className="h-16 border-b border-border flex items-center justify-between gap-3 px-4 sm:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
+        <header className="h-16 border-b border-border flex items-center justify-between gap-2 px-3 sm:gap-3 sm:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen((v) => !v)}
               title={sidebarOpen ? "Recolher menu" : "Expandir menu"}
-              className="p-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+              className="grid size-10 shrink-0 place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
             >
               <Menu className="size-4" />
             </button>
@@ -396,7 +417,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
             <Crumbs />
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
             <ThemeToggle />
             {header}
             <div className="text-right hidden sm:block">
@@ -438,7 +459,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
           </div>
         </header>
-        <main className="p-4 sm:p-8 max-w-7xl mx-auto">{children ?? <Outlet />}</main>
+        <main className="mx-auto max-w-7xl overflow-x-hidden p-3 sm:p-8">{children ?? <Outlet />}</main>
       </div>
     </div>
   );
