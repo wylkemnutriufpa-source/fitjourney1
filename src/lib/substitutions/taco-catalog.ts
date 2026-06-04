@@ -197,17 +197,9 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
     carbPer100g: 1.6,
     fatPer100g: 8.9,
   },
-  {
-    foodKey: "salmao",
-    name: "Salmão cru",
-    scaleGroup: "protein",
-    unit: "g",
-    defaultQty: 100,
-    kcalPer100g: 170,
-    proteinPer100g: 19.3,
-    carbPer100g: 0,
-    fatPer100g: 10,
-  },
+  // Salmão removido deliberadamente: o usuário pediu evitar promover salmão
+  // (caro/inviável para a maioria) — usar o termo genérico "peixe" coberto
+  // por merluza, tilápia e atum já presentes no catálogo.
 ];
 
 /** Normaliza nome/foodKey para casamento aproximado. */
