@@ -56,6 +56,7 @@ import {
 } from "@/lib/meal-planner";
 import { detectMealKind, getSubstitutionsFor } from "@/lib/plans/substitution-rules";
 import { buildTacoEquivalents } from "@/lib/substitutions/planner-bridge";
+import type { MatchCriterion } from "@/lib/substitutions/equivalents";
 import {
   Plus,
   Save,
