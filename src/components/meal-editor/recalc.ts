@@ -42,15 +42,27 @@ export function recalcMaterializedEquivalents(args: {
   candidates: readonly EquivalentCandidate[];
 }): MaterializedEquivalents | null {
   const { base, criterion, size, candidates } = args;
-  const cand = findCandidateIn(candidates, {
+
+  // 1) Tenta resolver o item base diretamente no TACO (por foodKey ou nome).
+  let anchor = findCandidateIn(candidates, {
     foodKey: base.foodKey,
     name: base.name,
   });
-  if (!cand) return null;
+
+  // 2) DÍVIDA TÉCNICA (Sprint 6 — fallback): catálogo `public.foods` (usado pelo
+  // FoodPicker) e `taco_foods` não compartilham foodKeys/nomes. Quando não há
+  // match direto, usamos um "representante" do mesmo scaleGroup como âncora
+  // nutricional. Substituir por matching real (alias table ou unificação dos
+  // catálogos) em frente futura.
+  if (!anchor && base.scaleGroup) {
+    anchor = candidates.find((c) => c.scaleGroup === base.scaleGroup) ?? null;
+  }
+
+  if (!anchor) return null;
 
   const eqBase: EquivalentBase = {
-    ...cand,
-    qty: base.qty || cand.defaultQty,
+    ...anchor,
+    qty: base.qty || anchor.defaultQty,
   };
   const matchCriterion = resolveCriterion(criterion, base.scaleGroup);
   const options = calculateEquivalents(eqBase, candidates, size, matchCriterion);
