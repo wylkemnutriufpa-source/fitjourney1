@@ -32,6 +32,8 @@ import {
 } from "@/lib/plans/patient-plan.functions";
 import { saveEditedPlan } from "@/lib/plans/plans.functions";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
+import { EquivalentsBlock, ApplyEquivalentsAllButton } from "@/components/meal-editor";
+import type { PlannerFoodItem } from "@/lib/meal-planner";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Plano do paciente — FitJourney" }] }),
