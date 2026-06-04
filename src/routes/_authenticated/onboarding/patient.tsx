@@ -55,22 +55,23 @@ function PatientOnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground px-4 py-10">
-      <div className="max-w-2xl mx-auto space-y-8">
-        <header className="flex items-center justify-between border-b border-border pb-4">
-          <div>
+    <div className="min-h-screen bg-background text-foreground px-4 py-6 sm:py-10">
+      <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border pb-4">
+          <div className="min-w-0">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Onboarding do paciente
             </p>
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-              <Activity className="size-7 text-primary" />
-              <span className="fj-wordmark">FitJourney</span>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
+              <Activity className="size-6 sm:size-7 text-primary shrink-0" />
+              <span className="fj-wordmark truncate">FitJourney</span>
             </h1>
           </div>
-          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground self-start sm:self-auto">
             {step === "consent" ? "1/2 Consentimento" : "2/2 Anamnese"}
           </div>
         </header>
+
 
         {step === "consent" && (
           <section className="space-y-6">
