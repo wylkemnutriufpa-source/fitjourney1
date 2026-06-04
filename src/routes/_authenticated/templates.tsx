@@ -1251,6 +1251,9 @@ function MealEditor({
   const kcal = mealKcalFromOption(meal.main);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [imagePickerOpen, setImagePickerOpen] = useState(false);
+  // Sprint 6 A.4.1 — critério manual de equivalência por bloco. "auto" usa
+  // o defaultCriterionFor(scaleGroup) embutido no motor TACO.
+  const [tacoCriterion, setTacoCriterion] = useState<MatchCriterion | "auto">("auto");
 
   function changeMainItem(itemId: string, updater: (i: PlannerFoodItem) => PlannerFoodItem) {
     onChange((m) => updateMainItemWithScaling(m, itemId, updater));
