@@ -18,6 +18,8 @@ import { FoodPickerDialog } from "@/components/FoodPickerDialog";
 import type { CatalogFood } from "@/lib/food-catalog";
 import {
   ArrowLeft,
+  ArrowDown,
+  ArrowUp,
   Clock,
   Loader2,
   Plus,
@@ -267,6 +269,20 @@ function PlanEditor({
     }));
   }
 
+  function moveItem(mealId: string, itemId: string, dir: -1 | 1) {
+    updateMeal(mealId, (m) => {
+      const items = m.main.items;
+      const idx = items.findIndex((it) => it.id === itemId);
+      if (idx < 0) return m;
+      const target = idx + dir;
+      if (target < 0 || target >= items.length) return m;
+      const next = items.slice();
+      const [moved] = next.splice(idx, 1);
+      next.splice(target, 0, moved);
+      return { ...m, main: { ...m.main, items: next } };
+    });
+  }
+
   function addFoodToMeal(mealId: string, food: CatalogFood) {
     updateMeal(mealId, (m) => ({
       ...m,
@@ -351,6 +367,7 @@ function PlanEditor({
           onAddItem={() => setPicker({ mealId: meal.id })}
           onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
           onUpdateItem={(itemId, fn) => updateItem(meal.id, itemId, fn)}
+          onMoveItem={(itemId, dir) => moveItem(meal.id, itemId, dir)}
         />
       ))}
 
@@ -402,6 +419,7 @@ function MealCard({
   onAddItem,
   onRemoveItem,
   onUpdateItem,
+  onMoveItem,
 }: {
   readonly meal: EditMeal;
   readonly onChange: (fn: (m: EditMeal) => EditMeal) => void;
@@ -412,6 +430,7 @@ function MealCard({
     itemId: string,
     fn: (it: EditItem) => EditItem,
   ) => void;
+  readonly onMoveItem: (itemId: string, dir: -1 | 1) => void;
 }) {
   const kcal = meal.main.items.reduce(
     (s, it) => s + (Number.isFinite(it.kcal) ? Number(it.kcal) : 0),
@@ -465,7 +484,7 @@ function MealCard({
       />
 
       <ul className="space-y-3">
-        {meal.main.items.map((it) => (
+        {meal.main.items.map((it, idx) => (
           <li key={it.id} className="space-y-2">
             <div className="grid grid-cols-[1fr_64px_56px_64px_auto] gap-2 items-center">
               <Input
@@ -506,15 +525,40 @@ function MealCard({
                 }
                 className="text-xs font-mono"
               />
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                onClick={() => onRemoveItem(it.id)}
-                aria-label="Remover item"
-              >
-                <Trash2 className="size-3.5 text-destructive" />
-              </Button>
+              <div className="flex items-center gap-0.5">
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => onMoveItem(it.id, -1)}
+                  disabled={idx === 0}
+                  aria-label="Mover para cima"
+                  className="h-7 w-7"
+                >
+                  <ArrowUp className="size-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => onMoveItem(it.id, 1)}
+                  disabled={idx === meal.main.items.length - 1}
+                  aria-label="Mover para baixo"
+                  className="h-7 w-7"
+                >
+                  <ArrowDown className="size-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => onRemoveItem(it.id)}
+                  aria-label="Remover item"
+                  className="h-7 w-7"
+                >
+                  <Trash2 className="size-3.5 text-destructive" />
+                </Button>
+              </div>
             </div>
             <EquivalentsBlock
               base={toPlannerFoodItem(it)}
