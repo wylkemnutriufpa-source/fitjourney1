@@ -190,12 +190,30 @@ function PatientProfile() {
                   <span className={"size-1.5 rounded-full " + st.dot} />
                   {st.label}
                 </span>
+                <span className={"inline-flex items-center gap-1.5 text-[10px] font-mono uppercase " + (p.isActive ? "text-emerald-400" : "text-muted-foreground")}>
+                  <span className={"size-1.5 rounded-full " + (p.isActive ? "bg-emerald-400" : "bg-muted-foreground")} />
+                  {p.isActive ? "Ativo" : "Inativo"}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Ações do paciente — toolbar dedicada para não competir por espaço no header */}
           <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              disabled={activeMutation.isPending}
+              onClick={() => activeMutation.mutate(!p.isActive)}
+              className={
+                "text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border transition-colors disabled:opacity-50 " +
+                (p.isActive
+                  ? "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+                  : "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10")
+              }
+            >
+              {activeMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Power className="size-3.5" />}
+              {p.isActive ? "Inativar" : "Reativar"}
+            </button>
             {p.anamnesis && (
               <Link
                 to="/anamneses/$id"
@@ -240,7 +258,7 @@ function PatientProfile() {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-surface border border-border rounded-lg p-6 space-y-4">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Contato
+              Contato · {p.isActive ? "Paciente ativo" : "Paciente inativo"}
             </p>
             <dl className="text-sm space-y-3">
               <div className="flex items-center gap-3">
