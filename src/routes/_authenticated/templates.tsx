@@ -214,13 +214,13 @@ function ApplyTacoAllButton({
         return { ...m, equivalents: r.options };
       }),
     }));
-    if (touched === 0) toast.error("Nenhuma refeição tem itens cobertos pela TACO.");
-    else toast.success(`TACO aplicada a ${touched} refeição(ões) com ${count} opções.`);
+    if (touched === 0) toast.error("Nenhuma refeição tem itens com equivalentes no catálogo.");
+    else toast.success(`Equivalentes aplicados a ${touched} refeição(ões) com ${count} opções.`);
   }
   return (
     <div className="inline-flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-background">
       <span className="text-[9px] font-mono uppercase text-muted-foreground px-1.5">
-        TACO em todas
+        Equivalentes em todas
       </span>
       {([1, 2, 3, 4] as const).map((n) => (
         <button
@@ -228,7 +228,7 @@ function ApplyTacoAllButton({
           type="button"
           onClick={() => applyAll(n)}
           className="text-[10px] font-medium px-2 py-0.5 rounded hover:bg-primary/10 hover:text-primary transition-colors"
-          title={`Aplicar TACO ${n} a todas as refeições`}
+          title={`Aplicar ${n} equivalente(s) a todas as refeições`}
         >
           {n}
         </button>
