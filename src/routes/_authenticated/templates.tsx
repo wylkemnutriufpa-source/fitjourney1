@@ -194,16 +194,20 @@ const STOP = new Set([
  * recém adicionado, usando o motor curado de substituições. Evita duplicar
  * opções já existentes (comparando títulos normalizados) e o próprio item.
  */
-function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): PlannerMealOption[] {
+function buildAutoEquivalents(
+  meal: PlannerMeal,
+  food: PlannerFoodItem,
+  candidates?: readonly import("@/lib/substitutions/equivalents").EquivalentCandidate[],
+): PlannerMealOption[] {
   const taken = new Set<string>([
     normalizeTitle(food.name),
     ...meal.equivalents.map((e) => normalizeTitle(e.title)),
     ...meal.equivalents.flatMap((e) => e.items.map((i) => normalizeTitle(i.name))),
   ]);
 
-  // 1) Tenta a fórmula TACO (Sprint 6 A.2): proteína/carbo/energia por critério,
-  //    arredondado a múltiplos de 5g. Cobre carnes, peixes, arroz, massas, etc.
-  const tacoOpts = buildTacoEquivalents(food, 3);
+  // 1) Tenta a fórmula TACO (Sprint 6 A.2/A.4.3): catálogo carregado do Cloud
+  //    (com fallback ao seed embutido) atravessa `candidates`.
+  const tacoOpts = buildTacoEquivalents(food, 3, undefined, candidates);
   if (tacoOpts && tacoOpts.length > 0) {
     const out: PlannerMealOption[] = [];
     for (const opt of tacoOpts) {
@@ -217,6 +221,7 @@ function buildAutoEquivalents(meal: PlannerMeal, food: PlannerFoodItem): Planner
     }
     if (out.length > 0) return out;
   }
+
 
   // 2) Fallback: motor curado por tipo de refeição.
   const kind = detectMealKind(meal.label, meal.time);
