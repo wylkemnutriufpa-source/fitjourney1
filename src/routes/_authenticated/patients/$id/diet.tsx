@@ -18,6 +18,8 @@ import { FoodPickerDialog } from "@/components/FoodPickerDialog";
 import type { CatalogFood } from "@/lib/food-catalog";
 import {
   ArrowLeft,
+  ArrowDown,
+  ArrowUp,
   Clock,
   Loader2,
   Plus,
