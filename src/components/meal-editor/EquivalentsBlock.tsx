@@ -57,6 +57,7 @@ export function EquivalentsBlock({
   const criterion: BlockCriterion = value?.criterion ?? "auto";
   const options = value?.options ?? [];
   const [open, setOpen] = useState(false);
+  const [swapIdx, setSwapIdx] = useState<number | null>(null);
 
   const canRecalc = useMemo(() => {
     return candidates.length > 0 && base.foodKey.length > 0;
