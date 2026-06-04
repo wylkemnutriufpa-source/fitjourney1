@@ -219,7 +219,7 @@ function Patients() {
           })}
         </div>
 
-        <div className="space-y-3 md:hidden">
+        <div className="space-y-3 pb-20 md:hidden">
           {isLoading && (
             <div className="rounded-lg border border-border bg-surface p-8">
               <VideoLoader size="md" label="Carregando pacientes…" />
@@ -432,7 +432,7 @@ function Patients() {
       <button
         type="button"
         onClick={() => setInviteOpen(true)}
-        className="md:hidden fixed bottom-4 right-4 z-30 bg-primary text-primary-foreground text-xs font-semibold py-3 px-4 flex items-center gap-2 rounded-full shadow-lg shadow-primary/25 hover:bg-primary/90"
+        className="fixed bottom-4 right-4 z-30 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-xs font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90 sm:hidden"
       >
         <Share2 className="size-4" />
         Convite Online
