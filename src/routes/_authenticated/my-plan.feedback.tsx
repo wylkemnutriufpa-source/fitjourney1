@@ -614,7 +614,173 @@ function FeedbackPage() {
           />
         )}
       </div>
+      {editing && (
+        <EditMyFeedbackDialog
+          feedback={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            qc.invalidateQueries({ queryKey: ["my-feedbacks"] });
+          }}
+        />
+      )}
     </AppShell>
+  );
+}
+
+function EditMyFeedbackDialog({
+  feedback,
+  onClose,
+  onSaved,
+}: {
+  feedback: FeedbackDTO;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const edit = useServerFn(editMyFeedback);
+  const [form, setForm] = useState({
+    weightKg: feedback.weightKg?.toString() ?? "",
+    waistCm: feedback.waistCm?.toString() ?? "",
+    abdomenCm: feedback.abdomenCm?.toString() ?? "",
+    hipCm: feedback.hipCm?.toString() ?? "",
+    notes: feedback.notes ?? "",
+    adherenceRating: feedback.adherenceRating,
+    resultRating: feedback.resultRating ?? "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  function parseNum(s: string): number | null {
+    const v = s.trim().replace(",", ".");
+    if (!v) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    setErr(null);
+    try {
+      await edit({
+        data: {
+          id: feedback.id,
+          weightKg: parseNum(form.weightKg),
+          waistCm: parseNum(form.waistCm),
+          abdomenCm: parseNum(form.abdomenCm),
+          hipCm: parseNum(form.hipCm),
+          notes: form.notes,
+          adherenceRating: form.adherenceRating as any,
+          resultRating: (form.resultRating || null) as any,
+        },
+      });
+      toast.success("Feedback atualizado.");
+      onSaved();
+    } catch (e: any) {
+      setErr(e?.message ?? "Erro ao salvar");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputCls =
+    "w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40";
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm grid place-items-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-lg border border-border bg-surface p-5 space-y-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Corrigir feedback
+            </p>
+            <h3 className="text-base font-semibold">Editar registro</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="Fechar"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+
+        <p className="text-[11px] text-muted-foreground border-l-2 border-amber-500/40 pl-3">
+          Você pode corrigir até 24h após o envio e enquanto o profissional ainda
+          não tiver revisado.
+        </p>
+
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Peso (kg)</span>
+            <input type="text" inputMode="decimal" value={form.weightKg} onChange={(e) => setForm({ ...form, weightKg: e.target.value })} className={inputCls} />
+          </label>
+          <label className="block space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Cintura (cm)</span>
+            <input type="text" inputMode="decimal" value={form.waistCm} onChange={(e) => setForm({ ...form, waistCm: e.target.value })} className={inputCls} />
+          </label>
+          <label className="block space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Abdômen (cm)</span>
+            <input type="text" inputMode="decimal" value={form.abdomenCm} onChange={(e) => setForm({ ...form, abdomenCm: e.target.value })} className={inputCls} />
+          </label>
+          <label className="block space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Quadril (cm)</span>
+            <input type="text" inputMode="decimal" value={form.hipCm} onChange={(e) => setForm({ ...form, hipCm: e.target.value })} className={inputCls} />
+          </label>
+        </div>
+
+        <label className="block space-y-1">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Aderência</span>
+          <select value={form.adherenceRating} onChange={(e) => setForm({ ...form, adherenceRating: e.target.value as any })} className={inputCls}>
+            <option value="muito_dificil">Muito difícil</option>
+            <option value="dificil">Difícil</option>
+            <option value="neutro">Neutro</option>
+            <option value="facil">Fácil</option>
+            <option value="muito_facil">Muito fácil</option>
+          </select>
+        </label>
+
+        <label className="block space-y-1">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Resultado percebido</span>
+          <select value={form.resultRating} onChange={(e) => setForm({ ...form, resultRating: e.target.value as any })} className={inputCls}>
+            <option value="">— sem avaliação —</option>
+            <option value="piores">Piorou</option>
+            <option value="abaixo">Abaixo do esperado</option>
+            <option value="dentro">Dentro do esperado</option>
+            <option value="acima">Acima do esperado</option>
+          </select>
+        </label>
+
+        <label className="block space-y-1">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Notas</span>
+          <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} className={inputCls} />
+        </label>
+
+        {err && (
+          <p className="text-xs text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
+            {err}
+          </p>
+        )}
+
+        <div className="flex justify-end gap-2 pt-2">
+          <button onClick={onClose} disabled={saving} className="px-3 py-2 text-sm rounded border border-border hover:bg-muted">
+            Cancelar
+          </button>
+          <button onClick={handleSave} disabled={saving} className="px-3 py-2 text-sm rounded bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2">
+            {saving && <Loader2 className="size-4 animate-spin" />}
+            Salvar alterações
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
