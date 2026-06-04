@@ -130,18 +130,18 @@ function Patients() {
   return (
     <AppShell
       header={
-        <div className="flex items-center gap-2">
+        <div className="hidden items-center gap-2 sm:flex">
           <button
             type="button"
             onClick={() => setInviteOpen(true)}
-            className="bg-surface border border-border text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:border-primary hover:text-primary transition-colors"
+            className="flex min-h-10 items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-xs font-semibold transition-colors hover:border-primary hover:text-primary"
           >
             <Share2 className="size-3.5" />
             ONLINE
           </button>
           <Link
             to="/patients/new"
-            className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+            className="flex min-h-10 items-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="size-3.5" />
             Adicionar Paciente
@@ -160,18 +160,18 @@ function Patients() {
               {filtered.length} de {patients.length} resultados
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <button
               type="button"
               onClick={() => setInviteOpen(true)}
-              className="bg-surface border border-primary/40 text-primary text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary hover:text-primary-foreground transition-colors"
+              className="flex min-h-10 flex-1 items-center justify-center gap-2 rounded-md border border-primary/40 bg-surface px-3 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground sm:flex-none"
             >
               <Share2 className="size-3.5" />
               Convite Online
             </button>
             <Link
               to="/patients/new"
-              className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+              className="flex min-h-10 flex-1 items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 sm:flex-none"
             >
               <Plus className="size-3.5" />
               Adicionar Paciente
@@ -180,7 +180,7 @@ function Patients() {
         </div>
 
         <div className="flex flex-wrap gap-3 items-center">
-          <div className="relative flex-1 min-w-[240px]">
+          <div className="relative flex-1 min-w-0 sm:min-w-[240px]">
             <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               value={q}
@@ -191,7 +191,7 @@ function Patients() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
           {filterTabs.map((tab) => {
             const active = filter === tab.id;
             return (
