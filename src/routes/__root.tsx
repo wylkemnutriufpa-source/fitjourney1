@@ -15,6 +15,8 @@ import { AuthProvider } from "../lib/auth-context";
 import { Toaster } from "@/components/ui/sonner";
 import { IntroOverlay } from "@/components/IntroOverlay";
 
+const fallbackQueryClient = new QueryClient();
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -125,7 +127,8 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
+  const routeContext = Route.useRouteContext();
+  const queryClient = routeContext?.queryClient ?? fallbackQueryClient;
 
   return (
     <QueryClientProvider client={queryClient}>
