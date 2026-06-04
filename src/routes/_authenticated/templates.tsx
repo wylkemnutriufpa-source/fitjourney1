@@ -83,6 +83,7 @@ import {
 import { RealPatientPicker } from "@/components/RealPatientPicker";
 import { publishPlanToPatient, publishDraftPlan, getDraftPlanForEdit, type PatientLite } from "@/lib/plans/plans.functions";
 import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
+import { EquivalentsBlock, ApplyEquivalentsAllButton } from "@/components/meal-editor";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
