@@ -177,11 +177,6 @@ function PatientProfile() {
                   <span className={"size-1.5 rounded-full " + st.dot} />
                   {st.label}
                 </span>
-                {p.anamnesis && (
-                  <span className="text-[10px] font-mono uppercase text-muted-foreground">
-                    · v{p.anamnesis.version}
-                  </span>
-                )}
               </div>
             </div>
           </div>
@@ -282,11 +277,6 @@ function PatientProfile() {
                   : p.anamnesis
                     ? st.label
                     : "Sem anamnese ainda"}
-                {p.anamnesis && (
-                  <span className="text-[10px] font-mono uppercase text-muted-foreground">
-                    v{p.anamnesis.version}
-                  </span>
-                )}
               </h3>
             </div>
             {p.anamnesis && (
@@ -296,7 +286,7 @@ function PatientProfile() {
                 className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-primary/40 text-primary hover:bg-primary/10"
               >
                 <Pencil className="size-3.5" />
-                {hasApprovedAnamnesis ? "Revisar / Nova versão" : "Abrir para edição"}
+                {hasApprovedAnamnesis ? "Revisar anamnese" : "Abrir para edição"}
               </Link>
             )}
           </div>
@@ -304,7 +294,7 @@ function PatientProfile() {
           {hasApprovedAnamnesis && (
             <div className="text-[11px] text-muted-foreground border-l-2 border-emerald-500/40 pl-3 py-1">
               Anamnese aprovada é imutável por contrato clínico. Para alterar,
-              uma nova versão é criada preservando todo o histórico.
+              uma nova revisão é criada preservando todo o histórico.
             </div>
           )}
 
