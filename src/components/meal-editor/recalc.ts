@@ -53,21 +53,14 @@ export function recalcMaterializedEquivalents(args: {
 }): MaterializedEquivalents | null {
   const { base, criterion, size, candidates } = args;
 
-  // 1) Tenta resolver o item base diretamente no TACO (por foodKey ou nome).
-  let anchor = findCandidateIn(candidates, {
+  // 1) Resolve o item base no TACO (foodKey/nome + fuzzy interno em findCandidateIn).
+  const anchor = findCandidateIn(candidates, {
     foodKey: base.foodKey,
     name: base.name,
   });
-
-  // 2) DÍVIDA TÉCNICA (Sprint 6 — fallback): catálogo `public.foods` (usado pelo
-  // FoodPicker) e `taco_foods` não compartilham foodKeys/nomes. Quando não há
-  // match direto, usamos um "representante" do mesmo scaleGroup como âncora
-  // nutricional. Substituir por matching real (alias table ou unificação dos
-  // catálogos) em frente futura.
-  if (!anchor && base.scaleGroup) {
-    anchor = candidates.find((c) => c.scaleGroup === base.scaleGroup) ?? null;
-  }
-
+  // Sem cobertura no catálogo? Não criamos âncora promíscua "qualquer item do
+  // mesmo scaleGroup" — isso gerava substituições absurdas. Retornamos null e
+  // a UI mostra "sem opções" em vez de misturar grupos alimentares.
   if (!anchor) return null;
 
   const eqBase: EquivalentBase = {

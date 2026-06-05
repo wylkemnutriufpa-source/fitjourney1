@@ -55,13 +55,13 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
         ) : null}
       </button>
 
-      <div className="flex flex-1 flex-col gap-2">
-        <div className="flex items-start gap-2">
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div className="flex flex-wrap items-start gap-2">
           <Input
             value={value.name}
             onChange={(e) => patch({ name: e.target.value })}
             disabled={disabled}
-            className="h-8 text-sm font-medium"
+            className="h-8 min-w-0 flex-1 basis-full text-sm font-medium sm:basis-auto"
             aria-label="Nome do equivalente"
           />
           {onSwap ? (

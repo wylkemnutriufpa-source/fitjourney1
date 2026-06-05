@@ -196,8 +196,8 @@ export function EquivalentsBlock({
           ? "order-last col-span-full space-y-3 rounded-lg border border-dashed border-border bg-muted/30 p-3"
           : "space-y-3 border-t border-border/60 p-3"}
         >
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="flex-1 min-w-[180px]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+            <div className="w-full min-w-0 sm:flex-1 sm:min-w-[180px]">
               <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
                 Critério de equivalência
               </Label>
@@ -225,6 +225,7 @@ export function EquivalentsBlock({
               variant="outline"
               onClick={handleRecalc}
               disabled={disabled || !canRecalc}
+              className="w-full sm:w-auto"
             >
               <RefreshCw className="mr-2 h-3.5 w-3.5" />
               Gerar outra opção
