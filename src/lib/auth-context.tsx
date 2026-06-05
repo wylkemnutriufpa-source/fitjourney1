@@ -22,54 +22,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const rolesRequestRef = useRef(0);
 
   const loadRoles = useCallback(async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-    const next = (data ?? []).map((r) => r.role as AppRole).sort();
-    setRoles((prev) => {
-      if (prev.length === next.length && prev.every((v, i) => v === next[i])) {
-        return prev; // mantém referência — evita re-render em cascata no iframe
-      }
-      return next;
-    });
+    const requestId = ++rolesRequestRef.current;
+    try {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
+      if (rolesRequestRef.current !== requestId) return;
+      const next = (data ?? []).map((r) => r.role as AppRole).sort();
+      setRoles((prev) => {
+        if (prev.length === next.length && prev.every((v, i) => v === next[i])) {
+          return prev;
+        }
+        return next;
+      });
+    } catch (err) {
+      console.warn("[auth] loadRoles failed:", err);
+    }
   }, []);
 
   useEffect(() => {
+    // 1) Listener síncrono — apenas atualiza session/roles. NUNCA bloqueia o gate
+    //    com setLoading(true), senão eventos repetidos (TOKEN_REFRESHED, etc.)
+    //    deixam o app preso em "Restaurando sua sessão...".
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
-      const requestId = ++rolesRequestRef.current;
-      setLoading(true);
       setSession((prev) => {
         if (prev?.access_token === s?.access_token && prev?.user?.id === s?.user?.id) {
-          return prev; // idem token → não re-renderiza
+          return prev;
         }
         return s;
       });
       if (s?.user) {
-        setTimeout(() => {
-          loadRoles(s.user.id).finally(() => {
-            if (rolesRequestRef.current === requestId) setLoading(false);
-          });
-        }, 0);
+        // dispara em background — não gateia render
+        setTimeout(() => { void loadRoles(s.user.id); }, 0);
       } else {
         setRoles([]);
-        setLoading(false);
+        rolesRequestRef.current++; // invalida loads pendentes
       }
     });
 
-    supabase.auth.getSession().then(({ data }) => {
-      const requestId = ++rolesRequestRef.current;
-      setSession(data.session);
-      if (data.session?.user) {
-        loadRoles(data.session.user.id).finally(() => {
-          if (rolesRequestRef.current === requestId) setLoading(false);
-        });
-      } else {
-        setLoading(false);
-      }
-    });
+    // 2) Boot inicial — resolve session uma vez e libera o gate. Em alguns
+    //    contextos de iframe (preview), o navigator lock do Supabase pode
+    //    pendurar getSession() indefinidamente; aplicamos um timeout para
+    //    nunca deixar o app preso em "Restaurando sua sessão...".
+    let released = false;
+    const release = () => {
+      if (released) return;
+      released = true;
+      setLoading(false);
+    };
+    const timeoutId = setTimeout(release, 1500);
 
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession()
+      .then(({ data }) => {
+        setSession(data.session);
+        if (data.session?.user) {
+          void loadRoles(data.session.user.id);
+        }
+      })
+      .catch((err) => console.warn("[auth] getSession failed:", err))
+      .finally(() => {
+        clearTimeout(timeoutId);
+        release();
+      });
+
+    return () => {
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, [loadRoles]);
 
   async function signIn(email: string, password: string, rememberMe = true) {
