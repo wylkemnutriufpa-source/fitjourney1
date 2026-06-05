@@ -659,6 +659,11 @@ function MealCard({
                 >
                   <Trash2 className="size-3.5 text-destructive" />
                 </Button>
+                <ReplicateMenu
+                  meals={allMeals}
+                  currentMealId={meal.id}
+                  onReplicate={(targetIds) => onReplicateItem(it.id, targetIds)}
+                />
             </div>
           </li>
         ))}
