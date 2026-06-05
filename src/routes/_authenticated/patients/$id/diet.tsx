@@ -433,6 +433,7 @@ function MealCard({
   onRemoveItem,
   onUpdateItem,
   onMoveItem,
+  newItemIds,
 }: {
   readonly meal: EditMeal;
   readonly onChange: (fn: (m: EditMeal) => EditMeal) => void;
@@ -444,6 +445,7 @@ function MealCard({
     fn: (it: EditItem) => EditItem,
   ) => void;
   readonly onMoveItem: (itemId: string, dir: -1 | 1) => void;
+  readonly newItemIds: Set<string>;
 }) {
   const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
 
