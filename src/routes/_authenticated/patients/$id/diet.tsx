@@ -6,7 +6,7 @@
 // Invariante de imutabilidade do snapshot preservada (nunca damos UPDATE).
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -35,7 +35,6 @@ import {
 import { saveEditedPlan } from "@/lib/plans/plans.functions";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
 import { EquivalentsBlock, toPlannerFoodItem } from "@/components/meal-editor";
-import type { PlannerFoodItem } from "@/lib/meal-planner";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Plano do paciente — FitJourney" }] }),
