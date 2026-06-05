@@ -31,6 +31,17 @@ function pickLandingRoute(identity: IdentityStateDTO): string {
   return "/dashboard";
 }
 
+const IDENTITY_TIMEOUT_MS = 6000;
+
+function resolveIdentityWithTimeout(): Promise<IdentityStateDTO> {
+  return Promise.race([
+    getMyIdentityState(),
+    new Promise<never>((_, reject) => {
+      window.setTimeout(() => reject(new Error("Tempo esgotado ao validar seu perfil.")), IDENTITY_TIMEOUT_MS);
+    }),
+  ]);
+}
+
 function Login() {
   const navigate = useNavigate();
   const { signIn, session, loading } = useAuth();
@@ -60,7 +71,7 @@ function Login() {
     let cancelled = false;
     (async () => {
       try {
-        const id = await getMyIdentityState();
+        const id = await resolveIdentityWithTimeout();
         if (!cancelled) setResolvedTarget(pickLandingRoute(id));
       } catch (err) {
         console.error("[Login] identity resolve failed:", err);
@@ -105,7 +116,7 @@ function Login() {
       return;
     }
     try {
-      const identity = await getMyIdentityState();
+      const identity = await resolveIdentityWithTimeout();
       navigate({ to: pickLandingRoute(identity) });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Não foi possível validar seu perfil.";
