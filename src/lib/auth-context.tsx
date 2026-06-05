@@ -61,8 +61,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    // 2) Boot inicial — resolve session uma vez e libera o gate, mesmo se
-    //    loadRoles falhar/pendurar (roles é UI secundária).
+    // 2) Boot inicial — resolve session uma vez e libera o gate. Em alguns
+    //    contextos de iframe (preview), o navigator lock do Supabase pode
+    //    pendurar getSession() indefinidamente; aplicamos um timeout para
+    //    nunca deixar o app preso em "Restaurando sua sessão...".
+    let released = false;
+    const release = () => {
+      if (released) return;
+      released = true;
+      setLoading(false);
+    };
+    const timeoutId = setTimeout(release, 1500);
+
     supabase.auth.getSession()
       .then(({ data }) => {
         setSession(data.session);
@@ -71,9 +81,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       })
       .catch((err) => console.warn("[auth] getSession failed:", err))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        clearTimeout(timeoutId);
+        release();
+      });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, [loadRoles]);
 
   async function signIn(email: string, password: string, rememberMe = true) {
