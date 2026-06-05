@@ -21,13 +21,24 @@ import {
   ArrowDown,
   ArrowUp,
   Clock,
+  Copy,
+  Eye,
   Loader2,
+  Pencil,
   Plus,
   Save,
   Send,
   Sparkles,
   Trash2,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   listPatientPlansForNutri,
   type PatientPlanFull,
