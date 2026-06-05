@@ -887,6 +887,7 @@ export type Database = {
           name: string
           protein_per_100g: number
           scale_group: string
+          source: string
           unit: string
           updated_at: string
         }
@@ -903,6 +904,7 @@ export type Database = {
           name: string
           protein_per_100g?: number
           scale_group: string
+          source?: string
           unit?: string
           updated_at?: string
         }
@@ -919,6 +921,7 @@ export type Database = {
           name?: string
           protein_per_100g?: number
           scale_group?: string
+          source?: string
           unit?: string
           updated_at?: string
         }
