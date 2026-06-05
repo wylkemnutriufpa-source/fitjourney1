@@ -34,13 +34,13 @@ export function buildTacoEquivalents(
   criterion?: MatchCriterion,
   candidates: readonly EquivalentCandidate[] = tacoCatalog,
 ): PlannerMealOption[] | null {
-  let tacoBase = findCandidateIn(candidates, {
+  const tacoBase = findCandidateIn(candidates, {
     foodKey: baseFood.foodKey,
     name: baseFood.name,
   });
-  if (!tacoBase && baseFood.scaleGroup) {
-    tacoBase = candidates.find((c) => c.scaleGroup === baseFood.scaleGroup) ?? null;
-  }
+  // Removida a âncora promíscua "primeiro candidato do mesmo scaleGroup":
+  // produzia substituições absurdas (ex.: 5g de patinho → 2 ovos).
+  // Sem cobertura real no catálogo, preferimos não sugerir nada.
   if (!tacoBase) return null;
 
   const base: EquivalentBase = {
