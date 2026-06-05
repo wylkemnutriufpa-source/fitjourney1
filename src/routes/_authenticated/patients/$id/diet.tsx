@@ -378,17 +378,59 @@ function PlanEditor({
 
   return (
     <section className="space-y-4 pb-28">
+      {/* Toggle Edição ↔ Visualização */}
+      <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2">
+        <div className="text-xs text-muted-foreground">
+          {mode === "edit"
+            ? "Modo edição — você está editando o plano."
+            : "Visualizando o plano como o paciente vê."}
+        </div>
+        <div className="inline-flex rounded-md border border-border overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setMode("edit")}
+            className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium transition-colors ${
+              mode === "edit"
+                ? "bg-primary text-primary-foreground"
+                : "bg-background text-foreground hover:bg-accent"
+            }`}
+          >
+            <Pencil className="size-3.5" /> Editar
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("preview")}
+            className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium transition-colors ${
+              mode === "preview"
+                ? "bg-primary text-primary-foreground"
+                : "bg-background text-foreground hover:bg-accent"
+            }`}
+          >
+            <Eye className="size-3.5" /> Visualizar plano
+          </button>
+        </div>
+      </div>
+
       {/* Cabeçalho do plano */}
       <div className="bg-surface border border-border rounded-lg p-4 space-y-3">
-        <label className="block space-y-1">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Nome do plano
-          </span>
-          <Input
-            value={draft.name ?? ""}
-            onChange={(e) => patch({ ...draft, name: e.target.value })}
-          />
-        </label>
+        {mode === "edit" ? (
+          <label className="block space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Nome do plano
+            </span>
+            <Input
+              value={draft.name ?? ""}
+              onChange={(e) => patch({ ...draft, name: e.target.value })}
+            />
+          </label>
+        ) : (
+          <div className="space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Plano
+            </span>
+            <p className="text-lg font-semibold">{draft.name || "Sem nome"}</p>
+          </div>
+        )}
         <div className="flex items-baseline justify-between border-t border-border pt-3">
           <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Total
@@ -400,29 +442,38 @@ function PlanEditor({
       </div>
 
       {/* Refeições */}
-      {draft.meals.map((meal) => (
-        <MealCard
-          key={meal.id}
-          meal={meal}
-          onChange={(fn) => updateMeal(meal.id, fn)}
-          onRemove={() => removeMeal(meal.id)}
-          onAddItem={() => setPicker({ mealId: meal.id })}
-          onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
-          onUpdateItem={(itemId, fn) => updateItem(meal.id, itemId, fn)}
-          onMoveItem={(itemId, dir) => moveItem(meal.id, itemId, dir)}
-          newItemIds={newItemIds}
-        />
-      ))}
+      {mode === "edit"
+        ? draft.meals.map((meal) => (
+            <MealCard
+              key={meal.id}
+              meal={meal}
+              allMeals={draft.meals}
+              onChange={(fn) => updateMeal(meal.id, fn)}
+              onRemove={() => removeMeal(meal.id)}
+              onAddItem={() => setPicker({ mealId: meal.id })}
+              onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
+              onUpdateItem={(itemId, fn) => updateItem(meal.id, itemId, fn)}
+              onMoveItem={(itemId, dir) => moveItem(meal.id, itemId, dir)}
+              onReplicateItem={(itemId, targetIds) =>
+                replicateItem(meal.id, itemId, targetIds)
+              }
+              newItemIds={newItemIds}
+            />
+          ))
+        : draft.meals.map((meal) => <PreviewMealCard key={meal.id} meal={meal} />)}
 
-      <Button
-        variant="outline"
-        className="w-full"
-        onClick={addMeal}
-        type="button"
-      >
-        <Plus className="size-3.5" />
-        Adicionar refeição
-      </Button>
+      {mode === "edit" && (
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={addMeal}
+          type="button"
+        >
+          <Plus className="size-3.5" />
+          Adicionar refeição
+        </Button>
+      )}
+
 
       {/* Barra fixa de salvar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
