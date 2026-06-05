@@ -424,21 +424,29 @@ export function findCandidateIn(
     if (firstWord.length >= 4 && norm.includes(firstWord)) return c;
   }
   // 3) Fuzzy por sobreposição de tokens. Ex.: "ovos mexitos" casa com
-  // "ovo de galinha mexido" (tokens: ovo, mexid*). Score = nº tokens
-  // significativos (≥3 chars) compartilhados, com tolerância a plural/sufixo.
+  // "ovo de galinha mexido". Tokens significativos = ≥3 chars (descarta "de",
+  // "da"). Dois tokens casam se: stems iguais OU compartilham prefixo ≥4 chars
+  // (cobre plural, sufixos verbais "mexit"/"mexid", "frita"/"frito").
+  // Exigimos score ≥ 2 para evitar match espúrio por uma palavra genérica
+  // (ex.: "natural" casando "iogurte natural" com "suco de laranja natural").
   const inputTokens = norm.split(" ").filter((t) => t.length >= 3);
   if (inputTokens.length === 0) return null;
   const stem = (t: string) => t.replace(/(oes|aes|ais|eis|ois|uis|ns|s|es)$/u, "");
-  const inputStems = new Set(inputTokens.map(stem));
+  const tokenMatch = (a: string, b: string) => {
+    if (stem(a) === stem(b)) return true;
+    let i = 0;
+    while (i < a.length && i < b.length && a[i] === b[i]) i++;
+    return i >= 4;
+  };
   let best: { c: EquivalentCandidate; score: number } | null = null;
   for (const c of candidates) {
     const candTokens = normalizeTacoName(c.name).split(" ").filter((t) => t.length >= 3);
     if (candTokens.length === 0) continue;
     let score = 0;
-    for (const t of candTokens) {
-      if (inputStems.has(stem(t))) score += 1;
+    for (const t of inputTokens) {
+      if (candTokens.some((ct) => tokenMatch(t, ct))) score += 1;
     }
-    if (score >= 1 && (!best || score > best.score)) best = { c, score };
+    if (score >= 2 && (!best || score > best.score)) best = { c, score };
   }
   return best ? best.c : null;
 }
