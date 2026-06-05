@@ -3,7 +3,7 @@
 // Burro: recebe value + onChange + onRemove. Sem estado de servidor.
 
 import { useState } from "react";
-import { Trash2, ArrowRightLeft } from "lucide-react";
+import { Search, Trash2, ArrowRightLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +64,20 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
             className="h-8 text-sm font-medium"
             aria-label="Nome do equivalente"
           />
+          {onSwap ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 flex-none px-2"
+              onClick={onSwap}
+              disabled={disabled}
+              aria-label="Buscar substituto"
+            >
+              <Search className="h-3.5 w-3.5" />
+              Buscar
+            </Button>
+          ) : null}
           {onRemove ? (
             <Button
               type="button"
