@@ -21,13 +21,24 @@ import {
   ArrowDown,
   ArrowUp,
   Clock,
+  Copy,
+  Eye,
   Loader2,
+  Pencil,
   Plus,
   Save,
   Send,
   Sparkles,
   Trash2,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   listPatientPlansForNutri,
   type PatientPlanFull,
@@ -211,6 +222,7 @@ function PlanEditor({
   const [dirty, setDirty] = useState(false);
   const [picker, setPicker] = useState<{ mealId: string } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [mode, setMode] = useState<"edit" | "preview">("edit");
   // Itens recém-adicionados nesta sessão: disparam auto-geração de substituições.
   const [newItemIds, setNewItemIds] = useState<Set<string>>(() => new Set());
 
@@ -316,6 +328,24 @@ function PlanEditor({
     }));
   }
 
+  function replicateItem(sourceMealId: string, itemId: string, targetMealIds: string[]) {
+    if (targetMealIds.length === 0) return;
+    const source = draft.meals.find((m) => m.id === sourceMealId);
+    const item = source?.main.items.find((it) => it.id === itemId);
+    if (!item) return;
+    patch({
+      ...draft,
+      meals: draft.meals.map((m) => {
+        if (!targetMealIds.includes(m.id)) return m;
+        const clone: EditItem = { ...item, id: uid() };
+        return { ...m, main: { ...m.main, items: [...m.main.items, clone] } };
+      }),
+    });
+    toast.success(
+      `"${item.name}" replicado em ${targetMealIds.length} ${targetMealIds.length === 1 ? "refeição" : "refeições"}.`,
+    );
+  }
+
   const totalKcal = useMemo(() => {
     return draft.meals.reduce(
       (acc, m) =>
@@ -348,17 +378,59 @@ function PlanEditor({
 
   return (
     <section className="space-y-4 pb-28">
+      {/* Toggle Edição ↔ Visualização */}
+      <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2">
+        <div className="text-xs text-muted-foreground">
+          {mode === "edit"
+            ? "Modo edição — você está editando o plano."
+            : "Visualizando o plano como o paciente vê."}
+        </div>
+        <div className="inline-flex rounded-md border border-border overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setMode("edit")}
+            className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium transition-colors ${
+              mode === "edit"
+                ? "bg-primary text-primary-foreground"
+                : "bg-background text-foreground hover:bg-accent"
+            }`}
+          >
+            <Pencil className="size-3.5" /> Editar
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("preview")}
+            className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium transition-colors ${
+              mode === "preview"
+                ? "bg-primary text-primary-foreground"
+                : "bg-background text-foreground hover:bg-accent"
+            }`}
+          >
+            <Eye className="size-3.5" /> Visualizar plano
+          </button>
+        </div>
+      </div>
+
       {/* Cabeçalho do plano */}
       <div className="bg-surface border border-border rounded-lg p-4 space-y-3">
-        <label className="block space-y-1">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Nome do plano
-          </span>
-          <Input
-            value={draft.name ?? ""}
-            onChange={(e) => patch({ ...draft, name: e.target.value })}
-          />
-        </label>
+        {mode === "edit" ? (
+          <label className="block space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Nome do plano
+            </span>
+            <Input
+              value={draft.name ?? ""}
+              onChange={(e) => patch({ ...draft, name: e.target.value })}
+            />
+          </label>
+        ) : (
+          <div className="space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Plano
+            </span>
+            <p className="text-lg font-semibold">{draft.name || "Sem nome"}</p>
+          </div>
+        )}
         <div className="flex items-baseline justify-between border-t border-border pt-3">
           <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Total
@@ -370,29 +442,38 @@ function PlanEditor({
       </div>
 
       {/* Refeições */}
-      {draft.meals.map((meal) => (
-        <MealCard
-          key={meal.id}
-          meal={meal}
-          onChange={(fn) => updateMeal(meal.id, fn)}
-          onRemove={() => removeMeal(meal.id)}
-          onAddItem={() => setPicker({ mealId: meal.id })}
-          onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
-          onUpdateItem={(itemId, fn) => updateItem(meal.id, itemId, fn)}
-          onMoveItem={(itemId, dir) => moveItem(meal.id, itemId, dir)}
-          newItemIds={newItemIds}
-        />
-      ))}
+      {mode === "edit"
+        ? draft.meals.map((meal) => (
+            <MealCard
+              key={meal.id}
+              meal={meal}
+              allMeals={draft.meals}
+              onChange={(fn) => updateMeal(meal.id, fn)}
+              onRemove={() => removeMeal(meal.id)}
+              onAddItem={() => setPicker({ mealId: meal.id })}
+              onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
+              onUpdateItem={(itemId, fn) => updateItem(meal.id, itemId, fn)}
+              onMoveItem={(itemId, dir) => moveItem(meal.id, itemId, dir)}
+              onReplicateItem={(itemId, targetIds) =>
+                replicateItem(meal.id, itemId, targetIds)
+              }
+              newItemIds={newItemIds}
+            />
+          ))
+        : draft.meals.map((meal) => <PreviewMealCard key={meal.id} meal={meal} />)}
 
-      <Button
-        variant="outline"
-        className="w-full"
-        onClick={addMeal}
-        type="button"
-      >
-        <Plus className="size-3.5" />
-        Adicionar refeição
-      </Button>
+      {mode === "edit" && (
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={addMeal}
+          type="button"
+        >
+          <Plus className="size-3.5" />
+          Adicionar refeição
+        </Button>
+      )}
+
 
       {/* Barra fixa de salvar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -427,15 +508,18 @@ function PlanEditor({
 
 function MealCard({
   meal,
+  allMeals,
   onChange,
   onRemove,
   onAddItem,
   onRemoveItem,
   onUpdateItem,
   onMoveItem,
+  onReplicateItem,
   newItemIds,
 }: {
   readonly meal: EditMeal;
+  readonly allMeals: EditMeal[];
   readonly onChange: (fn: (m: EditMeal) => EditMeal) => void;
   readonly onRemove: () => void;
   readonly onAddItem: () => void;
@@ -445,6 +529,7 @@ function MealCard({
     fn: (it: EditItem) => EditItem,
   ) => void;
   readonly onMoveItem: (itemId: string, dir: -1 | 1) => void;
+  readonly onReplicateItem: (itemId: string, targetMealIds: string[]) => void;
   readonly newItemIds: Set<string>;
 }) {
   const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
@@ -574,6 +659,11 @@ function MealCard({
                 >
                   <Trash2 className="size-3.5 text-destructive" />
                 </Button>
+                <ReplicateMenu
+                  meals={allMeals}
+                  currentMealId={meal.id}
+                  onReplicate={(targetIds) => onReplicateItem(it.id, targetIds)}
+                />
             </div>
           </li>
         ))}
@@ -590,6 +680,134 @@ function MealCard({
           Adicionar alimento
         </Button>
       </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Replicar alimento para outras refeições
+// ============================================================
+function ReplicateMenu({
+  meals,
+  currentMealId,
+  onReplicate,
+}: {
+  readonly meals: EditMeal[];
+  readonly currentMealId: string;
+  readonly onReplicate: (targetMealIds: string[]) => void;
+}) {
+  const others = meals.filter((m) => m.id !== currentMealId);
+  if (others.length === 0) return null;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          aria-label="Replicar em outras refeições"
+          className="h-7 w-7"
+        >
+          <Copy className="size-3.5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>Replicar em…</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {others.map((m) => (
+          <DropdownMenuItem
+            key={m.id}
+            onSelect={(e) => {
+              e.preventDefault();
+              onReplicate([m.id]);
+            }}
+          >
+            <span className="text-xs font-mono text-muted-foreground mr-2">
+              {m.time}
+            </span>
+            <span className="truncate">{m.label}</span>
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            onReplicate(others.map((m) => m.id));
+          }}
+        >
+          Replicar em todas
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+// ============================================================
+// Visualização (somente leitura) — espelha o que o paciente vê
+// ============================================================
+function PreviewMealCard({ meal }: { readonly meal: EditMeal }) {
+  const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
+  return (
+    <div className="bg-surface border border-border rounded-lg p-4 space-y-3">
+      <div className="flex items-center justify-between gap-3 border-b border-border pb-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Clock className="size-3.5 text-muted-foreground shrink-0" />
+          <span className="text-xs font-mono text-muted-foreground">
+            {meal.time}
+          </span>
+          <span className="text-sm font-semibold truncate">{meal.label}</span>
+        </div>
+        <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-mono font-semibold text-primary">
+          {Math.round(kcal)} kcal
+        </span>
+      </div>
+      {meal.main.title && (
+        <p className="text-sm font-medium">{meal.main.title}</p>
+      )}
+      <ul className="space-y-1.5">
+        {meal.main.items.map((it) => {
+          const eq = (it as any).materializedEquivalents as
+            | { options?: Array<{ name: string; qty: number; unit: string }> }
+            | undefined;
+          const hasOpts = (eq?.options?.length ?? 0) > 0;
+          return (
+            <li
+              key={it.id}
+              className="rounded-md border border-border/60 bg-background/60 px-3 py-2"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-sm">{it.name}</span>
+                <span className="text-xs font-mono text-muted-foreground">
+                  {it.qty} {it.unit}
+                </span>
+              </div>
+              {hasOpts && (
+                <div className="mt-1.5 space-y-0.5 border-t border-dashed border-border/60 pt-1.5">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                    Substituições
+                  </span>
+                  {eq!.options!.map((o, i) => (
+                    <div
+                      key={i}
+                      className="flex items-baseline justify-between gap-2 text-xs"
+                    >
+                      <span className="truncate">{o.name}</span>
+                      <span className="font-mono text-muted-foreground">
+                        {o.qty} {o.unit}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </li>
+          );
+        })}
+        {meal.main.items.length === 0 && (
+          <li className="text-xs text-muted-foreground italic">
+            Sem alimentos.
+          </li>
+        )}
+      </ul>
     </div>
   );
 }
