@@ -297,10 +297,90 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
     carbPer100g: 6.8,
     fatPer100g: 0.3,
   },
+  // ------ Bebidas ------
+  {
+    foodKey: "cafe-com-leite",
+    name: "Café com leite",
+    scaleGroup: "beverage",
+    unit: "ml",
+    defaultQty: 200,
+    kcalPer100g: 43,
+    proteinPer100g: 2.2,
+    carbPer100g: 4.5,
+    fatPer100g: 1.7,
+  },
+  {
+    foodKey: "suco-laranja-natural",
+    name: "Suco de laranja natural",
+    scaleGroup: "beverage",
+    unit: "ml",
+    defaultQty: 200,
+    kcalPer100g: 44,
+    proteinPer100g: 0.7,
+    carbPer100g: 10.4,
+    fatPer100g: 0.2,
+  },
+  {
+    foodKey: "suco-uva-integral",
+    name: "Suco de uva integral",
+    scaleGroup: "beverage",
+    unit: "ml",
+    defaultQty: 200,
+    kcalPer100g: 61,
+    proteinPer100g: 0.4,
+    carbPer100g: 14.8,
+    fatPer100g: 0.1,
+  },
+  {
+    foodKey: "suco-maracuja-natural",
+    name: "Suco de maracujá natural",
+    scaleGroup: "beverage",
+    unit: "ml",
+    defaultQty: 200,
+    kcalPer100g: 53,
+    proteinPer100g: 0.4,
+    carbPer100g: 13.6,
+    fatPer100g: 0.1,
+  },
+  // ------ Doces ------
+  {
+    foodKey: "goiabada",
+    name: "Goiabada cascão",
+    scaleGroup: "mixed",
+    unit: "g",
+    defaultQty: 30,
+    kcalPer100g: 290,
+    proteinPer100g: 0.5,
+    carbPer100g: 72,
+    fatPer100g: 0.1,
+  },
+  {
+    foodKey: "doce-leite",
+    name: "Doce de leite pastoso",
+    scaleGroup: "mixed",
+    unit: "g",
+    defaultQty: 30,
+    kcalPer100g: 315,
+    proteinPer100g: 6.8,
+    carbPer100g: 64,
+    fatPer100g: 4,
+  },
+  {
+    foodKey: "chocolate-100-cacau",
+    name: "Chocolate 100% cacau",
+    scaleGroup: "mixed",
+    unit: "g",
+    defaultQty: 20,
+    kcalPer100g: 550,
+    proteinPer100g: 14,
+    carbPer100g: 23,
+    fatPer100g: 46,
+  },
   // Salmão removido deliberadamente: o usuário pediu evitar promover salmão
   // (caro/inviável para a maioria) — usar o termo genérico "peixe" coberto
   // por merluza, tilápia e atum já presentes no catálogo.
 ];
+
 
 /** Normaliza nome/foodKey para casamento aproximado. */
 export function normalizeTacoName(s: string): string {
