@@ -34,7 +34,7 @@ import {
 } from "@/lib/plans/patient-plan.functions";
 import { saveEditedPlan } from "@/lib/plans/plans.functions";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
-import { EquivalentsBlock, ApplyEquivalentsAllButton, toPlannerFoodItem, toPlannerFoodItems } from "@/components/meal-editor";
+import { EquivalentsBlock, toPlannerFoodItem } from "@/components/meal-editor";
 import type { PlannerFoodItem } from "@/lib/meal-planner";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
@@ -81,6 +81,11 @@ function uid() {
 
 function cloneSnapshot(s: any): EditSnapshot {
   return JSON.parse(JSON.stringify(s ?? {}));
+}
+
+function kcalOf(item: Pick<EditItem, "kcal">) {
+  const value = Number(item.kcal);
+  return Number.isFinite(value) ? value : 0;
 }
 
 function PatientPlanPage() {
@@ -309,7 +314,7 @@ function PlanEditor({
       (acc, m) =>
         acc +
         m.main.items.reduce(
-          (s, it) => s + (Number.isFinite(it.kcal) ? Number(it.kcal) : 0),
+          (s, it) => s + kcalOf(it),
           0,
         ),
       0,
