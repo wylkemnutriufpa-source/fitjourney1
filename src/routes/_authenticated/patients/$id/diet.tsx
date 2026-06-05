@@ -437,10 +437,7 @@ function MealCard({
   ) => void;
   readonly onMoveItem: (itemId: string, dir: -1 | 1) => void;
 }) {
-  const kcal = meal.main.items.reduce(
-    (s, it) => s + (Number.isFinite(it.kcal) ? Number(it.kcal) : 0),
-    0,
-  );
+  const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
 
   return (
     <div className="bg-surface border border-border rounded-lg p-4 space-y-3">
@@ -464,16 +461,21 @@ function MealCard({
             className="text-xs"
           />
         </div>
-        <Button
-          type="button"
-          size="icon"
-          variant="ghost"
-          onClick={onRemove}
-          aria-label="Remover refeição"
-          className="shrink-0"
-        >
-          <Trash2 className="size-3.5 text-destructive" />
-        </Button>
+        <div className="flex shrink-0 items-center gap-2 pt-1">
+          <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-mono font-semibold text-primary">
+            {Math.round(kcal)} kcal
+          </span>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            onClick={onRemove}
+            aria-label="Remover refeição"
+            className="shrink-0"
+          >
+            <Trash2 className="size-3.5 text-destructive" />
+          </Button>
+        </div>
       </div>
 
       <Input
@@ -490,47 +492,45 @@ function MealCard({
 
       <ul className="space-y-3">
         {meal.main.items.map((it, idx) => (
-          <li key={it.id} className="space-y-2">
-            <div className="grid grid-cols-[1fr_64px_56px_64px_auto] gap-2 items-center">
-              <Input
-                value={it.name}
-                onChange={(e) =>
-                  onUpdateItem(it.id, (x) => ({ ...x, name: e.target.value }))
-                }
-                className="text-sm"
-              />
-              <Input
-                type="number"
-                inputMode="decimal"
-                value={it.qty}
-                onChange={(e) =>
-                  onUpdateItem(it.id, (x) => ({
-                    ...x,
-                    qty: Number(e.target.value) || 0,
-                  }))
-                }
-                className="text-xs font-mono"
-              />
-              <Input
-                value={it.unit}
-                onChange={(e) =>
-                  onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
-                }
-                className="text-xs font-mono"
-              />
-              <Input
-                type="number"
-                inputMode="numeric"
-                value={it.kcal}
-                onChange={(e) =>
-                  onUpdateItem(it.id, (x) => ({
-                    ...x,
-                    kcal: Number(e.target.value) || 0,
-                  }))
-                }
-                className="text-xs font-mono"
-              />
-              <div className="flex items-center gap-0.5">
+          <li
+            key={it.id}
+            className="grid grid-cols-[minmax(0,1fr)_72px_64px_auto_auto] items-center gap-2"
+          >
+            <Input
+              value={it.name}
+              onChange={(e) =>
+                onUpdateItem(it.id, (x) => ({ ...x, name: e.target.value }))
+              }
+              className="text-sm"
+            />
+            <Input
+              type="number"
+              inputMode="decimal"
+              value={it.qty}
+              onChange={(e) =>
+                onUpdateItem(it.id, (x) => ({
+                  ...x,
+                  qty: Number(e.target.value) || 0,
+                }))
+              }
+              className="text-xs font-mono"
+            />
+            <Input
+              value={it.unit}
+              onChange={(e) =>
+                onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
+              }
+              className="text-xs font-mono"
+            />
+            <EquivalentsBlock
+              base={toPlannerFoodItem(it)}
+              value={(it as any).materializedEquivalents}
+              onChange={(next) =>
+                onUpdateItem(it.id, (x) => ({ ...x, materializedEquivalents: next }))
+              }
+              variant="inline"
+            />
+            <div className="flex items-center gap-0.5">
                 <Button
                   type="button"
                   size="icon"
@@ -563,35 +563,12 @@ function MealCard({
                 >
                   <Trash2 className="size-3.5 text-destructive" />
                 </Button>
-              </div>
             </div>
-            <EquivalentsBlock
-              base={toPlannerFoodItem(it)}
-              value={(it as any).materializedEquivalents}
-              onChange={(next) =>
-                onUpdateItem(it.id, (x) => ({ ...x, materializedEquivalents: next }))
-              }
-            />
           </li>
         ))}
       </ul>
 
-      {meal.main.items.length > 0 && (
-        <div className="pt-1">
-          <ApplyEquivalentsAllButton
-            items={toPlannerFoodItems(meal.main.items)}
-            onChange={(nextItems) =>
-              onChange((m) => ({
-                ...m,
-                main: { ...m.main, items: nextItems as unknown as EditItem[] },
-              }))
-            }
-            label="Recalcular equivalentes de todos os itens"
-          />
-        </div>
-      )}
-
-      <div className="flex items-center justify-between border-t border-border pt-3">
+      <div className="flex items-center justify-start border-t border-border pt-3">
         <Button
           type="button"
           variant="outline"
@@ -601,9 +578,6 @@ function MealCard({
           <Plus className="size-3.5" />
           Adicionar alimento
         </Button>
-        <span className="text-xs font-mono text-primary">
-          {Math.round(kcal)} kcal
-        </span>
       </div>
     </div>
   );
