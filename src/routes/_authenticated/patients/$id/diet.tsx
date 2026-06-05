@@ -508,15 +508,18 @@ function PlanEditor({
 
 function MealCard({
   meal,
+  allMeals,
   onChange,
   onRemove,
   onAddItem,
   onRemoveItem,
   onUpdateItem,
   onMoveItem,
+  onReplicateItem,
   newItemIds,
 }: {
   readonly meal: EditMeal;
+  readonly allMeals: EditMeal[];
   readonly onChange: (fn: (m: EditMeal) => EditMeal) => void;
   readonly onRemove: () => void;
   readonly onAddItem: () => void;
@@ -526,6 +529,7 @@ function MealCard({
     fn: (it: EditItem) => EditItem,
   ) => void;
   readonly onMoveItem: (itemId: string, dir: -1 | 1) => void;
+  readonly onReplicateItem: (itemId: string, targetMealIds: string[]) => void;
   readonly newItemIds: Set<string>;
 }) {
   const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
