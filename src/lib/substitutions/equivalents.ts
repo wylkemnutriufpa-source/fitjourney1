@@ -122,12 +122,24 @@ export function calculateEquivalentQty(
  * calcula as quantidades equivalentes. Ordena por proximidade de massa final
  * (mais perto da quantidade do base = mais "natural" como substituição).
  */
+/**
+ * Grupos clinicamente válidos para substituição. `mixed`, `dairy`, `vegetable`,
+ * `beverage` e demais ficam de fora — preferimos NÃO sugerir nada a misturar
+ * grupos alimentares (ex.: trocar carboidrato por proteína).
+ */
+const ALLOWED_SCALE_GROUPS = new Set(["protein", "carb", "fat", "fruit"]);
+
 export function calculateEquivalents(
   base: EquivalentBase,
   candidates: readonly EquivalentCandidate[],
   count: number,
   criterion: MatchCriterion = defaultCriterionFor(base.scaleGroup),
 ): EquivalentOption[] {
+  // Trava clínica: scaleGroup do base precisa ser conhecido E permitido.
+  // Sem isso, qualquer fallback "mesmo grupo" produz substituições absurdas.
+  if (!base.scaleGroup || !ALLOWED_SCALE_GROUPS.has(base.scaleGroup)) {
+    return [];
+  }
   const n = Math.max(1, Math.min(4, Math.floor(count)));
   const pool = candidates.filter(
     (c) => c.scaleGroup === base.scaleGroup && c.foodKey !== base.foodKey,
