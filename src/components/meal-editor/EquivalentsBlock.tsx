@@ -153,32 +153,12 @@ export function EquivalentsBlock({
           )}
           <Shuffle className="h-3.5 w-3.5 text-primary shrink-0" />
           <span className="text-xs font-medium text-foreground truncate">
-            Equivalências
+            Substituições
           </span>
           <span className="text-[11px] text-muted-foreground truncate">
             · {summaryLabel}
           </span>
         </div>
-        {options.length === 0 && canRecalc && !open ? (
-          <span
-            role="button"
-            tabIndex={0}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRecalc();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.stopPropagation();
-                handleRecalc();
-              }
-            }}
-            className="inline-flex h-7 items-center justify-center rounded-md border border-input bg-background px-2 text-[11px] font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            <Plus className="mr-1 h-3 w-3" />
-            Gerar
-          </span>
-        ) : null}
       </button>
 
       {open ? (
@@ -214,7 +194,7 @@ export function EquivalentsBlock({
               disabled={disabled || !canRecalc}
             >
               <RefreshCw className="mr-2 h-3.5 w-3.5" />
-              Recalcular bloco
+              Gerar outra opção
             </Button>
           </div>
 
@@ -229,7 +209,7 @@ export function EquivalentsBlock({
                 disabled={disabled || !canRecalc}
               >
                 <Plus className="mr-1 h-3.5 w-3.5" />
-                Gerar
+                Gerar opções
               </Button>
             </div>
           ) : (
