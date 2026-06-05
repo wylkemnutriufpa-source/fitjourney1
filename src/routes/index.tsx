@@ -215,7 +215,7 @@ function Landing() {
     <div ref={rootRef} className="min-h-screen bg-background overflow-x-hidden">
       {/* ══════════ NAV — Premium Reveal ══════════ */}
       <motion.nav
-        initial={{ y: -32, opacity: 0 }}
+        initial={false}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${
@@ -324,7 +324,7 @@ function Landing() {
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-8 items-center">
             {/* — Coluna esquerda: copy — */}
-            <motion.div variants={stagger} initial="hidden" animate="show" className="text-center lg:text-left">
+            <motion.div variants={stagger} initial={false} animate="show" className="text-center lg:text-left">
               <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-premium text-primary text-sm font-semibold mb-8 gradient-border">
                 <Sparkles className="w-4 h-4" />
                 {c.hero.badge}
@@ -377,7 +377,7 @@ function Landing() {
 
             {/* — Coluna direita: mídia editável OU logo orbital — */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={false}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
               className="relative mx-auto w-full max-w-[560px] aspect-square hidden md:block"

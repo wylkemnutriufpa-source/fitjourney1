@@ -79,9 +79,18 @@ function Login() {
   }, [session, resolvedTarget]);
 
 
-  if (loading) return null;
+  if (loading) {
+    return <AuthGateState message="Restaurando sua sessão..." />;
+  }
   if (session) {
-    if (!resolvedTarget) return null; // aguarda resolução; sem flash
+    if (!resolvedTarget) {
+      return (
+        <AuthGateState
+          message={error ?? "Validando seu perfil..."}
+          tone={error ? "error" : "loading"}
+        />
+      );
+    }
     return <Navigate to={resolvedTarget} replace />;
   }
 
@@ -271,6 +280,39 @@ function Login() {
             </Link>
           </p>
         </form>
+      </div>
+    </div>
+  );
+}
+
+function AuthGateState({
+  message,
+  tone = "loading",
+}: {
+  message: string;
+  tone?: "loading" | "error";
+}) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-6 text-foreground">
+      <div className="w-full max-w-sm text-center space-y-4">
+        <div className="mx-auto flex size-12 items-center justify-center rounded-full border border-border bg-card/70">
+          {tone === "loading" ? (
+            <Loader2 className="size-5 animate-spin text-primary" />
+          ) : (
+            <Activity className="size-5 text-destructive" />
+          )}
+        </div>
+        <p className={tone === "error" ? "text-sm text-destructive" : "text-sm text-muted-foreground"}>
+          {message}
+        </p>
+        {tone === "error" && (
+          <a
+            href="/app"
+            className="inline-flex h-10 items-center justify-center rounded-md border border-border px-4 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            Tentar novamente
+          </a>
+        )}
       </div>
     </div>
   );
