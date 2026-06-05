@@ -202,6 +202,28 @@
   filter: drop-shadow(0 0 6px oklch(0.62 0.16 155 / 0.35));
 }
 
+.fj-logo-video-shell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  overflow: hidden;
+}
+
+.fj-logo-video-ios-fallback {
+  display: none;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .fj-logo-video-media {
+    display: none;
+  }
+
+  .fj-logo-video-ios-fallback {
+    display: block;
+  }
+}
+
 .fj-logo-pulse {
   position: absolute;
   inset: -10%;
