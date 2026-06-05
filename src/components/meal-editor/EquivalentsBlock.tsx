@@ -238,7 +238,7 @@ export function EquivalentsBlock({
           {value?.generatedAt && options.length > 0 ? (
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
               Materializado em {new Date(value.generatedAt).toLocaleString("pt-BR")} ·
-              catálogo {value.catalogVersion || "—"}
+              Banco de dados
             </p>
           ) : null}
         </div>
