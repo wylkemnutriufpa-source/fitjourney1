@@ -211,6 +211,8 @@ function PlanEditor({
   const [dirty, setDirty] = useState(false);
   const [picker, setPicker] = useState<{ mealId: string } | null>(null);
   const [saving, setSaving] = useState(false);
+  // Itens recém-adicionados nesta sessão: disparam auto-geração de substituições.
+  const [newItemIds, setNewItemIds] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
     setDraft(initial);
@@ -288,6 +290,12 @@ function PlanEditor({
   }
 
   function addFoodToMeal(mealId: string, food: CatalogFood) {
+    const newId = uid();
+    setNewItemIds((prev) => {
+      const next = new Set(prev);
+      next.add(newId);
+      return next;
+    });
     updateMeal(mealId, (m) => ({
       ...m,
       main: {
@@ -295,7 +303,7 @@ function PlanEditor({
         items: [
           ...m.main.items,
           {
-            id: uid(),
+            id: newId,
             foodKey: food.foodKey,
             name: food.name,
             qty: food.qty,
@@ -372,6 +380,7 @@ function PlanEditor({
           onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
           onUpdateItem={(itemId, fn) => updateItem(meal.id, itemId, fn)}
           onMoveItem={(itemId, dir) => moveItem(meal.id, itemId, dir)}
+          newItemIds={newItemIds}
         />
       ))}
 
@@ -424,6 +433,7 @@ function MealCard({
   onRemoveItem,
   onUpdateItem,
   onMoveItem,
+  newItemIds,
 }: {
   readonly meal: EditMeal;
   readonly onChange: (fn: (m: EditMeal) => EditMeal) => void;
@@ -435,6 +445,7 @@ function MealCard({
     fn: (it: EditItem) => EditItem,
   ) => void;
   readonly onMoveItem: (itemId: string, dir: -1 | 1) => void;
+  readonly newItemIds: Set<string>;
 }) {
   const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
 
@@ -528,6 +539,7 @@ function MealCard({
                 onUpdateItem(it.id, (x) => ({ ...x, materializedEquivalents: next }))
               }
               variant="inline"
+              autoGenerateOnMount={newItemIds.has(it.id)}
             />
             <div className="flex items-center gap-0.5">
                 <Button

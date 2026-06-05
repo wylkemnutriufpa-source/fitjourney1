@@ -38,6 +38,8 @@ type Props = {
   defaultSize?: EquivalentsBlockSize;
   disabled?: boolean;
   variant?: "stacked" | "inline";
+  /** Gera substituições automaticamente uma única vez ao montar, se ainda não houver. */
+  autoGenerateOnMount?: boolean;
 };
 
 const CRITERION_LABEL: Record<BlockCriterion, string> = {
@@ -54,6 +56,7 @@ export function EquivalentsBlock({
   defaultSize = 3,
   disabled,
   variant = "stacked",
+  autoGenerateOnMount = false,
 }: Props) {
   const candidates = useTacoCandidates();
   const criterion: BlockCriterion = value?.criterion ?? "auto";
@@ -79,6 +82,28 @@ export function EquivalentsBlock({
     }
     onChange(next);
   };
+
+  // Auto-geração única ao montar (item recém-adicionado em uma refeição).
+  const autoGenDoneRef = useRef(false);
+  useEffect(() => {
+    if (!autoGenerateOnMount || autoGenDoneRef.current) return;
+    if (value && value.options.length > 0) {
+      autoGenDoneRef.current = true;
+      return;
+    }
+    if (!canRecalc) return;
+    const next = recalcMaterializedEquivalents({
+      base,
+      criterion,
+      size: defaultSize,
+      candidates,
+    });
+    if (next) {
+      autoGenDoneRef.current = true;
+      onChange(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoGenerateOnMount, canRecalc, candidates]);
 
   // Recalc automático quando o item base muda (qty/unit/foodKey),
   // somente se já existe um bloco materializado. Debounce 400ms.
