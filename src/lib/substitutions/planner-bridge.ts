@@ -60,12 +60,16 @@ export function buildTacoEquivalents(
 function equivalentQtyFromPlannerQty(baseFood: PlannerFoodItem, tacoBase: EquivalentCandidate): number {
   const qty = Number(baseFood.qty);
   if (!Number.isFinite(qty) || qty <= 0) return tacoBase.defaultQty;
-  if (baseFood.unit === "g" || baseFood.unit === "ml") return qty;
-  if (tacoBase.scaleGroup === "fruit" || tacoBase.foodKey === "ovo-galinha") {
-    return qty * tacoBase.defaultQty;
+  // Quando o planner usa massa/volume na MESMA unidade do TACO, valor já é em gramas.
+  if ((baseFood.unit === "g" || baseFood.unit === "ml") && baseFood.unit === tacoBase.unit) {
+    return qty;
   }
-  return qty;
+  // Caso contrário (unidade discreta: "unid", "fatia", "colher", etc.), converter
+  // via defaultQty do TACO — que representa o peso/volume de UMA unidade.
+  // Ex.: 2 ovos × 50g = 100g; 1 fatia de pão × 50g = 50g.
+  return qty * tacoBase.defaultQty;
 }
+
 
 function equivalentToPlannerOption(
   opt: EquivalentOption,
