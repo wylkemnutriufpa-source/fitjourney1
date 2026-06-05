@@ -40,6 +40,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
   listPatientPlansForNutri,
   type PatientPlanFull,
 } from "@/lib/plans/patient-plan.functions";
@@ -225,6 +236,12 @@ function PlanEditor({
   const [mode, setMode] = useState<"edit" | "preview">("edit");
   // Itens recém-adicionados nesta sessão: disparam auto-geração de substituições.
   const [newItemIds, setNewItemIds] = useState<Set<string>>(() => new Set());
+  // Modal pós-adição: aparece toda vez que um alimento é inserido.
+  const [postAdd, setPostAdd] = useState<{
+    mealId: string;
+    itemId: string;
+    itemName: string;
+  } | null>(null);
 
   useEffect(() => {
     setDraft(initial);
@@ -303,11 +320,6 @@ function PlanEditor({
 
   function addFoodToMeal(mealId: string, food: CatalogFood) {
     const newId = uid();
-    setNewItemIds((prev) => {
-      const next = new Set(prev);
-      next.add(newId);
-      return next;
-    });
     updateMeal(mealId, (m) => ({
       ...m,
       main: {
@@ -326,25 +338,45 @@ function PlanEditor({
         ],
       },
     }));
+    // Abre o modal pós-adição para decidir Replicar / Gerar equivalentes.
+    setPostAdd({ mealId, itemId: newId, itemName: food.name });
   }
 
-  function replicateItem(sourceMealId: string, itemId: string, targetMealIds: string[]) {
-    if (targetMealIds.length === 0) return;
+  function markNewItems(ids: string[]) {
+    if (ids.length === 0) return;
+    setNewItemIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
+  }
+
+  function replicateItem(
+    sourceMealId: string,
+    itemId: string,
+    targetMealIds: string[],
+  ): string[] {
+    if (targetMealIds.length === 0) return [];
     const source = draft.meals.find((m) => m.id === sourceMealId);
     const item = source?.main.items.find((it) => it.id === itemId);
-    if (!item) return;
+    if (!item) return [];
+    const cloneIds: Record<string, string> = {};
+    for (const mid of targetMealIds) cloneIds[mid] = uid();
     patch({
       ...draft,
       meals: draft.meals.map((m) => {
         if (!targetMealIds.includes(m.id)) return m;
-        const clone: EditItem = { ...item, id: uid() };
+        const clone: EditItem = { ...item, id: cloneIds[m.id] };
         return { ...m, main: { ...m.main, items: [...m.main.items, clone] } };
       }),
     });
     toast.success(
       `"${item.name}" replicado em ${targetMealIds.length} ${targetMealIds.length === 1 ? "refeição" : "refeições"}.`,
     );
+    return Object.values(cloneIds);
   }
+
+
 
   const totalKcal = useMemo(() => {
     return draft.meals.reduce(
@@ -499,6 +531,26 @@ function PlanEditor({
           onPick={(food) => {
             addFoodToMeal(picker.mealId, food);
             setPicker(null);
+          }}
+        />
+      )}
+
+      {postAdd && (
+        <PostAddDialog
+          itemName={postAdd.itemName}
+          meals={draft.meals}
+          currentMealId={postAdd.mealId}
+          onClose={() => setPostAdd(null)}
+          onConfirm={({ replicateTo, generateEquivalents }) => {
+            const replicatedIds = replicateItem(
+              postAdd.mealId,
+              postAdd.itemId,
+              replicateTo,
+            );
+            if (generateEquivalents) {
+              markNewItems([postAdd.itemId, ...replicatedIds]);
+            }
+            setPostAdd(null);
           }}
         />
       )}
@@ -811,3 +863,135 @@ function PreviewMealCard({ meal }: { readonly meal: EditMeal }) {
     </div>
   );
 }
+
+// ============================================================
+// Modal pós-adição — escolher Replicar e/ou Gerar equivalentes
+// ============================================================
+function PostAddDialog({
+  itemName,
+  meals,
+  currentMealId,
+  onClose,
+  onConfirm,
+}: {
+  readonly itemName: string;
+  readonly meals: EditMeal[];
+  readonly currentMealId: string;
+  readonly onClose: () => void;
+  readonly onConfirm: (args: {
+    replicateTo: string[];
+    generateEquivalents: boolean;
+  }) => void;
+}) {
+  const others = meals.filter((m) => m.id !== currentMealId);
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const [generateEquivalents, setGenerateEquivalents] = useState(true);
+
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const allSelected = others.length > 0 && selected.size === others.length;
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-base">
+            "{itemName}" adicionado
+          </DialogTitle>
+          <DialogDescription>
+            Replicar em outras refeições e/ou gerar substituições equivalentes.
+            As opções podem ser combinadas.
+          </DialogDescription>
+        </DialogHeader>
+
+        {others.length > 0 ? (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Replicar em
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setSelected(
+                    allSelected ? new Set() : new Set(others.map((m) => m.id)),
+                  )
+                }
+                className="text-xs text-primary hover:underline"
+              >
+                {allSelected ? "Limpar tudo" : "Selecionar todas"}
+              </button>
+            </div>
+            <div className="max-h-48 overflow-y-auto space-y-1 rounded-md border border-border p-2">
+              {others.map((m) => {
+                const id = `rep-${m.id}`;
+                return (
+                  <label
+                    key={m.id}
+                    htmlFor={id}
+                    className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-accent cursor-pointer"
+                  >
+                    <Checkbox
+                      id={id}
+                      checked={selected.has(m.id)}
+                      onCheckedChange={() => toggle(m.id)}
+                    />
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {m.time}
+                    </span>
+                    <span className="text-sm truncate">{m.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground italic">
+            Não há outras refeições para replicar.
+          </p>
+        )}
+
+        <div className="flex items-center justify-between rounded-md border border-border bg-surface p-3">
+          <div className="space-y-0.5">
+            <Label htmlFor="gen-eq" className="text-sm">
+              Gerar equivalentes
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Plota substituições automáticas embaixo do item.
+            </p>
+          </div>
+          <Switch
+            id="gen-eq"
+            checked={generateEquivalents}
+            onCheckedChange={setGenerateEquivalents}
+          />
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button type="button" variant="ghost" onClick={onClose}>
+            Pular
+          </Button>
+          <Button
+            type="button"
+            onClick={() =>
+              onConfirm({
+                replicateTo: Array.from(selected),
+                generateEquivalents,
+              })
+            }
+          >
+            Aplicar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
