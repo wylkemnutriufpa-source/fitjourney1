@@ -148,17 +148,19 @@ export function LogoOrbital({
       )}
 
       {customIsVideo ? (
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          src={customUrl!}
-          className={`relative z-10 object-contain ${sizeClass}`}
-          style={{ background: "transparent", ...(sizeStyle ?? {}) }}
-          aria-label="Logo"
-        />
+        <span className={`fj-logo-video-shell relative z-10 object-contain ${sizeClass}`} style={sizeStyle} aria-label="Logo">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            src={customUrl!}
+            className="fj-logo-video-media size-full object-contain"
+            style={{ background: "transparent" }}
+          />
+          <LogoMark className="fj-logo-video-ios-fallback size-full object-contain" />
+        </span>
       ) : useVideo ? (
         <LogoVideo className={`relative z-10 object-contain ${sizeClass}`} style={sizeStyle} />
       ) : (
