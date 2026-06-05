@@ -165,7 +165,10 @@ export function getLogoSettings(slot: LogoSlot): SlotConfig {
 }
 
 export function useLogoSettings(slot: LogoSlot): SlotConfig {
-  const [cfg, setCfg] = useState<SlotConfig>(() => getLogoSettings(slot));
+  // O primeiro render precisa ser idêntico no SSR e no client. Ler localStorage
+  // antes da hidratação troca img/video/tamanho da logo e causa tela preta por
+  // hydration mismatch; configurações persistidas entram logo após o mount.
+  const [cfg, setCfg] = useState<SlotConfig>(() => mergeConfig(slot));
   useEffect(() => {
     const refresh = () => setCfg(getLogoSettings(slot));
     refresh();
