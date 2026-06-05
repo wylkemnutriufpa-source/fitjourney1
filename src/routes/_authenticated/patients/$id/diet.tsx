@@ -211,6 +211,8 @@ function PlanEditor({
   const [dirty, setDirty] = useState(false);
   const [picker, setPicker] = useState<{ mealId: string } | null>(null);
   const [saving, setSaving] = useState(false);
+  // Itens recém-adicionados nesta sessão: disparam auto-geração de substituições.
+  const [newItemIds, setNewItemIds] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
     setDraft(initial);
