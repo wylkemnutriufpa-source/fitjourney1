@@ -111,7 +111,7 @@ function Patients() {
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
-    return patients.filter((p) => {
+    const list = patients.filter((p) => {
       const matchesFilter =
         filter === "all" ||
         (filter === "approved" && p.anamnesisStatus === "approved") ||
@@ -124,6 +124,12 @@ function Patients() {
         p.email.toLowerCase().includes(term) ||
         (p.phone ?? "").toLowerCase().includes(term)
       );
+    });
+    // Pacientes inativos vão para o final da lista, mantendo ordem original entre iguais.
+    return list.slice().sort((a, b) => {
+      const aActive = a.isActive === false ? 1 : 0;
+      const bActive = b.isActive === false ? 1 : 0;
+      return aActive - bActive;
     });
   }, [patients, q, filter]);
 
