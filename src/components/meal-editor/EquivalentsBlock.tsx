@@ -37,6 +37,7 @@ type Props = {
   /** Quantidade de opções alvo ao recalcular do zero (default 3). */
   defaultSize?: EquivalentsBlockSize;
   disabled?: boolean;
+  variant?: "stacked" | "inline";
 };
 
 const CRITERION_LABEL: Record<BlockCriterion, string> = {
@@ -52,6 +53,7 @@ export function EquivalentsBlock({
   onChange,
   defaultSize = 3,
   disabled,
+  variant = "stacked",
 }: Props) {
   const candidates = useTacoCandidates();
   const criterion: BlockCriterion = value?.criterion ?? "auto";
@@ -136,14 +138,17 @@ export function EquivalentsBlock({
     options.length === 0
       ? "Nenhuma opção gerada"
       : `${options.length} ${options.length === 1 ? "opção equivalente" : "opções equivalentes"}`;
+  const isInline = variant === "inline";
 
   return (
-    <div className="rounded-lg border border-dashed border-border bg-muted/30">
+    <div className={isInline ? "contents" : "rounded-lg border border-dashed border-border bg-muted/30"}>
       {/* Header colapsável */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"
+        className={isInline
+          ? "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-input bg-background px-2 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+          : "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"}
       >
         <div className="flex items-center gap-2 min-w-0">
           {open ? (
@@ -155,14 +160,17 @@ export function EquivalentsBlock({
           <span className="text-xs font-medium text-foreground truncate">
             Substituições
           </span>
-          <span className="text-[11px] text-muted-foreground truncate">
+          <span className={isInline ? "hidden" : "text-[11px] text-muted-foreground truncate"}>
             · {summaryLabel}
           </span>
         </div>
       </button>
 
       {open ? (
-        <div className="space-y-3 border-t border-border/60 p-3">
+        <div className={isInline
+          ? "order-last col-span-full space-y-3 rounded-lg border border-dashed border-border bg-muted/30 p-3"
+          : "space-y-3 border-t border-border/60 p-3"}
+        >
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex-1 min-w-[180px]">
               <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
