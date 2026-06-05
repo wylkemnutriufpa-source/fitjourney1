@@ -83,6 +83,28 @@ export function EquivalentsBlock({
     onChange(next);
   };
 
+  // Auto-geração única ao montar (item recém-adicionado em uma refeição).
+  const autoGenDoneRef = useRef(false);
+  useEffect(() => {
+    if (!autoGenerateOnMount || autoGenDoneRef.current) return;
+    if (value && value.options.length > 0) {
+      autoGenDoneRef.current = true;
+      return;
+    }
+    if (!canRecalc) return;
+    const next = recalcMaterializedEquivalents({
+      base,
+      criterion,
+      size: defaultSize,
+      candidates,
+    });
+    if (next) {
+      autoGenDoneRef.current = true;
+      onChange(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoGenerateOnMount, canRecalc, candidates]);
+
   // Recalc automático quando o item base muda (qty/unit/foodKey),
   // somente se já existe um bloco materializado. Debounce 400ms.
   const lastSigRef = useRef<string | null>(null);
