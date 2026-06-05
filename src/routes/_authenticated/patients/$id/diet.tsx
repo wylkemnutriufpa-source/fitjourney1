@@ -534,6 +534,26 @@ function PlanEditor({
           }}
         />
       )}
+
+      {postAdd && (
+        <PostAddDialog
+          itemName={postAdd.itemName}
+          meals={draft.meals}
+          currentMealId={postAdd.mealId}
+          onClose={() => setPostAdd(null)}
+          onConfirm={({ replicateTo, generateEquivalents }) => {
+            const replicatedIds = replicateItem(
+              postAdd.mealId,
+              postAdd.itemId,
+              replicateTo,
+            );
+            if (generateEquivalents) {
+              markNewItems([postAdd.itemId, ...replicatedIds]);
+            }
+            setPostAdd(null);
+          }}
+        />
+      )}
     </section>
   );
 }
