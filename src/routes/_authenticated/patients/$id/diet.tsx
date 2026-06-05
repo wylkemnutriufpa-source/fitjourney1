@@ -683,3 +683,131 @@ function MealCard({
     </div>
   );
 }
+
+// ============================================================
+// Replicar alimento para outras refeições
+// ============================================================
+function ReplicateMenu({
+  meals,
+  currentMealId,
+  onReplicate,
+}: {
+  readonly meals: EditMeal[];
+  readonly currentMealId: string;
+  readonly onReplicate: (targetMealIds: string[]) => void;
+}) {
+  const others = meals.filter((m) => m.id !== currentMealId);
+  if (others.length === 0) return null;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          aria-label="Replicar em outras refeições"
+          className="h-7 w-7"
+        >
+          <Copy className="size-3.5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>Replicar em…</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {others.map((m) => (
+          <DropdownMenuItem
+            key={m.id}
+            onSelect={(e) => {
+              e.preventDefault();
+              onReplicate([m.id]);
+            }}
+          >
+            <span className="text-xs font-mono text-muted-foreground mr-2">
+              {m.time}
+            </span>
+            <span className="truncate">{m.label}</span>
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            onReplicate(others.map((m) => m.id));
+          }}
+        >
+          Replicar em todas
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+// ============================================================
+// Visualização (somente leitura) — espelha o que o paciente vê
+// ============================================================
+function PreviewMealCard({ meal }: { readonly meal: EditMeal }) {
+  const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
+  return (
+    <div className="bg-surface border border-border rounded-lg p-4 space-y-3">
+      <div className="flex items-center justify-between gap-3 border-b border-border pb-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Clock className="size-3.5 text-muted-foreground shrink-0" />
+          <span className="text-xs font-mono text-muted-foreground">
+            {meal.time}
+          </span>
+          <span className="text-sm font-semibold truncate">{meal.label}</span>
+        </div>
+        <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-mono font-semibold text-primary">
+          {Math.round(kcal)} kcal
+        </span>
+      </div>
+      {meal.main.title && (
+        <p className="text-sm font-medium">{meal.main.title}</p>
+      )}
+      <ul className="space-y-1.5">
+        {meal.main.items.map((it) => {
+          const eq = (it as any).materializedEquivalents as
+            | { options?: Array<{ name: string; qty: number; unit: string }> }
+            | undefined;
+          const hasOpts = (eq?.options?.length ?? 0) > 0;
+          return (
+            <li
+              key={it.id}
+              className="rounded-md border border-border/60 bg-background/60 px-3 py-2"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-sm">{it.name}</span>
+                <span className="text-xs font-mono text-muted-foreground">
+                  {it.qty} {it.unit}
+                </span>
+              </div>
+              {hasOpts && (
+                <div className="mt-1.5 space-y-0.5 border-t border-dashed border-border/60 pt-1.5">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                    Substituições
+                  </span>
+                  {eq!.options!.map((o, i) => (
+                    <div
+                      key={i}
+                      className="flex items-baseline justify-between gap-2 text-xs"
+                    >
+                      <span className="truncate">{o.name}</span>
+                      <span className="font-mono text-muted-foreground">
+                        {o.qty} {o.unit}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </li>
+          );
+        })}
+        {meal.main.items.length === 0 && (
+          <li className="text-xs text-muted-foreground italic">
+            Sem alimentos.
+          </li>
+        )}
+      </ul>
+    </div>
+  );
+}
