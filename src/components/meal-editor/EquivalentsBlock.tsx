@@ -56,6 +56,7 @@ export function EquivalentsBlock({
   defaultSize = 3,
   disabled,
   variant = "stacked",
+  autoGenerateOnMount = false,
 }: Props) {
   const candidates = useTacoCandidates();
   const criterion: BlockCriterion = value?.criterion ?? "auto";
