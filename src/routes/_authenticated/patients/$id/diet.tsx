@@ -290,6 +290,12 @@ function PlanEditor({
   }
 
   function addFoodToMeal(mealId: string, food: CatalogFood) {
+    const newId = uid();
+    setNewItemIds((prev) => {
+      const next = new Set(prev);
+      next.add(newId);
+      return next;
+    });
     updateMeal(mealId, (m) => ({
       ...m,
       main: {
@@ -297,7 +303,7 @@ function PlanEditor({
         items: [
           ...m.main.items,
           {
-            id: uid(),
+            id: newId,
             foodKey: food.foodKey,
             name: food.name,
             qty: food.qty,
