@@ -863,3 +863,135 @@ function PreviewMealCard({ meal }: { readonly meal: EditMeal }) {
     </div>
   );
 }
+
+// ============================================================
+// Modal pós-adição — escolher Replicar e/ou Gerar equivalentes
+// ============================================================
+function PostAddDialog({
+  itemName,
+  meals,
+  currentMealId,
+  onClose,
+  onConfirm,
+}: {
+  readonly itemName: string;
+  readonly meals: EditMeal[];
+  readonly currentMealId: string;
+  readonly onClose: () => void;
+  readonly onConfirm: (args: {
+    replicateTo: string[];
+    generateEquivalents: boolean;
+  }) => void;
+}) {
+  const others = meals.filter((m) => m.id !== currentMealId);
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const [generateEquivalents, setGenerateEquivalents] = useState(true);
+
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const allSelected = others.length > 0 && selected.size === others.length;
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-base">
+            "{itemName}" adicionado
+          </DialogTitle>
+          <DialogDescription>
+            Replicar em outras refeições e/ou gerar substituições equivalentes.
+            As opções podem ser combinadas.
+          </DialogDescription>
+        </DialogHeader>
+
+        {others.length > 0 ? (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Replicar em
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setSelected(
+                    allSelected ? new Set() : new Set(others.map((m) => m.id)),
+                  )
+                }
+                className="text-xs text-primary hover:underline"
+              >
+                {allSelected ? "Limpar tudo" : "Selecionar todas"}
+              </button>
+            </div>
+            <div className="max-h-48 overflow-y-auto space-y-1 rounded-md border border-border p-2">
+              {others.map((m) => {
+                const id = `rep-${m.id}`;
+                return (
+                  <label
+                    key={m.id}
+                    htmlFor={id}
+                    className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-accent cursor-pointer"
+                  >
+                    <Checkbox
+                      id={id}
+                      checked={selected.has(m.id)}
+                      onCheckedChange={() => toggle(m.id)}
+                    />
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {m.time}
+                    </span>
+                    <span className="text-sm truncate">{m.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground italic">
+            Não há outras refeições para replicar.
+          </p>
+        )}
+
+        <div className="flex items-center justify-between rounded-md border border-border bg-surface p-3">
+          <div className="space-y-0.5">
+            <Label htmlFor="gen-eq" className="text-sm">
+              Gerar equivalentes
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Plota substituições automáticas embaixo do item.
+            </p>
+          </div>
+          <Switch
+            id="gen-eq"
+            checked={generateEquivalents}
+            onCheckedChange={setGenerateEquivalents}
+          />
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button type="button" variant="ghost" onClick={onClose}>
+            Pular
+          </Button>
+          <Button
+            type="button"
+            onClick={() =>
+              onConfirm({
+                replicateTo: Array.from(selected),
+                generateEquivalents,
+              })
+            }
+          >
+            Aplicar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
