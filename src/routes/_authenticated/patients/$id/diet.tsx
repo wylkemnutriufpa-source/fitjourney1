@@ -236,6 +236,12 @@ function PlanEditor({
   const [mode, setMode] = useState<"edit" | "preview">("edit");
   // Itens recém-adicionados nesta sessão: disparam auto-geração de substituições.
   const [newItemIds, setNewItemIds] = useState<Set<string>>(() => new Set());
+  // Modal pós-adição: aparece toda vez que um alimento é inserido.
+  const [postAdd, setPostAdd] = useState<{
+    mealId: string;
+    itemId: string;
+    itemName: string;
+  } | null>(null);
 
   useEffect(() => {
     setDraft(initial);
