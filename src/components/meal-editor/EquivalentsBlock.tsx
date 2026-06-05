@@ -38,6 +38,8 @@ type Props = {
   defaultSize?: EquivalentsBlockSize;
   disabled?: boolean;
   variant?: "stacked" | "inline";
+  /** Gera substituições automaticamente uma única vez ao montar, se ainda não houver. */
+  autoGenerateOnMount?: boolean;
 };
 
 const CRITERION_LABEL: Record<BlockCriterion, string> = {
