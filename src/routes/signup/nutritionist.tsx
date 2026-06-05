@@ -127,12 +127,17 @@ function SignupNutritionistPage() {
           Criar conta
         </button>
 
-        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60 text-center">
-          Já tem conta?{" "}
-          <Link to="/app" className="text-primary hover:underline">
-            Entrar
+        <div className="pt-2 border-t border-border/60 space-y-2">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60 text-center">
+            Já tem conta?
+          </p>
+          <Link
+            to="/app"
+            className="w-full flex items-center justify-center gap-2 rounded-md border-2 border-primary bg-primary/10 px-4 py-3 text-base font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+          >
+            Entrar na minha conta
           </Link>
-        </p>
+        </div>
       </form>
     </div>
   );
