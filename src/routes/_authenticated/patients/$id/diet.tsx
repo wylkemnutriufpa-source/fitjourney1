@@ -320,11 +320,6 @@ function PlanEditor({
 
   function addFoodToMeal(mealId: string, food: CatalogFood) {
     const newId = uid();
-    setNewItemIds((prev) => {
-      const next = new Set(prev);
-      next.add(newId);
-      return next;
-    });
     updateMeal(mealId, (m) => ({
       ...m,
       main: {
@@ -343,25 +338,45 @@ function PlanEditor({
         ],
       },
     }));
+    // Abre o modal pós-adição para decidir Replicar / Gerar equivalentes.
+    setPostAdd({ mealId, itemId: newId, itemName: food.name });
   }
 
-  function replicateItem(sourceMealId: string, itemId: string, targetMealIds: string[]) {
-    if (targetMealIds.length === 0) return;
+  function markNewItems(ids: string[]) {
+    if (ids.length === 0) return;
+    setNewItemIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
+  }
+
+  function replicateItem(
+    sourceMealId: string,
+    itemId: string,
+    targetMealIds: string[],
+  ): string[] {
+    if (targetMealIds.length === 0) return [];
     const source = draft.meals.find((m) => m.id === sourceMealId);
     const item = source?.main.items.find((it) => it.id === itemId);
-    if (!item) return;
+    if (!item) return [];
+    const cloneIds: Record<string, string> = {};
+    for (const mid of targetMealIds) cloneIds[mid] = uid();
     patch({
       ...draft,
       meals: draft.meals.map((m) => {
         if (!targetMealIds.includes(m.id)) return m;
-        const clone: EditItem = { ...item, id: uid() };
+        const clone: EditItem = { ...item, id: cloneIds[m.id] };
         return { ...m, main: { ...m.main, items: [...m.main.items, clone] } };
       }),
     });
     toast.success(
       `"${item.name}" replicado em ${targetMealIds.length} ${targetMealIds.length === 1 ? "refeição" : "refeições"}.`,
     );
+    return Object.values(cloneIds);
   }
+
+
 
   const totalKcal = useMemo(() => {
     return draft.meals.reduce(
