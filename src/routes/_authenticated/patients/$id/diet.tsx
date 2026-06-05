@@ -539,6 +539,7 @@ function MealCard({
                 onUpdateItem(it.id, (x) => ({ ...x, materializedEquivalents: next }))
               }
               variant="inline"
+              autoGenerateOnMount={newItemIds.has(it.id)}
             />
             <div className="flex items-center gap-0.5">
                 <Button
