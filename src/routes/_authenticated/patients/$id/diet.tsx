@@ -328,6 +328,24 @@ function PlanEditor({
     }));
   }
 
+  function replicateItem(sourceMealId: string, itemId: string, targetMealIds: string[]) {
+    if (targetMealIds.length === 0) return;
+    const source = draft.meals.find((m) => m.id === sourceMealId);
+    const item = source?.main.items.find((it) => it.id === itemId);
+    if (!item) return;
+    patch({
+      ...draft,
+      meals: draft.meals.map((m) => {
+        if (!targetMealIds.includes(m.id)) return m;
+        const clone: EditItem = { ...item, id: uid() };
+        return { ...m, main: { ...m.main, items: [...m.main.items, clone] } };
+      }),
+    });
+    toast.success(
+      `"${item.name}" replicado em ${targetMealIds.length} ${targetMealIds.length === 1 ? "refeição" : "refeições"}.`,
+    );
+  }
+
   const totalKcal = useMemo(() => {
     return draft.meals.reduce(
       (acc, m) =>
