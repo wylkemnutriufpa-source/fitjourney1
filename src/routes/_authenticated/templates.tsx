@@ -913,6 +913,7 @@ function TemplateEditor({
     patientName: string,
     opts?: { overrideMissingClinical?: boolean },
   ) {
+    hapticTpl(20);
     setApplyBusy(true);
     setApplyError(null);
     try {
@@ -953,9 +954,15 @@ function TemplateEditor({
   }
 
 
+  function sortMealsByTime(meals: PlannerMeal[]): PlannerMeal[] {
+    // Ordenação por horário (HH:MM lexicográfico = cronológico).
+    // Mantém ordem estável para refeições com mesmo horário.
+    return [...meals].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+  }
+
   function setMeals(updater: (meals: PlannerMeal[]) => PlannerMeal[]) {
     setDraft((d) => {
-      const meals = updater(d.meals);
+      const meals = sortMealsByTime(updater(d.meals));
       return { ...d, meals, kcal: templateKcal(meals) };
     });
   }
@@ -965,14 +972,17 @@ function TemplateEditor({
   }
 
   function removeMeal(mealId: string) {
+    hapticTpl(15);
     setMeals((meals) => meals.filter((m) => m.id !== mealId));
   }
 
   function addMeal() {
+    hapticTpl(10);
     setMeals((meals) => [...meals, createEmptyMeal()]);
   }
 
   function save() {
+    hapticTpl(15);
     const finalTemplate: PlannerTemplate = {
       ...draft,
       name: name.trim() || draft.name,
@@ -1081,6 +1091,19 @@ function TemplateEditor({
                     onRemove={() => removeMeal(m.id)}
                   />
                 ))}
+
+                {/* FAB mobile: atalho flutuante para "+ Refeição" quando a lista é longa.
+                    Posicionado acima do DialogFooter sticky (~5rem). Não duplica o botão
+                    inline do topo — é apenas atalho de scroll. */}
+                <Button
+                  size="lg"
+                  onClick={addMeal}
+                  className="sm:hidden fixed bottom-24 right-4 z-20 h-12 rounded-full shadow-lg gap-1.5 pl-4 pr-5"
+                  aria-label="Adicionar refeição"
+                >
+                  <Plus className="size-5" />
+                  <span className="text-sm font-medium">Refeição</span>
+                </Button>
               </>
             )}
 
@@ -1387,6 +1410,7 @@ function MealEditor({
   }
 
   function addMainItemFromCatalog(food: PlannerFoodItem) {
+    hapticTpl(10);
     onChange((m) => {
       const isFirst = m.main.items.length === 0;
       let heroKey = m.heroKey;
@@ -1425,6 +1449,7 @@ function MealEditor({
   }
 
   function removeMainItem(itemId: string) {
+    hapticTpl(15);
     updateMainOption((o) => ({ ...o, items: o.items.filter((i) => i.id !== itemId) }));
   }
 
