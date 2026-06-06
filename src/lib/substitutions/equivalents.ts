@@ -104,7 +104,19 @@ export function calculateEquivalentQty(
   // Quantidade do candidato (na unidade do candidato) que fornece o mesmo absoluto.
   const rawQty = (baseAbsolute * 100) / candNutrientPer100;
   const candStep = candidate.unit === "g" || candidate.unit === "ml" ? step : 1;
-  const rounded = Math.max(minQty, Math.round(rawQty / candStep) * candStep);
+  // Arredondamento por grupo (regra clínica):
+  // - proteína: para CIMA (não subdosar a fonte proteica)
+  // - carboidrato/fruta: para BAIXO (evita excesso calórico)
+  // - demais (fat, energy): nearest (round)
+  const roundFn =
+    candidate.unit === "g" || candidate.unit === "ml"
+      ? candidate.scaleGroup === "protein"
+        ? Math.ceil
+        : candidate.scaleGroup === "carb" || candidate.scaleGroup === "fruit"
+          ? Math.floor
+          : Math.round
+      : Math.round;
+  const rounded = Math.max(minQty, roundFn(rawQty / candStep) * candStep);
 
   const factor = rounded / 100;
   return {
