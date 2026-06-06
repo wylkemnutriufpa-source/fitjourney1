@@ -3,6 +3,8 @@ import type {
   FoodItem as LegacyFoodItem,
   MealSlot as LegacyMealSlot,
 } from "./template-data";
+import { recalcMaterializedEquivalents } from "@/components/meal-editor/recalc";
+import { tacoCatalog } from "@/lib/substitutions/taco-catalog";
 
 export type ScaleGroup =
   | "carb"
@@ -595,13 +597,28 @@ function normalizePlannerMealOption(option: PlannerMealOption): PlannerMealOptio
   };
 }
 
+function materializeItemEquivalents(item: PlannerFoodItem): PlannerFoodItem {
+  if (item.materializedEquivalents) return item;
+  const mat = recalcMaterializedEquivalents({
+    base: item,
+    criterion: "auto",
+    size: 3,
+    candidates: tacoCatalog,
+  });
+  return mat ? { ...item, materializedEquivalents: mat } : item;
+}
+
+function materializeOptionEquivalents(opt: PlannerMealOption): PlannerMealOption {
+  return { ...opt, items: opt.items.map(materializeItemEquivalents) };
+}
+
 export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate): PlannerTemplate {
   const maybePlanner = template as PlannerTemplate;
   if (maybePlanner.meals?.every((meal) => isPlannerMealOption((meal as PlannerMeal).main))) {
     const normalizedMeals = maybePlanner.meals.map((meal) => ({
       ...meal,
-      main: normalizePlannerMealOption(meal.main),
-      equivalents: meal.equivalents.map(normalizePlannerMealOption),
+      main: materializeOptionEquivalents(normalizePlannerMealOption(meal.main)),
+      equivalents: meal.equivalents.map((o) => materializeOptionEquivalents(normalizePlannerMealOption(o))),
       heroKey: meal.heroKey || meal.main.imageKey,
     }));
 
@@ -617,13 +634,15 @@ export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate
     const isMainMeal = /almo[çc]o|jantar/i.test(meal.label);
     const main = legacyFoodToOption(meal.main);
     const equivalents = meal.equivalents.map(legacyFoodToOption);
+    const finalMain = isMainMeal ? withLunchSides(main) : main;
+    const finalEqs = isMainMeal ? equivalents.map(withLunchSides) : equivalents;
     return {
       id: meal.id,
       time: meal.time,
       label: meal.label,
       heroKey: meal.heroKey ?? meal.main.foodKey,
-      main: isMainMeal ? withLunchSides(main) : main,
-      equivalents: isMainMeal ? equivalents.map(withLunchSides) : equivalents,
+      main: materializeOptionEquivalents(finalMain),
+      equivalents: finalEqs.map(materializeOptionEquivalents),
     };
   });
 
