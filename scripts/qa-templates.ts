@@ -26,8 +26,72 @@ import type {
 } from "../src/lib/meal-planner";
 import { espHipertrofiaV2Piloto } from "../src/lib/v2/template-data.v2";
 import { buildSnapshotV2 } from "../src/lib/v2/snapshot/build";
-import { imgFor } from "../src/lib/food-images";
 import fs from "node:fs";
+import path from "node:path";
+
+// Replicar lógica de resolução de imagem (food-images.ts usa import.meta.glob).
+const FOODS_DIR = path.join(process.cwd(), "src/assets/foods");
+const availableImages = new Set(
+  fs.readdirSync(FOODS_DIR).filter((f) => f.endsWith(".jpg")).map((f) => f.replace(/\.jpg$/, "")),
+);
+const sortedKeys = [...availableImages].sort();
+const CATEGORY_FALLBACKS: Array<{ rx: RegExp; key: string }> = [
+  { rx: /banana/i, key: "banana-com-aveia" },
+  { rx: /(?<!\w)(maca|maçã)(?!\w)/i, key: "maca" },
+  { rx: /laranja/i, key: "laranja" },
+  { rx: /mam[aã]o/i, key: "mamao" },
+  { rx: /pera/i, key: "pera" },
+  { rx: /uva/i, key: "uva" },
+  { rx: /abacaxi/i, key: "abacaxi" },
+  { rx: /manga/i, key: "manga" },
+  { rx: /morango/i, key: "morango" },
+  { rx: /goiaba/i, key: "goiaba" },
+  { rx: /melancia/i, key: "melancia" },
+  { rx: /mel[aã]o/i, key: "melao" },
+  { rx: /(contrafil[eé]|patinho|alcatra|coxao|m[uú]sculo|fraldinha|cupim|bovin|carne\s*vermelha|bife)/i, key: "carne-grelhada" },
+  { rx: /ac[eé]m/i, key: "acem" },
+  { rx: /picanha(?!\s*su)/i, key: "picanha" },
+  { rx: /maminha/i, key: "maminha" },
+  { rx: /(costela\s*su[ií]na|bisteca|panceta|costelinha)/i, key: "costela-suina" },
+  { rx: /(carr[eé]|pernil|lombo)/i, key: "lombo-suino" },
+  { rx: /(file\s*(de\s*)?porco|fil[eé]\s*su[ií]no)/i, key: "file-de-porco" },
+  { rx: /(porco|su[ií]no|bacon)/i, key: "lombo-suino" },
+  { rx: /(coxa|sobrecoxa)/i, key: "coxa-e-sobrecoxa" },
+  { rx: /(frango|peito\s*de\s*frango|peru|aves?)/i, key: "frango-grelhado" },
+  { rx: /(til[aá]pia|sal[mã]o|atum|peixe|merluza|sardinha|pesc|bacalhau|cama?r[aã]o|polvo|lula)/i, key: "file-de-tilapia" },
+  { rx: /\bovo(s)?\b|omelete|clara/i, key: "ovos-cozidos" },
+  { rx: /crepioca/i, key: "crepioca" },
+  { rx: /tapioca/i, key: "tapioca-com-queijo" },
+  { rx: /p[aã]o\s*(com\s*)?ovo/i, key: "pao-com-ovo" },
+  { rx: /p[aã]o/i, key: "pao-com-queijo" },
+  { rx: /torrada/i, key: "torrada-integral" },
+  { rx: /batata(\s|-)?doce/i, key: "frango-com-batata-doce" },
+  { rx: /aveia|oats|mingau/i, key: "mingau-de-aveia" },
+  { rx: /cuscuz/i, key: "cuscuz-com-ovo" },
+  { rx: /quinoa/i, key: "quinoa-cozida" },
+  { rx: /(arroz|macarr[aã]o|massa)/i, key: "macarrao-com-carne-moida" },
+  { rx: /milho/i, key: "milho-cozido" },
+  { rx: /wrap|rap\s*10|rap10|tortilha/i, key: "wrap-de-frango" },
+  { rx: /panqueca/i, key: "panqueca-de-banana" },
+  { rx: /whey|shake/i, key: "whey-shake" },
+  { rx: /chocolate\s*(quente|cacau)|achocolatado/i, key: "chocolate-quente" },
+  { rx: /caf[eé]\s*com\s*leite/i, key: "copo-de-leite-morno" },
+  { rx: /iogurte/i, key: "iogurte-natural" },
+  { rx: /leite/i, key: "copo-de-leite-morno" },
+  { rx: /castanha|granola|am[eê]ndoa|noz|chia/i, key: "iogurte-com-granola-2" },
+  { rx: /fruta|berry|frutas\s*vermelhas/i, key: "salada-de-frutas" },
+];
+function imgFor(key: string, name?: string): string | undefined {
+  if (availableImages.has(key)) return key;
+  const norm = key.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const pre = sortedKeys.find((k) => k.startsWith(norm));
+  if (pre) return pre;
+  const hay = `${name ?? ""} ${key}`;
+  for (const { rx, key: fb } of CATEGORY_FALLBACKS) {
+    if (rx.test(hay) && availableImages.has(fb)) return fb;
+  }
+  return undefined;
+}
 
 type Severity = "CRITICO" | "ALTO" | "MEDIO" | "BAIXO";
 
