@@ -982,6 +982,7 @@ function TemplateEditor({
   }
 
   function save() {
+    hapticTpl(15);
     const finalTemplate: PlannerTemplate = {
       ...draft,
       name: name.trim() || draft.name,
