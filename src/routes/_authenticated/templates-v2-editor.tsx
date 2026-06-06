@@ -196,7 +196,7 @@ function TemplateV2Editor() {
   );
 
   return (
-    <div className="mx-auto max-w-4xl space-y-4 p-6">
+    <div className="mx-auto max-w-4xl space-y-4 p-4 sm:p-6 pb-24 sm:pb-6">
       <header className="space-y-2">
         <div className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
           <strong>PILOTO V2 — Editor isolado.</strong> Não toca produção. O
@@ -204,39 +204,50 @@ function TemplateV2Editor() {
         </div>
 
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold">{draft.name}</h1>
-            <p className="text-sm text-muted-foreground">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold truncate">{draft.name}</h1>
+            <p className="text-sm text-muted-foreground line-clamp-2">
               {draft.description}
             </p>
           </div>
-          <div className="flex gap-2 shrink-0">
-            <button
-              onClick={downloadSnapshot}
-              className="inline-flex items-center gap-1.5 rounded border border-border bg-background px-3 py-2 text-sm hover:bg-muted"
-            >
-              <Download className="h-4 w-4" /> snapshot.json
-            </button>
-            <button
-              onClick={generateSnapshot}
-              className="inline-flex items-center gap-1.5 rounded bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
-            >
-              Gerar Snapshot → Preview <ExternalLink className="h-4 w-4" />
-            </button>
-          </div>
         </div>
       </header>
+
+      {/* Barra de ações sticky (mobile-first, desce naturalmente em desktop) */}
+      <div className="sticky top-0 z-20 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 bg-background/85 backdrop-blur border-b border-border">
+        <div className="flex gap-2 justify-end flex-wrap">
+          <button
+            onClick={() => {
+              haptic();
+              downloadSnapshot();
+            }}
+            className="inline-flex items-center gap-1.5 rounded border border-border bg-background px-3 py-2 text-sm hover:bg-muted min-h-11"
+          >
+            <Download className="h-4 w-4" /> snapshot.json
+          </button>
+          <button
+            onClick={() => {
+              haptic(20);
+              generateSnapshot();
+            }}
+            className="inline-flex items-center gap-1.5 rounded bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 min-h-11"
+          >
+            Gerar Snapshot → Preview <ExternalLink className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
       <nav className="flex flex-wrap gap-1.5">
         {draft.days.map((d) => (
           <button
             key={d.id}
             onClick={() => {
+              haptic();
               setActiveDayId(d.id);
               setExpandedMealId(null);
               setExpandedItemId(null);
             }}
-            className={`rounded px-3 py-1.5 text-xs font-medium border ${
+            className={`rounded px-3 py-1.5 text-xs font-medium border min-h-9 ${
               d.id === activeDayId
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-background border-border hover:bg-muted"
@@ -260,12 +271,16 @@ function TemplateV2Editor() {
             key={meal.id}
             meal={meal}
             expanded={expandedMealId === meal.id}
-            onToggle={() =>
-              setExpandedMealId(expandedMealId === meal.id ? null : meal.id)
-            }
+            onToggle={() => {
+              haptic();
+              setExpandedMealId(expandedMealId === meal.id ? null : meal.id);
+            }}
             onRemove={() => removeMeal(meal.id)}
             onChange={(mut) => updateMeal(meal.id, mut)}
-            onAddItem={() => addItem(meal.id)}
+            onAddItem={() => {
+              haptic();
+              addItem(meal.id);
+            }}
             onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
             onUpdateItem={(itemId, mut) => updateItem(meal.id, itemId, mut)}
             expandedItemId={expandedItemId}
@@ -274,11 +289,23 @@ function TemplateV2Editor() {
         ))}
         <button
           onClick={addMeal}
-          className="w-full inline-flex items-center justify-center gap-1.5 rounded border border-dashed border-border py-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="hidden sm:inline-flex w-full items-center justify-center gap-1.5 rounded border border-dashed border-border py-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <Plus className="h-4 w-4" /> Adicionar refeição
         </button>
       </div>
+
+      {/* FAB mobile — adicionar refeição sempre acessível */}
+      <button
+        onClick={() => {
+          haptic(15);
+          addMeal();
+        }}
+        aria-label="Adicionar refeição"
+        className="sm:hidden fixed bottom-5 right-5 z-30 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg active:scale-95 transition-transform"
+      >
+        <Plus className="h-5 w-5" /> Refeição
+      </button>
     </div>
   );
 }
