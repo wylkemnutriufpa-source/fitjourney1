@@ -18,7 +18,7 @@ export const allFoodKeys = Object.keys(foodImages).sort();
  * caímos numa imagem representativa da família (UI premium, sem "sem img"). */
 const CATEGORY_FALLBACKS: Array<{ match: RegExp; key: string }> = [
   { match: /banana/i, key: "banana-com-aveia" },
-  { match: /ma[cç][aã]|maca/i, key: "maca" },
+  { match: /\bma[cç][aã][a-z]*\b/i, key: "maca" },
   { match: /laranja/i, key: "laranja" },
   { match: /mam[aã]o|mamao/i, key: "mamao" },
   { match: /pera/i, key: "pera" },
