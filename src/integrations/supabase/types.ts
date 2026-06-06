@@ -122,6 +122,39 @@ export type Database = {
           },
         ]
       }
+      app_settings: {
+        Row: {
+          created_at: string
+          id: string
+          pix_key: string
+          pix_key_type: string
+          singleton: boolean
+          updated_at: string
+          updated_by: string | null
+          whatsapp_number: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pix_key?: string
+          pix_key_type?: string
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp_number?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pix_key?: string
+          pix_key_type?: string
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp_number?: string
+        }
+        Relationships: []
+      }
       food_household_measures: {
         Row: {
           created_at: string

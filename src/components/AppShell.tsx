@@ -31,6 +31,7 @@ import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 import { LogoOrbital } from "@/components/LogoOrbital";
 import { BrandLockup } from "@/components/BrandLockup";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
+import { TrialPaywall } from "@/components/TrialPaywall";
 import { VideoLoaderFullscreen } from "@/components/VideoLoader";
 import { AvatarMenuDialog } from "@/components/layout/AvatarMenuDialog";
 
@@ -461,6 +462,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         </header>
         <main className="mx-auto max-w-7xl overflow-x-hidden p-3 sm:p-8">{children ?? <Outlet />}</main>
       </div>
+      <TrialPaywall />
     </div>
   );
 }

@@ -25,7 +25,9 @@ import {
   ShieldCheck,
   Wallet,
   Clock,
+  CreditCard,
 } from "lucide-react";
+import { CheckoutModal } from "@/components/CheckoutModal";
 
 import {
   Dialog,
@@ -130,7 +132,13 @@ export function AvatarMenuDialog({
           )}
         </div>
 
-        <div className="pt-3 border-t border-border/60">
+        <div className="pt-3 border-t border-border/60 space-y-2">
+          {role !== "admin" && (
+            <RenewButton
+              audience={role === "patient" ? "patient" : "nutritionist"}
+              displayName={displayName}
+            />
+          )}
           <button
             type="button"
             onClick={() => {
@@ -145,6 +153,35 @@ export function AvatarMenuDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function RenewButton({
+  audience,
+  displayName,
+}: {
+  audience: "patient" | "nutritionist";
+  displayName: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity w-full justify-center"
+      >
+        <CreditCard className="size-4" />
+        Renovar assinatura
+      </button>
+      <CheckoutModal
+        open={open}
+        onOpenChange={setOpen}
+        audience={audience}
+        displayName={displayName}
+        planLabel={audience === "nutritionist" ? "Assinatura mensal" : "Renovação de plano"}
+      />
+    </>
   );
 }
 
