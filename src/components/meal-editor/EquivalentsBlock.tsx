@@ -4,7 +4,8 @@
 // passam o mesmo PlannerFoodItem base + onChange para materializar.
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { RefreshCw, Plus, ChevronDown, ChevronRight, Shuffle } from "lucide-react";
+import { RefreshCw, Plus, ChevronDown, ChevronRight, Shuffle, Loader2 } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -64,24 +65,43 @@ export function EquivalentsBlock({
   const options = value?.options ?? [];
   const [open, setOpen] = useState(false);
   const [swapIdx, setSwapIdx] = useState<number | null>(null);
+  const [pending, setPending] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const canRecalc = useMemo(() => {
     return candidates.length > 0 && base.foodKey.length > 0;
   }, [candidates, base.foodKey]);
 
-  const handleRecalc = () => {
-    const size = (options.length || defaultSize) as EquivalentsBlockSize;
-    const next = recalcMaterializedEquivalents({
-      base,
-      criterion,
-      size,
-      candidates,
-    });
-    if (!next) {
-      toast.error(`Não foi possível recalcular equivalentes para "${base.name}".`);
+  const flashPending = (apply: () => void) => {
+    setPending(true);
+    // Pequeno flash de skeleton (~280ms) — recalc é síncrono, mas o feedback
+    // visual de "gerando" ajuda muito na percepção de premium.
+    if (reduceMotion) {
+      apply();
+      setPending(false);
       return;
     }
-    onChange(next);
+    setTimeout(() => {
+      apply();
+      setPending(false);
+    }, 280);
+  };
+
+  const handleRecalc = () => {
+    const size = (options.length || defaultSize) as EquivalentsBlockSize;
+    flashPending(() => {
+      const next = recalcMaterializedEquivalents({
+        base,
+        criterion,
+        size,
+        candidates,
+      });
+      if (!next) {
+        toast.error(`Não foi possível recalcular equivalentes para "${base.name}".`);
+        return;
+      }
+      onChange(next);
+    });
   };
 
   // Auto-geração única ao montar (item recém-adicionado em uma refeição).
@@ -192,84 +212,118 @@ export function EquivalentsBlock({
         </div>
       </button>
 
-      {open ? (
-        <div className={isInline
-          ? "order-last col-span-full space-y-3 rounded-lg border border-dashed border-border bg-muted/30 p-3"
-          : "space-y-3 border-t border-border/60 p-3"}
-        >
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-            <div className="w-full min-w-0 sm:flex-1 sm:min-w-[180px]">
-              <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                Critério de equivalência
-              </Label>
-              <Select
-                value={criterion}
-                onValueChange={(v) => handleCriterionChange(v as BlockCriterion)}
-                disabled={disabled}
-              >
-                <SelectTrigger className="h-8 text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {(Object.keys(CRITERION_LABEL) as BlockCriterion[]).map((k) => (
-                    <SelectItem key={k} value={k}>
-                      {CRITERION_LABEL[k]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleRecalc}
-              disabled={disabled || !canRecalc}
-              className="w-full sm:w-auto"
+      <AnimatePresence initial={false}>
+        {open ? (
+          <motion.div
+            key="content"
+            initial={reduceMotion ? false : { height: 0, opacity: 0 }}
+            animate={reduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            style={{ overflow: "hidden" }}
+            className={isInline ? "order-last col-span-full" : ""}
+          >
+            <div className={isInline
+              ? "space-y-3 rounded-lg border border-dashed border-border bg-muted/30 p-3"
+              : "space-y-3 border-t border-border/60 p-3"}
             >
-              <RefreshCw className="mr-2 h-3.5 w-3.5" />
-              Gerar outra opção
-            </Button>
-          </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+                <div className="w-full min-w-0 sm:flex-1 sm:min-w-[180px]">
+                  <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    Critério de equivalência
+                  </Label>
+                  <Select
+                    value={criterion}
+                    onValueChange={(v) => handleCriterionChange(v as BlockCriterion)}
+                    disabled={disabled || pending}
+                  >
+                    <SelectTrigger className="h-8 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(Object.keys(CRITERION_LABEL) as BlockCriterion[]).map((k) => (
+                        <SelectItem key={k} value={k}>
+                          {CRITERION_LABEL[k]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-          {options.length === 0 ? (
-            <div className="flex items-center justify-between rounded-md border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground">
-              <span>Nenhuma opção gerada ainda.</span>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={handleRecalc}
-                disabled={disabled || !canRecalc}
-              >
-                <Plus className="mr-1 h-3.5 w-3.5" />
-                Gerar opções
-              </Button>
-            </div>
-          ) : (
-            <div className="grid gap-2 md:grid-cols-2">
-              {options.map((o, idx) => (
-                <EquivalentsOptionCard
-                  key={`${o.foodKey}-${idx}`}
-                  value={o}
-                  onChange={(next) => handleOptionChange(idx, next)}
-                  onRemove={() => handleOptionRemove(idx)}
-                  onSwap={() => setSwapIdx(idx)}
-                  disabled={disabled}
+                <motion.div whileTap={reduceMotion ? undefined : { scale: 0.97 }} className="w-full sm:w-auto">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleRecalc}
+                    disabled={disabled || !canRecalc || pending}
+                    className="w-full sm:w-auto"
+                  >
+                    {pending ? (
+                      <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <RefreshCw className="mr-2 h-3.5 w-3.5" />
+                    )}
+                    {pending ? "Gerando equivalentes…" : "Gerar outra opção"}
+                  </Button>
+                </motion.div>
+              </div>
+
+              {pending ? (
+                <SkeletonOptions
+                  count={(options.length || defaultSize) as EquivalentsBlockSize}
                 />
-              ))}
-            </div>
-          )}
+              ) : options.length === 0 ? (
+                <div className="flex items-center justify-between rounded-md border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground">
+                  <span>Nenhuma opção gerada ainda.</span>
+                  <motion.div whileTap={reduceMotion ? undefined : { scale: 0.97 }}>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleRecalc}
+                      disabled={disabled || !canRecalc}
+                    >
+                      <Plus className="mr-1 h-3.5 w-3.5" />
+                      Gerar opções
+                    </Button>
+                  </motion.div>
+                </div>
+              ) : (
+                <div className="grid gap-2 md:grid-cols-2">
+                  <AnimatePresence initial={false}>
+                    {options.map((o, idx) => (
+                      <motion.div
+                        key={`${o.foodKey}-${idx}`}
+                        layout={!reduceMotion}
+                        initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+                        transition={{ duration: 0.18, delay: reduceMotion ? 0 : idx * 0.04 }}
+                      >
+                        <EquivalentsOptionCard
+                          value={o}
+                          onChange={(next) => handleOptionChange(idx, next)}
+                          onRemove={() => handleOptionRemove(idx)}
+                          onSwap={() => setSwapIdx(idx)}
+                          disabled={disabled}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
 
-          {value?.generatedAt && options.length > 0 ? (
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-              Materializado em {new Date(value.generatedAt).toLocaleString("pt-BR")} ·
-              Banco de dados
-            </p>
-          ) : null}
-        </div>
-      ) : null}
+              {value?.generatedAt && options.length > 0 && !pending ? (
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                  Materializado em {new Date(value.generatedAt).toLocaleString("pt-BR")} ·
+                  Banco de dados
+                </p>
+              ) : null}
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       {swapIdx !== null && options[swapIdx] ? (
         <FoodSwapDialog
@@ -281,6 +335,23 @@ export function EquivalentsBlock({
           onPick={(next) => handleOptionChange(swapIdx, next)}
         />
       ) : null}
+    </div>
+  );
+}
+
+// ============================================================
+// SkeletonOptions — placeholder visual durante recálculo.
+// Imita o formato do grid de EquivalentsOptionCard (md:grid-cols-2).
+// ============================================================
+function SkeletonOptions({ count }: { readonly count: number }) {
+  return (
+    <div className="grid gap-2 md:grid-cols-2" aria-hidden>
+      {Array.from({ length: Math.max(1, count) }).map((_, i) => (
+        <div
+          key={i}
+          className="h-[88px] rounded-md border border-border bg-muted/40 animate-pulse"
+        />
+      ))}
     </div>
   );
 }
