@@ -65,24 +65,43 @@ export function EquivalentsBlock({
   const options = value?.options ?? [];
   const [open, setOpen] = useState(false);
   const [swapIdx, setSwapIdx] = useState<number | null>(null);
+  const [pending, setPending] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const canRecalc = useMemo(() => {
     return candidates.length > 0 && base.foodKey.length > 0;
   }, [candidates, base.foodKey]);
 
-  const handleRecalc = () => {
-    const size = (options.length || defaultSize) as EquivalentsBlockSize;
-    const next = recalcMaterializedEquivalents({
-      base,
-      criterion,
-      size,
-      candidates,
-    });
-    if (!next) {
-      toast.error(`Não foi possível recalcular equivalentes para "${base.name}".`);
+  const flashPending = (apply: () => void) => {
+    setPending(true);
+    // Pequeno flash de skeleton (~280ms) — recalc é síncrono, mas o feedback
+    // visual de "gerando" ajuda muito na percepção de premium.
+    if (reduceMotion) {
+      apply();
+      setPending(false);
       return;
     }
-    onChange(next);
+    setTimeout(() => {
+      apply();
+      setPending(false);
+    }, 280);
+  };
+
+  const handleRecalc = () => {
+    const size = (options.length || defaultSize) as EquivalentsBlockSize;
+    flashPending(() => {
+      const next = recalcMaterializedEquivalents({
+        base,
+        criterion,
+        size,
+        candidates,
+      });
+      if (!next) {
+        toast.error(`Não foi possível recalcular equivalentes para "${base.name}".`);
+        return;
+      }
+      onChange(next);
+    });
   };
 
   // Auto-geração única ao montar (item recém-adicionado em uma refeição).
