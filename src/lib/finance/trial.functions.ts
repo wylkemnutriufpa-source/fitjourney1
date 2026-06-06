@@ -25,6 +25,24 @@ export const getMyNutriTrialStatus = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<NutriTrialStatus> => {
     const { supabase, userId } = context as { supabase: any; userId: string };
 
+    // Admin nunca é bloqueado pelo paywall.
+    const { data: adminRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (adminRole) {
+      return {
+        isNutritionist: false,
+        hasActiveSubscription: true,
+        trialEndsAt: null,
+        daysLeftInTrial: null,
+        trialExpired: false,
+        shouldBlock: false,
+      };
+    }
+
     const { data: nutri } = await supabase
       .from("nutritionists")
       .select("id, created_at")
