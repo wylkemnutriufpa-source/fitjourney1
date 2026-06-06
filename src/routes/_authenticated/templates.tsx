@@ -1091,6 +1091,19 @@ function TemplateEditor({
                     onRemove={() => removeMeal(m.id)}
                   />
                 ))}
+
+                {/* FAB mobile: atalho flutuante para "+ Refeição" quando a lista é longa.
+                    Posicionado acima do DialogFooter sticky (~5rem). Não duplica o botão
+                    inline do topo — é apenas atalho de scroll. */}
+                <Button
+                  size="lg"
+                  onClick={addMeal}
+                  className="sm:hidden fixed bottom-24 right-4 z-20 h-12 rounded-full shadow-lg gap-1.5 pl-4 pr-5"
+                  aria-label="Adicionar refeição"
+                >
+                  <Plus className="size-5" />
+                  <span className="text-sm font-medium">Refeição</span>
+                </Button>
               </>
             )}
 
