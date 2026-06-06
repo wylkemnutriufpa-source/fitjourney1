@@ -440,6 +440,8 @@ function TemplatesPage() {
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
   const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: StoredTemplate; draftPlanId?: string; draftPatient?: { id: string; name: string } } | null>(null);
+  const [planModeOpen, setPlanModeOpen] = useState(false);
+  const navigate = useNavigate();
 
   const qc = useQueryClient();
   const listFn = useServerFn(listMyTemplates);
