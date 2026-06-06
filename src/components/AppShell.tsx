@@ -31,6 +31,7 @@ import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 import { LogoOrbital } from "@/components/LogoOrbital";
 import { BrandLockup } from "@/components/BrandLockup";
 import { ExpirationBanner } from "@/components/ExpirationBanner";
+import { TrialPaywall } from "@/components/TrialPaywall";
 import { VideoLoaderFullscreen } from "@/components/VideoLoader";
 import { AvatarMenuDialog } from "@/components/layout/AvatarMenuDialog";
 
