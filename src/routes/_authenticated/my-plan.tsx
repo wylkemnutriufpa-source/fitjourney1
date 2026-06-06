@@ -18,8 +18,10 @@ import {
   Repeat2,
   ChefHat,
   Scale,
+  ChevronDown,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { imgFor } from "@/lib/food-images";
 import { emojiForFood } from "@/lib/food-emojis";
 import {
