@@ -830,7 +830,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
         heroKey: "merluza-file",
         items: [
           { foodKey: "merluza-file", name: "Filé de merluza assado/cozido", qty: 140, unit: "g", kcal: 117, scaleGroup: "protein" },
-          { foodKey: "batata", name: "Batata inglesa cozida (sem casca)", qty: 200, unit: "g", kcal: 116, scaleGroup: "carb" },
+          { foodKey: "pure-batata", name: "Purê de batata inglesa (sem leite)", qty: 200, unit: "g", kcal: 116, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem (cru)", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
         ],
       },
