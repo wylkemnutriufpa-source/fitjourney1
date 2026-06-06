@@ -71,47 +71,6 @@ export function CheckoutModal({
   );
 }
 
-function TabButton({
-  active,
-  onClick,
-  icon: Icon,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={
-        "flex items-center gap-2 px-4 py-2 text-sm border-b-2 -mb-px transition-colors " +
-        (active
-          ? "border-primary text-foreground"
-          : "border-transparent text-muted-foreground hover:text-foreground")
-      }
-    >
-      <Icon className="size-4" /> {label}
-    </button>
-  );
-}
-
-function CardTab() {
-  return (
-    <div className="space-y-3 py-6">
-      <div className="rounded-lg border border-dashed border-border bg-surface/40 p-6 text-center">
-        <CreditCard className="size-8 mx-auto mb-3 text-muted-foreground" />
-        <p className="font-medium">Pagamento com cartão em breve</p>
-        <p className="text-xs text-muted-foreground mt-1">
-          Em integração com Stripe (cartão e recorrência). Por enquanto, use o
-          Pix na aba ao lado.
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function PixTab({
   audience,
