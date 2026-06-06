@@ -9,6 +9,7 @@ import {
   Download,
   ExternalLink,
   AlertTriangle,
+  Pencil,
 } from "lucide-react";
 import type {
   PlannerTemplateV2,
@@ -24,6 +25,26 @@ import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
 import { validateMatrix } from "@/lib/v2/matrix.v2";
 import { buildSnapshotV2 } from "@/lib/v2/snapshot/build";
 import { saveSnapshot } from "@/lib/v2/snapshot/storage";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+
+// haptics leves — silencioso em desktop / quando indisponível
+function haptic(ms = 10) {
+  try {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      (navigator as Navigator).vibrate?.(ms);
+    }
+  } catch {
+    /* ignore */
+  }
+}
 
 // EDITOR V2 — Atelier do nutricionista (piloto, isolado).
 // Estado interno (React). NUNCA persiste em storage.
@@ -175,7 +196,7 @@ function TemplateV2Editor() {
   );
 
   return (
-    <div className="mx-auto max-w-4xl space-y-4 p-6">
+    <div className="mx-auto max-w-4xl space-y-4 p-4 sm:p-6 pb-24 sm:pb-6">
       <header className="space-y-2">
         <div className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
           <strong>PILOTO V2 — Editor isolado.</strong> Não toca produção. O
@@ -183,39 +204,50 @@ function TemplateV2Editor() {
         </div>
 
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold">{draft.name}</h1>
-            <p className="text-sm text-muted-foreground">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold truncate">{draft.name}</h1>
+            <p className="text-sm text-muted-foreground line-clamp-2">
               {draft.description}
             </p>
           </div>
-          <div className="flex gap-2 shrink-0">
-            <button
-              onClick={downloadSnapshot}
-              className="inline-flex items-center gap-1.5 rounded border border-border bg-background px-3 py-2 text-sm hover:bg-muted"
-            >
-              <Download className="h-4 w-4" /> snapshot.json
-            </button>
-            <button
-              onClick={generateSnapshot}
-              className="inline-flex items-center gap-1.5 rounded bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
-            >
-              Gerar Snapshot → Preview <ExternalLink className="h-4 w-4" />
-            </button>
-          </div>
         </div>
       </header>
+
+      {/* Barra de ações sticky (mobile-first, desce naturalmente em desktop) */}
+      <div className="sticky top-0 z-20 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 bg-background/85 backdrop-blur border-b border-border">
+        <div className="flex gap-2 justify-end flex-wrap">
+          <button
+            onClick={() => {
+              haptic();
+              downloadSnapshot();
+            }}
+            className="inline-flex items-center gap-1.5 rounded border border-border bg-background px-3 py-2 text-sm hover:bg-muted min-h-11"
+          >
+            <Download className="h-4 w-4" /> snapshot.json
+          </button>
+          <button
+            onClick={() => {
+              haptic(20);
+              generateSnapshot();
+            }}
+            className="inline-flex items-center gap-1.5 rounded bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 min-h-11"
+          >
+            Gerar Snapshot → Preview <ExternalLink className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
       <nav className="flex flex-wrap gap-1.5">
         {draft.days.map((d) => (
           <button
             key={d.id}
             onClick={() => {
+              haptic();
               setActiveDayId(d.id);
               setExpandedMealId(null);
               setExpandedItemId(null);
             }}
-            className={`rounded px-3 py-1.5 text-xs font-medium border ${
+            className={`rounded px-3 py-1.5 text-xs font-medium border min-h-9 ${
               d.id === activeDayId
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-background border-border hover:bg-muted"
@@ -239,12 +271,16 @@ function TemplateV2Editor() {
             key={meal.id}
             meal={meal}
             expanded={expandedMealId === meal.id}
-            onToggle={() =>
-              setExpandedMealId(expandedMealId === meal.id ? null : meal.id)
-            }
+            onToggle={() => {
+              haptic();
+              setExpandedMealId(expandedMealId === meal.id ? null : meal.id);
+            }}
             onRemove={() => removeMeal(meal.id)}
             onChange={(mut) => updateMeal(meal.id, mut)}
-            onAddItem={() => addItem(meal.id)}
+            onAddItem={() => {
+              haptic();
+              addItem(meal.id);
+            }}
             onRemoveItem={(itemId) => removeItem(meal.id, itemId)}
             onUpdateItem={(itemId, mut) => updateItem(meal.id, itemId, mut)}
             expandedItemId={expandedItemId}
@@ -253,11 +289,23 @@ function TemplateV2Editor() {
         ))}
         <button
           onClick={addMeal}
-          className="w-full inline-flex items-center justify-center gap-1.5 rounded border border-dashed border-border py-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="hidden sm:inline-flex w-full items-center justify-center gap-1.5 rounded border border-dashed border-border py-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <Plus className="h-4 w-4" /> Adicionar refeição
         </button>
       </div>
+
+      {/* FAB mobile — adicionar refeição sempre acessível */}
+      <button
+        onClick={() => {
+          haptic(15);
+          addMeal();
+        }}
+        aria-label="Adicionar refeição"
+        className="sm:hidden fixed bottom-5 right-5 z-30 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg active:scale-95 transition-transform"
+      >
+        <Plus className="h-5 w-5" /> Refeição
+      </button>
     </div>
   );
 }
@@ -393,28 +441,96 @@ function ItemRow({
   onRemove: () => void;
   onChange: (mut: (it: PlannerFoodItemV2) => void) => void;
 }) {
+  const isMobile = useIsMobile();
+
+  const Row = (
+    <div className="flex items-center gap-2 p-2">
+      <button
+        onClick={() => {
+          haptic();
+          onToggle();
+        }}
+        className="p-1 hover:bg-muted rounded min-h-9 min-w-9 inline-flex items-center justify-center"
+        aria-expanded={expanded}
+        aria-label={expanded ? "Recolher alimento" : (isMobile ? "Editar alimento" : "Expandir alimento")}
+      >
+        {isMobile ? (
+          <Pencil className="h-3.5 w-3.5" />
+        ) : expanded ? (
+          <ChevronDown className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5" />
+        )}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          haptic();
+          onToggle();
+        }}
+        className="flex-1 min-w-0 text-left text-sm font-medium truncate hover:underline"
+      >
+        {item.name}
+      </button>
+      <span className="text-xs text-muted-foreground shrink-0">
+        {item.qty} {item.unit} · {item.kcal} kcal
+      </span>
+      <button
+        onClick={onRemove}
+        className="p-1 text-destructive hover:bg-destructive/10 rounded min-h-9 min-w-9 inline-flex items-center justify-center"
+        aria-label="Remover alimento"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+
+  // Mobile: editor abre em Sheet bottom com header sticky
+  if (isMobile) {
+    return (
+      <div className="rounded-md border border-border/60 bg-background">
+        {Row}
+        <Sheet
+          open={expanded}
+          onOpenChange={(v) => {
+            if (v !== expanded) {
+              haptic();
+              onToggle();
+            }
+          }}
+        >
+          <SheetContent
+            side="bottom"
+            className="max-h-[92dvh] overflow-y-auto p-0 flex flex-col gap-0"
+          >
+            <SheetHeader className="sticky top-0 z-10 bg-background border-b border-border p-4 text-left">
+              <SheetTitle className="truncate pr-8">{item.name}</SheetTitle>
+              <SheetDescription>
+                {item.qty} {item.unit} · {item.kcal} kcal · {item.scaleGroup}
+              </SheetDescription>
+            </SheetHeader>
+            <div className="p-3">
+              <ItemEditor item={item} onChange={onChange} />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    );
+  }
+
+  // Desktop: inline (comportamento original)
   return (
     <div className="rounded-md border border-border/60 bg-background">
-      <div className="flex items-center gap-2 p-2">
-        <button onClick={onToggle} className="p-1 hover:bg-muted rounded">
-          {expanded ? (
-            <ChevronDown className="h-3.5 w-3.5" />
-          ) : (
-            <ChevronRight className="h-3.5 w-3.5" />
-          )}
-        </button>
-        <span className="flex-1 text-sm font-medium truncate">{item.name}</span>
-        <span className="text-xs text-muted-foreground shrink-0">
-          {item.qty} {item.unit} · {item.kcal} kcal
-        </span>
-        <button
-          onClick={onRemove}
-          className="p-1 text-destructive hover:bg-destructive/10 rounded"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
+      {Row}
+      <div
+        className={cn(
+          "overflow-hidden transition-[max-height,opacity] duration-200",
+          expanded ? "max-h-[3000px] opacity-100" : "max-h-0 opacity-0",
+        )}
+        aria-hidden={!expanded}
+      >
+        {expanded && <ItemEditor item={item} onChange={onChange} />}
       </div>
-      {expanded && <ItemEditor item={item} onChange={onChange} />}
     </div>
   );
 }
