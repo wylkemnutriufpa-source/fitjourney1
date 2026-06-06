@@ -1016,3 +1016,143 @@ function PostAddDialog({
   );
 }
 
+
+// ============================================================
+// ConfirmDestroy — botão destrutivo com confirmação (AlertDialog)
+// Usado para "Remover refeição" e "Remover alimento" no editor.
+// Protege contra cliques acidentais no mobile.
+// ============================================================
+function ConfirmDestroy({
+  onConfirm,
+  title,
+  description,
+  confirmLabel,
+  ariaLabel,
+  className,
+}: {
+  readonly onConfirm: () => void;
+  readonly title: string;
+  readonly description: string;
+  readonly confirmLabel: string;
+  readonly ariaLabel: string;
+  readonly className?: string;
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          aria-label={ariaLabel}
+          className={className}
+        >
+          <Trash2 className="size-4 md:size-3.5 text-destructive" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+// ============================================================
+// MealSlot — escolhe entre render inline (desktop) ou Sheet (mobile).
+// No mobile, a refeição vira uma linha resumo (toque grande); ao tocar,
+// abre um Sheet full-height com a MealCard inteira (mesmos props, mesmo
+// motor). Sem divergência de regras com o desktop.
+// ============================================================
+type MealSlotProps = React.ComponentProps<typeof MealCard>;
+
+function MealSlot(props: MealSlotProps) {
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
+  const { meal } = props;
+  const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
+  const itemCount = meal.main.items.length;
+
+  if (!isMobile) {
+    return <MealCard {...props} />;
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="w-full flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-4 text-left active:bg-surface/80 transition-colors min-h-[64px]"
+      >
+        <div className="flex flex-col items-center justify-center w-14 shrink-0">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            {meal.time || "--:--"}
+          </span>
+          <span className="text-xs font-mono font-semibold text-primary mt-0.5">
+            {Math.round(kcal)}
+          </span>
+          <span className="text-[9px] font-mono uppercase text-muted-foreground">
+            kcal
+          </span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold truncate">
+            {meal.label || "Sem nome"}
+          </p>
+          <p className="text-xs text-muted-foreground truncate">
+            {itemCount === 0
+              ? "Sem alimentos"
+              : `${itemCount} ${itemCount === 1 ? "alimento" : "alimentos"}`}
+          </p>
+        </div>
+        <ChevronRight className="size-5 text-muted-foreground shrink-0" />
+      </button>
+
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent
+          side="bottom"
+          className="h-[100dvh] max-h-[100dvh] p-0 flex flex-col gap-0 sm:max-w-none"
+        >
+          <SheetHeader className="flex flex-row items-center justify-between gap-2 border-b border-border px-4 py-3 space-y-0">
+            <SheetTitle className="text-base truncate">
+              {meal.label || "Refeição"}
+            </SheetTitle>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={() => setOpen(false)}
+              aria-label="Fechar"
+              className="h-10 w-10 shrink-0"
+            >
+              <X className="size-5" />
+            </Button>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto p-4 pb-32">
+            <MealCard {...props} />
+          </div>
+          <div className="border-t border-border bg-background px-4 py-3">
+            <Button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="w-full h-12 text-base"
+            >
+              Concluir refeição
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}
