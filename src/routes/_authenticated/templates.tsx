@@ -953,9 +953,15 @@ function TemplateEditor({
   }
 
 
+  function sortMealsByTime(meals: PlannerMeal[]): PlannerMeal[] {
+    // Ordenação por horário (HH:MM lexicográfico = cronológico).
+    // Mantém ordem estável para refeições com mesmo horário.
+    return [...meals].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+  }
+
   function setMeals(updater: (meals: PlannerMeal[]) => PlannerMeal[]) {
     setDraft((d) => {
-      const meals = updater(d.meals);
+      const meals = sortMealsByTime(updater(d.meals));
       return { ...d, meals, kcal: templateKcal(meals) };
     });
   }
@@ -965,10 +971,12 @@ function TemplateEditor({
   }
 
   function removeMeal(mealId: string) {
+    hapticTpl(15);
     setMeals((meals) => meals.filter((m) => m.id !== mealId));
   }
 
   function addMeal() {
+    hapticTpl(10);
     setMeals((meals) => [...meals, createEmptyMeal()]);
   }
 
