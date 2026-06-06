@@ -1449,6 +1449,7 @@ function MealEditor({
   }
 
   function removeMainItem(itemId: string) {
+    hapticTpl(15);
     updateMainOption((o) => ({ ...o, items: o.items.filter((i) => i.id !== itemId) }));
   }
 
