@@ -217,15 +217,35 @@ function AnamnesisDetailPage() {
               )}
 
               {isApproved ? (
-                <div className="text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded px-2 py-1.5 flex items-start gap-1.5">
-                  <CheckCircle2 className="size-3.5 mt-0.5 shrink-0" />
-                  <span>
-                    Aprovada em{" "}
-                    {data.approvedAt
-                      ? new Date(data.approvedAt).toLocaleString("pt-BR")
-                      : "—"}
-                    . Versão imutável.
-                  </span>
+                <div className="space-y-2">
+                  <div className="text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded px-2 py-1.5 flex items-start gap-1.5">
+                    <CheckCircle2 className="size-3.5 mt-0.5 shrink-0" />
+                    <span>
+                      Aprovada em{" "}
+                      {data.approvedAt
+                        ? new Date(data.approvedAt).toLocaleString("pt-BR")
+                        : "—"}
+                      . Versão imutável.
+                    </span>
+                  </div>
+                  {data.patient?.id && (
+                    <Link
+                      to="/patients/$id/diet"
+                      params={{ id: data.patient.id }}
+                      className="w-full bg-primary text-primary-foreground rounded-md py-2 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/90"
+                    >
+                      <ClipboardEdit className="size-4" /> Elaborar plano alimentar
+                    </Link>
+                  )}
+                  {data.patient?.id && (
+                    <Link
+                      to="/patients/$id"
+                      params={{ id: data.patient.id }}
+                      className="w-full border border-border rounded-md py-2 text-sm font-medium flex items-center justify-center gap-2 hover:bg-accent"
+                    >
+                      <User className="size-4" /> Abrir perfil do paciente
+                    </Link>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-2">
