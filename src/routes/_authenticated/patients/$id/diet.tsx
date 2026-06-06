@@ -632,18 +632,17 @@ function MealCard({
           <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-mono font-semibold text-primary">
             {Math.round(kcal)} kcal
           </span>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            onClick={onRemove}
-            aria-label="Remover refeição"
-            className="shrink-0"
-          >
-            <Trash2 className="size-3.5 text-destructive" />
-          </Button>
-        </div>
+          <ConfirmDestroy
+            onConfirm={onRemove}
+            title="Remover refeição?"
+            description={`A refeição "${meal.label || "sem nome"}" e todos os seus alimentos serão removidos. Esta ação pode ser desfeita descartando as alterações antes de salvar.`}
+            confirmLabel="Remover refeição"
+            ariaLabel="Remover refeição"
+            className="shrink-0 h-9 w-9 md:h-9 md:w-9"
+          />
+          </div>
       </div>
+      {/* sentinel-close-removed */}
 
       <Input
         value={meal.main.title}
