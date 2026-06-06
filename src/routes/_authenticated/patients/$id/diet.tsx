@@ -420,6 +420,9 @@ function PlanEditor({
       };
       await onSave(snapshotToPersist);
       setDirty(false);
+      if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+        try { navigator.vibrate([8, 30, 12]); } catch { /* ignore */ }
+      }
     } catch (e) {
       toast.error(
         `Não consegui salvar: ${(e as Error).message ?? "erro desconhecido"}`,
@@ -1085,12 +1088,57 @@ function ConfirmDestroy({
 // ============================================================
 type MealSlotProps = ComponentProps<typeof MealCard>;
 
+// Pequeno helper de haptic feedback. Silencioso em desktops/navegadores
+// sem suporte. Use em ações destrutivas / confirmações / salvar.
+function haptic(ms: number = 10) {
+  if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+    try {
+      navigator.vibrate(ms);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 function MealSlot(props: MealSlotProps) {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   const { meal } = props;
   const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
   const itemCount = meal.main.items.length;
+
+  // Snapshot inicial ao abrir, pra detectar se mudou algo na sessão.
+  const [openSnapshot, setOpenSnapshot] = useState<string | null>(null);
+  const currentSig = useMemo(
+    () =>
+      JSON.stringify({
+        l: meal.label,
+        t: meal.time,
+        items: meal.main.items.map((i) => ({ k: i.foodKey, q: i.qty, u: i.unit })),
+      }),
+    [meal],
+  );
+  const sessionDirty = openSnapshot !== null && openSnapshot !== currentSig;
+
+  const itemPreview = meal.main.items.slice(0, 3).map((i) => i.name);
+  const extra = Math.max(0, itemCount - itemPreview.length);
+
+  function handleOpen() {
+    haptic(8);
+    setOpenSnapshot(currentSig);
+    setOpen(true);
+  }
+  function handleClose(force = false) {
+    if (!force && sessionDirty) {
+      haptic(15);
+      setConfirmClose(true);
+      return;
+    }
+    haptic(10);
+    setOpen(false);
+    setOpenSnapshot(null);
+  }
 
   if (!isMobile) {
     return <MealCard {...props} />;
@@ -1100,8 +1148,8 @@ function MealSlot(props: MealSlotProps) {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
-        className="w-full flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-4 text-left active:bg-surface/80 transition-colors min-h-[64px]"
+        onClick={handleOpen}
+        className="w-full flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-4 text-left active:bg-surface/80 transition-colors min-h-[72px]"
       >
         <div className="flex flex-col items-center justify-center w-14 shrink-0">
           <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -1114,46 +1162,115 @@ function MealSlot(props: MealSlotProps) {
             kcal
           </span>
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 space-y-1">
           <p className="text-sm font-semibold truncate">
             {meal.label || "Sem nome"}
           </p>
-          <p className="text-xs text-muted-foreground truncate">
-            {itemCount === 0
-              ? "Sem alimentos"
-              : `${itemCount} ${itemCount === 1 ? "alimento" : "alimentos"}`}
-          </p>
+          {itemCount === 0 ? (
+            <p className="text-xs text-muted-foreground italic">Sem alimentos</p>
+          ) : (
+            <div className="flex flex-wrap gap-1">
+              {itemPreview.map((name, i) => (
+                <span
+                  key={i}
+                  className="inline-block max-w-[120px] truncate rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                >
+                  {name}
+                </span>
+              ))}
+              {extra > 0 && (
+                <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                  +{extra}
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <ChevronRight className="size-5 text-muted-foreground shrink-0" />
       </button>
 
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet
+        open={open}
+        onOpenChange={(o) => {
+          if (!o) handleClose();
+          else setOpen(true);
+        }}
+      >
         <SheetContent
           side="bottom"
           className="h-[100dvh] max-h-[100dvh] p-0 flex flex-col gap-0 sm:max-w-none"
+          onEscapeKeyDown={(e) => {
+            if (sessionDirty) {
+              e.preventDefault();
+              setConfirmClose(true);
+            }
+          }}
+          onPointerDownOutside={(e) => {
+            if (sessionDirty) {
+              e.preventDefault();
+              setConfirmClose(true);
+            }
+          }}
         >
-          <SheetHeader className="flex flex-row items-center justify-between gap-2 border-b border-border px-4 py-3 space-y-0">
-            <SheetTitle className="text-base truncate">
-              {meal.label || "Refeição"}
-            </SheetTitle>
+          {/* Sticky header com nome + kcal vivos */}
+          <SheetHeader className="sticky top-0 z-10 flex flex-row items-center justify-between gap-2 border-b border-border bg-background/95 backdrop-blur px-4 py-3 space-y-0">
+            <div className="flex-1 min-w-0">
+              <SheetTitle className="text-base truncate">
+                {meal.label || "Refeição"}
+              </SheetTitle>
+              <div className="flex items-center gap-2 mt-0.5 text-[11px] font-mono text-muted-foreground">
+                <Clock className="size-3" />
+                <span>{meal.time || "--:--"}</span>
+                <span className="text-border">·</span>
+                <span className="font-semibold text-primary">
+                  {Math.round(kcal)} kcal
+                </span>
+                <span className="text-border">·</span>
+                <span>
+                  {itemCount} {itemCount === 1 ? "item" : "itens"}
+                </span>
+                {sessionDirty && (
+                  <span className="ml-1 inline-block size-1.5 rounded-full bg-amber-500 animate-pulse" />
+                )}
+              </div>
+            </div>
             <Button
               type="button"
               size="icon"
               variant="ghost"
-              onClick={() => setOpen(false)}
+              onClick={() => handleClose()}
               aria-label="Fechar"
               className="h-10 w-10 shrink-0"
             >
               <X className="size-5" />
             </Button>
           </SheetHeader>
-          <div className="flex-1 overflow-y-auto p-4 pb-32">
+
+          <div className="relative flex-1 overflow-y-auto p-4 pb-32">
             <MealCard {...props} />
+
+            {/* FAB +Item */}
+            <button
+              type="button"
+              onClick={() => {
+                haptic(8);
+                props.onAddItem();
+              }}
+              aria-label="Adicionar alimento"
+              className="fixed bottom-24 right-4 z-20 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <Plus className="size-6" />
+            </button>
           </div>
+
           <div className="border-t border-border bg-background px-4 py-3">
             <Button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                haptic(12);
+                setOpen(false);
+                setOpenSnapshot(null);
+              }}
               className="w-full h-12 text-base"
             >
               Concluir refeição
@@ -1161,6 +1278,30 @@ function MealSlot(props: MealSlotProps) {
           </div>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={confirmClose} onOpenChange={setConfirmClose}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Fechar sem concluir?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você fez alterações nesta refeição. Elas continuam aplicadas no
+              editor, mas você ainda precisa salvar o plano. Deseja fechar
+              mesmo assim?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continuar editando</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setConfirmClose(false);
+                handleClose(true);
+              }}
+            >
+              Fechar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
