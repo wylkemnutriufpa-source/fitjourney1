@@ -8,7 +8,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ComponentProps } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   ArrowDown,
   ArrowUp,
+  ChevronRight,
   Clock,
   Copy,
   Eye,
@@ -30,6 +31,7 @@ import {
   Send,
   Sparkles,
   Trash2,
+  X,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -47,6 +49,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -476,7 +496,7 @@ function PlanEditor({
       {/* Refeições */}
       {mode === "edit"
         ? draft.meals.map((meal) => (
-            <MealCard
+            <MealSlot
               key={meal.id}
               meal={meal}
               allMeals={draft.meals}
@@ -612,18 +632,17 @@ function MealCard({
           <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-mono font-semibold text-primary">
             {Math.round(kcal)} kcal
           </span>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            onClick={onRemove}
-            aria-label="Remover refeição"
-            className="shrink-0"
-          >
-            <Trash2 className="size-3.5 text-destructive" />
-          </Button>
-        </div>
+          <ConfirmDestroy
+            onConfirm={onRemove}
+            title="Remover refeição?"
+            description={`A refeição "${meal.label || "sem nome"}" e todos os seus alimentos serão removidos. Esta ação pode ser desfeita descartando as alterações antes de salvar.`}
+            confirmLabel="Remover refeição"
+            ariaLabel="Remover refeição"
+            className="shrink-0 h-9 w-9 md:h-9 md:w-9"
+          />
+          </div>
       </div>
+      {/* sentinel-close-removed */}
 
       <Input
         value={meal.main.title}
@@ -641,34 +660,38 @@ function MealCard({
         {meal.main.items.map((it, idx) => (
           <li
             key={it.id}
-            className="grid grid-cols-[minmax(0,1fr)_72px_64px_auto_auto] items-center gap-2"
+            className="space-y-2 rounded-md border border-border/40 bg-background/40 p-2 md:space-y-0 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:grid md:grid-cols-[minmax(0,1fr)_72px_64px_auto_auto] md:items-center md:gap-2"
           >
             <Input
               value={it.name}
               onChange={(e) =>
                 onUpdateItem(it.id, (x) => ({ ...x, name: e.target.value }))
               }
-              className="text-sm"
+              className="text-sm h-11 md:h-9"
             />
-            <Input
-              type="number"
-              inputMode="decimal"
-              value={it.qty}
-              onChange={(e) =>
-                onUpdateItem(it.id, (x) => ({
-                  ...x,
-                  qty: Number(e.target.value) || 0,
-                }))
-              }
-              className="text-xs font-mono"
-            />
-            <Input
-              value={it.unit}
-              onChange={(e) =>
-                onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
-              }
-              className="text-xs font-mono"
-            />
+            <div className="flex gap-2 md:contents">
+              <Input
+                type="number"
+                inputMode="decimal"
+                value={it.qty}
+                onChange={(e) =>
+                  onUpdateItem(it.id, (x) => ({
+                    ...x,
+                    qty: Number(e.target.value) || 0,
+                  }))
+                }
+                aria-label="Quantidade"
+                className="flex-1 md:flex-none text-xs font-mono h-11 md:h-9"
+              />
+              <Input
+                value={it.unit}
+                onChange={(e) =>
+                  onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
+                }
+                aria-label="Unidade"
+                className="w-20 md:w-auto text-xs font-mono h-11 md:h-9"
+              />
+            </div>
             <EquivalentsBlock
               base={toPlannerFoodItem(it)}
               value={(it as any).materializedEquivalents}
@@ -678,7 +701,7 @@ function MealCard({
               variant="inline"
               autoGenerateOnMount={newItemIds.has(it.id)}
             />
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center justify-end gap-1 md:gap-0.5">
                 <Button
                   type="button"
                   size="icon"
@@ -686,9 +709,9 @@ function MealCard({
                   onClick={() => onMoveItem(it.id, -1)}
                   disabled={idx === 0}
                   aria-label="Mover para cima"
-                  className="h-7 w-7"
+                  className="h-11 w-11 md:h-7 md:w-7"
                 >
-                  <ArrowUp className="size-3.5" />
+                  <ArrowUp className="size-4 md:size-3.5" />
                 </Button>
                 <Button
                   type="button"
@@ -697,20 +720,18 @@ function MealCard({
                   onClick={() => onMoveItem(it.id, 1)}
                   disabled={idx === meal.main.items.length - 1}
                   aria-label="Mover para baixo"
-                  className="h-7 w-7"
+                  className="h-11 w-11 md:h-7 md:w-7"
                 >
-                  <ArrowDown className="size-3.5" />
+                  <ArrowDown className="size-4 md:size-3.5" />
                 </Button>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => onRemoveItem(it.id)}
-                  aria-label="Remover item"
-                  className="h-7 w-7"
-                >
-                  <Trash2 className="size-3.5 text-destructive" />
-                </Button>
+                <ConfirmDestroy
+                  onConfirm={() => onRemoveItem(it.id)}
+                  title="Remover alimento?"
+                  description={`"${it.name || "Item"}" será removido desta refeição.`}
+                  confirmLabel="Remover alimento"
+                  ariaLabel="Remover item"
+                  className="h-11 w-11 md:h-7 md:w-7"
+                />
                 <ReplicateMenu
                   meals={allMeals}
                   currentMealId={meal.id}
@@ -995,3 +1016,143 @@ function PostAddDialog({
   );
 }
 
+
+// ============================================================
+// ConfirmDestroy — botão destrutivo com confirmação (AlertDialog)
+// Usado para "Remover refeição" e "Remover alimento" no editor.
+// Protege contra cliques acidentais no mobile.
+// ============================================================
+function ConfirmDestroy({
+  onConfirm,
+  title,
+  description,
+  confirmLabel,
+  ariaLabel,
+  className,
+}: {
+  readonly onConfirm: () => void;
+  readonly title: string;
+  readonly description: string;
+  readonly confirmLabel: string;
+  readonly ariaLabel: string;
+  readonly className?: string;
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          aria-label={ariaLabel}
+          className={className}
+        >
+          <Trash2 className="size-4 md:size-3.5 text-destructive" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+// ============================================================
+// MealSlot — escolhe entre render inline (desktop) ou Sheet (mobile).
+// No mobile, a refeição vira uma linha resumo (toque grande); ao tocar,
+// abre um Sheet full-height com a MealCard inteira (mesmos props, mesmo
+// motor). Sem divergência de regras com o desktop.
+// ============================================================
+type MealSlotProps = ComponentProps<typeof MealCard>;
+
+function MealSlot(props: MealSlotProps) {
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
+  const { meal } = props;
+  const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
+  const itemCount = meal.main.items.length;
+
+  if (!isMobile) {
+    return <MealCard {...props} />;
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="w-full flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-4 text-left active:bg-surface/80 transition-colors min-h-[64px]"
+      >
+        <div className="flex flex-col items-center justify-center w-14 shrink-0">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            {meal.time || "--:--"}
+          </span>
+          <span className="text-xs font-mono font-semibold text-primary mt-0.5">
+            {Math.round(kcal)}
+          </span>
+          <span className="text-[9px] font-mono uppercase text-muted-foreground">
+            kcal
+          </span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold truncate">
+            {meal.label || "Sem nome"}
+          </p>
+          <p className="text-xs text-muted-foreground truncate">
+            {itemCount === 0
+              ? "Sem alimentos"
+              : `${itemCount} ${itemCount === 1 ? "alimento" : "alimentos"}`}
+          </p>
+        </div>
+        <ChevronRight className="size-5 text-muted-foreground shrink-0" />
+      </button>
+
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent
+          side="bottom"
+          className="h-[100dvh] max-h-[100dvh] p-0 flex flex-col gap-0 sm:max-w-none"
+        >
+          <SheetHeader className="flex flex-row items-center justify-between gap-2 border-b border-border px-4 py-3 space-y-0">
+            <SheetTitle className="text-base truncate">
+              {meal.label || "Refeição"}
+            </SheetTitle>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={() => setOpen(false)}
+              aria-label="Fechar"
+              className="h-10 w-10 shrink-0"
+            >
+              <X className="size-5" />
+            </Button>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto p-4 pb-32">
+            <MealCard {...props} />
+          </div>
+          <div className="border-t border-border bg-background px-4 py-3">
+            <Button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="w-full h-12 text-base"
+            >
+              Concluir refeição
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}
