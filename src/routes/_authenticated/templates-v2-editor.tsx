@@ -9,6 +9,7 @@ import {
   Download,
   ExternalLink,
   AlertTriangle,
+  Pencil,
 } from "lucide-react";
 import type {
   PlannerTemplateV2,
@@ -24,6 +25,26 @@ import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
 import { validateMatrix } from "@/lib/v2/matrix.v2";
 import { buildSnapshotV2 } from "@/lib/v2/snapshot/build";
 import { saveSnapshot } from "@/lib/v2/snapshot/storage";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+
+// haptics leves — silencioso em desktop / quando indisponível
+function haptic(ms = 10) {
+  try {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      (navigator as Navigator).vibrate?.(ms);
+    }
+  } catch {
+    /* ignore */
+  }
+}
 
 // EDITOR V2 — Atelier do nutricionista (piloto, isolado).
 // Estado interno (React). NUNCA persiste em storage.
