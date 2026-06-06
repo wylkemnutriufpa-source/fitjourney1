@@ -161,18 +161,13 @@ export function calculateEquivalents(
   candidates: readonly EquivalentCandidate[],
   count: number,
   criterion: MatchCriterion = defaultCriterionFor(base.scaleGroup),
+  rotationOffset = 0,
 ): EquivalentOption[] {
   // Trava clínica: scaleGroup do base precisa ser conhecido E permitido.
-  // Sem isso, qualquer fallback "mesmo grupo" produz substituições absurdas.
   if (!base.scaleGroup || !ALLOWED_SCALE_GROUPS.has(base.scaleGroup)) {
     return [];
   }
   const n = Math.max(1, Math.min(4, Math.floor(count)));
-  // Trava clínica fina: se o base tem subGroup, só substituímos dentro do
-  // mesmo subGroup (ex.: tapioca [carb-breakfast] nunca vira macaxeira
-  // [carb-meal]; pasta de amendoim [fat-spread] nunca vira azeite
-  // [fat-cooking]). Se o base não tem subGroup, mantém comportamento antigo
-  // (filtro por scaleGroup).
   const pool = candidates.filter((c) => {
     if (c.foodKey === base.foodKey) return false;
     if (c.scaleGroup !== base.scaleGroup) return false;
@@ -183,10 +178,16 @@ export function calculateEquivalents(
     .map((c) => calculateEquivalentQty(base, c, criterion))
     .filter((x): x is EquivalentOption => x !== null);
 
-  // Ordena por proximidade de massa relativa ao base — empurra opções "razoáveis"
-  // para o topo (evita sugerir 400g de algo quando o base é 100g).
+  // Ordena por proximidade de massa relativa ao base.
   computed.sort(
     (a, b) => Math.abs(a.qty - base.qty) - Math.abs(b.qty - base.qty),
   );
-  return computed.slice(0, n);
+
+  // Rotação: ao clicar "Gerar outra opção", o cursor avança e devolvemos uma
+  // janela diferente da pool ordenada. Mantém variedade sem perder a "naturalidade"
+  // (todas as opções continuam ordenadas por proximidade dentro da janela).
+  if (computed.length === 0) return [];
+  const offset = ((rotationOffset % computed.length) + computed.length) % computed.length;
+  const rotated = offset === 0 ? computed : [...computed.slice(offset), ...computed.slice(0, offset)];
+  return rotated.slice(0, n);
 }
