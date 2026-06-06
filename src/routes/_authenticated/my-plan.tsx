@@ -175,7 +175,7 @@ function MyPlanPage() {
   if (isLoading) {
     return (
       <AppShell>
-        <p className="text-sm text-muted-foreground">Carregando seu plano…</p>
+        <MyPlanSkeleton />
       </AppShell>
     );
   }
@@ -246,23 +246,7 @@ function MyPlanPage() {
           </div>
         )}
 
-        {meals.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            <Info className="inline size-3.5 mr-1" />
-            Este plano não possui refeições registradas.
-          </p>
-        ) : (
-          <div className="space-y-5">
-            {meals.map((m, idx) => (
-              <MealCard
-                key={m?.id ?? idx}
-                meal={m}
-                index={idx}
-                foods={foods}
-              />
-            ))}
-          </div>
-        )}
+        <PlanMeals planId={data.id} meals={meals} foods={foods} />
 
         {orientacoes && (
           <section className="border border-border rounded-lg p-5 bg-surface space-y-2">
@@ -276,6 +260,179 @@ function MyPlanPage() {
         )}
       </div>
     </AppShell>
+  );
+}
+
+// ====================================================================
+// Skeleton de carregamento
+// ====================================================================
+function MyPlanSkeleton() {
+  return (
+    <div className="space-y-8 max-w-3xl" aria-busy="true" aria-live="polite">
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-2/3" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-3 w-24" />
+      </div>
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-8 w-32" />
+      </div>
+      <div className="space-y-3">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="border border-border rounded-lg overflow-hidden grid grid-cols-[88px_1fr_auto] sm:grid-cols-[112px_1fr_auto] gap-3 items-center"
+          >
+            <Skeleton className="aspect-square w-full rounded-none" />
+            <div className="py-3 space-y-2">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-28" />
+            </div>
+            <Skeleton className="size-4 mr-3" />
+          </div>
+        ))}
+      </div>
+      <span className="sr-only">Carregando seu plano…</span>
+    </div>
+  );
+}
+
+// ====================================================================
+// Lista de refeições + provider de expansão persistente
+// ====================================================================
+function PlanMeals({
+  planId,
+  meals,
+  foods,
+}: {
+  planId: string;
+  meals: any[];
+  foods: FoodDTO[] | undefined;
+}) {
+  const storageKey = `myplan:exp:${planId}`;
+
+  const allMealIds = useMemo(
+    () => meals.map((m, idx) => `meal-${m?.id ?? idx}`),
+    [meals],
+  );
+  const allItemIds = useMemo(() => {
+    const ids: string[] = [];
+    meals.forEach((m, idx) => {
+      const mid = `meal-${m?.id ?? idx}`;
+      const items: any[] = Array.isArray(m?.main?.items) ? m.main.items : [];
+      items.forEach((it, i) => ids.push(`${mid}-item-${it?.id ?? i}`));
+    });
+    return ids;
+  }, [meals]);
+
+  const [openMeals, setOpenMeals] = useState<Set<string>>(() => {
+    const saved = loadSet(`${storageKey}:meals`);
+    if (saved.size > 0) return saved;
+    // padrão: primeira refeição aberta
+    return new Set(allMealIds.slice(0, 1));
+  });
+  const [openItems, setOpenItems] = useState<Set<string>>(() =>
+    loadSet(`${storageKey}:items`),
+  );
+
+  useEffect(() => {
+    saveSet(`${storageKey}:meals`, openMeals);
+  }, [storageKey, openMeals]);
+  useEffect(() => {
+    saveSet(`${storageKey}:items`, openItems);
+  }, [storageKey, openItems]);
+
+  const ctx = useMemo<ExpansionCtx>(
+    () => ({
+      isMealOpen: (id) => openMeals.has(id),
+      toggleMeal: (id) =>
+        setOpenMeals((prev) => {
+          const next = new Set(prev);
+          next.has(id) ? next.delete(id) : next.add(id);
+          return next;
+        }),
+      isItemOpen: (id) => openItems.has(id),
+      toggleItem: (id) =>
+        setOpenItems((prev) => {
+          const next = new Set(prev);
+          next.has(id) ? next.delete(id) : next.add(id);
+          return next;
+        }),
+      setItemOpen: (id, open) =>
+        setOpenItems((prev) => {
+          const next = new Set(prev);
+          open ? next.add(id) : next.delete(id);
+          return next;
+        }),
+    }),
+    [openMeals, openItems],
+  );
+
+  const allExpanded =
+    allMealIds.length > 0 &&
+    allMealIds.every((id) => openMeals.has(id)) &&
+    allItemIds.every((id) => openItems.has(id));
+
+  const handleToggleAll = useCallback(() => {
+    if (allExpanded) {
+      setOpenMeals(new Set());
+      setOpenItems(new Set());
+    } else {
+      setOpenMeals(new Set(allMealIds));
+      setOpenItems(new Set(allItemIds));
+    }
+  }, [allExpanded, allMealIds, allItemIds]);
+
+  if (meals.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        <Info className="inline size-3.5 mr-1" />
+        Este plano não possui refeições registradas.
+      </p>
+    );
+  }
+
+  return (
+    <ExpansionContext.Provider value={ctx}>
+      <section aria-label="Refeições do plano" className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Refeições ({meals.length})
+          </h2>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleToggleAll}
+            aria-pressed={allExpanded}
+            className="h-8 text-xs gap-1.5"
+          >
+            {allExpanded ? (
+              <>
+                <ChevronsDownUp className="size-3.5" /> Recolher tudo
+              </>
+            ) : (
+              <>
+                <ChevronsUpDown className="size-3.5" /> Expandir tudo
+              </>
+            )}
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {meals.map((m, idx) => (
+            <MealCard
+              key={m?.id ?? idx}
+              meal={m}
+              index={idx}
+              foods={foods}
+              mealId={`meal-${m?.id ?? idx}`}
+            />
+          ))}
+        </div>
+      </section>
+    </ExpansionContext.Provider>
   );
 }
 
