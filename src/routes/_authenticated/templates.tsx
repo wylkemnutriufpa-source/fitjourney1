@@ -553,7 +553,7 @@ function TemplatesPage() {
           <PlanModeDialog
             open={planModeOpen}
             onOpenChange={setPlanModeOpen}
-            onChoose={(mode) => {
+            onChoose={(mode: PlanMode) => {
               setPlanModeOpen(false);
               if (mode === "daily") {
                 setEditing({ tpl: createEmptyTemplate(), isMine: false });
