@@ -46,6 +46,7 @@ import { Route as AuthenticatedMyPlanPhysicalAssessmentRouteImport } from './rou
 import { Route as AuthenticatedMyPlanFeedbackRouteImport } from './routes/_authenticated/my-plan.feedback'
 import { Route as AuthenticatedMyPlanAnamneseRouteImport } from './routes/_authenticated/my-plan.anamnese'
 import { Route as AuthenticatedAnamnesesIdRouteImport } from './routes/_authenticated/anamneses.$id'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminProfissionaisRouteImport } from './routes/_authenticated/admin.profissionais'
 import { Route as AuthenticatedAdminPacientesRouteImport } from './routes/_authenticated/admin.pacientes'
 import { Route as AuthenticatedAdminLogosRouteImport } from './routes/_authenticated/admin.logos'
@@ -253,6 +254,12 @@ const AuthenticatedAnamnesesIdRoute =
     path: '/anamneses/$id',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminProfissionaisRoute =
   AuthenticatedAdminProfissionaisRouteImport.update({
     id: '/profissionais',
@@ -330,6 +337,7 @@ export interface FileRoutesByFullPath {
   '/admin/logos': typeof AuthenticatedAdminLogosRoute
   '/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
@@ -376,6 +384,7 @@ export interface FileRoutesByTo {
   '/admin/logos': typeof AuthenticatedAdminLogosRoute
   '/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
@@ -424,6 +433,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/logos': typeof AuthenticatedAdminLogosRoute
   '/_authenticated/admin/pacientes': typeof AuthenticatedAdminPacientesRoute
   '/_authenticated/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
   '/_authenticated/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/_authenticated/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
@@ -472,6 +482,7 @@ export interface FileRouteTypes {
     | '/admin/logos'
     | '/admin/pacientes'
     | '/admin/profissionais'
+    | '/admin/settings'
     | '/anamneses/$id'
     | '/my-plan/anamnese'
     | '/my-plan/feedback'
@@ -518,6 +529,7 @@ export interface FileRouteTypes {
     | '/admin/logos'
     | '/admin/pacientes'
     | '/admin/profissionais'
+    | '/admin/settings'
     | '/anamneses/$id'
     | '/my-plan/anamnese'
     | '/my-plan/feedback'
@@ -565,6 +577,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/logos'
     | '/_authenticated/admin/pacientes'
     | '/_authenticated/admin/profissionais'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/anamneses/$id'
     | '/_authenticated/my-plan/anamnese'
     | '/_authenticated/my-plan/feedback'
@@ -860,6 +873,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnamnesesIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/profissionais': {
       id: '/_authenticated/admin/profissionais'
       path: '/profissionais'
@@ -925,6 +945,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminLogosRoute: typeof AuthenticatedAdminLogosRoute
   AuthenticatedAdminPacientesRoute: typeof AuthenticatedAdminPacientesRoute
   AuthenticatedAdminProfissionaisRoute: typeof AuthenticatedAdminProfissionaisRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
@@ -933,6 +954,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminLogosRoute: AuthenticatedAdminLogosRoute,
   AuthenticatedAdminPacientesRoute: AuthenticatedAdminPacientesRoute,
   AuthenticatedAdminProfissionaisRoute: AuthenticatedAdminProfissionaisRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =

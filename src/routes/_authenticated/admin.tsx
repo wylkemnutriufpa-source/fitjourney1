@@ -26,6 +26,7 @@ function AdminLayout() {
     { to: "/admin/leads", label: "Leads" },
     { to: "/admin/landing", label: "Landing Page" },
     { to: "/admin/logos", label: "Logos" },
+    { to: "/admin/settings", label: "Checkout" },
   ];
   return (
     <AppShell>
