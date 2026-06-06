@@ -42,6 +42,7 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { PlanModeDialog, type PlanMode } from "@/components/PlanModeDialog";
 
 function hapticTpl(ms = 10) {
   try {
