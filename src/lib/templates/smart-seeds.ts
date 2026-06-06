@@ -479,6 +479,298 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
       },
     ],
   },
+
+  // ============== HIPERTROFIA MASCULINA ==============
+  {
+    slug: "esp-hipertrofia-masc-3000",
+    name: "Esportivo · Hipertrofia Masculina — 3.000 kcal",
+    category: "Esportivo",
+    finalidade:
+      "Ganho de massa muscular para homem adulto ativo (treino 5–6x/sem). Superávit calórico moderado, alta densidade proteica (~2 g/kg) distribuída em 5 refeições.",
+    observacoes:
+      "Pré-treino 60–90 min antes da sessão (carbo + proteína). Pós-treino até 45 min. Hidratação 3,5 L/dia. Substituições materializadas por grupo — preferir grelhados e assados. Creatina 5 g/dia opcional (não substitui alimento).",
+    meals: [
+      {
+        time: "07:00", label: "Café da manhã", heroKey: "pao-frances",
+        items: [
+          { foodKey: "pao-frances", name: "Pão francês", qty: 100, unit: "g", kcal: 297, scaleGroup: "carb" },
+          { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+          { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+          { foodKey: "manteiga", name: "Manteiga", qty: 10, unit: "g", kcal: 76, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "10:00", label: "Lanche da manhã", heroKey: "usda-greek-yogurt-nonfat",
+        items: [
+          { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 200, unit: "g", kcal: 117, scaleGroup: "protein" },
+          { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 40, unit: "g", kcal: 156, scaleGroup: "carb" },
+          { foodKey: "pasta-amendoim", name: "Pasta de amendoim integral", qty: 20, unit: "g", kcal: 118, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "13:00", label: "Almoço", heroKey: "contrafile-bovino",
+        items: [
+          { foodKey: "contrafile-bovino", name: "Contrafilé bovino grelhado", qty: 200, unit: "g", kcal: 435, scaleGroup: "protein" },
+          { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 200, unit: "g", kcal: 257, scaleGroup: "carb" },
+          { foodKey: "abacate", name: "Abacate em fatias", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "16:30", label: "Pré-treino", heroKey: "batata-doce",
+        items: [
+          { foodKey: "batata-doce", name: "Batata doce cozida", qty: 250, unit: "g", kcal: 195, scaleGroup: "carb" },
+          { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+        ],
+      },
+      {
+        time: "20:30", label: "Jantar / Pós-treino", heroKey: "peito-frango",
+        items: [
+          { foodKey: "usda-whey-protein", name: "Whey protein isolado", qty: 35, unit: "g", kcal: 130, scaleGroup: "protein" },
+          { foodKey: "macarrao-espaguete", name: "Macarrão integral cozido", qty: 180, unit: "g", kcal: 281, scaleGroup: "carb" },
+          { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+        ],
+      },
+    ],
+  },
+
+  // ============== HIPERTROFIA FEMININA ==============
+  {
+    slug: "esp-hipertrofia-fem-2200",
+    name: "Esportivo · Hipertrofia Feminina — 2.200 kcal",
+    category: "Esportivo",
+    finalidade:
+      "Ganho de massa muscular para mulher adulta ativa (treino 4–5x/sem). Superávit moderado, ~1,8 g/kg de proteína em 5 refeições, ênfase em ferro e cálcio.",
+    observacoes:
+      "Pré-treino 60–90 min antes. Pós-treino em até 45 min. Hidratação 2,5–3 L/dia. Ferro: combinar carne vermelha + vitamina C. Cálcio: iogurte/laticínio diário. Substituições materializadas por grupo.",
+    meals: [
+      {
+        time: "07:00", label: "Café da manhã", heroKey: "tapioca",
+        items: [
+          { foodKey: "tapioca", name: "Tapioca", qty: 60, unit: "g", kcal: 146, scaleGroup: "carb" },
+          { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+          { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "10:00", label: "Lanche da manhã", heroKey: "usda-greek-yogurt-nonfat",
+        items: [
+          { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 170, unit: "g", kcal: 99, scaleGroup: "protein" },
+          { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 30, unit: "g", kcal: 117, scaleGroup: "carb" },
+          { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 10, unit: "g", kcal: 49, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "13:00", label: "Almoço", heroKey: "patinho-bovino",
+        items: [
+          { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 150, unit: "g", kcal: 204, scaleGroup: "protein" },
+          { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 150, unit: "g", kcal: 193, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "16:30", label: "Pré-treino", heroKey: "banana",
+        items: [
+          { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+          { foodKey: "usda-whey-protein", name: "Whey protein", qty: 25, unit: "g", kcal: 93, scaleGroup: "protein" },
+        ],
+      },
+      {
+        time: "20:00", label: "Jantar", heroKey: "tilapia-file",
+        items: [
+          { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 143, scaleGroup: "protein" },
+          { foodKey: "batata-doce", name: "Batata doce cozida", qty: 180, unit: "g", kcal: 140, scaleGroup: "carb" },
+          { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+        ],
+      },
+    ],
+  },
+
+  // ============== CUTTING MASCULINO ==============
+  {
+    slug: "esp-cutting-masc-2400",
+    name: "Esportivo · Cutting Masculino — 2.400 kcal",
+    category: "Esportivo",
+    finalidade:
+      "Definição muscular para homem em fase de redução. Déficit moderado, proteína alta (~2,2 g/kg) para preservar massa magra, carbo periodizado em torno do treino.",
+    observacoes:
+      "Concentrar carbo no pré e pós-treino. Saladas e verduras livres. Hidratação 3,5 L/dia. Cafeína pré-treino opcional. Reavaliar a cada 2 semanas para ajuste de déficit.",
+    meals: [
+      {
+        time: "07:00", label: "Café da manhã", heroKey: "ovo-galinha",
+        items: [
+          { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+          { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 40, unit: "g", kcal: 156, scaleGroup: "carb" },
+          { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "10:00", label: "Lanche da manhã", heroKey: "usda-greek-yogurt-nonfat",
+        items: [
+          { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 200, unit: "g", kcal: 117, scaleGroup: "protein" },
+          { foodKey: "castanha-para", name: "Castanha-do-pará", qty: 15, unit: "g", kcal: 99, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "13:00", label: "Almoço", heroKey: "peito-frango",
+        items: [
+          { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 200, unit: "g", kcal: 330, scaleGroup: "protein" },
+          { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 130, unit: "g", kcal: 167, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "16:30", label: "Pré-treino", heroKey: "batata-doce",
+        items: [
+          { foodKey: "batata-doce", name: "Batata doce cozida", qty: 200, unit: "g", kcal: 156, scaleGroup: "carb" },
+          { foodKey: "usda-whey-protein", name: "Whey protein", qty: 25, unit: "g", kcal: 93, scaleGroup: "protein" },
+        ],
+      },
+      {
+        time: "20:00", label: "Jantar", heroKey: "usda-salmon-atlantic-raw",
+        items: [
+          { foodKey: "usda-salmon-atlantic-raw", name: "Salmão grelhado", qty: 150, unit: "g", kcal: 309, scaleGroup: "protein" },
+          { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
+          { foodKey: "abacate", name: "Abacate", qty: 40, unit: "g", kcal: 77, scaleGroup: "fat" },
+        ],
+      },
+    ],
+  },
+
+  // ============== CUTTING FEMININO ==============
+  {
+    slug: "esp-cutting-fem-1700",
+    name: "Esportivo · Cutting Feminino — 1.700 kcal",
+    category: "Esportivo",
+    finalidade:
+      "Definição muscular para mulher em fase de redução. Déficit moderado, ~2 g/kg de proteína para preservar massa magra, carbo concentrado no pré-treino.",
+    observacoes:
+      "Saladas e verduras livres. Hidratação 2,5 L/dia. Acompanhar ciclo menstrual — flexibilizar ±100 kcal na fase lútea se necessário. Reavaliar a cada 2 semanas.",
+    meals: [
+      {
+        time: "07:30", label: "Café da manhã", heroKey: "tapioca",
+        items: [
+          { foodKey: "tapioca", name: "Tapioca", qty: 40, unit: "g", kcal: 97, scaleGroup: "carb" },
+          { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+          { foodKey: "morango", name: "Morangos", qty: 100, unit: "g", kcal: 32, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "12:30", label: "Almoço", heroKey: "peito-frango",
+        items: [
+          { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+          { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 100, unit: "g", kcal: 128, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "16:00", label: "Pré-treino", heroKey: "banana",
+        items: [
+          { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+          { foodKey: "usda-whey-protein", name: "Whey protein", qty: 25, unit: "g", kcal: 93, scaleGroup: "protein" },
+        ],
+      },
+      {
+        time: "20:00", label: "Jantar", heroKey: "tilapia-file",
+        items: [
+          { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 143, scaleGroup: "protein" },
+          { foodKey: "batata-doce", name: "Batata doce cozida", qty: 130, unit: "g", kcal: 101, scaleGroup: "carb" },
+          { foodKey: "abacate", name: "Abacate", qty: 40, unit: "g", kcal: 77, scaleGroup: "fat" },
+        ],
+      },
+    ],
+  },
+
+  // ============== ENDURANCE / CORRIDA ==============
+  {
+    slug: "esp-endurance-corrida-2600",
+    name: "Esportivo · Endurance / Corrida — 2.600 kcal",
+    category: "Esportivo",
+    finalidade:
+      "Atleta de endurance (corrida/ciclismo, 5–6 sessões/sem, sessões longas). Alta densidade de carboidrato (~5–6 g/kg) para reposição de glicogênio, proteína ~1,6 g/kg.",
+    observacoes:
+      "Carbo pré-treino 60 min antes (banana + aveia). Reposição de eletrólitos em sessões > 60 min. Hidratação 3,5–4 L/dia. Treino longo (>90 min): gel de carbo a cada 45 min.",
+    meals: [
+      {
+        time: "06:30", label: "Café pré-treino", heroKey: "banana",
+        items: [
+          { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+          { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 50, unit: "g", kcal: 195, scaleGroup: "carb" },
+          { foodKey: "pasta-amendoim", name: "Pasta de amendoim", qty: 15, unit: "g", kcal: 89, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "10:00", label: "Pós-treino", heroKey: "pao-frances",
+        items: [
+          { foodKey: "pao-frances", name: "Pão francês", qty: 100, unit: "g", kcal: 297, scaleGroup: "carb" },
+          { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+          { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "13:00", label: "Almoço", heroKey: "peito-frango",
+        items: [
+          { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 170, unit: "g", kcal: 281, scaleGroup: "protein" },
+          { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 200, unit: "g", kcal: 257, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "16:30", label: "Lanche", heroKey: "usda-greek-yogurt-nonfat",
+        items: [
+          { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 170, unit: "g", kcal: 99, scaleGroup: "protein" },
+          { foodKey: "usda-oats-rolled", name: "Granola caseira", qty: 30, unit: "g", kcal: 117, scaleGroup: "carb" },
+          { foodKey: "usda-blueberries", name: "Mirtilos", qty: 80, unit: "g", kcal: 46, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "20:00", label: "Jantar", heroKey: "usda-salmon-atlantic-raw",
+        items: [
+          { foodKey: "usda-salmon-atlantic-raw", name: "Salmão grelhado", qty: 130, unit: "g", kcal: 268, scaleGroup: "protein" },
+          { foodKey: "batata-doce", name: "Batata doce cozida", qty: 200, unit: "g", kcal: 156, scaleGroup: "carb" },
+          { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+        ],
+      },
+    ],
+  },
+
+  // ============== JEJUM INTERMITENTE — JANELA EDITÁVEL ==============
+  {
+    slug: "esp-jejum-intermitente-2000",
+    name: "Esportivo · Jejum Intermitente (janela editável) — 2.000 kcal",
+    category: "Esportivo",
+    finalidade:
+      "Protocolo 16/8 padrão (janela alimentar 12h–20h, jejum 20h–12h do dia seguinte) para adulto ativo. Três refeições densas em proteína (~1,8 g/kg) e gordura boa dentro da janela.",
+    observacoes:
+      "JANELA EDITÁVEL pelo profissional: ajuste os horários das 3 refeições para 14/10 (10h–20h), 18/6 (14h–20h) ou outro protocolo conforme o paciente. Durante o jejum: apenas água, café puro, chá sem açúcar. Quebra de jejum sempre leve. Hidratação reforçada (3 L/dia) inclusive na janela de jejum. Treino preferencialmente nas últimas horas do jejum ou já na janela alimentar.",
+    meals: [
+      {
+        time: "12:00", label: "Quebra do jejum (refeição 1)", heroKey: "ovo-galinha",
+        items: [
+          { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+          { foodKey: "abacate", name: "Abacate", qty: 80, unit: "g", kcal: 154, scaleGroup: "fat" },
+          { foodKey: "tapioca", name: "Tapioca", qty: 50, unit: "g", kcal: 121, scaleGroup: "carb" },
+          { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "16:00", label: "Refeição 2 (pré/pós-treino)", heroKey: "peito-frango",
+        items: [
+          { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 180, unit: "g", kcal: 297, scaleGroup: "protein" },
+          { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+          { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "19:30", label: "Última refeição da janela", heroKey: "usda-salmon-atlantic-raw",
+        items: [
+          { foodKey: "usda-salmon-atlantic-raw", name: "Salmão grelhado", qty: 150, unit: "g", kcal: 309, scaleGroup: "protein" },
+          { foodKey: "batata-doce", name: "Batata doce cozida", qty: 180, unit: "g", kcal: 140, scaleGroup: "carb" },
+          { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+        ],
+      },
+    ],
+  },
 ];
 
 let _seq = 0;
