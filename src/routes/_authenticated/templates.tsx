@@ -42,6 +42,7 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { PlanModeDialog, type PlanMode } from "@/components/PlanModeDialog";
 
 function hapticTpl(ms = 10) {
   try {
@@ -440,6 +441,8 @@ function TemplatesPage() {
   const [tab, setTab] = useState<Tab>("biblioteca");
   const [category, setCategory] = useState<DietTemplate["category"] | "Todos">("Todos");
   const [editing, setEditing] = useState<{ tpl: PlannerTemplate; isMine: boolean; mine?: StoredTemplate; draftPlanId?: string; draftPatient?: { id: string; name: string } } | null>(null);
+  const [planModeOpen, setPlanModeOpen] = useState(false);
+  const navigate = useNavigate();
 
   const qc = useQueryClient();
   const listFn = useServerFn(listMyTemplates);
@@ -542,11 +545,23 @@ function TemplatesPage() {
             </p>
           </div>
           <Button
-            onClick={() => setEditing({ tpl: createEmptyTemplate(), isMine: false })}
+            onClick={() => setPlanModeOpen(true)}
             className="gap-1.5 self-start sm:self-auto shrink-0"
           >
             <Plus className="size-3.5" /> <span className="sm:hidden">Novo</span><span className="hidden sm:inline">Plano do zero</span>
           </Button>
+          <PlanModeDialog
+            open={planModeOpen}
+            onOpenChange={setPlanModeOpen}
+            onChoose={(mode: PlanMode) => {
+              setPlanModeOpen(false);
+              if (mode === "daily") {
+                setEditing({ tpl: createEmptyTemplate(), isMine: false });
+              } else {
+                navigate({ to: "/templates-v2-editor" });
+              }
+            }}
+          />
         </div>
 
         {/* Tabs */}
