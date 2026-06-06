@@ -1869,6 +1869,7 @@ function FoodItemRow({
   primary?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
+  const isMobile = useIsMobile();
   const [infoOpen, setInfoOpen] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const listFoodsFn = useServerFn(listFoods);
