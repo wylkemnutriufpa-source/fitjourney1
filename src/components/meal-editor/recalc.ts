@@ -70,7 +70,7 @@ export function recalcMaterializedEquivalents(args: {
     originalUnit: base.unit,
   };
   const matchCriterion = resolveCriterion(criterion, anchor.scaleGroup);
-  const options = calculateEquivalents(eqBase, candidates, size, matchCriterion);
+  const options = calculateEquivalents(eqBase, candidates, size, matchCriterion, rotationOffset);
   if (options.length === 0) return null;
 
   const mapped: MaterializedEquivalentOption[] = options.map((o) => ({
