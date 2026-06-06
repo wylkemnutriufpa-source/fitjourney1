@@ -6,6 +6,7 @@ import {
   listMyTemplates,
   saveMyTemplate,
   deleteMyTemplate,
+  importSmartTemplates,
   type StoredTemplate,
 } from "@/lib/templates/templates.functions";
 import { toast } from "sonner";
@@ -605,25 +606,28 @@ function TemplatesPage() {
         )}
 
         {tab === "meus" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {myList.length === 0 && (
-              <div className="col-span-full border border-dashed border-border rounded-lg p-10 text-center">
-                <FolderHeart className="size-8 mx-auto text-muted-foreground mb-3" />
-                <p className="text-sm text-muted-foreground">
-                  Você ainda não salvou nenhum template. Abra um da biblioteca, edite e clique
-                  em <strong>Salvar em Meus Templates</strong>.
-                </p>
-              </div>
-            )}
-            {myList.map((t) => (
-              <TemplateCard
-                key={t.id}
-                tpl={t}
-                mine
-                onOpen={() => setEditing({ tpl: t, isMine: true, mine: t })}
-                onDelete={() => removeMine(t.id)}
-              />
-            ))}
+          <div className="space-y-4">
+            <SmartSeedsImportBanner />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {myList.length === 0 && (
+                <div className="col-span-full border border-dashed border-border rounded-lg p-10 text-center">
+                  <FolderHeart className="size-8 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-sm text-muted-foreground">
+                    Você ainda não salvou nenhum template. Abra um da biblioteca, edite e clique
+                    em <strong>Salvar em Meus Templates</strong>, ou importe os exemplos inteligentes acima.
+                  </p>
+                </div>
+              )}
+              {myList.map((t) => (
+                <TemplateCard
+                  key={t.id}
+                  tpl={t}
+                  mine
+                  onOpen={() => setEditing({ tpl: t, isMine: true, mine: t })}
+                  onDelete={() => removeMine(t.id)}
+                />
+              ))}
+            </div>
           </div>
         )}
 
@@ -2146,6 +2150,57 @@ function EquivalentOptionEditor({
         value={option.imageKey}
         onPick={(key) => onChange((o) => ({ ...o, imageKey: key }))}
       />
+    </div>
+  );
+}
+
+function SmartSeedsImportBanner() {
+  const qc = useQueryClient();
+  const importFn = useServerFn(importSmartTemplates);
+  const [loading, setLoading] = useState(false);
+
+  const handleImport = async () => {
+    setLoading(true);
+    try {
+      const res = await importFn();
+      await qc.invalidateQueries({ queryKey: ["my-templates"] });
+      if (res.created === 0 && res.skipped > 0) {
+        toast.info(`Os ${res.skipped} templates inteligentes já estão no seu acervo.`);
+      } else if (res.skipped > 0) {
+        toast.success(`Importados ${res.created} templates. ${res.skipped} já existiam e foram ignorados.`);
+      } else {
+        toast.success(`Importados ${res.created} templates inteligentes.`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao importar templates.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-3 min-w-0">
+        <FlaskConical className="size-5 text-primary shrink-0 mt-0.5" />
+        <div className="space-y-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground">
+            Templates inteligentes prontos
+          </p>
+          <p className="text-xs text-muted-foreground">
+            3 templates brasileiros (Emagrecimento, Hipertrofia Moderada, Low Carb) com substituições
+            já materializadas pelo novo motor — proteína↔proteína, carbo↔carbo, sem mistura de grupos.
+          </p>
+        </div>
+      </div>
+      <Button
+        type="button"
+        size="sm"
+        onClick={handleImport}
+        disabled={loading}
+        className="w-full sm:w-auto"
+      >
+        {loading ? "Importando..." : "Importar templates inteligentes"}
+      </Button>
     </div>
   );
 }
