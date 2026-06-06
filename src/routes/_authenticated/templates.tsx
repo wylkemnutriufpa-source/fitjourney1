@@ -2153,3 +2153,54 @@ function EquivalentOptionEditor({
     </div>
   );
 }
+
+function SmartSeedsImportBanner() {
+  const qc = useQueryClient();
+  const importFn = useServerFn(importSmartTemplates);
+  const [loading, setLoading] = useState(false);
+
+  const handleImport = async () => {
+    setLoading(true);
+    try {
+      const res = await importFn();
+      await qc.invalidateQueries({ queryKey: ["my-templates"] });
+      if (res.created === 0 && res.skipped > 0) {
+        toast.info(`Os ${res.skipped} templates inteligentes já estão no seu acervo.`);
+      } else if (res.skipped > 0) {
+        toast.success(`Importados ${res.created} templates. ${res.skipped} já existiam e foram ignorados.`);
+      } else {
+        toast.success(`Importados ${res.created} templates inteligentes.`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao importar templates.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-3 min-w-0">
+        <FlaskConical className="size-5 text-primary shrink-0 mt-0.5" />
+        <div className="space-y-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground">
+            Templates inteligentes prontos
+          </p>
+          <p className="text-xs text-muted-foreground">
+            3 templates brasileiros (Emagrecimento, Hipertrofia Moderada, Low Carb) com substituições
+            já materializadas pelo novo motor — proteína↔proteína, carbo↔carbo, sem mistura de grupos.
+          </p>
+        </div>
+      </div>
+      <Button
+        type="button"
+        size="sm"
+        onClick={handleImport}
+        disabled={loading}
+        className="w-full sm:w-auto"
+      >
+        {loading ? "Importando..." : "Importar templates inteligentes"}
+      </Button>
+    </div>
+  );
+}
