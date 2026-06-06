@@ -47,8 +47,10 @@ export function recalcMaterializedEquivalents(args: {
   criterion: BlockCriterion;
   size: EquivalentsBlockSize;
   candidates: readonly EquivalentCandidate[];
+  rotationOffset?: number;
 }): MaterializedEquivalents | null {
-  const { base, criterion, size, candidates } = args;
+  const { base, criterion, size, candidates, rotationOffset = 0 } = args;
+
 
   // 1) Resolve o item base no TACO (foodKey/nome + fuzzy interno em findCandidateIn).
   const anchor = findCandidateIn(candidates, {
@@ -68,7 +70,7 @@ export function recalcMaterializedEquivalents(args: {
     originalUnit: base.unit,
   };
   const matchCriterion = resolveCriterion(criterion, anchor.scaleGroup);
-  const options = calculateEquivalents(eqBase, candidates, size, matchCriterion);
+  const options = calculateEquivalents(eqBase, candidates, size, matchCriterion, rotationOffset);
   if (options.length === 0) return null;
 
   const mapped: MaterializedEquivalentOption[] = options.map((o) => ({
