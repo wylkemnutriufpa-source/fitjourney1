@@ -1075,7 +1075,7 @@ function ConfirmDestroy({
 // abre um Sheet full-height com a MealCard inteira (mesmos props, mesmo
 // motor). Sem divergência de regras com o desktop.
 // ============================================================
-type MealSlotProps = React.ComponentProps<typeof MealCard>;
+type MealSlotProps = ComponentProps<typeof MealCard>;
 
 function MealSlot(props: MealSlotProps) {
   const isMobile = useIsMobile();
