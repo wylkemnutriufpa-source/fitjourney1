@@ -18,8 +18,10 @@ import {
   Repeat2,
   ChefHat,
   Scale,
+  ChevronDown,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { imgFor } from "@/lib/food-images";
 import { emojiForFood } from "@/lib/food-emojis";
 import {
@@ -323,95 +325,113 @@ function MealCard({
   const heroUrl = imgFor(meal?.heroKey || main?.imageKey || "");
   const kcal = mealKcal(main);
   const mealKind: MealKind = detectMealKind(meal?.label, meal?.time);
+  const [open, setOpen] = useState(index === 0);
+  const reduce = useReducedMotion();
 
   return (
-    <article className="space-y-2">
-      {/* Cabeçalho fora do card — hora ao lado do nome da refeição */}
-      <header className="px-1 space-y-0.5">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            {meal?.label ?? `Refeição ${index + 1}`}
-          </p>
-          {meal?.time && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-              <Clock className="size-3" />
-              {meal.time}
-            </span>
+    <article className="border border-border rounded-lg overflow-hidden bg-background">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full grid grid-cols-[88px_1fr_auto] sm:grid-cols-[112px_1fr_auto] gap-3 items-center text-left hover:bg-primary/5 transition-colors"
+      >
+        <div className="relative aspect-square bg-muted">
+          {heroUrl ? (
+            <img
+              src={heroUrl}
+              alt={main?.title ?? ""}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center text-muted-foreground">
+              <ImageOff className="size-5" />
+            </div>
           )}
         </div>
-        {main?.title && (
-          <h2 className="text-base sm:text-lg font-semibold truncate">
-            {main.title}
-          </h2>
-        )}
-      </header>
-
-      {/* Card horizontal com imagem menor (não estica) */}
-      <div className="border border-border rounded-lg overflow-hidden bg-background">
-        <div className="grid grid-cols-[112px_1fr] sm:grid-cols-[140px_1fr] gap-0">
-          <div className="relative aspect-square bg-muted">
-            {heroUrl ? (
-              <img
-                src={heroUrl}
-                alt={main?.title ?? ""}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 grid place-items-center text-muted-foreground">
-                <ImageOff className="size-5" />
-              </div>
+        <div className="py-3 min-w-0 space-y-0.5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              {meal?.label ?? `Refeição ${index + 1}`}
+            </p>
+            {meal?.time && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+                <Clock className="size-3" />
+                {meal.time}
+              </span>
             )}
-            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-1.5">
-              <p className="text-white text-[10px] font-mono">{kcal} kcal</p>
-            </div>
           </div>
+          {main?.title && (
+            <h2 className="text-sm sm:text-base font-semibold truncate">
+              {main.title}
+            </h2>
+          )}
+          <p className="text-[11px] text-muted-foreground">
+            {items.length} {items.length === 1 ? "alimento" : "alimentos"} ·{" "}
+            <span className="tabular-nums">{kcal} kcal</span>
+          </p>
+        </div>
+        <ChevronDown
+          className={`size-4 mr-3 text-muted-foreground transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
 
-          <div className="p-3 space-y-2.5">
-            <ul className="text-sm space-y-1">
-              {items.map((it, i) => (
-                <FoodItemReadonlyRow
-                  key={it?.id ?? i}
-                  item={it}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="content"
+            initial={reduce ? false : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="overflow-hidden border-t border-border"
+          >
+            <div className="p-3 space-y-2.5">
+              <ul className="text-sm">
+                {items.map((it, i) => (
+                  <FoodItemReadonlyRow
+                    key={it?.id ?? i}
+                    item={it}
+                    foods={foods}
+                    mealKind={mealKind}
+                  />
+                ))}
+                {items.length === 0 && (
+                  <li className="text-xs text-muted-foreground italic">
+                    Sem alimentos registrados.
+                  </li>
+                )}
+              </ul>
+
+              {main?.recipe && (
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="recipe" className="border-0">
+                    <AccordionTrigger className="py-1.5 text-xs font-mono uppercase tracking-widest text-primary hover:no-underline">
+                      <span className="inline-flex items-center gap-1.5">
+                        <ChefHat className="size-3.5" /> Modo de preparo
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm whitespace-pre-wrap text-muted-foreground leading-relaxed">
+                      {main.recipe}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              )}
+
+              {equivalents.length > 0 && (
+                <EquivalentsButton
+                  mealLabel={meal?.label ?? `Refeição ${index + 1}`}
+                  equivalents={equivalents}
                   foods={foods}
                   mealKind={mealKind}
                 />
-              ))}
-              {items.length === 0 && (
-                <li className="text-xs text-muted-foreground italic">
-                  Sem alimentos registrados.
-                </li>
               )}
-            </ul>
-
-            {/* Modo de preparo (collapsable) */}
-            {main?.recipe && (
-              <Accordion type="single" collapsible>
-                <AccordionItem value="recipe" className="border-0">
-                  <AccordionTrigger className="py-1.5 text-xs font-mono uppercase tracking-widest text-primary hover:no-underline">
-                    <span className="inline-flex items-center gap-1.5">
-                      <ChefHat className="size-3.5" /> Modo de preparo
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm whitespace-pre-wrap text-muted-foreground leading-relaxed">
-                    {main.recipe}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            )}
-
-            {/* Substituições / equivalentes em modal */}
-            {/* Substituições da REFEIÇÃO INTEIRA (montagens equivalentes) */}
-            {equivalents.length > 0 && (
-              <EquivalentsButton
-                mealLabel={meal?.label ?? `Refeição ${index + 1}`}
-                equivalents={equivalents}
-                foods={foods}
-                mealKind={mealKind}
-              />
-            )}
-          </div>
-        </div>
-      </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </article>
   );
 }
@@ -426,6 +446,7 @@ function FoodItemReadonlyRow({
   mealKind: MealKind;
 }) {
   const [open, setOpen] = useState(false);
+  const reduce = useReducedMotion();
   const match = useMemo(
     () => (item?.name ? findCatalogFood(foods, item) : null),
     [foods, item?.name, item?.foodKey],
@@ -435,9 +456,6 @@ function FoodItemReadonlyRow({
 
   const itemKcal = Number.isFinite(item?.kcal) ? Number(item.kcal) : 0;
 
-  // Substituições CURADAS por contexto da refeição (3-4 opções coerentes).
-  // Não usa scaleGroup aberto para evitar trocas absurdas
-  // (ex.: arroz por pão no almoço, carne por feijão).
   const substitutions = useMemo(
     () => getSubstitutionsFor(item?.name ?? "", mealKind, itemKcal),
     [item?.name, mealKind, itemKcal],
@@ -445,104 +463,108 @@ function FoodItemReadonlyRow({
 
   return (
     <li className="border-b border-border/50 last:border-0">
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            className="w-full flex items-center justify-between gap-3 py-1.5 text-left hover:bg-primary/5 rounded-sm px-1 -mx-1 transition-colors"
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between gap-3 py-2 text-left hover:bg-primary/5 rounded-sm px-1 -mx-1 transition-colors"
+      >
+        <span className="flex items-center gap-1.5 min-w-0">
+          <span className="text-sm leading-none shrink-0" aria-hidden>
+            {emojiForFood(item?.name)}
+          </span>
+          <span className="truncate">{item?.name ?? "—"}</span>
+        </span>
+        <span className="flex items-center gap-1.5 shrink-0">
+          <span className="text-muted-foreground tabular-nums text-xs">
+            {item?.qty} {item?.unit}
+            {Number.isFinite(item?.kcal) ? ` · ${item.kcal} kcal` : ""}
+          </span>
+          <ChevronDown
+            className={`size-3.5 text-muted-foreground transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
+          />
+        </span>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="details"
+            initial={reduce ? false : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
+            className="overflow-hidden"
           >
-            <span className="flex items-center gap-1.5 min-w-0">
-              <span className="text-sm leading-none shrink-0" aria-hidden>{emojiForFood(item?.name)}</span>
-              <span className="truncate">{item?.name ?? "—"}</span>
-            </span>
-            <span className="text-muted-foreground tabular-nums text-xs shrink-0">
-              {item?.qty} {item?.unit}
-              {Number.isFinite(item?.kcal) ? ` · ${item.kcal} kcal` : ""}
-            </span>
-          </button>
-        </DialogTrigger>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Alimento
-            </p>
-            <DialogTitle className="text-base">{item?.name}</DialogTitle>
-            <p className="text-xs text-muted-foreground">
-              {item?.qty} {item?.unit}
-              {Number.isFinite(item?.kcal) ? ` · ${item.kcal} kcal` : ""}
-            </p>
-          </DialogHeader>
-
-          {/* Medidas caseiras */}
-          <section className="space-y-2">
-            <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Medidas caseiras
-            </h3>
-            {hasMeasures ? (
-              <div className="grid grid-cols-1 gap-1">
-                {measures.map((m) => (
-                  <div
-                    key={m.id}
-                    className="text-xs border border-border rounded px-2 py-1.5 flex items-center justify-between gap-2"
-                  >
-                    <span>{m.measureName}</span>
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                      {m.gramsEquivalent} g
-                    </span>
+            <div className="px-1 pb-3 pt-1 space-y-3">
+              <section className="space-y-1.5">
+                <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1">
+                  <Scale className="size-3" /> Medidas caseiras
+                </h3>
+                {hasMeasures ? (
+                  <div className="grid grid-cols-1 gap-1">
+                    {measures.map((m) => (
+                      <div
+                        key={m.id}
+                        className="text-xs border border-border rounded px-2 py-1.5 flex items-center justify-between gap-2"
+                      >
+                        <span>{m.measureName}</span>
+                        <span className="font-mono text-[10px] text-muted-foreground">
+                          {m.gramsEquivalent} g
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[11px] text-muted-foreground italic">
-                Sem medidas caseiras cadastradas para este alimento.
-              </p>
-            )}
-          </section>
+                ) : (
+                  <p className="text-[11px] text-muted-foreground italic">
+                    Sem medidas caseiras cadastradas.
+                  </p>
+                )}
+              </section>
 
-          {/* Substituições equivalentes (mesmo grupo nutricional) */}
-          <section className="space-y-2 border-t border-border pt-3">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                Substituições equivalentes
-              </h3>
-              <span className="text-[10px] font-mono text-muted-foreground">
-                ~{itemKcal || 0} kcal
-              </span>
+              <section className="space-y-1.5">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1">
+                    <Repeat2 className="size-3" /> Substituições
+                  </h3>
+                  <span className="text-[10px] font-mono text-muted-foreground">
+                    ~{itemKcal || 0} kcal
+                  </span>
+                </div>
+                {substitutions.length > 0 ? (
+                  <div className="space-y-1">
+                    {substitutions.map((s, i) => (
+                      <div
+                        key={`${s.name}-${i}`}
+                        className="text-xs border border-border rounded px-2 py-1.5"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium truncate">{s.name}</span>
+                          <span className="font-mono text-[10px] text-muted-foreground tabular-nums shrink-0">
+                            {s.qty} {s.unit}
+                            {s.kcal ? ` · ${s.kcal} kcal` : ""}
+                          </span>
+                        </div>
+                        {s.note && (
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            {s.note}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-muted-foreground italic">
+                    Sem substituições sugeridas para este alimento.
+                  </p>
+                )}
+              </section>
             </div>
-            {substitutions.length > 0 ? (
-              <div className="space-y-1">
-                {substitutions.map((s, i) => (
-                  <div
-                    key={`${s.name}-${i}`}
-                    className="text-xs border border-border rounded px-2 py-1.5"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium truncate">{s.name}</span>
-                      <span className="font-mono text-[10px] text-muted-foreground tabular-nums shrink-0">
-                        {s.qty} {s.unit}
-                        {s.kcal ? ` · ${s.kcal} kcal` : ""}
-                      </span>
-                    </div>
-                    {s.note && (
-                      <p className="text-[10px] text-muted-foreground mt-0.5">
-                        {s.note}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[11px] text-muted-foreground italic">
-                Sem substituições sugeridas para este alimento neste momento da refeição.
-              </p>
-            )}
-            <p className="text-[10px] text-muted-foreground pt-1 leading-relaxed">
-              Opções coerentes para esta refeição. Mantenha quantidades próximas
-              das indicadas para preservar o equilíbrio do plano.
-            </p>
-          </section>
-        </DialogContent>
-      </Dialog>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </li>
   );
 }
