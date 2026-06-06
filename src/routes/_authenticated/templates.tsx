@@ -33,6 +33,25 @@ import {
   type DietTemplate,
 } from "@/lib/template-data";
 import { TemplateMatcherPanel } from "@/components/TemplateMatcherPanel";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+function hapticTpl(ms = 10) {
+  try {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      (navigator as Navigator).vibrate?.(ms);
+    }
+  } catch {
+    /* ignore */
+  }
+}
 
 import { imgFor, allFoodKeys, foodImages } from "@/lib/food-images";
 
