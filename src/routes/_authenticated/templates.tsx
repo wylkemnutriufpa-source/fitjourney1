@@ -1965,8 +1965,8 @@ function FoodItemRow({
     );
   }
 
-  return (
-    <div className={baseClass}>
+  const editFields = (
+    <>
       <Input
         ref={nameInputRef}
         value={item.name}
@@ -1976,26 +1976,149 @@ function FoodItemRow({
             setEditing(false);
           }
         }}
-        className="h-7 flex-1 text-xs"
+        className="h-9 flex-1 text-sm md:h-7 md:text-xs"
+        placeholder="Nome do alimento"
       />
       <Input
         type="number"
+        inputMode="decimal"
         value={item.qty}
         onChange={(e) => updatePortion({ qty: Number(e.target.value) || 0 })}
-        className="h-7 w-16 text-xs text-right"
+        className="h-9 w-20 text-sm text-right md:h-7 md:w-16 md:text-xs"
+        title="Quantidade"
       />
       <Input
         value={item.unit}
         onChange={(e) => updatePortion({ unit: e.target.value })}
-        className="h-7 w-14 text-xs"
+        className="h-9 w-16 text-sm md:h-7 md:w-14 md:text-xs"
+        title="Unidade"
       />
       <Input
         type="number"
+        inputMode="decimal"
         value={item.kcal}
         onChange={(e) => onChange({ ...item, kcal: Number(e.target.value) || 0 })}
-        className="h-7 w-16 text-xs text-right font-mono text-primary"
+        className="h-9 w-20 text-sm text-right font-mono text-primary md:h-7 md:w-16 md:text-xs"
         title="kcal"
       />
+    </>
+  );
+
+  // Mobile: edição em bottom sheet (legível, sem scroll horizontal)
+  if (isMobile) {
+    return (
+      <>
+        <div className={baseClass}>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium truncate">{item.name}</p>
+            <p className="text-[10px] text-muted-foreground font-mono">
+              {item.qty} {item.unit} · {item.kcal} kcal
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              hapticTpl();
+              setEditing(false);
+            }}
+            className="text-primary hover:text-primary/80 p-2"
+            title="Concluir"
+            aria-label="Concluir edição"
+          >
+            <Save className="size-4" />
+          </button>
+        </div>
+        <Sheet
+          open={editing}
+          onOpenChange={(v) => {
+            if (!v) {
+              hapticTpl();
+              setEditing(false);
+            }
+          }}
+        >
+          <SheetContent
+            side="bottom"
+            className="max-h-[90dvh] overflow-y-auto p-0 flex flex-col gap-0"
+          >
+            <SheetHeader className="sticky top-0 z-10 bg-background border-b border-border p-4 text-left">
+              <SheetTitle className="truncate pr-8">{item.name || "Editar alimento"}</SheetTitle>
+              <SheetDescription>
+                {item.qty} {item.unit} · {item.kcal} kcal
+              </SheetDescription>
+            </SheetHeader>
+            <div className="p-4 space-y-3">
+              <label className="block text-xs text-muted-foreground">
+                Nome
+                <Input
+                  ref={nameInputRef}
+                  value={item.name}
+                  onChange={(e) => onChange({ ...item, name: e.target.value })}
+                  className="mt-1 h-10 text-sm"
+                />
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block text-xs text-muted-foreground">
+                  Quantidade
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    value={item.qty}
+                    onChange={(e) => updatePortion({ qty: Number(e.target.value) || 0 })}
+                    className="mt-1 h-10 text-sm text-right"
+                  />
+                </label>
+                <label className="block text-xs text-muted-foreground">
+                  Unidade
+                  <Input
+                    value={item.unit}
+                    onChange={(e) => updatePortion({ unit: e.target.value })}
+                    className="mt-1 h-10 text-sm"
+                  />
+                </label>
+              </div>
+              <label className="block text-xs text-muted-foreground">
+                kcal
+                <Input
+                  type="number"
+                  inputMode="decimal"
+                  value={item.kcal}
+                  onChange={(e) => onChange({ ...item, kcal: Number(e.target.value) || 0 })}
+                  className="mt-1 h-10 text-sm text-right font-mono text-primary"
+                />
+              </label>
+            </div>
+            <SheetFooter className="sticky bottom-0 bg-background border-t border-border p-3 flex-row gap-2">
+              <Button
+                variant="outline"
+                className="flex-1 min-h-11"
+                onClick={() => {
+                  hapticTpl();
+                  onRemove();
+                  setEditing(false);
+                }}
+              >
+                <X className="size-4 mr-1" /> Remover
+              </Button>
+              <Button
+                className="flex-1 min-h-11"
+                onClick={() => {
+                  hapticTpl();
+                  setEditing(false);
+                }}
+              >
+                <Save className="size-4 mr-1" /> Concluir
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
+
+  // Desktop: inline (comportamento original preservado)
+  return (
+    <div className={baseClass}>
+      {editFields}
       <button
         onClick={() => setEditing(false)}
         className="text-primary hover:text-primary/80 p-1"
