@@ -606,25 +606,28 @@ function TemplatesPage() {
         )}
 
         {tab === "meus" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {myList.length === 0 && (
-              <div className="col-span-full border border-dashed border-border rounded-lg p-10 text-center">
-                <FolderHeart className="size-8 mx-auto text-muted-foreground mb-3" />
-                <p className="text-sm text-muted-foreground">
-                  Você ainda não salvou nenhum template. Abra um da biblioteca, edite e clique
-                  em <strong>Salvar em Meus Templates</strong>.
-                </p>
-              </div>
-            )}
-            {myList.map((t) => (
-              <TemplateCard
-                key={t.id}
-                tpl={t}
-                mine
-                onOpen={() => setEditing({ tpl: t, isMine: true, mine: t })}
-                onDelete={() => removeMine(t.id)}
-              />
-            ))}
+          <div className="space-y-4">
+            <SmartSeedsImportBanner />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {myList.length === 0 && (
+                <div className="col-span-full border border-dashed border-border rounded-lg p-10 text-center">
+                  <FolderHeart className="size-8 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-sm text-muted-foreground">
+                    Você ainda não salvou nenhum template. Abra um da biblioteca, edite e clique
+                    em <strong>Salvar em Meus Templates</strong>, ou importe os exemplos inteligentes acima.
+                  </p>
+                </div>
+              )}
+              {myList.map((t) => (
+                <TemplateCard
+                  key={t.id}
+                  tpl={t}
+                  mine
+                  onOpen={() => setEditing({ tpl: t, isMine: true, mine: t })}
+                  onDelete={() => removeMine(t.id)}
+                />
+              ))}
+            </div>
           </div>
         )}
 
