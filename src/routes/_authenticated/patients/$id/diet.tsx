@@ -496,7 +496,7 @@ function PlanEditor({
       {/* Refeições */}
       {mode === "edit"
         ? draft.meals.map((meal) => (
-            <MealCard
+            <MealSlot
               key={meal.id}
               meal={meal}
               allMeals={draft.meals}
