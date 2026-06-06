@@ -48,6 +48,13 @@ const F = {
   // mixed
   salada: { foodKey: "salada_verde", name: "Salada verde", scaleGroup: "mixed", kcal100: 20, p100: 1.5, c100: 3, f100: 0.2, defaultQty: 100, defaultUnit: "g" },
   legumes: { foodKey: "legumes", name: "Legumes cozidos", scaleGroup: "mixed", kcal100: 35, p100: 2, c100: 7, f100: 0.3, defaultQty: 120, defaultUnit: "g" },
+  // composites (café/lanche) — apontam para foods reais do banco
+  paoOvo: { foodKey: "pao_com_ovo", name: "Pão francês com ovo", scaleGroup: "mixed", kcal100: 260, p100: 11.5, c100: 35, f100: 8, defaultQty: 150, defaultUnit: "g" },
+  paoQueijo: { foodKey: "pao_com_queijo", name: "Pão francês com queijo", scaleGroup: "mixed", kcal100: 280, p100: 13, c100: 34, f100: 9, defaultQty: 130, defaultUnit: "g" },
+  tapiocaOvo: { foodKey: "tapioca_com_ovo", name: "Tapioca com ovo", scaleGroup: "mixed", kcal100: 270, p100: 9, c100: 45, f100: 6, defaultQty: 130, defaultUnit: "g" },
+  tapiocaQueijo: { foodKey: "tapioca_com_queijo", name: "Tapioca com queijo", scaleGroup: "mixed", kcal100: 285, p100: 10, c100: 44, f100: 7, defaultQty: 130, defaultUnit: "g" },
+  cuscuzOvo: { foodKey: "cuscuz_com_ovo", name: "Cuscuz com ovo", scaleGroup: "mixed", kcal100: 200, p100: 8, c100: 32, f100: 5, defaultQty: 180, defaultUnit: "g" },
+  cuscuzQueijo: { foodKey: "cuscuz_com_queijo", name: "Cuscuz com queijo", scaleGroup: "mixed", kcal100: 215, p100: 9, c100: 31, f100: 6, defaultQty: 180, defaultUnit: "g" },
 } satisfies Record<string, Food>;
 
 type FoodKey = keyof typeof F;
