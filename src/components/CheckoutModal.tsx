@@ -5,8 +5,6 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
-  CreditCard,
-  QrCode,
   Copy,
   Check,
   MessageCircle,
@@ -51,89 +49,28 @@ export function CheckoutModal({
   suggestedAmountCents,
   planLabel,
 }: Props) {
-  const [tab, setTab] = useState<"card" | "pix">("pix");
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Renovar assinatura</DialogTitle>
           <DialogDescription>
-            Escolha a forma de pagamento. Após o pagamento, seu acesso é liberado.
+            Pague via Pix. Após o pagamento, envie o comprovante pelo WhatsApp
+            para liberar seu acesso.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex gap-2 border-b border-border">
-          <TabButton
-            active={tab === "card"}
-            onClick={() => setTab("card")}
-            icon={CreditCard}
-            label="Cartão"
-          />
-          <TabButton
-            active={tab === "pix"}
-            onClick={() => setTab("pix")}
-            icon={QrCode}
-            label="Pix"
-          />
-        </div>
-
-        {tab === "card" ? (
-          <CardTab />
-        ) : (
-          <PixTab
-            audience={audience}
-            displayName={displayName}
-            suggestedAmountCents={suggestedAmountCents}
-            planLabel={planLabel}
-          />
-        )}
+        <PixTab
+          audience={audience}
+          displayName={displayName}
+          suggestedAmountCents={suggestedAmountCents}
+          planLabel={planLabel}
+        />
       </DialogContent>
     </Dialog>
   );
 }
 
-function TabButton({
-  active,
-  onClick,
-  icon: Icon,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={
-        "flex items-center gap-2 px-4 py-2 text-sm border-b-2 -mb-px transition-colors " +
-        (active
-          ? "border-primary text-foreground"
-          : "border-transparent text-muted-foreground hover:text-foreground")
-      }
-    >
-      <Icon className="size-4" /> {label}
-    </button>
-  );
-}
-
-function CardTab() {
-  return (
-    <div className="space-y-3 py-6">
-      <div className="rounded-lg border border-dashed border-border bg-surface/40 p-6 text-center">
-        <CreditCard className="size-8 mx-auto mb-3 text-muted-foreground" />
-        <p className="font-medium">Pagamento com cartão em breve</p>
-        <p className="text-xs text-muted-foreground mt-1">
-          Em integração com Stripe (cartão e recorrência). Por enquanto, use o
-          Pix na aba ao lado.
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function PixTab({
   audience,
