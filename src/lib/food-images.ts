@@ -63,9 +63,18 @@ const CATEGORY_FALLBACKS: Array<{ match: RegExp; key: string }> = [
   { match: /aveia|oats|mingau/i, key: "mingau-de-aveia" },
   { match: /cuscuz\s*(com\s*)?(ovo|queijo)/i, key: "cuscuz-com-ovo" },
   { match: /cuscuz/i, key: "cuscuz-com-ovo" },
-  { match: /(quinoa|arroz|macarr[aã]o|massa)/i, key: "macarrao-com-carne-moida" },
+  { match: /quinoa/i, key: "quinoa-cozida" },
+  { match: /(arroz|macarr[aã]o|massa)/i, key: "macarrao-com-carne-moida" },
   { match: /trilha\s*de\s*milho|tortilha\s*de\s*milho|tostada\s*de\s*milho/i, key: "trilha-de-milho" },
   { match: /milho/i, key: "milho-cozido" },
+  // Wrap / Rap10
+  { match: /wrap|rap\s*10|rap10|tortilha\s*de\s*trigo/i, key: "wrap-de-frango" },
+  // Panqueca de banana
+  { match: /panqueca\s*(de\s*)?banana|panqueca\s*fit/i, key: "panqueca-de-banana" },
+  // Whey shake/batido
+  { match: /whey|shake\s*prot|vit[aá]mina\s*de\s*whey|batido\s*prot/i, key: "whey-shake" },
+  // Salmão
+  { match: /salm[aã]o/i, key: "salmao-grelhado" },
   // Bebidas quentes
   { match: /chocolate\s*(quente|100|cacau)|achocolatado/i, key: "chocolate-quente" },
   { match: /caf[eé]\s*com\s*leite|caf[eé]\s*au\s*lait/i, key: "copo-de-leite-morno" },
