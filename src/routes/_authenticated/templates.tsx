@@ -542,11 +542,23 @@ function TemplatesPage() {
             </p>
           </div>
           <Button
-            onClick={() => setEditing({ tpl: createEmptyTemplate(), isMine: false })}
+            onClick={() => setPlanModeOpen(true)}
             className="gap-1.5 self-start sm:self-auto shrink-0"
           >
             <Plus className="size-3.5" /> <span className="sm:hidden">Novo</span><span className="hidden sm:inline">Plano do zero</span>
           </Button>
+          <PlanModeDialog
+            open={planModeOpen}
+            onOpenChange={setPlanModeOpen}
+            onChoose={(mode) => {
+              setPlanModeOpen(false);
+              if (mode === "daily") {
+                setEditing({ tpl: createEmptyTemplate(), isMine: false });
+              } else {
+                navigate({ to: "/templates-v2-editor" });
+              }
+            }}
+          />
         </div>
 
         {/* Tabs */}
