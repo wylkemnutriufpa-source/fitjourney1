@@ -39,7 +39,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
   {
     slug: "brasileiro-emagrecimento-1600",
     name: "Brasileiro Emagrecimento — 1.600 kcal",
-    category: "Emagrecimento",
+    category: "Clínico",
     finalidade:
       "Emagrecimento moderado para adulto com rotina padrão. Distribuição clássica brasileira em 4 refeições.",
     observacoes:
@@ -88,7 +88,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
   {
     slug: "hipertrofia-moderada-2400",
     name: "Hipertrofia Moderada — 2.400 kcal",
-    category: "Hipertrofia",
+    category: "Esportivo",
     finalidade:
       "Ganho de massa muscular moderado para adulto ativo (treino 4–5x/sem). Alta densidade proteica distribuída em 5 refeições.",
     observacoes:
@@ -146,7 +146,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
   {
     slug: "low-carb-moderado-1500",
     name: "Low Carb Moderado — 1.500 kcal",
-    category: "Low Carb",
+    category: "Clínico",
     finalidade:
       "Redução estratégica de carboidratos para perda de gordura, mantendo proteína alta e gordura boa. 4 refeições.",
     observacoes:
@@ -196,7 +196,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
   {
     slug: "saciedade-prolongada-1800",
     name: "Saciedade Prolongada — 1.800 kcal",
-    category: "Saciedade",
+    category: "Clínico",
     finalidade:
       "Foco em fibras, proteína magra e gorduras boas para prolongar a saciedade entre refeições. Indicado para perfis com fome frequente ou compulsão leve.",
     observacoes:
@@ -248,7 +248,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
   {
     slug: "ansiedade-sono-1700",
     name: "Ansiedade & Sono — 1.700 kcal",
-    category: "Ansiedade",
+    category: "Clínico",
     finalidade:
       "Suporte nutricional para regulação de humor e sono: triptofano (frango, ovo, banana, aveia), magnésio (folhas verdes, castanhas) e ômega-3 (peixes, chia, linhaça). Sem cafeína após 15h.",
     observacoes:
@@ -298,7 +298,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
   {
     slug: "anti-inflamatorio-1900",
     name: "Anti-inflamatório — 1.900 kcal",
-    category: "Anti-inflamatório",
+    category: "Clínico",
     finalidade:
       "Padrão mediterrâneo adaptado: alta densidade de ômega-3, polifenóis (frutas vermelhas, azeite, cacau), folhas verdes, sem açúcar refinado e sem ultraprocessados.",
     observacoes:
@@ -343,7 +343,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
   {
     slug: "protocolo-caldos-recuperacao-1200",
     name: "Protocolo de Caldos — Recuperação 1.200 kcal",
-    category: "Caldos",
+    category: "Clínico",
     finalidade:
       "Protocolo leve e quente para fases de recuperação (pós-virose, alta inflamação intestinal, gripe ou semanas estressantes). Caldos densos em micronutrientes, fáceis de digerir.",
     observacoes:
@@ -389,7 +389,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
   {
     slug: "vegetariano-equilibrado-1800",
     name: "Vegetariano Equilibrado — 1.800 kcal",
-    category: "Vegetariano",
+    category: "Clínico",
     finalidade:
       "Plano ovo-lacto-vegetariano com combinação de proteínas vegetais e ovos/laticínios para perfil completo de aminoácidos.",
     observacoes:
@@ -433,7 +433,7 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
   {
     slug: "pos-treino-express-2200",
     name: "Pós-treino Express — 2.200 kcal",
-    category: "Performance",
+    category: "Esportivo",
     finalidade:
       "Reposição rápida de glicogênio + síntese proteica para quem treina à tarde/noite. Janela pós-treino com proteína de alta absorção e carbo de IG médio-alto.",
     observacoes:
