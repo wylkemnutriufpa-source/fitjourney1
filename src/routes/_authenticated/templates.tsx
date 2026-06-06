@@ -2370,9 +2370,10 @@ function SmartSeedsImportBanner() {
             Templates inteligentes prontos
           </p>
           <p className="text-xs text-muted-foreground">
-            9 templates clínicos (Emagrecimento, Hipertrofia, Low Carb, Saciedade, Ansiedade & Sono,
-            Anti-inflamatório, Protocolo de Caldos, Vegetariano e Pós-treino) com substituições já
-            materializadas — proteína↔proteína, carbo↔carbo, sem mistura de grupos.
+            15 templates clínicos — Emagrecimento, Hipertrofia, Low Carb, Saciedade, Ansiedade & Sono,
+            Anti-inflamatório, Caldos, Vegetariano, Pós-treino e o bloco <strong>Esportivos</strong>{" "}
+            (Hipertrofia Masc/Fem, Cutting Masc/Fem, Endurance e <strong>Jejum Intermitente</strong>).
+            Clique para importar — novos templates entram no acervo, os já existentes são ignorados.
           </p>
 
         </div>
