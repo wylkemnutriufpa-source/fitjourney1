@@ -297,6 +297,62 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
     carbPer100g: 6.8,
     fatPer100g: 0.3,
   },
+  // ------ Lipídios ------
+  {
+    foodKey: "azeite-oliva",
+    name: "Azeite de oliva",
+    scaleGroup: "fat",
+    unit: "ml",
+    defaultQty: 10,
+    kcalPer100g: 884,
+    proteinPer100g: 0,
+    carbPer100g: 0,
+    fatPer100g: 100,
+  },
+  {
+    foodKey: "abacate",
+    name: "Abacate cru",
+    scaleGroup: "fat",
+    unit: "g",
+    defaultQty: 80,
+    kcalPer100g: 160,
+    proteinPer100g: 2,
+    carbPer100g: 8.5,
+    fatPer100g: 14.7,
+  },
+  {
+    foodKey: "castanha-para",
+    name: "Castanha-do-pará",
+    scaleGroup: "fat",
+    unit: "g",
+    defaultQty: 15,
+    kcalPer100g: 656,
+    proteinPer100g: 14.3,
+    carbPer100g: 12.3,
+    fatPer100g: 66.4,
+  },
+  {
+    foodKey: "pasta-amendoim",
+    name: "Pasta de amendoim integral",
+    scaleGroup: "fat",
+    unit: "g",
+    defaultQty: 15,
+    kcalPer100g: 588,
+    proteinPer100g: 25.1,
+    carbPer100g: 20,
+    fatPer100g: 50.4,
+  },
+  {
+    foodKey: "manteiga",
+    name: "Manteiga com sal",
+    scaleGroup: "fat",
+    unit: "g",
+    defaultQty: 10,
+    kcalPer100g: 717,
+    proteinPer100g: 0.9,
+    carbPer100g: 0.1,
+    fatPer100g: 81.1,
+  },
   // ------ Bebidas ------
   {
     foodKey: "cafe-com-leite",
@@ -406,19 +462,21 @@ for (const c of tacoCatalog) {
  */
 export function findCandidateIn(
   candidates: readonly EquivalentCandidate[],
-  input: { foodKey?: string; name: string },
+  input: { foodKey?: string; name: string; scaleGroup?: string },
 ): EquivalentCandidate | null {
+  const groupOk = (c: EquivalentCandidate) => !input.scaleGroup || c.scaleGroup === input.scaleGroup;
   if (input.foodKey) {
-    const hit = candidates.find((c) => c.foodKey === input.foodKey);
+    const hit = candidates.find((c) => c.foodKey === input.foodKey && groupOk(c));
     if (hit) return hit;
   }
   const norm = normalizeTacoName(input.name);
   if (!norm) return null;
   // 1) match exato normalizado
-  const exact = candidates.find((c) => normalizeTacoName(c.name) === norm);
+  const exact = candidates.find((c) => groupOk(c) && normalizeTacoName(c.name) === norm);
   if (exact) return exact;
   // 2) substring por primeira palavra (≥ 4 chars) — heurística antiga
   for (const c of candidates) {
+    if (!groupOk(c)) continue;
     const candNorm = normalizeTacoName(c.name);
     const firstWord = candNorm.split(" ")[0];
     if (firstWord.length >= 4 && norm.includes(firstWord)) return c;
@@ -440,6 +498,7 @@ export function findCandidateIn(
   };
   let best: { c: EquivalentCandidate; score: number } | null = null;
   for (const c of candidates) {
+    if (!groupOk(c)) continue;
     const candTokens = normalizeTacoName(c.name).split(" ").filter((t) => t.length >= 3);
     if (candTokens.length === 0) continue;
     let score = 0;
