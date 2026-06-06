@@ -441,28 +441,96 @@ function ItemRow({
   onRemove: () => void;
   onChange: (mut: (it: PlannerFoodItemV2) => void) => void;
 }) {
+  const isMobile = useIsMobile();
+
+  const Row = (
+    <div className="flex items-center gap-2 p-2">
+      <button
+        onClick={() => {
+          haptic();
+          onToggle();
+        }}
+        className="p-1 hover:bg-muted rounded min-h-9 min-w-9 inline-flex items-center justify-center"
+        aria-expanded={expanded}
+        aria-label={expanded ? "Recolher alimento" : (isMobile ? "Editar alimento" : "Expandir alimento")}
+      >
+        {isMobile ? (
+          <Pencil className="h-3.5 w-3.5" />
+        ) : expanded ? (
+          <ChevronDown className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5" />
+        )}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          haptic();
+          onToggle();
+        }}
+        className="flex-1 min-w-0 text-left text-sm font-medium truncate hover:underline"
+      >
+        {item.name}
+      </button>
+      <span className="text-xs text-muted-foreground shrink-0">
+        {item.qty} {item.unit} · {item.kcal} kcal
+      </span>
+      <button
+        onClick={onRemove}
+        className="p-1 text-destructive hover:bg-destructive/10 rounded min-h-9 min-w-9 inline-flex items-center justify-center"
+        aria-label="Remover alimento"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+
+  // Mobile: editor abre em Sheet bottom com header sticky
+  if (isMobile) {
+    return (
+      <div className="rounded-md border border-border/60 bg-background">
+        {Row}
+        <Sheet
+          open={expanded}
+          onOpenChange={(v) => {
+            if (v !== expanded) {
+              haptic();
+              onToggle();
+            }
+          }}
+        >
+          <SheetContent
+            side="bottom"
+            className="max-h-[92dvh] overflow-y-auto p-0 flex flex-col gap-0"
+          >
+            <SheetHeader className="sticky top-0 z-10 bg-background border-b border-border p-4 text-left">
+              <SheetTitle className="truncate pr-8">{item.name}</SheetTitle>
+              <SheetDescription>
+                {item.qty} {item.unit} · {item.kcal} kcal · {item.scaleGroup}
+              </SheetDescription>
+            </SheetHeader>
+            <div className="p-3">
+              <ItemEditor item={item} onChange={onChange} />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    );
+  }
+
+  // Desktop: inline (comportamento original)
   return (
     <div className="rounded-md border border-border/60 bg-background">
-      <div className="flex items-center gap-2 p-2">
-        <button onClick={onToggle} className="p-1 hover:bg-muted rounded">
-          {expanded ? (
-            <ChevronDown className="h-3.5 w-3.5" />
-          ) : (
-            <ChevronRight className="h-3.5 w-3.5" />
-          )}
-        </button>
-        <span className="flex-1 text-sm font-medium truncate">{item.name}</span>
-        <span className="text-xs text-muted-foreground shrink-0">
-          {item.qty} {item.unit} · {item.kcal} kcal
-        </span>
-        <button
-          onClick={onRemove}
-          className="p-1 text-destructive hover:bg-destructive/10 rounded"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
+      {Row}
+      <div
+        className={cn(
+          "overflow-hidden transition-[max-height,opacity] duration-200",
+          expanded ? "max-h-[3000px] opacity-100" : "max-h-0 opacity-0",
+        )}
+        aria-hidden={!expanded}
+      >
+        {expanded && <ItemEditor item={item} onChange={onChange} />}
       </div>
-      {expanded && <ItemEditor item={item} onChange={onChange} />}
     </div>
   );
 }
