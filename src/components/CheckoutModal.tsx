@@ -49,43 +49,23 @@ export function CheckoutModal({
   suggestedAmountCents,
   planLabel,
 }: Props) {
-  const [tab, setTab] = useState<"card" | "pix">("pix");
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Renovar assinatura</DialogTitle>
           <DialogDescription>
-            Escolha a forma de pagamento. Após o pagamento, seu acesso é liberado.
+            Pague via Pix. Após o pagamento, envie o comprovante pelo WhatsApp
+            para liberar seu acesso.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex gap-2 border-b border-border">
-          <TabButton
-            active={tab === "card"}
-            onClick={() => setTab("card")}
-            icon={CreditCard}
-            label="Cartão"
-          />
-          <TabButton
-            active={tab === "pix"}
-            onClick={() => setTab("pix")}
-            icon={QrCode}
-            label="Pix"
-          />
-        </div>
-
-        {tab === "card" ? (
-          <CardTab />
-        ) : (
-          <PixTab
-            audience={audience}
-            displayName={displayName}
-            suggestedAmountCents={suggestedAmountCents}
-            planLabel={planLabel}
-          />
-        )}
+        <PixTab
+          audience={audience}
+          displayName={displayName}
+          suggestedAmountCents={suggestedAmountCents}
+          planLabel={planLabel}
+        />
       </DialogContent>
     </Dialog>
   );
