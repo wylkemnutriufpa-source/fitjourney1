@@ -134,7 +134,15 @@ function buildDay(dayIdx: number): PlannerMealV2[] {
             { label: "2 unidades", gramsEquivalent: 100, fromCatalog: true },
             { label: "1 fatia grande", gramsEquivalent: 40, fromCatalog: false },
           ],
-          substitutions: [sub("tapioca", 60), sub("aveia", 50, "com leite")],
+          substitutions: [
+            sub("paoOvo"),
+            sub("paoQueijo"),
+            sub("tapiocaOvo"),
+            sub("tapiocaQueijo"),
+            sub("cuscuzOvo"),
+            sub("cuscuzQueijo"),
+            sub("aveia", 50, "com leite"),
+          ],
         }),
         makeItem("it", "ovo", 150, {
           notes: "Preferir mexido ou cozido — evitar frituras.",
