@@ -204,7 +204,15 @@ function buildDay(dayIdx: number): PlannerMealV2[] {
       heroKey: "banana-com-aveia",
       items: [
         makeItem("it", "banana", 120, {
-          substitutions: [sub("aveia", 40), sub("tapioca", 40)],
+          substitutions: [
+            sub("paoOvo"),
+            sub("paoQueijo"),
+            sub("tapiocaOvo"),
+            sub("tapiocaQueijo"),
+            sub("cuscuzOvo"),
+            sub("cuscuzQueijo"),
+            sub("aveia", 40),
+          ],
         }),
         makeItem("it", "castanhas", 25, {
           measures: [{ label: "1 punhado pequeno", gramsEquivalent: 25, fromCatalog: true }],
