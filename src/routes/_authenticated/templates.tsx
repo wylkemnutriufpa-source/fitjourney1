@@ -637,7 +637,7 @@ function TemplatesPage() {
                   <TemplateCard
                     key={t.id}
                     tpl={planner}
-                    onOpen={() => setEditing({ tpl: materializeTemplateEquivalents(planner), isMine: false })}
+                    onOpen={() => setEditing({ tpl: planner, isMine: false })}
                   />
 
                 );
