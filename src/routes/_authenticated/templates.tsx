@@ -1410,6 +1410,7 @@ function MealEditor({
   }
 
   function addMainItemFromCatalog(food: PlannerFoodItem) {
+    hapticTpl(10);
     onChange((m) => {
       const isFirst = m.main.items.length === 0;
       let heroKey = m.heroKey;
