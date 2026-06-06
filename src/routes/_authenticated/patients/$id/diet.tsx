@@ -745,8 +745,9 @@ function MealCard({
                   onReplicate={(targetIds) => onReplicateItem(it.id, targetIds)}
                 />
             </div>
-          </li>
+          </motion.li>
         ))}
+        </AnimatePresence>
       </ul>
 
       <div className="flex items-center justify-start border-t border-border pt-3">
