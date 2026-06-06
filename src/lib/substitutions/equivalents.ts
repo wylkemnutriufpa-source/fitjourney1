@@ -30,6 +30,17 @@ export type EquivalentCandidate = {
   name: string;
   /** Grupo de escala — usado para filtrar candidatos compatíveis. */
   scaleGroup: string;
+  /**
+   * Subgrupo clínico-contextual (refinamento do scaleGroup). Quando presente,
+   * o engine só substitui dentro do MESMO subGroup, evitando misturas absurdas:
+   * - `protein-meal`  (carnes/peixes/lombo p/ almoço-jantar)
+   * - `protein-snack` (ovo, queijo, frango desfiado, carne moída — lanche/café)
+   * - `carb-meal`     (arroz, macarrão, batata, macaxeira, inhame)
+   * - `carb-breakfast`(pão, tapioca, cuscuz)
+   * - `fat-spread`    (pasta de amendoim, castanha, abacate — combina com fruta/pão)
+   * - `fat-cooking`   (azeite, manteiga — só finalização/cocção)
+   */
+  subGroup?: string;
   /** Unidade padrão (geralmente "g" ou "ml"; pode ser "unid"). */
   unit: string;
   /** Quantidade padrão sugerida no catálogo (referência, não usada no cálculo). */
@@ -157,9 +168,17 @@ export function calculateEquivalents(
     return [];
   }
   const n = Math.max(1, Math.min(4, Math.floor(count)));
-  const pool = candidates.filter(
-    (c) => c.scaleGroup === base.scaleGroup && c.foodKey !== base.foodKey,
-  );
+  // Trava clínica fina: se o base tem subGroup, só substituímos dentro do
+  // mesmo subGroup (ex.: tapioca [carb-breakfast] nunca vira macaxeira
+  // [carb-meal]; pasta de amendoim [fat-spread] nunca vira azeite
+  // [fat-cooking]). Se o base não tem subGroup, mantém comportamento antigo
+  // (filtro por scaleGroup).
+  const pool = candidates.filter((c) => {
+    if (c.foodKey === base.foodKey) return false;
+    if (c.scaleGroup !== base.scaleGroup) return false;
+    if (base.subGroup) return c.subGroup === base.subGroup;
+    return true;
+  });
   const computed = pool
     .map((c) => calculateEquivalentQty(base, c, criterion))
     .filter((x): x is EquivalentOption => x !== null);
