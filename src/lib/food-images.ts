@@ -64,7 +64,11 @@ const CATEGORY_FALLBACKS: Array<{ match: RegExp; key: string }> = [
   { match: /cuscuz\s*(com\s*)?(ovo|queijo)/i, key: "cuscuz-com-ovo" },
   { match: /cuscuz/i, key: "cuscuz-com-ovo" },
   { match: /(quinoa|arroz|macarr[aã]o|massa)/i, key: "macarrao-com-carne-moida" },
+  { match: /trilha\s*de\s*milho|tortilha\s*de\s*milho|tostada\s*de\s*milho/i, key: "trilha-de-milho" },
   { match: /milho/i, key: "milho-cozido" },
+  // Bebidas quentes
+  { match: /chocolate\s*(quente|100|cacau)|achocolatado/i, key: "chocolate-quente" },
+  { match: /caf[eé]\s*com\s*leite|caf[eé]\s*au\s*lait/i, key: "copo-de-leite-morno" },
   // Laticínios
   { match: /iogurte|yogurt|grego/i, key: "iogurte-natural" },
   { match: /leite/i, key: "copo-de-leite-morno" },
