@@ -62,6 +62,9 @@ import { templateToPrintHtml, templateToWhatsText } from "@/lib/diet-serializers
 import { printHTML, escapeHtml } from "@/lib/share-utils";
 import {
   toPlannerTemplate,
+
+
+
   clonePlannerTemplate,
   updateMainItemWithScaling,
   mealKcalFromOption,
@@ -75,6 +78,8 @@ import {
   type PlannerMealOption,
   type PlannerFoodItem,
 } from "@/lib/meal-planner";
+import { materializeTemplateEquivalents } from "@/lib/templates/materialize-equivalents";
+
 import { detectMealKind, getSubstitutionsFor } from "@/lib/plans/substitution-rules";
 import { buildTacoEquivalents } from "@/lib/substitutions/planner-bridge";
 import type { MatchCriterion } from "@/lib/substitutions/equivalents";
@@ -601,7 +606,7 @@ function TemplatesPage() {
                 <TemplateMatcherPanel
                   onPickTemplate={(id) => {
                     const t = systemTemplates.find((x) => x.id === id);
-                    if (t) setEditing({ tpl: toPlannerTemplate(t), isMine: false });
+                    if (t) setEditing({ tpl: materializeTemplateEquivalents(toPlannerTemplate(t)), isMine: false });
                   }}
                 />
               )}
@@ -631,8 +636,9 @@ function TemplatesPage() {
                   <TemplateCard
                     key={t.id}
                     tpl={planner}
-                    onOpen={() => setEditing({ tpl: planner, isMine: false })}
+                    onOpen={() => setEditing({ tpl: materializeTemplateEquivalents(planner), isMine: false })}
                   />
+
                 );
               })}
             </div>
