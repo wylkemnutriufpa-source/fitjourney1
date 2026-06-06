@@ -913,6 +913,7 @@ function TemplateEditor({
     patientName: string,
     opts?: { overrideMissingClinical?: boolean },
   ) {
+    hapticTpl(20);
     setApplyBusy(true);
     setApplyError(null);
     try {
