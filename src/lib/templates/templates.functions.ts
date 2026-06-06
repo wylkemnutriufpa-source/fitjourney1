@@ -183,22 +183,31 @@ export const importSmartTemplates = createServerFn({ method: "POST" })
 
     const { data: existing, error: listErr } = await supabase
       .from("templates")
-      .select("name")
+      .select("id, name, content")
       .eq("nutritionist_id", nutriId);
     if (listErr) throw new Error(listErr.message);
-    const existingNames = new Set(
-      ((existing ?? []) as { name: string }[]).map((r) => r.name),
-    );
+    const existingByName = new Map<string, { id: string; content: any }>();
+    for (const r of (existing ?? []) as { id: string; name: string; content: any }[]) {
+      existingByName.set(r.name, { id: r.id, content: r.content });
+    }
 
     let created = 0;
     let skipped = 0;
     const savedAt = new Date().toISOString();
 
     for (const seed of SMART_TEMPLATE_SEEDS) {
-      if (existingNames.has(seed.name)) {
+      const existingRow = existingByName.get(seed.name);
+      // Só atualizamos seeds já importados (basedOn começa com "smart-seed:").
+      // Templates manuais com o mesmo nome NÃO são tocados.
+      const isImportedSeed =
+        existingRow &&
+        typeof existingRow.content?.basedOn === "string" &&
+        existingRow.content.basedOn.startsWith("smart-seed:");
+      if (existingRow && !isImportedSeed) {
         skipped += 1;
         continue;
       }
+
       const tpl = seedToPlannerTemplate(seed);
 
       // Materializa substituições item-a-item — motor puro, server-safe.
@@ -228,6 +237,21 @@ export const importSmartTemplates = createServerFn({ method: "POST" })
         finalidade: seed.finalidade,
         observacoes: seed.observacoes,
       };
+
+      if (existingRow) {
+        const { error: updErr } = await supabase
+          .from("templates")
+          .update({
+            name: seed.name,
+            content: contentJson,
+            updated_at: savedAt,
+          })
+          .eq("id", existingRow.id)
+          .eq("nutritionist_id", nutriId);
+        if (updErr) throw new Error(updErr.message);
+        created += 1; // contamos como "atualizado/criado"
+        continue;
+      }
 
       const { error: insErr } = await supabase
         .from("templates")
