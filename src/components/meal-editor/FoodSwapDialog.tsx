@@ -59,12 +59,11 @@ export function FoodSwapDialog({
   onPick,
 }: Props) {
   const [query, setQuery] = useState("");
-  const [onlyGroup, setOnlyGroup] = useState(true);
 
   const filtered = useMemo(() => {
     const q = norm(query.trim());
     let list = candidates as EquivalentCandidate[];
-    if (onlyGroup && scaleGroup) {
+    if (scaleGroup) {
       list = list.filter((c) => c.scaleGroup === scaleGroup);
     }
     if (q) {
@@ -73,16 +72,17 @@ export function FoodSwapDialog({
       );
     }
     return list.slice(0, 60);
-  }, [candidates, query, onlyGroup, scaleGroup]);
+  }, [candidates, query, scaleGroup]);
 
   const handlePick = (cand: EquivalentCandidate) => {
+    if (scaleGroup && cand.scaleGroup !== scaleGroup) return;
     onPick(swapKcalPreserving(current, cand));
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-h-[90vh] max-w-[calc(100vw-1rem)] overflow-hidden sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ArrowRightLeft className="h-4 w-4 text-primary" />
@@ -93,7 +93,7 @@ export function FoodSwapDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -104,19 +104,10 @@ export function FoodSwapDialog({
               className="h-9 pl-8 text-sm"
             />
           </div>
-          {scaleGroup ? (
-            <Button
-              type="button"
-              variant={onlyGroup ? "default" : "outline"}
-              size="sm"
-              onClick={() => setOnlyGroup((v) => !v)}
-            >
-              {scaleGroup}
-            </Button>
-          ) : null}
+          {scaleGroup ? <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">Só {scaleGroup}</span> : null}
         </div>
 
-        <div className="max-h-[420px] overflow-y-auto rounded-md border border-border">
+        <div className="max-h-[48vh] overflow-y-auto rounded-md border border-border sm:max-h-[420px]">
           {filtered.length === 0 ? (
             <p className="p-6 text-center text-sm text-muted-foreground">
               Nenhum alimento encontrado.

@@ -37,11 +37,13 @@ export function buildTacoEquivalents(
   const tacoBase = findCandidateIn(candidates, {
     foodKey: baseFood.foodKey,
     name: baseFood.name,
+    scaleGroup: baseFood.scaleGroup,
   });
   // Removida a âncora promíscua "primeiro candidato do mesmo scaleGroup":
   // produzia substituições absurdas (ex.: 5g de patinho → 2 ovos).
   // Sem cobertura real no catálogo, preferimos não sugerir nada.
   if (!tacoBase) return null;
+  if (tacoBase.scaleGroup !== baseFood.scaleGroup) return null;
 
   const base: EquivalentBase = {
     ...tacoBase,
@@ -52,7 +54,7 @@ export function buildTacoEquivalents(
     base,
     candidates,
     count,
-    criterion ?? defaultCriterionFor(tacoBase.scaleGroup),
+    criterion ?? defaultCriterionFor(base.scaleGroup),
   );
   return options.map((opt) => equivalentToPlannerOption(opt, candidates));
 }
@@ -98,5 +100,7 @@ function tacoScaleGroupToPlanner(
   const cand = findCandidateIn(candidates, { foodKey: opt.foodKey, name: opt.name });
   if (cand?.scaleGroup === "protein") return "protein";
   if (cand?.scaleGroup === "carb") return "carb";
+  if (cand?.scaleGroup === "fat") return "fat";
+  if (cand?.scaleGroup === "fruit") return "fruit";
   return (cand?.scaleGroup as ScaleGroup | undefined) ?? "mixed";
 }
