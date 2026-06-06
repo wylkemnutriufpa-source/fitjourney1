@@ -660,34 +660,38 @@ function MealCard({
         {meal.main.items.map((it, idx) => (
           <li
             key={it.id}
-            className="grid grid-cols-[minmax(0,1fr)_72px_64px_auto_auto] items-center gap-2"
+            className="space-y-2 rounded-md border border-border/40 bg-background/40 p-2 md:space-y-0 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:grid md:grid-cols-[minmax(0,1fr)_72px_64px_auto_auto] md:items-center md:gap-2"
           >
             <Input
               value={it.name}
               onChange={(e) =>
                 onUpdateItem(it.id, (x) => ({ ...x, name: e.target.value }))
               }
-              className="text-sm"
+              className="text-sm h-11 md:h-9"
             />
-            <Input
-              type="number"
-              inputMode="decimal"
-              value={it.qty}
-              onChange={(e) =>
-                onUpdateItem(it.id, (x) => ({
-                  ...x,
-                  qty: Number(e.target.value) || 0,
-                }))
-              }
-              className="text-xs font-mono"
-            />
-            <Input
-              value={it.unit}
-              onChange={(e) =>
-                onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
-              }
-              className="text-xs font-mono"
-            />
+            <div className="flex gap-2 md:contents">
+              <Input
+                type="number"
+                inputMode="decimal"
+                value={it.qty}
+                onChange={(e) =>
+                  onUpdateItem(it.id, (x) => ({
+                    ...x,
+                    qty: Number(e.target.value) || 0,
+                  }))
+                }
+                aria-label="Quantidade"
+                className="flex-1 md:flex-none text-xs font-mono h-11 md:h-9"
+              />
+              <Input
+                value={it.unit}
+                onChange={(e) =>
+                  onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
+                }
+                aria-label="Unidade"
+                className="w-20 md:w-auto text-xs font-mono h-11 md:h-9"
+              />
+            </div>
             <EquivalentsBlock
               base={toPlannerFoodItem(it)}
               value={(it as any).materializedEquivalents}
@@ -697,7 +701,7 @@ function MealCard({
               variant="inline"
               autoGenerateOnMount={newItemIds.has(it.id)}
             />
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center justify-end gap-1 md:gap-0.5">
                 <Button
                   type="button"
                   size="icon"
@@ -705,9 +709,9 @@ function MealCard({
                   onClick={() => onMoveItem(it.id, -1)}
                   disabled={idx === 0}
                   aria-label="Mover para cima"
-                  className="h-7 w-7"
+                  className="h-11 w-11 md:h-7 md:w-7"
                 >
-                  <ArrowUp className="size-3.5" />
+                  <ArrowUp className="size-4 md:size-3.5" />
                 </Button>
                 <Button
                   type="button"
@@ -716,20 +720,18 @@ function MealCard({
                   onClick={() => onMoveItem(it.id, 1)}
                   disabled={idx === meal.main.items.length - 1}
                   aria-label="Mover para baixo"
-                  className="h-7 w-7"
+                  className="h-11 w-11 md:h-7 md:w-7"
                 >
-                  <ArrowDown className="size-3.5" />
+                  <ArrowDown className="size-4 md:size-3.5" />
                 </Button>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => onRemoveItem(it.id)}
-                  aria-label="Remover item"
-                  className="h-7 w-7"
-                >
-                  <Trash2 className="size-3.5 text-destructive" />
-                </Button>
+                <ConfirmDestroy
+                  onConfirm={() => onRemoveItem(it.id)}
+                  title="Remover alimento?"
+                  description={`"${it.name || "Item"}" será removido desta refeição.`}
+                  confirmLabel="Remover alimento"
+                  ariaLabel="Remover item"
+                  className="h-11 w-11 md:h-7 md:w-7"
+                />
                 <ReplicateMenu
                   meals={allMeals}
                   currentMealId={meal.id}
