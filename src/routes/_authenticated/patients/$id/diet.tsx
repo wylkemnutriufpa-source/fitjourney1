@@ -658,9 +658,15 @@ function MealCard({
       />
 
       <ul className="space-y-3">
+        <AnimatePresence initial={false}>
         {meal.main.items.map((it, idx) => (
-          <li
+          <motion.li
             key={it.id}
+            layout
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.15 } }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             className="space-y-2 rounded-md border border-border/40 bg-background/40 p-2 md:space-y-0 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:grid md:grid-cols-[minmax(0,1fr)_72px_64px_auto_auto] md:items-center md:gap-2"
           >
             <Input
