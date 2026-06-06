@@ -32,14 +32,19 @@ export type PlannerFoodItem = {
 };
 
 /** Critério escolhido pelo profissional no bloco. "auto" = derivado do scaleGroup. */
-export type BlockCriterion = "auto" | "protein" | "carb" | "energy";
+export type BlockCriterion = "auto" | "protein" | "carb" | "fat" | "energy";
 
 export type MaterializedEquivalentOption = {
   foodKey: string;
   name: string;
+  /** Assinatura clínica opcional; snapshots antigos podem não conter. */
+  scaleGroup?: ScaleGroup;
   qty: number;
   unit: string;
   kcal: number;
+  proteinG?: number;
+  carbG?: number;
+  fatG?: number;
   /** Slug da imagem (default: foodKey). Editável pelo profissional. */
   imageSlug?: string;
 };
