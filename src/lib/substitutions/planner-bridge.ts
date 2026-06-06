@@ -37,6 +37,7 @@ export function buildTacoEquivalents(
   const tacoBase = findCandidateIn(candidates, {
     foodKey: baseFood.foodKey,
     name: baseFood.name,
+    scaleGroup: baseFood.scaleGroup,
   });
   // Removida a âncora promíscua "primeiro candidato do mesmo scaleGroup":
   // produzia substituições absurdas (ex.: 5g de patinho → 2 ovos).

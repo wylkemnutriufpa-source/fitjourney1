@@ -54,6 +54,7 @@ export function recalcMaterializedEquivalents(args: {
   const anchor = findCandidateIn(candidates, {
     foodKey: base.foodKey,
     name: base.name,
+    scaleGroup: base.scaleGroup,
   });
   // Sem cobertura no catálogo? Não criamos âncora promíscua "qualquer item do
   // mesmo scaleGroup" — isso gerava substituições absurdas. Retornamos null e
