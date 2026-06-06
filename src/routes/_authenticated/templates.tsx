@@ -606,7 +606,7 @@ function TemplatesPage() {
                 <TemplateMatcherPanel
                   onPickTemplate={(id) => {
                     const t = systemTemplates.find((x) => x.id === id);
-                    if (t) setEditing({ tpl: toPlannerTemplate(t), isMine: false });
+                    if (t) setEditing({ tpl: materializeTemplateEquivalents(toPlannerTemplate(t)), isMine: false });
                   }}
                 />
               )}
