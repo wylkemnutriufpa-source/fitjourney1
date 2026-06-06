@@ -62,7 +62,7 @@ import { templateToPrintHtml, templateToWhatsText } from "@/lib/diet-serializers
 import { printHTML, escapeHtml } from "@/lib/share-utils";
 import {
   toPlannerTemplate,
-  materializeTemplateEquivalents as _placeholder,
+
 
 
   clonePlannerTemplate,
