@@ -90,12 +90,15 @@ export function EquivalentsBlock({
 
   const handleRecalc = () => {
     const size = (options.length || defaultSize) as EquivalentsBlockSize;
+    const nextRotation = rotation + 1;
+    setRotation(nextRotation);
     flashPending(() => {
       const next = recalcMaterializedEquivalents({
         base,
         criterion,
         size,
         candidates,
+        rotationOffset: nextRotation,
       });
       if (!next) {
         toast.error(`Não foi possível recalcular equivalentes para "${base.name}".`);
