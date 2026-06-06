@@ -1449,7 +1449,7 @@ function MealEditor({
 
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-background">
-      <div className="grid grid-cols-[140px_1fr] gap-0">
+      <div className="grid grid-cols-1 gap-0 sm:grid-cols-[140px_1fr]">
         <button
           type="button"
           onClick={() => setImagePickerOpen(true)}
@@ -1573,6 +1573,7 @@ function MealEditor({
                     { v: "auto", l: "Auto" },
                     { v: "protein", l: "Prot" },
                     { v: "carb", l: "Carb" },
+                    { v: "fat", l: "Gord" },
                     { v: "energy", l: "Kcal" },
                   ] as const).map((opt) => (
                     <button
