@@ -4,7 +4,8 @@
 // passam o mesmo PlannerFoodItem base + onChange para materializar.
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { RefreshCw, Plus, ChevronDown, ChevronRight, Shuffle } from "lucide-react";
+import { RefreshCw, Plus, ChevronDown, ChevronRight, Shuffle, Loader2 } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
