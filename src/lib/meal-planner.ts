@@ -3,6 +3,8 @@ import type {
   FoodItem as LegacyFoodItem,
   MealSlot as LegacyMealSlot,
 } from "./template-data";
+import { recalcMaterializedEquivalents } from "@/components/meal-editor/recalc";
+import { tacoCatalog } from "@/lib/substitutions/taco-catalog";
 
 export type ScaleGroup =
   | "carb"
