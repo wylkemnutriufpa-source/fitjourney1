@@ -25,7 +25,9 @@ import {
   ShieldCheck,
   Wallet,
   Clock,
+  CreditCard,
 } from "lucide-react";
+import { CheckoutModal } from "@/components/CheckoutModal";
 
 import {
   Dialog,
