@@ -78,6 +78,8 @@ import {
   type PlannerMealOption,
   type PlannerFoodItem,
 } from "@/lib/meal-planner";
+import { materializeTemplateEquivalents } from "@/lib/templates/materialize-equivalents";
+
 import { detectMealKind, getSubstitutionsFor } from "@/lib/plans/substitution-rules";
 import { buildTacoEquivalents } from "@/lib/substitutions/planner-bridge";
 import type { MatchCriterion } from "@/lib/substitutions/equivalents";
