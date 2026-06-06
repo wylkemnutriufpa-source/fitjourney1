@@ -420,6 +420,9 @@ function PlanEditor({
       };
       await onSave(snapshotToPersist);
       setDirty(false);
+      if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+        try { navigator.vibrate([8, 30, 12]); } catch { /* ignore */ }
+      }
     } catch (e) {
       toast.error(
         `Não consegui salvar: ${(e as Error).message ?? "erro desconhecido"}`,
