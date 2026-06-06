@@ -46,6 +46,7 @@ const CRITERION_LABEL: Record<BlockCriterion, string> = {
   auto: "Automático (pelo grupo)",
   protein: "Proteína",
   carb: "Carboidrato",
+  fat: "Gordura",
   energy: "Energia (kcal)",
 };
 
@@ -276,7 +277,7 @@ export function EquivalentsBlock({
           onOpenChange={(v) => { if (!v) setSwapIdx(null); }}
           current={options[swapIdx]}
           candidates={candidates}
-          scaleGroup={base.scaleGroup}
+          scaleGroup={options[swapIdx].scaleGroup ?? base.scaleGroup}
           onPick={(next) => handleOptionChange(swapIdx, next)}
         />
       ) : null}

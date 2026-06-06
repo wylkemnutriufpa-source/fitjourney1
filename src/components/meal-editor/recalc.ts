@@ -33,11 +33,8 @@ function resolveCriterion(
 function equivalentQtyFromPlannerQty(base: PlannerFoodItem, anchor: EquivalentCandidate): number {
   const qty = Number(base.qty);
   if (!Number.isFinite(qty) || qty <= 0) return anchor.defaultQty;
-  if (base.unit === "g" || base.unit === "ml") return qty;
-  if (anchor.scaleGroup === "fruit" || anchor.foodKey === "ovo-galinha") {
-    return qty * anchor.defaultQty;
-  }
-  return qty;
+  if ((base.unit === "g" || base.unit === "ml") && base.unit === anchor.unit) return qty;
+  return qty * anchor.defaultQty;
 }
 
 /**
@@ -62,22 +59,27 @@ export function recalcMaterializedEquivalents(args: {
   // mesmo scaleGroup" — isso gerava substituições absurdas. Retornamos null e
   // a UI mostra "sem opções" em vez de misturar grupos alimentares.
   if (!anchor) return null;
+  if (anchor.scaleGroup !== base.scaleGroup) return null;
 
   const eqBase: EquivalentBase = {
     ...anchor,
     qty: equivalentQtyFromPlannerQty(base, anchor),
     originalUnit: base.unit,
   };
-  const matchCriterion = resolveCriterion(criterion, base.scaleGroup);
+  const matchCriterion = resolveCriterion(criterion, anchor.scaleGroup);
   const options = calculateEquivalents(eqBase, candidates, size, matchCriterion);
   if (options.length === 0) return null;
 
   const mapped: MaterializedEquivalentOption[] = options.map((o) => ({
     foodKey: o.foodKey,
     name: o.name,
+    scaleGroup: o.scaleGroup as MaterializedEquivalentOption["scaleGroup"],
     qty: o.qty,
     unit: o.unit,
     kcal: o.kcal,
+    proteinG: o.proteinG,
+    carbG: o.carbG,
+    fatG: o.fatG,
     imageSlug: o.foodKey,
   }));
 
