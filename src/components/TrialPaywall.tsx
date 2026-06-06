@@ -11,17 +11,19 @@ import { useAuth } from "@/lib/auth-context";
 import { CheckoutModal } from "@/components/CheckoutModal";
 
 export function TrialPaywall() {
-  const { user } = useAuth();
+  const { user, roles } = useAuth();
+  const isAdmin = roles?.includes("admin");
   const fetchTrial = useServerFn(getMyNutriTrialStatus);
   const [open, setOpen] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["nutri-trial-status", user?.id ?? "anon"],
     queryFn: () => fetchTrial(),
-    enabled: !!user?.id,
+    enabled: !!user?.id && !isAdmin,
     staleTime: 60_000,
   });
 
+  if (isAdmin) return null;
   if (!data || !data.isNutritionist || !data.shouldBlock) return null;
 
   return (
