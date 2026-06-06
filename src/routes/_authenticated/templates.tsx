@@ -2187,9 +2187,11 @@ function SmartSeedsImportBanner() {
             Templates inteligentes prontos
           </p>
           <p className="text-xs text-muted-foreground">
-            3 templates brasileiros (Emagrecimento, Hipertrofia Moderada, Low Carb) com substituições
-            já materializadas pelo novo motor — proteína↔proteína, carbo↔carbo, sem mistura de grupos.
+            9 templates clínicos (Emagrecimento, Hipertrofia, Low Carb, Saciedade, Ansiedade & Sono,
+            Anti-inflamatório, Protocolo de Caldos, Vegetariano e Pós-treino) com substituições já
+            materializadas — proteína↔proteína, carbo↔carbo, sem mistura de grupos.
           </p>
+
         </div>
       </div>
       <Button
