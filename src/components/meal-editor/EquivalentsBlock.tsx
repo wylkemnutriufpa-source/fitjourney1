@@ -66,6 +66,7 @@ export function EquivalentsBlock({
   const [open, setOpen] = useState(false);
   const [swapIdx, setSwapIdx] = useState<number | null>(null);
   const [pending, setPending] = useState(false);
+  const [rotation, setRotation] = useState(0);
   const reduceMotion = useReducedMotion();
 
   const canRecalc = useMemo(() => {
