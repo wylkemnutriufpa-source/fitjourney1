@@ -36,8 +36,18 @@ const CATEGORY_FALLBACKS: Array<{ match: RegExp; key: string }> = [
   { match: /(til[aá]pia|sal[mã]o|atum|peixe|merluza|sardinha|pesc)/i, key: "file-de-tilapia" },
   // Ovos
   { match: /\bovo(s)?\b|omelete|clara/i, key: "ovos-cozidos" },
+  // Carboidratos/cereais
+  { match: /tapioca|crepioca/i, key: "crepioca" },
+  { match: /p[aã]o(\s|-)?(frances|franc[eê]s|integral|forma)?/i, key: "pao-com-queijo" },
+  { match: /batata(\s|-)?doce/i, key: "frango-com-batata-doce" },
+  { match: /aveia|oats|mingau/i, key: "mingau-de-aveia" },
+  { match: /quinoa|arroz|macarr[aã]o|massa|cuscuz/i, key: "cuscuz-com-ovo" },
+  // Laticínios
+  { match: /iogurte|yogurt|grego/i, key: "iogurte-natural" },
+  // Oleaginosas / sementes (fallback p/ granola)
+  { match: /castanha|am[eê]ndoa|noz|chia|lin(h)?a[cç]a|flax|granola|semente/i, key: "iogurte-com-granola-2" },
   // Frutas genéricas (último recurso de fruta)
-  { match: /(fruta|salada\s*de\s*fruta)/i, key: "salada-de-frutas" },
+  { match: /(fruta|salada\s*de\s*fruta|frutas\s*vermelhas|berry)/i, key: "salada-de-frutas" },
 ];
 
 /** Resolve image by exact key, fallback to prefix match, then category by name, else undefined. */
