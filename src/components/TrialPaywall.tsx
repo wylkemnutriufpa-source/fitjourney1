@@ -28,7 +28,7 @@ export function TrialPaywall() {
 
   return (
     <>
-      <div className="fixed inset-0 z-[80] grid place-items-center bg-background/95 backdrop-blur-sm p-4">
+      <div className="fixed inset-0 z-40 grid place-items-center bg-background/95 backdrop-blur-sm p-4">
         <div className="w-full max-w-md rounded-xl border border-border bg-surface p-6 shadow-2xl space-y-4">
           <div className="size-12 rounded-full bg-primary/10 grid place-items-center">
             <Lock className="size-6 text-primary" />
