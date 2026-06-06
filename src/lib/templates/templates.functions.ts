@@ -13,8 +13,12 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   normalizeStoredPlannerTemplate,
+  type PlannerFoodItem,
   type PlannerTemplate,
 } from "@/lib/meal-planner";
+import { SMART_TEMPLATE_SEEDS, seedToPlannerTemplate } from "@/lib/templates/smart-seeds";
+import { recalcMaterializedEquivalents } from "@/components/meal-editor/recalc";
+import { tacoCatalog } from "@/lib/substitutions/taco-catalog";
 
 export type StoredTemplate = PlannerTemplate & {
   basedOn: string;
