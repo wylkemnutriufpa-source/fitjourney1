@@ -6,6 +6,7 @@ import {
   listMyTemplates,
   saveMyTemplate,
   deleteMyTemplate,
+  importSmartTemplates,
   type StoredTemplate,
 } from "@/lib/templates/templates.functions";
 import { toast } from "sonner";
