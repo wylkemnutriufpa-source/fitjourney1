@@ -771,6 +771,191 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
       },
     ],
   },
+  // ---------------------------------------------------------------------------
+  // Templates clínicos — Doenças intestinais (RCU, DC, SII)
+  // Estratégia: low-FODMAP + baixo resíduo, proteínas magras grelhadas/cozidas,
+  // carboidratos de fácil digestão (arroz branco, batata, mandioca, tapioca,
+  // inhame), frutas low-FODMAP (banana madura, mamão, morango), sem leite,
+  // sem trigo integral, sem leguminosas em fase aguda, sem oleaginosas inteiras.
+  // ---------------------------------------------------------------------------
+  {
+    slug: "intestino-sensivel-rcu-fase-aguda-1700",
+    name: "Intestino Sensível — Fase Aguda (RCU/DC) — 1.700 kcal",
+    category: "Clínico",
+    finalidade:
+      "Retocolite ulcerativa, doença de Crohn ou flare de SII em fase aguda. Dieta de baixo resíduo, low-FODMAP, sem lactose, sem trigo integral, sem leguminosas. Foco em proteína magra e carboidrato de fácil digestão.",
+    observacoes:
+      "Evitar: leite, queijos amarelos, feijão, lentilha, grão-de-bico, trigo integral, oleaginosas inteiras, alho/cebola crus, brócolis, couve-flor, repolho, maçã, pera, manga, frutas com casca. Cocção: cozido, grelhado, assado (sem fritura). Hidratação: 2–2,5 L água/dia. Mastigação lenta. 5 refeições pequenas.",
+    meals: [
+      {
+        time: "07:00",
+        label: "Café da manhã",
+        heroKey: "tapioca",
+        items: [
+          { foodKey: "tapioca", name: "Tapioca fina (sem recheio gorduroso)", qty: 50, unit: "g", kcal: 121, scaleGroup: "carb" },
+          { foodKey: "ovo-galinha", name: "Ovo cozido (sem gema dura)", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+          { foodKey: "banana", name: "Banana madura amassada", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "10:00",
+        label: "Lanche da manhã",
+        heroKey: "mamao",
+        items: [
+          { foodKey: "mamao", name: "Mamão papaya (sem sementes)", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "12:30",
+        label: "Almoço",
+        heroKey: "peito-frango",
+        items: [
+          { foodKey: "peito-frango", name: "Peito de frango cozido/desfiado", qty: 130, unit: "g", kcal: 215, scaleGroup: "protein" },
+          { foodKey: "arroz-branco", name: "Arroz branco bem cozido", qty: 150, unit: "g", kcal: 193, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem (cru, no prato)", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "16:00",
+        label: "Lanche da tarde",
+        heroKey: "tapioca",
+        items: [
+          { foodKey: "tapioca", name: "Tapioca pequena", qty: 40, unit: "g", kcal: 97, scaleGroup: "carb" },
+          { foodKey: "peito-frango", name: "Frango desfiado (recheio)", qty: 60, unit: "g", kcal: 99, scaleGroup: "protein" },
+        ],
+      },
+      {
+        time: "19:30",
+        label: "Jantar",
+        heroKey: "merluza-file",
+        items: [
+          { foodKey: "merluza-file", name: "Filé de merluza assado/cozido", qty: 140, unit: "g", kcal: 117, scaleGroup: "protein" },
+          { foodKey: "pure-batata", name: "Purê de batata inglesa (sem leite)", qty: 200, unit: "g", kcal: 116, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem (cru)", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "intestino-irritado-sii-low-fodmap-1900",
+    name: "SII Low-FODMAP — Manutenção — 1.900 kcal",
+    category: "Clínico",
+    finalidade:
+      "Síndrome do intestino irritável fora de fase aguda. Low-FODMAP, sem lactose, sem trigo, frutas e carboidratos seguros, proteína magra distribuída em 5 refeições.",
+    observacoes:
+      "Liberados: arroz, batata, batata-doce, mandioca, inhame, tapioca, banana, mamão, morango, abacaxi (porção controlada), uva, frango, peixes brancos, ovos, azeite. Restritos: leite, iogurte comum, trigo integral, feijão, lentilha, alho, cebola crua, maçã, pera, manga, melancia, mel. Mastigar lentamente; refeições em intervalos regulares.",
+    meals: [
+      {
+        time: "07:00",
+        label: "Café da manhã",
+        heroKey: "tapioca",
+        items: [
+          { foodKey: "tapioca", name: "Tapioca", qty: 60, unit: "g", kcal: 146, scaleGroup: "carb" },
+          { foodKey: "ovo-galinha", name: "Ovos mexidos (azeite)", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+          { foodKey: "banana", name: "Banana madura", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "10:00",
+        label: "Lanche da manhã",
+        heroKey: "morango",
+        items: [
+          { foodKey: "morango", name: "Morangos", qty: 150, unit: "g", kcal: 45, scaleGroup: "fruit" },
+          { foodKey: "pasta-amendoim", name: "Pasta de amendoim 100% (sem açúcar)", qty: 15, unit: "g", kcal: 89, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "12:30",
+        label: "Almoço",
+        heroKey: "peito-frango",
+        items: [
+          { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+          { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 150, unit: "g", kcal: 193, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "16:00",
+        label: "Lanche da tarde",
+        heroKey: "mamao",
+        items: [
+          { foodKey: "mamao", name: "Mamão papaya", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+          { foodKey: "ovo-galinha", name: "Ovo cozido", qty: 50, unit: "g", kcal: 72, scaleGroup: "protein" },
+        ],
+      },
+      {
+        time: "19:30",
+        label: "Jantar",
+        heroKey: "tilapia-file",
+        items: [
+          { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 143, scaleGroup: "protein" },
+          { foodKey: "batata-doce", name: "Batata doce cozida (sem casca)", qty: 200, unit: "g", kcal: 156, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "intestino-pos-flare-reintroducao-2100",
+    name: "Pós-Flare Intestinal — Reintrodução Gradual — 2.100 kcal",
+    category: "Clínico",
+    finalidade:
+      "Paciente saindo de fase aguda de RCU/DC/SII iniciando reintrodução cuidadosa. Aumenta aporte calórico e variedade proteica mantendo cocções suaves e low-FODMAP.",
+    observacoes:
+      "Reintrodução em ordem: peixes brancos → frango → ovos → carne bovina magra (patinho cozido/desfiado). Carboidratos: arroz, batata, mandioca, inhame; tapioca tolerada. Frutas: banana, mamão, morango, abacaxi (porção pequena). Manter restrição de lactose, trigo integral, leguminosas, oleaginosas inteiras e crucíferas até reintrodução guiada. Sintomas → voltar ao template anterior.",
+    meals: [
+      {
+        time: "07:00",
+        label: "Café da manhã",
+        heroKey: "tapioca",
+        items: [
+          { foodKey: "tapioca", name: "Tapioca", qty: 70, unit: "g", kcal: 170, scaleGroup: "carb" },
+          { foodKey: "ovo-galinha", name: "Ovos mexidos no azeite", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+          { foodKey: "banana", name: "Banana madura", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "10:00",
+        label: "Lanche da manhã",
+        heroKey: "mamao",
+        items: [
+          { foodKey: "mamao", name: "Mamão papaya", qty: 200, unit: "g", kcal: 86, scaleGroup: "fruit" },
+          { foodKey: "pasta-amendoim", name: "Pasta de amendoim 100%", qty: 15, unit: "g", kcal: 89, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "12:30",
+        label: "Almoço",
+        heroKey: "patinho-bovino",
+        items: [
+          { foodKey: "patinho-bovino", name: "Patinho bovino cozido/desfiado", qty: 150, unit: "g", kcal: 200, scaleGroup: "protein" },
+          { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+          { foodKey: "macaxeira", name: "Mandioca cozida", qty: 100, unit: "g", kcal: 125, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+        ],
+      },
+      {
+        time: "16:00",
+        label: "Lanche da tarde",
+        heroKey: "tapioca",
+        items: [
+          { foodKey: "tapioca", name: "Tapioca", qty: 50, unit: "g", kcal: 121, scaleGroup: "carb" },
+          { foodKey: "peito-frango", name: "Frango desfiado", qty: 80, unit: "g", kcal: 132, scaleGroup: "protein" },
+          { foodKey: "morango", name: "Morangos", qty: 100, unit: "g", kcal: 30, scaleGroup: "fruit" },
+        ],
+      },
+      {
+        time: "19:30",
+        label: "Jantar",
+        heroKey: "merluza-file",
+        items: [
+          { foodKey: "merluza-file", name: "Filé de merluza assado", qty: 160, unit: "g", kcal: 134, scaleGroup: "protein" },
+          { foodKey: "batata-doce", name: "Batata doce cozida", qty: 220, unit: "g", kcal: 172, scaleGroup: "carb" },
+          { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+        ],
+      },
+    ],
+  },
 ];
 
 let _seq = 0;
