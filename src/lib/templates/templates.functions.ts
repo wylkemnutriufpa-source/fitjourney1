@@ -167,3 +167,78 @@ export const deleteMyTemplate = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/**
+ * Importa os Smart Template Seeds (catálogo curado da Fase 1) na conta do
+ * nutricionista logado, materializando substituições item-a-item via o motor
+ * `recalcMaterializedEquivalents` (com a trava clínica de scaleGroup).
+ *
+ * Idempotente: pula seeds cujo `name` já exista no acervo do nutricionista.
+ */
+export const importSmartTemplates = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ created: number; skipped: number }> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+    const nutriId = await resolveNutritionistId(supabase, userId);
+
+    const { data: existing, error: listErr } = await supabase
+      .from("templates")
+      .select("name")
+      .eq("nutritionist_id", nutriId);
+    if (listErr) throw new Error(listErr.message);
+    const existingNames = new Set(
+      ((existing ?? []) as { name: string }[]).map((r) => r.name),
+    );
+
+    let created = 0;
+    let skipped = 0;
+    const savedAt = new Date().toISOString();
+
+    for (const seed of SMART_TEMPLATE_SEEDS) {
+      if (existingNames.has(seed.name)) {
+        skipped += 1;
+        continue;
+      }
+      const tpl = seedToPlannerTemplate(seed);
+
+      // Materializa substituições item-a-item — motor puro, server-safe.
+      // Itens fora de ALLOWED_SCALE_GROUPS (ex.: "beverage") naturalmente
+      // ficam sem materializedEquivalents (recalc devolve null).
+      tpl.meals = tpl.meals.map((meal) => ({
+        ...meal,
+        main: {
+          ...meal.main,
+          items: meal.main.items.map((it: PlannerFoodItem) => {
+            const mat = recalcMaterializedEquivalents({
+              base: it,
+              criterion: "auto",
+              size: 3,
+              candidates: tacoCatalog,
+            });
+            return mat ? { ...it, materializedEquivalents: mat } : it;
+          }),
+        },
+      }));
+
+      const contentJson = {
+        ...tpl,
+        name: seed.name,
+        basedOn: `smart-seed:${seed.slug}`,
+        savedAt,
+        finalidade: seed.finalidade,
+        observacoes: seed.observacoes,
+      };
+
+      const { error: insErr } = await supabase
+        .from("templates")
+        .insert({
+          nutritionist_id: nutriId,
+          name: seed.name,
+          content: contentJson,
+        });
+      if (insErr) throw new Error(insErr.message);
+      created += 1;
+    }
+
+    return { created, skipped };
+  });
