@@ -19,8 +19,18 @@ import {
   ChefHat,
   Scale,
   ChevronDown,
+  ChevronsUpDown,
+  ChevronsDownUp,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+} from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { imgFor } from "@/lib/food-images";
 import { emojiForFood } from "@/lib/food-emojis";
@@ -37,11 +47,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   getPeriod,
   periodLabel,
@@ -50,6 +70,43 @@ import {
   pickObjectiveMessage,
   inferObjectiveFromTag,
 } from "@/lib/patient/greetings";
+
+// ====================================================================
+// Expansão persistente (localStorage por plano)
+// ====================================================================
+type ExpansionCtx = {
+  isMealOpen: (id: string) => boolean;
+  toggleMeal: (id: string) => void;
+  isItemOpen: (id: string) => boolean;
+  toggleItem: (id: string) => void;
+  setItemOpen: (id: string, open: boolean) => void;
+};
+const ExpansionContext = createContext<ExpansionCtx | null>(null);
+function useExpansion() {
+  const c = useContext(ExpansionContext);
+  if (!c) throw new Error("ExpansionContext provider missing");
+  return c;
+}
+
+function loadSet(key: string): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw);
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch {
+    return new Set();
+  }
+}
+function saveSet(key: string, set: Set<string>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(Array.from(set)));
+  } catch {
+    /* ignore quota */
+  }
+}
 
 export const Route = createFileRoute("/_authenticated/my-plan")({
   head: () => ({ meta: [{ title: "Meu Plano — FitJourney" }] }),
