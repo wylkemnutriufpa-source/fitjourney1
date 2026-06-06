@@ -435,7 +435,18 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   // Salmão removido deliberadamente: o usuário pediu evitar promover salmão
   // (caro/inviável para a maioria) — usar o termo genérico "peixe" coberto
   // por merluza, tilápia e atum já presentes no catálogo.
+
+  // ------ Protocolo de Caldos (receitas) ------
+  // Pratos compostos (não substituíveis isoladamente — scaleGroup 'mixed').
+  // Macros médias por 100 ml de caldo pronto.
+  { foodKey: "caldo-frango-legumes",     name: "Caldo de frango com legumes (receita)",            scaleGroup: "mixed", unit: "ml", defaultQty: 300, kcalPer100g: 45, proteinPer100g: 4.5, carbPer100g: 3.0,  fatPer100g: 1.5 },
+  { foodKey: "caldo-abobora-gengibre",   name: "Caldo de abóbora com gengibre (receita)",          scaleGroup: "mixed", unit: "ml", defaultQty: 300, kcalPer100g: 55, proteinPer100g: 1.2, carbPer100g: 9.0,  fatPer100g: 1.5 },
+  { foodKey: "caldo-feijao-couve",       name: "Caldo de feijão com couve (receita)",              scaleGroup: "mixed", unit: "ml", defaultQty: 300, kcalPer100g: 80, proteinPer100g: 4.5, carbPer100g: 11.0, fatPer100g: 1.8 },
+  { foodKey: "caldo-peixe-acafrao",      name: "Caldo de peixe branco com açafrão (receita)",      scaleGroup: "mixed", unit: "ml", defaultQty: 300, kcalPer100g: 50, proteinPer100g: 6.0, carbPer100g: 2.5,  fatPer100g: 1.2 },
+  { foodKey: "caldo-carne-mandioquinha", name: "Caldo de carne magra com mandioquinha (receita)",  scaleGroup: "mixed", unit: "ml", defaultQty: 300, kcalPer100g: 70, proteinPer100g: 5.5, carbPer100g: 7.0,  fatPer100g: 2.0 },
+  { foodKey: "caldo-verde-portugues",    name: "Caldo verde leve (couve + batata + frango)",       scaleGroup: "mixed", unit: "ml", defaultQty: 300, kcalPer100g: 65, proteinPer100g: 3.5, carbPer100g: 9.5,  fatPer100g: 1.6 },
 ];
+
 
 
 /** Normaliza nome/foodKey para casamento aproximado. */
