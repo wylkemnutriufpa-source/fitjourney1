@@ -21,7 +21,7 @@
 //
 // O profissional pode sobrepor o critério por bloco (parâmetro `criterion`).
 
-export type MatchCriterion = "protein" | "carb" | "energy";
+export type MatchCriterion = "protein" | "carb" | "fat" | "energy";
 
 export type EquivalentCandidate = {
   /** Identidade estável do alimento no catálogo (foods.food_key ou foods.id). */
@@ -50,6 +50,7 @@ export type EquivalentBase = EquivalentCandidate & {
 export type EquivalentOption = {
   foodKey: string;
   name: string;
+  scaleGroup: string;
   qty: number;
   unit: string;
   kcal: number;
@@ -64,6 +65,7 @@ export type EquivalentOption = {
 export function defaultCriterionFor(scaleGroup: string): MatchCriterion {
   if (scaleGroup === "protein") return "protein";
   if (scaleGroup === "carb") return "carb";
+  if (scaleGroup === "fat") return "fat";
   if (scaleGroup === "fruit") return "energy";
   return "energy";
 }
@@ -71,6 +73,7 @@ export function defaultCriterionFor(scaleGroup: string): MatchCriterion {
 function nutrientPer100g(c: EquivalentCandidate, criterion: MatchCriterion): number {
   if (criterion === "protein") return c.proteinPer100g;
   if (criterion === "carb") return c.carbPer100g;
+  if (criterion === "fat") return c.fatPer100g;
   return c.kcalPer100g;
 }
 
@@ -107,6 +110,7 @@ export function calculateEquivalentQty(
   return {
     foodKey: candidate.foodKey,
     name: candidate.name,
+    scaleGroup: candidate.scaleGroup,
     qty: rounded,
     unit: candidate.unit,
     kcal: Math.round(candidate.kcalPer100g * factor),
