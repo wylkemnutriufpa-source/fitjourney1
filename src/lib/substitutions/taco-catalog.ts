@@ -698,6 +698,39 @@ for (const c of tacoCatalog) {
 }
 
 /**
+ * Aliases de foodKeys legados (templates antigos e smart-seeds) → foodKey canônico
+ * do catálogo TACO. Não muda regras estruturais: apenas garante que o motor de
+ * substituições encontre a âncora correta para itens cujo `foodKey` foi escrito
+ * como nome composto ("omelete", "peixe-com-legumes") em vez do ingrediente base.
+ */
+const FOODKEY_ALIASES: Record<string, string> = {
+  // Ovo (variações de preparo da mesma proteína)
+  omelete: "ovo-galinha",
+  "ovos-mexidos": "ovo-galinha",
+  "ovos-cozidos": "ovo-galinha",
+  "ovos-com-bacon": "ovo-galinha",
+  "panqueca-proteica": "ovo-galinha",
+  // Tapioca (recheios variam, base é a mesma)
+  crepioca: "tapioca",
+  "tapioca-com-queijo": "tapioca",
+  // Aveia / banana / frutas
+  "mingau-de-aveia": "aveia-flocos",
+  "banana-com-aveia": "banana",
+  "vitamina-de-fruta": "banana",
+  "frutas-vermelhas": "morango",
+  "smoff-de-frutas": "morango",
+  // Carbos compostos
+  "macarronada-de-camarao": "macarrao-espaguete",
+  "torrada-integral": "pao-integral",
+  "pao-de-queijo": "pao-frances",
+  "pupunha-com-cafe": "macaxeira",
+  // Proteínas (corte/preparo da mesma família)
+  "peixe-com-legumes": "tilapia-file",
+  picanha: "contrafile-bovino",
+  acem: "patinho-bovino",
+};
+
+/**
  * Versão pura: resolve um item para o candidato correspondente dentro de
  * uma lista de candidatos fornecida (ex: catálogo carregado do Cloud).
  * Sprint 6 A.4.3.
@@ -710,6 +743,11 @@ export function findCandidateIn(
   if (input.foodKey) {
     const hit = candidates.find((c) => c.foodKey === input.foodKey && groupOk(c));
     if (hit) return hit;
+    const aliased = FOODKEY_ALIASES[input.foodKey];
+    if (aliased) {
+      const aliasHit = candidates.find((c) => c.foodKey === aliased && groupOk(c));
+      if (aliasHit) return aliasHit;
+    }
   }
   const norm = normalizeTacoName(input.name);
   if (!norm) return null;
@@ -763,6 +801,11 @@ export function findTacoCandidate(input: {
   if (input.foodKey) {
     const hit = indexByFoodKey.get(input.foodKey);
     if (hit) return hit;
+    const aliased = FOODKEY_ALIASES[input.foodKey];
+    if (aliased) {
+      const aliasHit = indexByFoodKey.get(aliased);
+      if (aliasHit) return aliasHit;
+    }
   }
   const norm = normalizeTacoName(input.name);
   if (!norm) return null;
