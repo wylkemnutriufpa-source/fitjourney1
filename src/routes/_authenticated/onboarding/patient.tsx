@@ -23,17 +23,23 @@ function PatientOnboardingPage() {
   const [step, setStep] = useState<"consent" | "anamnesis">("consent");
   const [lgpd, setLgpd] = useState(false);
   const [clinical, setClinical] = useState(false);
+  const [phone, setPhone] = useState("");
   const [savingConsent, setSavingConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const phoneValid = isValidPhoneBR(phone);
+
   async function handleConsent() {
-    if (!lgpd || !clinical) return;
+    if (!lgpd || !clinical || !phoneValid) return;
     setSavingConsent(true);
     setError(null);
     try {
       await recordConsent({
-        data: { consentTypes: ["lgpd", "clinical_data"] },
+        data: {
+          consentTypes: ["lgpd", "clinical_data"],
+          phoneE164: normalizePhoneE164(phone),
+        },
       });
       setStep("anamnesis");
     } catch (e) {
