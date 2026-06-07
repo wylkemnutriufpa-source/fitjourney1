@@ -558,7 +558,7 @@ function Landing() {
         <section id="features" className="py-28 px-4 relative noise-overlay">
           <div className="max-w-7xl mx-auto relative z-10">
             <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-12">
-              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.features.eyebrow}</span>
+              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 border border-[var(--gold)]/40 uppercase tracking-widest">{c.features.eyebrow}</span>
               <h2 className="font-display text-3xl md:text-5xl font-bold mb-5">
                 {c.features.title_line1}<br className="hidden md:block" />{" "}
                 <span className="text-gradient-animated">{c.features.title_line2}</span>
