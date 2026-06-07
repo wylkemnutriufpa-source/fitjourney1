@@ -188,8 +188,9 @@ function Landing() {
   const { data } = useQuery<LandingContent>({
     queryKey: ["landing-content"],
     queryFn: fetchLandingContent,
-    initialData: DEFAULT_LANDING_CONTENT,
-    staleTime: 60_000,
+    placeholderData: DEFAULT_LANDING_CONTENT,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
   const c = data ?? DEFAULT_LANDING_CONTENT;
 
