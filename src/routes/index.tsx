@@ -267,7 +267,7 @@ html { scroll-behavior: smooth; }
 .fj-vis-img img { width: 100%; height: auto; display: block; }
 .fj-vis-body { padding: 0 4px; }
 .fj-vis-tag { font-family: var(--mono); font-size: .65rem; letter-spacing: .3em; color: var(--neon); text-transform: uppercase; margin-bottom: 14px; }
-.fj-vis-title { font-family: var(--syne); font-size: 1.6rem; font-weight: 800; color: white; line-height: 1.15; margin-bottom: 14px; }
+.fj-vis-title { font-family: var(--syne); font-size: 1.6rem; font-weight: 800; color: var(--forest-deep); line-height: 1.15; margin-bottom: 14px; }
 @media (min-width: 1024px) { .fj-vis-title { font-size: 2.2rem; } }
 .fj-vis-desc { font-size: .9rem; color: var(--muted); line-height: 1.7; }
 `;
