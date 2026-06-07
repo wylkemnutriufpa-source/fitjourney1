@@ -288,7 +288,7 @@ html { scroll-behavior: smooth; }
 `;
 
 function LandingPage() {
-  useEffect(() => {
+  const [contactOpen, setContactOpen] = useState(false);
     // Carrega fontes
     const fontLink = document.createElement("link");
     fontLink.rel = "stylesheet";
