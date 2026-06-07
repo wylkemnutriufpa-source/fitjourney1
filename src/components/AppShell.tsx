@@ -477,6 +477,9 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         <main className="mx-auto max-w-7xl overflow-x-hidden p-3 sm:p-8">{children ?? <Outlet />}</main>
       </div>
       <TrialPaywall />
+      {!isPatient && (
+        <GlobalSearchDialog open={searchOpen} onOpenChange={setSearchOpen} isAdmin={isAdmin} />
+      )}
     </div>
   );
 }
