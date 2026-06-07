@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { LogoOrbital } from "@/components/LogoOrbital";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,13 +29,14 @@ const CSS = `
   --dark: #081208;
   --panel: #0C1A0C;
   --card: #101E10;
-  --neon: #00FF6A;
-  --neon-dim: rgba(0,255,106,0.12);
-  --neon-glow: rgba(0,255,106,0.08);
+  --neon: #2EE07A;
+  --neon-dim: rgba(46,224,122,0.12);
+  --neon-glow: rgba(46,224,122,0.08);
   --silver: #C0D4C0;
   --muted: #527052;
-  --border: rgba(0,255,106,0.12);
-  --border-dim: rgba(0,255,106,0.06);
+  --border: rgba(46,224,122,0.14);
+  --border-dim: rgba(46,224,122,0.07);
+  --silver-metal: linear-gradient(135deg, #f4f8f4 0%, #b8c8b8 45%, #6a7a6a 100%);
   --syne: 'Syne', sans-serif;
   --mono: 'IBM Plex Mono', monospace;
   --sans: 'IBM Plex Sans', sans-serif;
@@ -284,7 +286,10 @@ function LandingPage() {
       <div className="fj-grid-bg" />
 
       <nav className="fj-nav">
-        <div className="fj-nav-logo"><div className="fj-nav-dot" />FITJOURNEY</div>
+        <a href="/" className="fj-nav-logo" style={{ textDecoration: "none" }}>
+          <LogoOrbital sizePx={36} effect="orbit" />
+          <span style={{ background: "var(--silver-metal)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>FITJOURNEY</span>
+        </a>
         <div className="fj-nav-links">
           <a href="#capacidades">O que você faz</a>
           <a href="#inteligencia">Inteligência</a>
