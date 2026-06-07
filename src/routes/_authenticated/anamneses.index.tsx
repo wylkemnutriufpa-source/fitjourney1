@@ -3,10 +3,11 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ClipboardList, ChevronRight, AlertCircle } from "lucide-react";
-import { listAnamnesesForNutritionist } from "@/lib/anamnesis/review.functions";
+import { ClipboardList, ChevronRight, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { listAnamnesesForNutritionist, reviewAnamnesis } from "@/lib/anamnesis/review.functions";
 import { AppShell } from "@/components/AppShell";
 import { describeFlag } from "@/lib/anamnesis/v2/alerts.catalog";
 import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
@@ -44,11 +45,23 @@ function fmtDate(iso: string | null) {
 function AnamnesesQueuePage() {
   const [status, setStatus] = useState<StatusFilter>("submitted");
   const fetchList = useServerFn(listAnamnesesForNutritionist);
+  const reviewFn = useServerFn(reviewAnamnesis);
+  const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["nutri", "anamneses", status],
     queryFn: () => fetchList({ data: { status } }),
     staleTime: 15_000,
+  });
+
+  const approveMut = useMutation({
+    mutationFn: (anamnesisId: string) =>
+      reviewFn({ data: { anamnesisId, decision: "approved" } }),
+    onSuccess: () => {
+      toast.success("Anamnese aprovada");
+      queryClient.invalidateQueries({ queryKey: ["nutri", "anamneses"] });
+    },
+    onError: (e: Error) => toast.error(e.message ?? "Falha ao aprovar"),
   });
 
   return (
@@ -112,11 +125,11 @@ function AnamnesesQueuePage() {
 
         <ul className="space-y-2">
           {(data?.items ?? []).map((item) => (
-            <li key={item.id}>
+                      <li key={item.id} className="relative">
               <Link
                 to="/anamneses/$id"
                 params={{ id: item.id }}
-                className="block rounded-lg border border-border hover:border-primary/50 transition-colors p-4"
+                className="block rounded-lg border border-border hover:border-primary/50 transition-colors p-4 pr-4 sm:pr-44"
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
@@ -183,6 +196,30 @@ function AnamnesesQueuePage() {
                   <ChevronRight className="size-4 text-muted-foreground shrink-0 mt-1" />
                 </div>
               </Link>
+              {(item.reviewStatus === "submitted" || item.reviewStatus === "needs_changes") && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (approveMut.isPending) return;
+                    const ok = window.confirm(
+                      `Aprovar a anamnese de ${item.patientName} (v${item.version})?\n\nA aprovação é imutável e dispara os alertas clínicos no app do paciente.`,
+                    );
+                    if (ok) approveMut.mutate(item.id);
+                  }}
+                  disabled={approveMut.isPending && approveMut.variables === item.id}
+                  className="absolute top-3 right-3 sm:top-1/2 sm:-translate-y-1/2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                  aria-label={`Aprovar anamnese de ${item.patientName}`}
+                >
+                  {approveMut.isPending && approveMut.variables === item.id ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="size-3.5" />
+                  )}
+                  Aprovar
+                </button>
+              )}
             </li>
           ))}
         </ul>
