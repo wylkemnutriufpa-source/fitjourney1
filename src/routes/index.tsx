@@ -543,6 +543,12 @@ function Landing() {
       {/* ══════════ FEATURES ══════════ */}
       {c.features.visible && (
         <section id="features" className="py-28 px-4 relative noise-overlay">
+          <div className="max-w-3xl mx-auto mb-16">
+            <div className="fj-inline-reel">
+              <video src={reel2.url} autoPlay muted loop playsInline preload="metadata" />
+              <span className="fj-inline-reel-mask" aria-hidden />
+            </div>
+          </div>
           <div className="max-w-7xl mx-auto relative z-10">
             <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
               <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.features.eyebrow}</span>
