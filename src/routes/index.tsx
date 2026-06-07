@@ -336,7 +336,7 @@ function LandingPage() {
 
       <nav className="fj-nav">
         <a href="/" className="fj-nav-logo" style={{ textDecoration: "none" }}>
-          <LogoOrbital sizePx={36} effect="orbit" />
+          <LogoOrbital sizePx={64} effect="orbit" slot="landing-header" />
           <span style={{ background: "var(--silver-metal)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>FITJOURNEY</span>
         </a>
         <div className="fj-nav-links">
