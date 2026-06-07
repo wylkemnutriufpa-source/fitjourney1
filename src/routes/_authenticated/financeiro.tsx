@@ -205,7 +205,7 @@ function Kpi({
         <Icon className="size-3" />
         {label}
       </div>
-      <p className="text-2xl font-bold tracking-tight">{value}</p>
+      <p className="text-xl font-bold tracking-tight truncate">{value}</p>
       {hint && <p className="text-[10px] text-muted-foreground">{hint}</p>}
     </div>
   );
