@@ -624,11 +624,6 @@ function LandingPage() {
         <p className="fj-ms fj-reveal">Uma nova geração de acompanhamento nutricional, onde tecnologia, ciência e prática clínica trabalham juntas para acelerar transformações corporais de forma segura e sustentável — com você no controle.</p>
       </section>
 
-      {/* CTA FINAL */}
-      <section className="fj-final">
-        <h2 className="fj-f-h2 fj-reveal">
-          Mais ciência.<br />Mais estratégia.<br /><span className="neon">Mais resultado real.</span>
-        </h2>
 
       {/* CTA FINAL */}
       <section className="fj-final">
