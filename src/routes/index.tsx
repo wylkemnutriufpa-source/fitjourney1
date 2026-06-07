@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { LogoOrbital } from "@/components/LogoOrbital";
+import reel1 from "@/assets/reels/reel-1.mp4.asset.json";
+import reel2 from "@/assets/reels/reel-2.mp4.asset.json";
+import reel3 from "@/assets/reels/reel-3.mp4.asset.json";
+import reel4 from "@/assets/reels/reel-4.mp4.asset.json";
+import imgEvolucao from "@/assets/reels/evolucao-pratica.png.asset.json";
+import imgDuradouras from "@/assets/reels/mudancas-duradouras.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -221,6 +227,29 @@ html { scroll-behavior: smooth; }
 
 .fj-reveal { opacity: 0; transform: translateY(22px); transition: opacity .8s ease, transform .8s ease; }
 .fj-reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* Reels showcase */
+.fj-reels-sec { padding: 80px 24px; position: relative; overflow: hidden; }
+@media (min-width: 1024px) { .fj-reels-sec { padding: 120px 56px; } }
+.fj-reels-strip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 36px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+@media (min-width: 768px) { .fj-reels-strip { grid-template-columns: repeat(4, 1fr); gap: 18px; } }
+.fj-reel { position: relative; aspect-ratio: 9 / 16; border-radius: 18px; overflow: hidden; border: 1px solid var(--border); background: var(--card); box-shadow: 0 20px 60px -30px rgba(46,224,122,0.35), inset 0 0 0 1px rgba(192,212,192,0.04); transition: transform .4s ease, box-shadow .4s ease, border-color .4s ease; }
+.fj-reel:hover { transform: translateY(-4px); border-color: rgba(46,224,122,0.35); box-shadow: 0 30px 80px -30px rgba(46,224,122,0.55); }
+.fj-reel video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fj-reel::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 60%, rgba(4,10,4,0.55) 100%); }
+.fj-reel-corner { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: .55rem; letter-spacing: .25em; color: var(--silver); background: rgba(4,10,4,0.65); backdrop-filter: blur(8px); padding: 5px 9px; border-radius: 6px; border: 1px solid var(--border); z-index: 2; }
+
+/* Visual showcase image */
+.fj-vis-row { display: grid; grid-template-columns: 1fr; gap: 22px; margin-top: 28px; align-items: center; }
+@media (min-width: 1024px) { .fj-vis-row { grid-template-columns: 1.1fr 1fr; gap: 40px; } .fj-vis-row.reverse > :first-child { order: 2; } }
+.fj-vis-img { width: 100%; border-radius: 18px; overflow: hidden; border: 1px solid var(--border); background: var(--card); box-shadow: 0 30px 80px -40px rgba(46,224,122,0.4); position: relative; }
+.fj-vis-img::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 40%, rgba(192,212,192,0.06) 60%, transparent 80%); pointer-events: none; z-index: 1; }
+.fj-vis-img img { width: 100%; height: auto; display: block; }
+.fj-vis-body { padding: 0 4px; }
+.fj-vis-tag { font-family: var(--mono); font-size: .65rem; letter-spacing: .3em; color: var(--neon); text-transform: uppercase; margin-bottom: 14px; }
+.fj-vis-title { font-family: var(--syne); font-size: 1.6rem; font-weight: 800; color: white; line-height: 1.15; margin-bottom: 14px; }
+@media (min-width: 1024px) { .fj-vis-title { font-size: 2.2rem; } }
+.fj-vis-desc { font-size: .9rem; color: var(--muted); line-height: 1.7; }
 `;
 
 function LandingPage() {
@@ -418,6 +447,25 @@ function LandingPage() {
         <h2 className="fj-s-h2 fj-reveal">Veja o corpo do seu paciente<br /><span className="neon">evoluindo semana a semana.</span></h2>
         <p className="fj-s-sub fj-reveal">Gráficos de progresso, medições precisas, marcos visíveis e projeção futura. Dados que tornam a evolução concreta.</p>
 
+        <div className="fj-vis-row fj-reveal">
+          <div className="fj-vis-img"><img src={imgEvolucao.url} alt="Evolução da prática clínica — de prescritor reativo a gestor estratégico do metabolismo" /></div>
+          <div className="fj-vis-body">
+            <div className="fj-vis-tag">// A evolução da prática clínica</div>
+            <div className="fj-vis-title">Você não entrega dietas.<br/>Você conduz transformações <span className="neon">metabólicas</span>.</div>
+            <p className="fj-vis-desc">Deixa de ser prescritor reativo. Passa a ser gestor estratégico do metabolismo. Utiliza inteligência clínica para decisões precisas, conduz transformações corporais mensuráveis — e amplifica sua autoridade clínica por tecnologia.</p>
+          </div>
+        </div>
+
+        <div className="fj-vis-row fj-reveal reverse" style={{ marginTop: 36 }}>
+          <div className="fj-vis-body">
+            <div className="fj-vis-tag">// Resultados sustentáveis</div>
+            <div className="fj-vis-title">Não buscamos mudanças rápidas.<br/>Buscamos <span className="neon">mudanças duradouras</span>.</div>
+            <p className="fj-vis-desc">Construção de hábitos saudáveis, mudanças duradouras e reais, foco em constância, sem efeito rebote. Transformação para a vida toda — para o paciente, e para a sua reputação clínica.</p>
+          </div>
+          <div className="fj-vis-img"><img src={imgDuradouras.url} alt="Não buscamos mudanças rápidas. Buscamos mudanças duradouras." /></div>
+        </div>
+
+
         <div className="fj-evolution-grid fj-reveal">
           <div className="fj-evo-card wide">
             <div>
@@ -562,6 +610,30 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* REELS SHOWCASE */}
+      <section className="fj-reels-sec">
+        <div className="fj-s-tag">Em movimento</div>
+        <h2 className="fj-s-h2 fj-reveal" style={{ textAlign: "center", marginBottom: 14 }}>
+          A plataforma<br /><span className="neon">em ação.</span>
+        </h2>
+        <p className="fj-s-sub fj-reveal" style={{ textAlign: "center" }}>
+          Veja como o FitJourney transforma a prática clínica e a experiência do paciente — em quatro cenas reais.
+        </p>
+        <div className="fj-reels-strip fj-reveal">
+          {[
+            { src: reel1.url, label: "// 01 · Protocolo" },
+            { src: reel2.url, label: "// 02 · Inteligência" },
+            { src: reel3.url, label: "// 03 · Evolução" },
+            { src: reel4.url, label: "// 04 · Paciente" },
+          ].map((r) => (
+            <div className="fj-reel" key={r.label}>
+              <span className="fj-reel-corner">{r.label}</span>
+              <video src={r.src} autoPlay muted loop playsInline preload="metadata" />
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* MANIFESTO FINAL */}
       <section className="fj-manifesto">
         <div className="fj-mq fj-reveal">
@@ -570,6 +642,7 @@ function LandingPage() {
         </div>
         <p className="fj-ms fj-reveal">Uma nova geração de acompanhamento nutricional, onde tecnologia, ciência e prática clínica trabalham juntas para acelerar transformações corporais de forma segura e sustentável — com você no controle.</p>
       </section>
+
 
       {/* CTA FINAL */}
       <section className="fj-final">
