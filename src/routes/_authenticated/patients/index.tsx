@@ -242,21 +242,27 @@ function Patients() {
             return (
               <div
                 key={p.id}
-                className={"rounded-lg border border-border bg-surface p-4 space-y-4 " + (!p.isActive ? "opacity-60" : "")}
+                className="rounded-lg border border-border bg-surface p-4 space-y-4"
               >
-                <Link to="/patients/$id" params={{ id: p.id }} className="flex min-w-0 items-start gap-3">
+                <Link to="/patients/$id" params={{ id: p.id }} className={"flex min-w-0 items-start gap-3 " + (!p.isActive ? "opacity-60" : "")}>
                   <div className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-background text-[10px] font-mono">
                     {initialsFromName(p.fullName)}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{p.fullName}</p>
                     <p className="truncate text-xs font-mono text-muted-foreground">{p.email}</p>
+                    {p.phone && (
+                      <p className="mt-0.5 flex items-center gap-1 truncate text-xs font-mono text-muted-foreground">
+                        <Phone className="size-3 shrink-0" />
+                        {maskPhoneBR(p.phone)}
+                      </p>
+                    )}
                     <p className="mt-1 text-[10px] font-mono uppercase text-muted-foreground">
                       Cadastro {formatDate(p.createdAt)}
                     </p>
                   </div>
                 </Link>
-                <div className="flex flex-wrap gap-2">
+                <div className={"flex flex-wrap gap-2 " + (!p.isActive ? "opacity-60" : "")}>
                   <span className={`inline-flex items-center gap-1.5 rounded-full border border-border px-2 py-1 text-[10px] font-mono uppercase ${statusMeta.cls}`}>
                     <span className={`size-1.5 rounded-full ${statusMeta.dot}`} />
                     {statusMeta.label}
@@ -275,7 +281,12 @@ function Patients() {
                     type="button"
                     disabled={activeMutation.isPending}
                     onClick={() => activeMutation.mutate({ patientId: p.id, isActive: !p.isActive })}
-                    className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground disabled:opacity-50"
+                    className={
+                      "flex min-h-10 items-center justify-center gap-2 rounded-md border text-xs font-semibold disabled:opacity-50 " +
+                      (p.isActive
+                        ? "border-border text-foreground hover:border-primary/40 hover:text-primary"
+                        : "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10")
+                    }
                   >
                     <Power className="size-4" />
                     {p.isActive ? "Inativar" : "Reativar"}
@@ -354,7 +365,7 @@ function Patients() {
                     </Link>
                   </td>
                   <td className="p-4 font-mono text-muted-foreground hidden md:table-cell">
-                    {p.phone ?? "Sem telefone"}
+                    {p.phone ? maskPhoneBR(p.phone) : "Sem telefone"}
                   </td>
                   <td className="p-4 font-mono text-muted-foreground hidden lg:table-cell">
                     {formatDate(p.createdAt)}

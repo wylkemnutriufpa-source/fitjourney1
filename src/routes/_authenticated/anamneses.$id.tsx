@@ -128,7 +128,7 @@ function AnamnesisDetailPage() {
               {data.patient.phone && (
                 <span className="flex items-center gap-1.5">
                   <Phone className="size-3.5" />
-                  {data.patient.phone}
+                  {maskPhoneBR(data.patient.phone)}
                 </span>
               )}
             </div>
