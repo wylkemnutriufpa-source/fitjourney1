@@ -631,6 +631,13 @@ function Landing() {
               </motion.div>
             ))}
           </div>
+
+          <div className="max-w-3xl mx-auto mt-20">
+            <div className="fj-inline-reel">
+              <video src={reel3.url} autoPlay muted loop playsInline preload="metadata" />
+              <span className="fj-inline-reel-mask" aria-hidden />
+            </div>
+          </div>
         </div>
       </section>
 
