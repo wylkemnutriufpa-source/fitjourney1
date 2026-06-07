@@ -61,7 +61,10 @@ export const exportMyPatientData = createServerFn({ method: "POST" })
         supabase.from("plans").select("*").eq("patient_id", patient.id),
         supabase.from("patient_feedbacks").select("*").eq("patient_id", patient.id),
         supabase.from("physical_assessments").select("*").eq("patient_id", patient.id),
-        supabase.from("patient_consents").select("*").eq("patient_id", patient.id),
+        supabase
+          .from("patient_consents")
+          .select("id, consent_type, consent_version, accepted_at, anamnesis_id, user_agent")
+          .eq("patient_id", patient.id),
         supabase.from("patient_subscriptions").select("*").eq("patient_id", patient.id),
       ]);
 
