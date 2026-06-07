@@ -18,7 +18,9 @@ import {
   Sun,
   Moon,
   Monitor,
+  Search,
 } from "lucide-react";
+import { GlobalSearchDialog } from "@/components/layout/GlobalSearchDialog";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
@@ -194,6 +196,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   });
   const [mounted, setMounted] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     __sidebarOpenCache = sidebarOpen;
@@ -419,6 +422,17 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
+            {!isPatient && (
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                title="Buscar (pacientes e atalhos)"
+                aria-label="Abrir busca global"
+                className="grid size-10 place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+              >
+                <Search className="size-4" />
+              </button>
+            )}
             <ThemeToggle />
             {header}
             <div className="text-right hidden sm:block">
