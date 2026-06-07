@@ -835,7 +835,10 @@ const FOODKEY_ALIASES: Record<string, string> = {
   // Carbos compostos
   "macarronada-de-camarao": "macarrao-espaguete",
   "torrada-integral": "pao-integral",
-  "pao-de-queijo": "pao-frances",
+  "pao-de-queijo": "pao-queijo",
+  "iogurte-com-granola": "iogurte-natural",
+  "iogurte-com-ganola": "iogurte-natural",
+  "iogurte-com-fruta": "iogurte-natural",
   "pupunha-com-cafe": "macaxeira",
   // Proteínas (corte/preparo da mesma família)
   "peixe-com-legumes": "tilapia-file",
