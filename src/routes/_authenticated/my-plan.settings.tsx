@@ -21,6 +21,10 @@ import { maskPhoneBR } from "@/lib/phone-mask";
 export const Route = createFileRoute("/_authenticated/my-plan/settings")({
   head: () => ({ meta: [{ title: "Minha conta — FitJourney" }] }),
   component: PatientSettings,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 const inputCls =

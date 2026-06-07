@@ -14,6 +14,10 @@ import type { Answers } from "@/lib/anamnesis/v2/catalog/types";
 export const Route = createFileRoute("/_authenticated/my-plan/update-health-profile")({
   head: () => ({ meta: [{ title: "Atualizar Perfil de Saúde — FitJourney" }] }),
   component: UpdateHealthProfilePage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 function UpdateHealthProfilePage() {

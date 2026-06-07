@@ -11,6 +11,10 @@ import { listMyPhysicalAssessments } from "@/lib/physical-assessments/physical-a
 export const Route = createFileRoute("/_authenticated/my-plan/physical-assessment")({
   head: () => ({ meta: [{ title: "Avaliação Física — FitJourney" }] }),
   component: MyPhysicalAssessmentPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 function fmt(v: number | null, unit = "", digits = 1): string {

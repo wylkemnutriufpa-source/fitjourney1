@@ -46,6 +46,10 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/my-plan/feedback")({
   head: () => ({ meta: [{ title: "Feedback — FitJourney" }] }),
   component: FeedbackPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 type Tab = "novo" | "historico" | "evolucao";
