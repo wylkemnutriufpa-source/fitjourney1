@@ -557,9 +557,9 @@ function TemplatesPage() {
           </div>
           <Button
             onClick={() => setPlanModeOpen(true)}
-            className="gap-1.5 self-start sm:self-auto shrink-0"
+            className="gap-1.5 self-start sm:self-auto shrink-0 bg-emerald-600/90 hover:bg-emerald-500 text-white border border-emerald-500/40"
           >
-            <Plus className="size-3.5" /> <span className="sm:hidden">Novo</span><span className="hidden sm:inline">Plano do zero</span>
+            <Plus className="size-3.5" /> <span className="sm:hidden">Novo</span><span className="hidden sm:inline">Plano com Smart-templates</span>
           </Button>
           <PlanModeDialog
             open={planModeOpen}
