@@ -15,6 +15,10 @@ export const CONSENT_VERSION = "lgpd-v1.2026-05" as const;
 // ---------- recordConsent ----------
 const ConsentInput = z.object({
   consentTypes: z.array(z.enum(["lgpd", "clinical_data"])).min(1).max(2),
+  phoneE164: z
+    .string()
+    .regex(/^\+\d{12,13}$/, "Telefone inválido")
+    .optional(),
 });
 
 export const recordPatientConsent = createServerFn({ method: "POST" })
@@ -24,7 +28,7 @@ export const recordPatientConsent = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: patient, error: pErr } = await supabase
       .from("patients")
-      .select("id")
+      .select("id, phone")
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (pErr) throw new Error(pErr.message);
@@ -37,6 +41,16 @@ export const recordPatientConsent = createServerFn({ method: "POST" })
     }));
     const { error } = await supabase.from("patient_consents").insert(rows);
     if (error) throw new Error(error.message);
+
+    // Salva telefone se enviado e ainda não existe (não sobrescreve)
+    if (data.phoneE164 && (!patient.phone || patient.phone.trim() === "")) {
+      const { error: upErr } = await supabase
+        .from("patients")
+        .update({ phone: data.phoneE164 })
+        .eq("id", patient.id);
+      if (upErr) throw new Error(upErr.message);
+    }
+
     return { ok: true, patientId: patient.id };
   });
 
