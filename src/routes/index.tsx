@@ -93,7 +93,7 @@ html { scroll-behavior: smooth; }
 .fj-hero-radial { position: absolute; top: -10%; right: -5%; width: 700px; height: 700px; background: radial-gradient(circle, rgba(0,255,106,.05) 0%, transparent 70%); pointer-events: none; }
 .fj-hero-tag { font-family: var(--mono); font-size: .65rem; letter-spacing: .16em; text-transform: uppercase; color: var(--neon); margin-bottom: 28px; display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
 .fj-hero-tag::before { content: ''; width: 28px; height: 1px; background: var(--neon); box-shadow: 0 0 6px var(--neon); }
-.fj-hero-h1 { font-family: var(--syne); font-size: clamp(2.5rem,6vw,6.5rem); font-weight: 800; line-height: .95; letter-spacing: -.03em; color: white; margin-bottom: 36px; max-width: 960px; position: relative; z-index: 1; }
+.fj-hero-h1 { font-family: var(--syne); font-size: clamp(2.5rem,6vw,6.5rem); font-weight: 800; line-height: .95; letter-spacing: -.03em; color: var(--forest-deep); margin-bottom: 36px; max-width: 960px; position: relative; z-index: 1; }
 .fj-hero-h1 .neon { color: var(--neon); text-shadow: 0 0 48px rgba(0,255,106,.45); }
 .fj-hero-h1 .dim { color: var(--muted); }
 .fj-hero-sub { font-size: 1.05rem; color: var(--silver); opacity: .65; max-width: 580px; line-height: 1.8; margin-bottom: 56px; position: relative; z-index: 1; }
@@ -116,7 +116,7 @@ html { scroll-behavior: smooth; }
 @media (min-width: 1024px) { .fj-s { padding: 110px 56px; } }
 .fj-s-tag { font-family: var(--mono); font-size: .62rem; color: var(--neon); letter-spacing: .16em; text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
 .fj-s-tag::before { content: '//'; color: var(--muted); }
-.fj-s-h2 { font-family: var(--syne); font-size: clamp(2rem,4vw,3.8rem); font-weight: 800; line-height: 1.05; letter-spacing: -.03em; color: white; margin-bottom: 18px; }
+.fj-s-h2 { font-family: var(--syne); font-size: clamp(2rem,4vw,3.8rem); font-weight: 800; line-height: 1.05; letter-spacing: -.03em; color: var(--forest-deep); margin-bottom: 18px; }
 .fj-s-h2 .neon { color: var(--neon); }
 .fj-s-sub { font-size: .95rem; color: var(--muted); max-width: 540px; line-height: 1.8; margin-bottom: 60px; }
 
@@ -215,14 +215,14 @@ html { scroll-behavior: smooth; }
 .fj-manifesto { padding: 80px 24px; text-align: center; position: relative; overflow: hidden; }
 @media (min-width: 1024px) { .fj-manifesto { padding: 100px 56px; } }
 .fj-manifesto::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,255,106,.05) 0%, transparent 70%); pointer-events: none; }
-.fj-mq { font-family: var(--syne); font-size: clamp(1.6rem,4vw,3.6rem); font-weight: 800; line-height: 1.12; letter-spacing: -.03em; color: white; max-width: 900px; margin: 0 auto 24px; position: relative; z-index: 1; }
+.fj-mq { font-family: var(--syne); font-size: clamp(1.6rem,4vw,3.6rem); font-weight: 800; line-height: 1.12; letter-spacing: -.03em; color: var(--forest-deep); max-width: 900px; margin: 0 auto 24px; position: relative; z-index: 1; }
 .fj-mq .neon { color: var(--neon); text-shadow: 0 0 40px rgba(0,255,106,.4); }
 .fj-ms { font-family: var(--mono); font-size: .78rem; color: var(--muted); letter-spacing: .06em; position: relative; z-index: 1; max-width: 480px; margin: 0 auto; line-height: 1.9; }
 
 .fj-final { padding: 100px 24px; text-align: center; position: relative; overflow: hidden; border-top: 1px solid var(--border-dim); }
 @media (min-width: 1024px) { .fj-final { padding: 140px 56px; } }
 .fj-final::before { content: ''; position: absolute; top: -40%; left: 50%; transform: translateX(-50%); width: 700px; height: 700px; background: radial-gradient(circle, rgba(0,255,106,.06) 0%, transparent 70%); pointer-events: none; }
-.fj-f-h2 { font-family: var(--syne); font-size: clamp(2rem,5.5vw,5.5rem); font-weight: 800; line-height: .98; letter-spacing: -.04em; color: white; max-width: 820px; margin: 0 auto 24px; position: relative; z-index: 1; }
+.fj-f-h2 { font-family: var(--syne); font-size: clamp(2rem,5.5vw,5.5rem); font-weight: 800; line-height: .98; letter-spacing: -.04em; color: var(--forest-deep); max-width: 820px; margin: 0 auto 24px; position: relative; z-index: 1; }
 .fj-f-h2 .neon { color: var(--neon); text-shadow: 0 0 48px rgba(0,255,106,.5); }
 .fj-f-sub { font-family: var(--mono); font-size: .78rem; color: var(--muted); letter-spacing: .06em; max-width: 400px; margin: 0 auto 48px; line-height: 1.9; position: relative; z-index: 1; }
 .fj-f-acts { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; position: relative; z-index: 1; }
@@ -233,7 +233,7 @@ html { scroll-behavior: smooth; }
 @media (min-width: 1024px) { .fj-footer { padding: 60px 56px 36px; } }
 .fj-ft { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--border-dim); }
 @media (min-width: 1024px) { .fj-ft { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 48px; } }
-.fj-fl { font-family: var(--syne); font-size: 1rem; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.fj-fl { font-family: var(--syne); font-size: 1rem; font-weight: 800; color: var(--forest-deep); display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .fj-fl-dot { width: 6px; height: 6px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 6px var(--neon); }
 .fj-fd { font-size: .78rem; color: var(--muted); line-height: 1.8; max-width: 210px; }
 .fj-fc-t { font-family: var(--mono); font-size: .6rem; color: var(--neon); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; }
@@ -267,7 +267,7 @@ html { scroll-behavior: smooth; }
 .fj-vis-img img { width: 100%; height: auto; display: block; }
 .fj-vis-body { padding: 0 4px; }
 .fj-vis-tag { font-family: var(--mono); font-size: .65rem; letter-spacing: .3em; color: var(--neon); text-transform: uppercase; margin-bottom: 14px; }
-.fj-vis-title { font-family: var(--syne); font-size: 1.6rem; font-weight: 800; color: white; line-height: 1.15; margin-bottom: 14px; }
+.fj-vis-title { font-family: var(--syne); font-size: 1.6rem; font-weight: 800; color: var(--forest-deep); line-height: 1.15; margin-bottom: 14px; }
 @media (min-width: 1024px) { .fj-vis-title { font-size: 2.2rem; } }
 .fj-vis-desc { font-size: .9rem; color: var(--muted); line-height: 1.7; }
 `;
@@ -336,7 +336,7 @@ function LandingPage() {
 
       <nav className="fj-nav">
         <a href="/" className="fj-nav-logo" style={{ textDecoration: "none" }}>
-          <LogoOrbital sizePx={36} effect="orbit" />
+          <LogoOrbital sizePx={64} effect="orbit" slot="landing-header" />
           <span style={{ background: "var(--silver-metal)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>FITJOURNEY</span>
         </a>
         <div className="fj-nav-links">
