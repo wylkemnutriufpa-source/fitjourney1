@@ -245,7 +245,7 @@ function PatientProfile() {
               <Link
                 to="/patients/$id/diet"
                 params={{ id: p.id }}
-                className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-emerald-500/40 px-3 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/10"
+                className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
               >
                 <Eye className="size-3.5" />
                 Ver plano vigente
@@ -253,16 +253,16 @@ function PatientProfile() {
             )}
             <Link
               to="/templates"
-              search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
-              className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-emerald-500/30 px-3 py-2 text-xs font-semibold text-emerald-300/90 hover:bg-emerald-500/10 hover:border-emerald-500/50"
+              search={{ patientId: p.id, patientName: p.fullName }}
+              className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
             >
               <Sparkles className="size-3.5" />
               Plano com Smart-templates
             </Link>
             <Link
               to="/templates"
-              search={{ patientId: p.id, patientName: p.fullName }}
-              className="flex min-h-10 items-center justify-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-500"
+              search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
+              className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
             >
               <FileText className="size-3.5" />
               {hasPublishedPlan ? "Novo plano com IA" : "Plano com IA FitJourney"}
