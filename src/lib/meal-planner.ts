@@ -597,6 +597,37 @@ function normalizePlannerMealOption(option: PlannerMealOption): PlannerMealOptio
   };
 }
 
+type MealKind = "main-meal" | "snack" | "other";
+
+function classifyMealLabel(label: string | undefined): MealKind {
+  if (!label) return "other";
+  if (/almo[çc]o|jantar/i.test(label)) return "main-meal";
+  if (/caf[eé]|lanche|ceia|desjejum/i.test(label)) return "snack";
+  return "other";
+}
+
+const ACCOMPANIMENT_KEYS = new Set([
+  "feijao-cozido",
+  "salada-verde-livre",
+  "fruta-sobremesa",
+  "arroz-cozido",
+]);
+
+function isAccompanimentItem(item: PlannerFoodItem): boolean {
+  if (ACCOMPANIMENT_KEYS.has(item.foodKey)) return true;
+  return /feij[ãa]o|salada|fruta\s*(de\s*sobremesa)?|à\s*vontade/i.test(item.name);
+}
+
+function pickAnchorIndex(items: PlannerFoodItem[], mealKind: MealKind): number {
+  if (items.length === 0) return -1;
+  if (mealKind === "main-meal") {
+    const idx = items.findIndex((i) => i.scaleGroup === "protein" && !isAccompanimentItem(i));
+    return idx;
+  }
+  if (mealKind === "snack") return 0;
+  return -1;
+}
+
 function materializeItemEquivalents(item: PlannerFoodItem): PlannerFoodItem {
   if (item.materializedEquivalents) return item;
   const mat = recalcMaterializedEquivalents({
@@ -608,9 +639,15 @@ function materializeItemEquivalents(item: PlannerFoodItem): PlannerFoodItem {
   return mat ? { ...item, materializedEquivalents: mat } : item;
 }
 
-function materializeOptionEquivalents(opt: PlannerMealOption): PlannerMealOption {
-  return { ...opt, items: opt.items.map(materializeItemEquivalents) };
+function materializeOptionEquivalents(opt: PlannerMealOption, mealKind: MealKind = "other"): PlannerMealOption {
+  const anchorIdx = pickAnchorIndex(opt.items, mealKind);
+  if (anchorIdx < 0) return opt;
+  return {
+    ...opt,
+    items: opt.items.map((it, i) => (i === anchorIdx ? materializeItemEquivalents(it) : it)),
+  };
 }
+
 
 export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate): PlannerTemplate {
   const maybePlanner = template as PlannerTemplate;
