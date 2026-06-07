@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "../lib/auth-context";
 import { Toaster } from "@/components/ui/sonner";
 import { IntroOverlay } from "@/components/IntroOverlay";
+import { CookieBanner } from "@/components/CookieBanner";
 
 const fallbackQueryClient = new QueryClient();
 
@@ -136,6 +137,7 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <IntroOverlay />
+        <CookieBanner />
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
