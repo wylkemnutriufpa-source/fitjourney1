@@ -30,6 +30,7 @@ const CATEGORY_FALLBACKS: Array<{ match: RegExp; key: string }> = [
   { match: /melancia/i, key: "melancia" },
   { match: /melao|mel[aã]o/i, key: "melao" },
   // Bovinos
+  { match: /carne\s*mo[ií]da|picadinho|moida|moído/i, key: "carne-moida" },
   { match: /(contrafil[eé]|patinho|alcatra|coxao|m[uú]sculo|fraldinha|cupim|bovin|carne\s*vermelha|bife)/i, key: "carne-grelhada" },
   { match: /ac[eé]m/i, key: "acem" },
   { match: /picanha(?!\s*su)/i, key: "picanha" },
