@@ -1,6 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Menu, X, Mail, Instagram, ArrowRight } from "lucide-react";
 import { LogoOrbital } from "@/components/LogoOrbital";
+import { playIntro } from "@/components/IntroOverlay";
+
+const CONTACT_INSTAGRAM = "https://www.instagram.com/fitjourney_system?igsh=eWlodHhjN2l4ZjVu";
+const CONTACT_WHATSAPP = "https://wa.me/message/G3GN7VMIMTAWA1";
+const CONTACT_WHATSAPP_LABEL = "(91) 98415-5365";
+const CONTACT_EMAIL = "sistemafitjourney.suporte@gmail.com";
+
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} fill="currentColor" aria-hidden="true">
+      <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.09-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.478-1.318.13-.27.21-.6.21-.96 0-.16-.044-.215-.115-.34-.214-.4-2.105-1.435-2.564-1.435m-3.04-13.05c-7.115 0-12.93 5.815-12.93 12.93 0 2.49.715 4.92 2.078 7.02L3 28l4.135-1.293a12.91 12.91 0 0 0 6.93 2.05c7.115 0 12.93-5.815 12.93-12.93C26.995 8.7 22.18 4.155 16.07 4.155m0 23.515a10.7 10.7 0 0 1-5.7-1.625l-.405-.245-2.45.77.78-2.392-.27-.405a10.6 10.6 0 0 1-1.625-5.7c0-5.844 4.83-10.675 10.67-10.675a10.7 10.7 0 0 1 10.67 10.675c0 5.84-4.825 10.675-10.67 10.675"/>
+    </svg>
+  );
+}
 import reel1 from "@/assets/reels/reel-1.mp4.asset.json";
 import reel2 from "@/assets/reels/reel-2.mp4.asset.json";
 import reel3 from "@/assets/reels/reel-3.mp4.asset.json";
