@@ -335,15 +335,18 @@ function Landing() {
           <div className="grid lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-8 items-center">
             {/* — Coluna esquerda: copy — */}
             <motion.div variants={stagger} initial={false} animate="show" className="text-center lg:text-left">
-              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-premium text-primary text-sm font-semibold mb-8 gradient-border">
+              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-premium text-[var(--gold)] text-sm font-semibold mb-8 border border-[var(--gold)]/40 shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_18%,transparent),0_8px_24px_-12px_color-mix(in_oklab,var(--gold)_45%,transparent)]">
                 <Sparkles className="w-4 h-4" />
                 {c.hero.badge}
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse shadow-[0_0_8px_color-mix(in_oklab,var(--gold)_70%,transparent)]" />
               </motion.div>
 
               <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] mb-6 tracking-tight">
                 {c.hero.title_line1}{" "}
-                <span className="text-gradient-animated">{c.hero.title_line2}</span>
+                <span className="relative inline-block">
+                  <span className="text-gradient-animated">{c.hero.title_line2}</span>
+                  <span aria-hidden className="absolute left-0 right-0 -bottom-1 h-[3px] rounded-full bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-80" />
+                </span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
@@ -363,7 +366,7 @@ function Landing() {
                 <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-8 h-14 font-semibold hover:scale-[1.03] active:scale-[0.98] transition-transform">
                   {c.hero.cta_primary} <ArrowRight className="w-4 h-4" />
                 </Link>
-                <a href="#features" className="inline-flex items-center justify-center gap-2 border border-border glass rounded-md text-base px-7 h-14 font-medium hover:bg-muted transition-colors">
+                <a href="#features" className="inline-flex items-center justify-center gap-2 border border-[var(--gold)]/60 text-[var(--gold)] glass rounded-md text-base px-7 h-14 font-medium hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] hover:border-[var(--gold)] transition-colors">
                   <Play className="w-4 h-4" /> {c.hero.cta_secondary}
                 </a>
               </motion.div>
@@ -550,12 +553,14 @@ function Landing() {
         </div>
       </section>
 
+      <div aria-hidden className="flex justify-center py-2"><span className="block w-32 h-px bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-70" /></div>
+
       {/* ══════════ FEATURES ══════════ */}
       {c.features.visible && (
         <section id="features" className="py-28 px-4 relative noise-overlay">
           <div className="max-w-7xl mx-auto relative z-10">
             <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-12">
-              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.features.eyebrow}</span>
+              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 border border-[var(--gold)]/40 uppercase tracking-widest">{c.features.eyebrow}</span>
               <h2 className="font-display text-3xl md:text-5xl font-bold mb-5">
                 {c.features.title_line1}<br className="hidden md:block" />{" "}
                 <span className="text-gradient-animated">{c.features.title_line2}</span>
@@ -580,10 +585,10 @@ function Landing() {
                   className="group relative glass-premium rounded-2xl p-6 card-hover-glow shimmer-sweep cursor-default gradient-border"
                 >
                   <div className="absolute top-4 right-4">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary">{f.tag}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[color-mix(in_oklab,var(--gold)_14%,transparent)] text-[var(--gold)] border border-[var(--gold)]/30">{f.tag}</span>
                   </div>
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary/15 group-hover:shadow-glow transition-all duration-500">
-                    <Icon name={f.icon} className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-[color-mix(in_oklab,var(--gold)_18%,transparent)] ring-1 ring-[var(--gold)]/30 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:ring-[var(--gold)]/60 group-hover:shadow-[0_0_24px_-6px_color-mix(in_oklab,var(--gold)_55%,transparent)] transition-all duration-500">
+                    <Icon name={f.icon} className="w-6 h-6 text-[var(--gold)]" />
                   </div>
                   <h3 className="font-display font-semibold text-lg mb-2">{f.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
@@ -655,7 +660,7 @@ function Landing() {
       <section className="py-28 px-4 bg-muted/20 border-y border-border/30">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
-            <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">Para Pacientes</span>
+            <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 border border-[var(--gold)]/40 uppercase tracking-widest">Para Pacientes</span>
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
               Acesso seguro por <span className="text-gradient-animated">convite do profissional</span>
             </h2>
@@ -686,6 +691,8 @@ function Landing() {
           </motion.div>
         </div>
       </section>
+
+      <div aria-hidden className="flex justify-center py-2"><span className="block w-32 h-px bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-70" /></div>
 
       {/* ══════════ TESTIMONIALS ══════════ */}
       {c.testimonials.visible && (
@@ -723,12 +730,14 @@ function Landing() {
         </section>
       )}
 
+      <div aria-hidden className="flex justify-center py-2"><span className="block w-32 h-px bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-70" /></div>
+
       {/* ══════════ PRICING ══════════ */}
       {c.pricing.visible && (
         <section id="pricing" className="py-28 px-4 bg-muted/20 border-y border-border/30">
           <div className="max-w-5xl mx-auto">
             <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
-              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.pricing.eyebrow}</span>
+              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 border border-[var(--gold)]/40 uppercase tracking-widest">{c.pricing.eyebrow}</span>
               <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
                 {c.pricing.title_line1} <span className="text-gradient-animated">{c.pricing.title_line2}</span>
               </h2>
@@ -774,6 +783,8 @@ function Landing() {
           </div>
         </section>
       )}
+
+      <div aria-hidden className="flex justify-center py-2"><span className="block w-32 h-px bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-70" /></div>
 
       {/* ══════════ FAQ ══════════ */}
       {c.faq.visible && (
