@@ -514,10 +514,10 @@ function BuildPlanCTA({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 inline-flex items-center gap-2 rounded-md hover:bg-primary/90"
+        className="bg-emerald-600 text-white text-xs font-semibold py-2 px-3 inline-flex items-center gap-2 rounded-md hover:bg-emerald-500"
       >
         <Sparkles className="size-3.5" />
-        Elaborar plano
+        Plano com IA FitJourney
       </button>
 
       {open && (
