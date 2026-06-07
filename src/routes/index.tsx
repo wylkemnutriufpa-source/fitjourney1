@@ -31,22 +31,42 @@ export const Route = createFileRoute("/")({
 const CSS = `
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --black: #040A04;
-  --dark: #081208;
-  --panel: #0C1A0C;
-  --card: #101E10;
-  --neon: #2EE07A;
-  --neon-dim: rgba(46,224,122,0.12);
-  --neon-glow: rgba(46,224,122,0.08);
-  --silver: #C0D4C0;
-  --muted: #527052;
-  --border: rgba(46,224,122,0.14);
-  --border-dim: rgba(46,224,122,0.07);
-  --silver-metal: linear-gradient(135deg, #f4f8f4 0%, #b8c8b8 45%, #6a7a6a 100%);
-  --syne: 'Syne', sans-serif;
+  /* Paleta FitJourney — creme + verde-floresta + dourado (alinhada aos prints) */
+  --cream: #F5F0E6;
+  --cream-soft: #EFE8D9;
+  --ivory: #FBF7EE;
+  --black: #F5F0E6;            /* alias do background base (creme) */
+  --dark: #EFE8D9;             /* seções "dark" agora são creme suave */
+  --panel: #1F3A2A;            /* verde-floresta dos cards */
+  --card: #234334;
+  --forest-deep: #14271C;
+  --forest: #1F3A2A;
+  --forest-soft: #2A4A38;
+  --sage: #8FB59A;             /* sage para destaques sobre card escuro */
+  --sage-soft: #B8D1BF;
+  --gold: #C9A24C;
+  --gold-soft: #E6C77A;
+  --neon: #1F3A2A;             /* "neon" antigo → agora verde-floresta sólido */
+  --neon-dim: rgba(31,58,42,0.10);
+  --neon-glow: rgba(31,58,42,0.06);
+  --silver: #2E3A2E;           /* texto principal sobre creme */
+  --muted: #6B7A6B;
+  --border: rgba(31,58,42,0.18);
+  --border-dim: rgba(31,58,42,0.10);
+  --silver-metal: linear-gradient(135deg, #EAE2CC 0%, #C9B98E 50%, #8C7A4A 100%);
+  --gradient-forest: linear-gradient(160deg, #234334 0%, #1F3A2A 55%, #14271C 100%);
+  --gradient-gold: linear-gradient(135deg, #E6C77A 0%, #C9A24C 60%, #8C7A4A 100%);
+  --syne: 'Fraunces', 'Playfair Display', Georgia, serif;   /* wordmark / H1 serif premium */
   --mono: 'IBM Plex Mono', monospace;
-  --sans: 'IBM Plex Sans', sans-serif;
+  --sans: 'Inter', 'IBM Plex Sans', sans-serif;
 }
+/* Fades premium */
+@keyframes fj-fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes fj-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.fj-landing [class*="fj-"] { animation: fj-fade-in .6s ease-out both; }
+.fj-hero-h1, .fj-s-h2, .fj-cap-card, .fj-intel-item, .fj-evo-card, .fj-eng-card, .fj-reel, .fj-vis-row { animation: fj-fade-up .8s cubic-bezier(.2,.7,.2,1) both; }
+.fj-nav-logo { font-family: var(--syne); font-weight: 700; letter-spacing: 0; font-size: 1.35rem; }
+.fj-nav-logo .gold { background: var(--gradient-gold); -webkit-background-clip: text; background-clip: text; color: transparent; }
 html { scroll-behavior: smooth; }
 .fj-landing { background: var(--black); color: var(--silver); font-family: var(--sans); overflow-x: hidden; min-height: 100vh; position: relative; }
 @media (min-width: 1024px) { .fj-landing { cursor: none; } }
