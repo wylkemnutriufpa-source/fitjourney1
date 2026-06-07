@@ -10,6 +10,7 @@ import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 import { VideoLoader } from "@/components/VideoLoader";
 import { maskPhoneBR } from "@/lib/phone-mask";
 import { toast } from "sonner";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
   head: () => ({ meta: [{ title: "Pacientes — FitJourney" }] }),
@@ -17,6 +18,10 @@ export const Route = createFileRoute("/_authenticated/patients/")({
     filter: isPatientFilter(search.filter) ? search.filter : undefined,
   }),
   component: Patients,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/dashboard" homeLabel="Dashboard" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/dashboard" homeLabel="Dashboard" />,
 });
 
 type PatientFilter = "all" | "approved" | "anamnesis_pending" | "plans_delivered";

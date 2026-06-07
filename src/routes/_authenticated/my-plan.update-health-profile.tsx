@@ -1,4 +1,5 @@
 // Atualização da anamnese pós-onboarding. Não confundir com /onboarding/patient
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 // (primeira entrada, bloqueada após conclusão). Aqui o paciente cria uma NOVA
 // versão da anamnese — supersedes_id encadeia, version+1, review_status=submitted.
 
@@ -14,6 +15,10 @@ import type { Answers } from "@/lib/anamnesis/v2/catalog/types";
 export const Route = createFileRoute("/_authenticated/my-plan/update-health-profile")({
   head: () => ({ meta: [{ title: "Atualizar Perfil de Saúde — FitJourney" }] }),
   component: UpdateHealthProfilePage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 function UpdateHealthProfilePage() {

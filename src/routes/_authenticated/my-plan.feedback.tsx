@@ -1,4 +1,5 @@
 // Patient — módulo Feedback (peso, fotos, aderência, resultado, notas)
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 // + histórico imutável + gráfico premium de evolução.
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -46,6 +47,10 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/my-plan/feedback")({
   head: () => ({ meta: [{ title: "Feedback — FitJourney" }] }),
   component: FeedbackPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 type Tab = "novo" | "historico" | "evolucao";

@@ -12,10 +12,15 @@ import {
   getMyGoalDistribution,
   getMyAdherenceAverage,
 } from "@/lib/dashboard/dashboard.functions";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — FitJourney" }] }),
   component: Dashboard,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/dashboard" homeLabel="Recarregar" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/dashboard" homeLabel="Recarregar" />,
 });
 
 function Kpi({

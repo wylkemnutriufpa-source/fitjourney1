@@ -1,4 +1,5 @@
 // Patient Settings — paciente edita nome e WhatsApp.
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 // Dados clínicos NÃO entram aqui: vão pelo Runner (anamnese versionada).
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -21,6 +22,10 @@ import { maskPhoneBR } from "@/lib/phone-mask";
 export const Route = createFileRoute("/_authenticated/my-plan/settings")({
   head: () => ({ meta: [{ title: "Minha conta — FitJourney" }] }),
   component: PatientSettings,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 const inputCls =

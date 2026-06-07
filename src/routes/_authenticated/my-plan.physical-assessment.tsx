@@ -1,4 +1,5 @@
 // Paciente vê a própria avaliação física — read-only.
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 // Atual + histórico simplificado. Sem edição.
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -11,6 +12,10 @@ import { listMyPhysicalAssessments } from "@/lib/physical-assessments/physical-a
 export const Route = createFileRoute("/_authenticated/my-plan/physical-assessment")({
   head: () => ({ meta: [{ title: "Avaliação Física — FitJourney" }] }),
   component: MyPhysicalAssessmentPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 function fmt(v: number | null, unit = "", digits = 1): string {

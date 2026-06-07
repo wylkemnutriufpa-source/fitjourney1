@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -22,6 +22,13 @@ import { cn } from "@/lib/utils";
 // PROIBIDO importar editor/store/template-data. Zero cálculo, zero hidratação.
 
 export const Route = createFileRoute("/_authenticated/my-plan-v2-preview")({
+  beforeLoad: ({ context }) => {
+    if (typeof window === "undefined") return;
+    const identity = (context as { identity?: { appRoles?: string[] } } | undefined)?.identity;
+    if (identity && !identity.appRoles?.includes("admin")) {
+      throw redirect({ to: "/my-dashboard" });
+    }
+  },
   component: V2Preview,
 });
 

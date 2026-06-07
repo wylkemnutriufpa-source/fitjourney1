@@ -9,10 +9,15 @@ import {
 } from "@/lib/onboarding/onboarding.functions";
 import type { Answers } from "@/lib/anamnesis/v2/catalog/types";
 import { maskPhoneBR, normalizePhoneE164, isValidPhoneBR } from "@/lib/phone-mask";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/onboarding/patient")({
   head: () => ({ meta: [{ title: "Onboarding — FitJourney" }] }),
   component: PatientOnboardingPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 function PatientOnboardingPage() {

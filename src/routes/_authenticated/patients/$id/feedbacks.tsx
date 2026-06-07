@@ -23,12 +23,17 @@ import {
   X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute(
   "/_authenticated/patients/$id/feedbacks",
 )({
   head: () => ({ meta: [{ title: "Feedbacks do paciente — FitJourney" }] }),
   component: PatientFeedbacksPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/patients" homeLabel="Lista de pacientes" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/patients" homeLabel="Lista de pacientes" />,
 });
 
 function fmtDateTime(iso: string): string {

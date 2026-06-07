@@ -1,14 +1,27 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 import { calcTMB } from "@/lib/engine/tdee";
-import { Calculator, Save, Activity, ChevronDown } from "lucide-react";
+import { Calculator, Activity, ChevronDown, UserPlus, Info } from "lucide-react";
 
 type Goal = "Performance" | "Hipertrofia" | "Emagrecimento" | "Manutenção";
 
 export const Route = createFileRoute("/_authenticated/patients/new")({
-  head: () => ({ meta: [{ title: "Nova Anamnese — FitJourney" }] }),
+  head: () => ({ meta: [{ title: "Calculadora TDEE — FitJourney" }] }),
   component: NewPatient,
+  errorComponent: ({ error, reset }) => (
+    <AppShell>
+      <div className="max-w-md mx-auto py-16 space-y-4 text-center">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-destructive">Erro</p>
+        <h2 className="text-2xl font-bold">Não foi possível carregar a calculadora.</h2>
+        <p className="text-sm text-muted-foreground">{error.message}</p>
+        <button onClick={reset} className="px-4 py-2 rounded bg-primary text-primary-foreground text-xs">
+          Tentar novamente
+        </button>
+      </div>
+    </AppShell>
+  ),
 });
 
 function CollapsibleSection({
@@ -91,7 +104,7 @@ const inputCls =
   "w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary";
 
 function NewPatient() {
-  const navigate = useNavigate();
+  const [inviteOpen, setInviteOpen] = useState(false);
   const [sex, setSex] = useState<"M" | "F">("M");
   const [age, setAge] = useState(30);
   const [weight, setWeight] = useState(75);
@@ -124,21 +137,38 @@ function NewPatient() {
   return (
     <AppShell>
       <div className="space-y-8">
-        <div className="flex items-end justify-between border-b border-border pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-border pb-4">
           <div className="space-y-1">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Anamnese Médica Esportiva
+              Calculadora TDEE / Pré-anamnese
             </p>
-            <h1 className="text-3xl font-bold tracking-tight">Novo Paciente</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Simulação Antropométrica</h1>
           </div>
           <button
-            onClick={() => navigate({ to: "/patients/$id", params: { id: "p-001" } })}
-            className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90"
+            onClick={() => setInviteOpen(true)}
+            className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md hover:bg-primary/90 self-start sm:self-auto"
           >
-            <Save className="size-3.5" />
-            Salvar Paciente
+            <UserPlus className="size-3.5" />
+            Convidar paciente
           </button>
         </div>
+
+        <div className="border border-dashed border-amber-400/40 bg-amber-400/5 rounded-md p-4 text-[12px] text-muted-foreground flex gap-3">
+          <Info className="size-4 text-amber-400 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="text-foreground text-[13px] font-medium">
+              Esta tela é uma calculadora de TDEE / pré-anamnese.
+            </p>
+            <p>
+              Para cadastrar um paciente real, use <strong>Convidar paciente</strong> (acima) ou
+              compartilhe seu link público em{" "}
+              <Link to="/settings" className="text-primary hover:underline">Configurações</Link>.
+              O vínculo paciente↔nutricionista nasce pelo convite e é imutável depois — por isso o
+              cadastro manual aqui não persiste.
+            </p>
+          </div>
+        </div>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_300px] gap-8">
           <aside className="space-y-1">
@@ -468,6 +498,7 @@ function NewPatient() {
           </aside>
         </div>
       </div>
+      <OnlineInviteDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
     </AppShell>
   );
 }

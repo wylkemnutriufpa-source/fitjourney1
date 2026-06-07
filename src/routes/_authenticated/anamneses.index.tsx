@@ -9,6 +9,7 @@ import { ClipboardList, ChevronRight, AlertCircle } from "lucide-react";
 import { listAnamnesesForNutritionist } from "@/lib/anamnesis/review.functions";
 import { AppShell } from "@/components/AppShell";
 import { describeFlag } from "@/lib/anamnesis/v2/alerts.catalog";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 type StatusFilter = "submitted" | "needs_changes" | "approved" | "all";
 
@@ -22,6 +23,10 @@ const tabs: { id: StatusFilter; label: string }[] = [
 export const Route = createFileRoute("/_authenticated/anamneses/")({
   head: () => ({ meta: [{ title: "Anamneses — FitJourney" }] }),
   component: AnamnesesQueuePage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/dashboard" homeLabel="Dashboard" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/dashboard" homeLabel="Dashboard" />,
 });
 
 function fmtDate(iso: string | null) {

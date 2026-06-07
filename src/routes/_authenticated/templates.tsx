@@ -111,6 +111,7 @@ import { RealPatientPicker } from "@/components/RealPatientPicker";
 import { publishPlanToPatient, publishDraftPlan, getDraftPlanForEdit, type PatientLite } from "@/lib/plans/plans.functions";
 import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
 import { EquivalentsBlock, ApplyEquivalentsAllButton } from "@/components/meal-editor";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({
@@ -122,6 +123,10 @@ export const Route = createFileRoute("/_authenticated/templates")({
     draftPlanId: typeof search.draftPlanId === "string" ? search.draftPlanId : undefined,
   }),
   component: TemplatesPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/dashboard" homeLabel="Dashboard" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/dashboard" homeLabel="Dashboard" />,
 });
 
 type Tab = "biblioteca" | "meus" | "pilotos";

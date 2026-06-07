@@ -19,10 +19,15 @@ import { AppShell } from "@/components/AppShell";
 import { TrendingUp, ArrowLeft, Loader2 } from "lucide-react";
 import { getMyAdherenceInsights } from "@/lib/dashboard/dashboard.functions";
 import { VideoLoader } from "@/components/VideoLoader";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/insights")({
   head: () => ({ meta: [{ title: "Insights — FitJourney" }] }),
   component: InsightsPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/dashboard" homeLabel="Dashboard" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/dashboard" homeLabel="Dashboard" />,
 });
 
 function InsightsPage() {

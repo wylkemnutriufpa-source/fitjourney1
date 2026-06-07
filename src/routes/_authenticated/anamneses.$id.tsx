@@ -32,10 +32,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ClipboardEdit, ListChecks } from "lucide-react";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/anamneses/$id")({
   head: () => ({ meta: [{ title: "Revisão clínica — FitJourney" }] }),
   component: AnamnesisDetailPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/anamneses" homeLabel="Anamneses" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/anamneses" homeLabel="Anamneses" />,
 });
 
 function AnamnesisDetailPage() {
