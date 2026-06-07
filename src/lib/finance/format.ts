@@ -60,14 +60,21 @@ export function paymentMethodLabel(m: SubscriptionPaymentMethod | null): string 
 export function formatShortDate(iso: string | null): string {
   if (!iso) return "—";
   try {
-    return new Date(iso + "T00:00:00").toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    const d = new Date(iso + "T00:00:00");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${dd}/${mm}/${yy}`;
   } catch {
     return iso;
   }
+}
+
+export function shortName(full: string | null | undefined): string {
+  if (!full) return "—";
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0]} ${parts[parts.length - 1]}`;
 }
 
 export function daysUntil(iso: string | null): number | null {

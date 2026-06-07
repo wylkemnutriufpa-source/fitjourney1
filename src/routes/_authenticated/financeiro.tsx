@@ -23,6 +23,7 @@ import {
   formatMoneyBRL,
   formatShortDate,
   planKindLabel,
+  shortName,
   statusLabel,
 } from "@/lib/finance/format";
 
@@ -157,7 +158,7 @@ function FinanceiroPage() {
                               params={{ id: s.patientId }}
                               className="text-primary hover:underline"
                             >
-                              {s.patientName ?? `${s.patientId.slice(0, 8)}…`}
+                              {s.patientName ? shortName(s.patientName) : `${s.patientId.slice(0, 8)}…`}
                             </Link>
                           </td>
                           <td className="px-5 py-2">
@@ -204,7 +205,7 @@ function Kpi({
         <Icon className="size-3" />
         {label}
       </div>
-      <p className="text-2xl font-bold tracking-tight">{value}</p>
+      <p className="text-xl font-bold tracking-tight truncate">{value}</p>
       {hint && <p className="text-[10px] text-muted-foreground">{hint}</p>}
     </div>
   );
@@ -269,7 +270,7 @@ function SubscriptionList({
               params={{ id: s.patientId }}
               className="text-primary hover:underline truncate"
             >
-              {s.patientName ?? `${s.patientId.slice(0, 8)}…`}
+              {s.patientName ? shortName(s.patientName) : `${s.patientId.slice(0, 8)}…`}
             </Link>
             <span className="text-xs font-mono text-muted-foreground">
               {formatShortDate(s.endsAt)}
