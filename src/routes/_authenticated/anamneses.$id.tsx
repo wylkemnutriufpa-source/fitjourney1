@@ -22,6 +22,7 @@ import {
 } from "@/lib/anamnesis/review.functions";
 import { describeFlag } from "@/lib/anamnesis/v2/alerts.catalog";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
+import { maskPhoneBR } from "@/lib/phone-mask";
 import {
   Dialog,
   DialogContent,
