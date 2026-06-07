@@ -10,7 +10,7 @@ import { toast } from "sonner";
 const STORAGE_KEY = "fj_intro_pending";
 const EVENT_NAME = "fj:play-intro";
 // Velocidade do vídeo da intro — menor que 1 deixa o giro mais lento e cinematográfico
-const INTRO_PLAYBACK_RATE = 0.55;
+const INTRO_PLAYBACK_RATE = 0.85;
 
 export function markIntroPending() {
   try {
@@ -75,9 +75,9 @@ export function IntroOverlay() {
   useEffect(() => {
     if (!show) return;
     // Texto entra acompanhando o giro (vídeo agora roda em ~0.55x ⇒ tempos ajustados)
-    const t1 = window.setTimeout(() => setTextVisible(true), 3200);
-    const t2 = window.setTimeout(() => setFadeOut(true), 9500);
-    const t3 = window.setTimeout(() => finish(), 10200);
+    const t1 = window.setTimeout(() => setTextVisible(true), 2000);
+    const t2 = window.setTimeout(() => setFadeOut(true), 6200);
+    const t3 = window.setTimeout(() => finish(), 6800);
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
