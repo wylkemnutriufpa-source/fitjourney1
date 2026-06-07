@@ -916,7 +916,11 @@ function EquivalentCard({
   mealKind: MealKind;
 }) {
   const items: any[] = Array.isArray(option?.items) ? option.items : [];
-  const imgUrl = imgFor(option?.imageKey || "");
+  const imgUrl = resolveBlockImage({
+    imageKey: option?.imageKey,
+    items,
+    mealKind,
+  });
   const kcal = mealKcal(option);
   return (
     <div className="border border-border rounded-md overflow-hidden">
