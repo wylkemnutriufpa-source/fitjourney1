@@ -5,10 +5,15 @@ import { AppShell } from "@/components/AppShell";
 import { listFeedbacksForNutritionist } from "@/lib/feedback/feedback.functions";
 import { adherenceLabel, resultLabel } from "@/lib/feedback/copy";
 import { MessageSquareHeart, ChevronRight } from "lucide-react";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/feedbacks")({
   head: () => ({ meta: [{ title: "Feedbacks — FitJourney" }] }),
   component: FeedbacksPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/dashboard" homeLabel="Dashboard" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/dashboard" homeLabel="Dashboard" />,
 });
 
 function fmtDateTime(iso: string): string {

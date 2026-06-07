@@ -5,6 +5,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   ResponsiveContainer,
   BarChart,
   Bar,
@@ -23,6 +24,10 @@ import { VideoLoader } from "@/components/VideoLoader";
 export const Route = createFileRoute("/_authenticated/insights")({
   head: () => ({ meta: [{ title: "Insights — FitJourney" }] }),
   component: InsightsPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/dashboard" homeLabel="Dashboard" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/dashboard" homeLabel="Dashboard" />,
 });
 
 function InsightsPage() {

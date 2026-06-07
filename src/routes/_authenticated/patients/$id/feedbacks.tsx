@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import {
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   listPatientFeedbacks,
   getSignedFeedbackPhotoUrl,
   editPatientFeedback,
@@ -29,6 +30,10 @@ export const Route = createFileRoute(
 )({
   head: () => ({ meta: [{ title: "Feedbacks do paciente — FitJourney" }] }),
   component: PatientFeedbacksPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/patients" homeLabel="Lista de pacientes" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/patients" homeLabel="Lista de pacientes" />,
 });
 
 function fmtDateTime(iso: string): string {

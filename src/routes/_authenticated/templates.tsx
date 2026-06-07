@@ -3,6 +3,7 @@ import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   listMyTemplates,
   saveMyTemplate,
   deleteMyTemplate,
@@ -122,6 +123,10 @@ export const Route = createFileRoute("/_authenticated/templates")({
     draftPlanId: typeof search.draftPlanId === "string" ? search.draftPlanId : undefined,
   }),
   component: TemplatesPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/dashboard" homeLabel="Dashboard" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/dashboard" homeLabel="Dashboard" />,
 });
 
 type Tab = "biblioteca" | "meus" | "pilotos";

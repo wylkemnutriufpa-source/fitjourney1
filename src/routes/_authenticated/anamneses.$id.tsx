@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import {
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   ArrowLeft,
   CheckCircle2,
   AlertTriangle,
@@ -36,6 +37,10 @@ import { ClipboardEdit, ListChecks } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/anamneses/$id")({
   head: () => ({ meta: [{ title: "Revisão clínica — FitJourney" }] }),
   component: AnamnesisDetailPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/anamneses" homeLabel="Anamneses" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/anamneses" homeLabel="Anamneses" />,
 });
 
 function AnamnesisDetailPage() {

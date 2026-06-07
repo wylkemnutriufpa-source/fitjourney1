@@ -8,6 +8,7 @@ import { getMyNutritionistProfile } from "@/lib/profile/nutritionist-profile.fun
 import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import {
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   getMyWeeklyActivity,
   getMyGoalDistribution,
   getMyAdherenceAverage,
@@ -16,6 +17,10 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — FitJourney" }] }),
   component: Dashboard,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/dashboard" homeLabel="Recarregar" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/dashboard" homeLabel="Recarregar" />,
 });
 
 function Kpi({

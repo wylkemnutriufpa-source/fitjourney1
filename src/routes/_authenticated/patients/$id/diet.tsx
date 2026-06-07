@@ -18,6 +18,7 @@ import { VideoLoader } from "@/components/VideoLoader";
 import { FoodPickerDialog } from "@/components/FoodPickerDialog";
 import type { CatalogFood } from "@/lib/food-catalog";
 import {
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   ArrowLeft,
   ArrowDown,
   ArrowUp,
@@ -82,6 +83,10 @@ import { EquivalentsBlock, toPlannerFoodItem } from "@/components/meal-editor";
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Plano do paciente — FitJourney" }] }),
   component: PatientPlanPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/patients" homeLabel="Lista de pacientes" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/patients" homeLabel="Lista de pacientes" />,
 });
 
 // ---------- Tipos locais (passthrough do snapshot) ----------

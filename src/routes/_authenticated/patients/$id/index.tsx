@@ -14,6 +14,7 @@ import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersVie
 import { VideoLoader } from "@/components/VideoLoader";
 import { maskPhoneBR } from "@/lib/phone-mask";
 import {
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   ArrowLeft,
   FileText,
   Sparkles,
@@ -37,6 +38,10 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
   head: () => ({ meta: [{ title: "Perfil do paciente — FitJourney" }] }),
   component: PatientProfile,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/patients" homeLabel="Lista de pacientes" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/patients" homeLabel="Lista de pacientes" />,
 });
 
 function initialsFromName(name: string): string {

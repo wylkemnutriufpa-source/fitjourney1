@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Activity, ShieldCheck, Loader2, Phone } from "lucide-react";
 import { AnamnesisRunner } from "@/lib/anamnesis/v2/components/AnamnesisRunner";
 import {
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   recordPatientConsent,
   submitInitialAnamnesis,
 } from "@/lib/onboarding/onboarding.functions";
@@ -13,6 +14,10 @@ import { maskPhoneBR, normalizePhoneE164, isValidPhoneBR } from "@/lib/phone-mas
 export const Route = createFileRoute("/_authenticated/onboarding/patient")({
   head: () => ({ meta: [{ title: "Onboarding — FitJourney" }] }),
   component: PatientOnboardingPage,
+  errorComponent: ({ error, reset }) => (
+    <RouteErrorFallback error={error} reset={reset} homeTo="/my-dashboard" homeLabel="Início" />
+  ),
+  notFoundComponent: () => <RouteNotFoundFallback homeTo="/my-dashboard" homeLabel="Início" />,
 });
 
 function PatientOnboardingPage() {
