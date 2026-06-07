@@ -583,10 +583,10 @@ function Landing() {
                   className="group relative glass-premium rounded-2xl p-6 card-hover-glow shimmer-sweep cursor-default gradient-border"
                 >
                   <div className="absolute top-4 right-4">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary">{f.tag}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[color-mix(in_oklab,var(--gold)_14%,transparent)] text-[var(--gold)] border border-[var(--gold)]/30">{f.tag}</span>
                   </div>
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary/15 group-hover:shadow-glow transition-all duration-500">
-                    <Icon name={f.icon} className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-[color-mix(in_oklab,var(--gold)_18%,transparent)] ring-1 ring-[var(--gold)]/30 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:ring-[var(--gold)]/60 group-hover:shadow-[0_0_24px_-6px_color-mix(in_oklab,var(--gold)_55%,transparent)] transition-all duration-500">
+                    <Icon name={f.icon} className="w-6 h-6 text-[var(--gold)]" />
                   </div>
                   <h3 className="font-display font-semibold text-lg mb-2">{f.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
