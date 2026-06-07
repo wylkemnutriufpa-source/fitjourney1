@@ -447,6 +447,25 @@ function LandingPage() {
         <h2 className="fj-s-h2 fj-reveal">Veja o corpo do seu paciente<br /><span className="neon">evoluindo semana a semana.</span></h2>
         <p className="fj-s-sub fj-reveal">Gráficos de progresso, medições precisas, marcos visíveis e projeção futura. Dados que tornam a evolução concreta.</p>
 
+        <div className="fj-vis-row fj-reveal">
+          <div className="fj-vis-img"><img src={imgEvolucao.url} alt="Evolução da prática clínica — de prescritor reativo a gestor estratégico do metabolismo" /></div>
+          <div className="fj-vis-body">
+            <div className="fj-vis-tag">// A evolução da prática clínica</div>
+            <div className="fj-vis-title">Você não entrega dietas.<br/>Você conduz transformações <span className="neon">metabólicas</span>.</div>
+            <p className="fj-vis-desc">Deixa de ser prescritor reativo. Passa a ser gestor estratégico do metabolismo. Utiliza inteligência clínica para decisões precisas, conduz transformações corporais mensuráveis — e amplifica sua autoridade clínica por tecnologia.</p>
+          </div>
+        </div>
+
+        <div className="fj-vis-row fj-reveal reverse" style={{ marginTop: 36 }}>
+          <div className="fj-vis-body">
+            <div className="fj-vis-tag">// Resultados sustentáveis</div>
+            <div className="fj-vis-title">Não buscamos mudanças rápidas.<br/>Buscamos <span className="neon">mudanças duradouras</span>.</div>
+            <p className="fj-vis-desc">Construção de hábitos saudáveis, mudanças duradouras e reais, foco em constância, sem efeito rebote. Transformação para a vida toda — para o paciente, e para a sua reputação clínica.</p>
+          </div>
+          <div className="fj-vis-img"><img src={imgDuradouras.url} alt="Não buscamos mudanças rápidas. Buscamos mudanças duradouras." /></div>
+        </div>
+
+
         <div className="fj-evolution-grid fj-reveal">
           <div className="fj-evo-card wide">
             <div>
