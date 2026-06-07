@@ -692,6 +692,8 @@ function Landing() {
         </div>
       </section>
 
+      <div aria-hidden className="flex justify-center py-2"><span className="block w-32 h-px bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-70" /></div>
+
       {/* ══════════ TESTIMONIALS ══════════ */}
       {c.testimonials.visible && (
         <section id="testimonials" className="py-28 px-4 relative noise-overlay">
