@@ -597,6 +597,37 @@ function normalizePlannerMealOption(option: PlannerMealOption): PlannerMealOptio
   };
 }
 
+type MealKind = "main-meal" | "snack" | "other";
+
+function classifyMealLabel(label: string | undefined): MealKind {
+  if (!label) return "other";
+  if (/almo[çc]o|jantar/i.test(label)) return "main-meal";
+  if (/caf[eé]|lanche|ceia|desjejum/i.test(label)) return "snack";
+  return "other";
+}
+
+const ACCOMPANIMENT_KEYS = new Set([
+  "feijao-cozido",
+  "salada-verde-livre",
+  "fruta-sobremesa",
+  "arroz-cozido",
+]);
+
+function isAccompanimentItem(item: PlannerFoodItem): boolean {
+  if (ACCOMPANIMENT_KEYS.has(item.foodKey)) return true;
+  return /feij[ãa]o|salada|fruta\s*(de\s*sobremesa)?|à\s*vontade/i.test(item.name);
+}
+
+function pickAnchorIndex(items: PlannerFoodItem[], mealKind: MealKind): number {
+  if (items.length === 0) return -1;
+  if (mealKind === "main-meal") {
+    const idx = items.findIndex((i) => i.scaleGroup === "protein" && !isAccompanimentItem(i));
+    return idx;
+  }
+  if (mealKind === "snack") return 0;
+  return -1;
+}
+
 function materializeItemEquivalents(item: PlannerFoodItem): PlannerFoodItem {
   if (item.materializedEquivalents) return item;
   const mat = recalcMaterializedEquivalents({
@@ -608,19 +639,30 @@ function materializeItemEquivalents(item: PlannerFoodItem): PlannerFoodItem {
   return mat ? { ...item, materializedEquivalents: mat } : item;
 }
 
-function materializeOptionEquivalents(opt: PlannerMealOption): PlannerMealOption {
-  return { ...opt, items: opt.items.map(materializeItemEquivalents) };
+function materializeOptionEquivalents(opt: PlannerMealOption, mealKind: MealKind = "other"): PlannerMealOption {
+  const anchorIdx = pickAnchorIndex(opt.items, mealKind);
+  if (anchorIdx < 0) return opt;
+  return {
+    ...opt,
+    items: opt.items.map((it, i) => (i === anchorIdx ? materializeItemEquivalents(it) : it)),
+  };
 }
+
 
 export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate): PlannerTemplate {
   const maybePlanner = template as PlannerTemplate;
   if (maybePlanner.meals?.every((meal) => isPlannerMealOption((meal as PlannerMeal).main))) {
-    const normalizedMeals = maybePlanner.meals.map((meal) => ({
-      ...meal,
-      main: materializeOptionEquivalents(normalizePlannerMealOption(meal.main)),
-      equivalents: meal.equivalents.map((o) => materializeOptionEquivalents(normalizePlannerMealOption(o))),
-      heroKey: meal.heroKey || meal.main.imageKey,
-    }));
+    const normalizedMeals = maybePlanner.meals.map((meal) => {
+      const kind = classifyMealLabel(meal.label);
+      return {
+        ...meal,
+        main: materializeOptionEquivalents(normalizePlannerMealOption(meal.main), kind),
+        equivalents: meal.equivalents.map((o) =>
+          materializeOptionEquivalents(normalizePlannerMealOption(o), kind),
+        ),
+        heroKey: meal.heroKey || meal.main.imageKey,
+      };
+    });
 
     return {
       ...maybePlanner,
@@ -631,7 +673,8 @@ export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate
 
   const legacy = template as LegacyDietTemplate;
   const meals = legacy.meals.map((meal: LegacyMealSlot) => {
-    const isMainMeal = /almo[çc]o|jantar/i.test(meal.label);
+    const kind = classifyMealLabel(meal.label);
+    const isMainMeal = kind === "main-meal";
     const main = legacyFoodToOption(meal.main);
     const equivalents = meal.equivalents.map(legacyFoodToOption);
     const finalMain = isMainMeal ? withLunchSides(main) : main;
@@ -641,10 +684,11 @@ export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate
       time: meal.time,
       label: meal.label,
       heroKey: meal.heroKey ?? meal.main.foodKey,
-      main: materializeOptionEquivalents(finalMain),
-      equivalents: finalEqs.map(materializeOptionEquivalents),
+      main: materializeOptionEquivalents(finalMain, kind),
+      equivalents: finalEqs.map((o) => materializeOptionEquivalents(o, kind)),
     };
   });
+
 
   return {
     ...legacy,
@@ -662,17 +706,18 @@ function withLunchSides(option: PlannerMealOption): PlannerMealOption {
   const has = (re: RegExp) => option.items.some((i) => re.test(i.name.toLowerCase()));
   const additions: BlueprintItem[] = [];
   if (!has(/arroz|macarra|cuscuz|batata|macaxeira|pupunha|p[ãa]o|tapioca|quinoa|farofa/)) {
-    additions.push({ name: "Arroz cozido", qty: 100, unit: "g", kcal: 128, scaleGroup: "carb" });
+    additions.push({ foodKey: "arroz-cozido", name: "Arroz cozido", qty: 100, unit: "g", kcal: 128, scaleGroup: "carb" });
   }
   if (!has(/feij[ãa]o|lentilha|gr[ãa]o-de-bico|ervilha/)) {
-    additions.push({ name: "Feijão cozido", qty: 80, unit: "g", kcal: 60, scaleGroup: "protein" });
+    additions.push({ foodKey: "feijao-cozido", name: "Feijão cozido", qty: 80, unit: "g", kcal: 60, scaleGroup: "protein" });
   }
   if (!has(/salada|folhas|alface|r[úu]cula/)) {
-    additions.push({ name: "Salada verde (livre)", qty: 1, unit: "à vontade", kcal: 30, scaleGroup: "vegetable" });
+    additions.push({ foodKey: "salada-verde-livre", name: "Salada verde (livre)", qty: 1, unit: "à vontade", kcal: 30, scaleGroup: "vegetable" });
   }
   if (!has(/fruta|ma[çc][ãa]|banana|mam[ãa]o|melancia|mel[ãa]o|abacaxi|manga|laranja|pera|uva|morango|goiaba|sobremesa/)) {
-    additions.push({ name: "Fruta de sobremesa", qty: 1, unit: "unid", kcal: 70, scaleGroup: "fruit" });
+    additions.push({ foodKey: "fruta-sobremesa", name: "Fruta de sobremesa", qty: 1, unit: "unid", kcal: 70, scaleGroup: "fruit" });
   }
+
   if (additions.length === 0) return option;
   return {
     ...option,
