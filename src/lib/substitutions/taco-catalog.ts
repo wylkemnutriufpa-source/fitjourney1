@@ -19,7 +19,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   // ------ Proteínas de refeição (almoço/jantar) ------
   {
     foodKey: "peito-frango",
-    name: "Peito de frango sem pele cru",
+    name: "Peito de frango sem pele",
     scaleGroup: "protein",
     subGroup: "protein-meal",
     unit: "g",
@@ -31,7 +31,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "patinho-bovino",
-    name: "Patinho bovino sem gordura cru",
+    name: "Patinho bovino sem gordura",
     scaleGroup: "protein",
     subGroup: "protein-meal",
     unit: "g",
@@ -43,7 +43,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "contrafile-bovino",
-    name: "Contrafilé bovino sem gordura cru",
+    name: "Contrafilé bovino sem gordura",
     scaleGroup: "protein",
     subGroup: "protein-meal",
     unit: "g",
@@ -55,7 +55,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "lombo-suino",
-    name: "Lombo suíno cru",
+    name: "Lombo suíno",
     scaleGroup: "protein",
     subGroup: "protein-meal",
     unit: "g",
@@ -67,7 +67,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "merluza-file",
-    name: "Filé de merluza cru",
+    name: "Filé de merluza",
     scaleGroup: "protein",
     subGroup: "protein-meal",
     unit: "g",
@@ -79,7 +79,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "tilapia-file",
-    name: "Tilápia filé cru",
+    name: "Tilápia filé",
     scaleGroup: "protein",
     subGroup: "protein-meal",
     unit: "g",
@@ -91,7 +91,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "atum-fresco",
-    name: "Atum fresco cru",
+    name: "Atum fresco",
     scaleGroup: "protein",
     subGroup: "protein-meal",
     unit: "g",
@@ -352,7 +352,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   // ------ Proteínas de lanche/café (ovo, queijo, frango desfiado, carne moída) ------
   {
     foodKey: "ovo-galinha",
-    name: "Ovo de galinha inteiro cru",
+    name: "Ovo de galinha inteiro",
     scaleGroup: "protein",
     subGroup: "protein-snack",
     unit: "g",
@@ -457,7 +457,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "mamao",
-    name: "Mamão papaia cru",
+    name: "Mamão papaia",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 150,
@@ -479,7 +479,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "abacaxi",
-    name: "Abacaxi cru",
+    name: "Abacaxi",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 100,
@@ -501,7 +501,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "morango",
-    name: "Morango cru",
+    name: "Morango",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 100,
@@ -538,7 +538,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   // ------ Lipídios — spread/lanche (combinam com fruta/pão) ------
   {
     foodKey: "abacate",
-    name: "Abacate cru",
+    name: "Abacate",
     scaleGroup: "fat",
     subGroup: "fat-spread",
     unit: "g",
@@ -745,7 +745,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "melao",
-    name: "Melão cru",
+    name: "Melão",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 150,

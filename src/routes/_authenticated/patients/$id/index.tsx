@@ -224,8 +224,8 @@ function PatientProfile() {
               className={
                 "flex min-h-10 items-center justify-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold transition-colors disabled:opacity-50 " +
                 (p.isActive
-                  ? "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
-                  : "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10")
+                  ? "border-rose-500/30 text-rose-300/90 hover:bg-rose-500/10 hover:border-rose-500/50"
+                  : "border-emerald-500/30 text-emerald-300/90 hover:bg-emerald-500/10 hover:border-emerald-500/50")
               }
             >
               {activeMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Power className="size-3.5" />}
@@ -254,18 +254,18 @@ function PatientProfile() {
             <Link
               to="/templates"
               search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
-              className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-emerald-500/30 px-3 py-2 text-xs font-semibold text-emerald-300/90 hover:bg-emerald-500/10 hover:border-emerald-500/50"
             >
               <Sparkles className="size-3.5" />
-              Plano do zero
+              Plano com Smart-templates
             </Link>
             <Link
               to="/templates"
               search={{ patientId: p.id, patientName: p.fullName }}
-              className="flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+              className="flex min-h-10 items-center justify-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-500"
             >
               <FileText className="size-3.5" />
-              {hasPublishedPlan ? "Novo plano" : "Elaborar plano"}
+              {hasPublishedPlan ? "Novo plano com IA" : "Plano com IA FitJourney"}
             </Link>
           </div>
         </div>
@@ -514,10 +514,10 @@ function BuildPlanCTA({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="bg-primary text-primary-foreground text-xs font-semibold py-2 px-3 inline-flex items-center gap-2 rounded-md hover:bg-primary/90"
+        className="bg-emerald-600 text-white text-xs font-semibold py-2 px-3 inline-flex items-center gap-2 rounded-md hover:bg-emerald-500"
       >
         <Sparkles className="size-3.5" />
-        Elaborar plano
+        Plano com IA FitJourney
       </button>
 
       {open && (

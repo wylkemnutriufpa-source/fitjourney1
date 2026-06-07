@@ -289,8 +289,8 @@ function Patients() {
                     className={
                       "flex min-h-10 items-center justify-center gap-2 rounded-md border text-xs font-semibold disabled:opacity-50 " +
                       (p.isActive
-                        ? "border-border text-foreground hover:border-primary/40 hover:text-primary"
-                        : "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10")
+                        ? "border-rose-500/30 text-rose-300/90 hover:bg-rose-500/10 hover:border-rose-500/50"
+                        : "border-emerald-500/30 text-emerald-300/90 hover:bg-emerald-500/10 hover:border-emerald-500/50")
                     }
                   >
                     <Power className="size-4" />
@@ -423,7 +423,12 @@ function Patients() {
                         type="button"
                         disabled={activeMutation.isPending}
                         onClick={() => activeMutation.mutate({ patientId: p.id, isActive: !p.isActive })}
-                        className="size-8 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent/50 disabled:opacity-50"
+                        className={
+                          "size-8 grid place-items-center rounded disabled:opacity-50 " +
+                          (p.isActive
+                            ? "text-rose-400/80 hover:text-rose-300 hover:bg-rose-500/10"
+                            : "text-emerald-400/80 hover:text-emerald-300 hover:bg-emerald-500/10")
+                        }
                         title={p.isActive ? "Inativar paciente" : "Reativar paciente"}
                       >
                         <Power className="size-4" />
