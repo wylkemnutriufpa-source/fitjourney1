@@ -125,11 +125,11 @@ function AnamnesesQueuePage() {
 
         <ul className="space-y-2">
           {(data?.items ?? []).map((item) => (
-            <li key={item.id}>
+                      <li key={item.id} className="relative">
               <Link
                 to="/anamneses/$id"
                 params={{ id: item.id }}
-                className="block rounded-lg border border-border hover:border-primary/50 transition-colors p-4"
+                className="block rounded-lg border border-border hover:border-primary/50 transition-colors p-4 pr-4 sm:pr-44"
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
