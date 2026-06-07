@@ -3,7 +3,6 @@ import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
-import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   listMyTemplates,
   saveMyTemplate,
   deleteMyTemplate,
@@ -112,6 +111,7 @@ import { RealPatientPicker } from "@/components/RealPatientPicker";
 import { publishPlanToPatient, publishDraftPlan, getDraftPlanForEdit, type PatientLite } from "@/lib/plans/plans.functions";
 import { espHipertrofiaV2Piloto } from "@/lib/v2/template-data.v2";
 import { EquivalentsBlock, ApplyEquivalentsAllButton } from "@/components/meal-editor";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 
 export const Route = createFileRoute("/_authenticated/templates")({

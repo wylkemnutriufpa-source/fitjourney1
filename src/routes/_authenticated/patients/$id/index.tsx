@@ -14,7 +14,6 @@ import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersVie
 import { VideoLoader } from "@/components/VideoLoader";
 import { maskPhoneBR } from "@/lib/phone-mask";
 import {
-import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   ArrowLeft,
   FileText,
   Sparkles,
@@ -34,6 +33,7 @@ import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBou
   ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/")({
   head: () => ({ meta: [{ title: "Perfil do paciente — FitJourney" }] }),

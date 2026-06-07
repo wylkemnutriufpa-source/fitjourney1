@@ -7,7 +7,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import {
-import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   ArrowLeft,
   CheckCircle2,
   AlertTriangle,
@@ -33,6 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ClipboardEdit, ListChecks } from "lucide-react";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/anamneses/$id")({
   head: () => ({ meta: [{ title: "Revisão clínica — FitJourney" }] }),

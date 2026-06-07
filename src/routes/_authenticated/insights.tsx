@@ -5,7 +5,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
-import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   ResponsiveContainer,
   BarChart,
   Bar,
@@ -20,6 +19,7 @@ import { AppShell } from "@/components/AppShell";
 import { TrendingUp, ArrowLeft, Loader2 } from "lucide-react";
 import { getMyAdherenceInsights } from "@/lib/dashboard/dashboard.functions";
 import { VideoLoader } from "@/components/VideoLoader";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/insights")({
   head: () => ({ meta: [{ title: "Insights — FitJourney" }] }),

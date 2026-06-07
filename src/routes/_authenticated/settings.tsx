@@ -7,7 +7,6 @@ import { Save, Loader2, Copy, Link2, MessageCircle, Upload, User } from "lucide-
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
-import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   getMyNutritionistProfile,
   updateMyNutritionistProfile,
   getOrCreateMyReferralCode,
@@ -17,6 +16,7 @@ import {
   setMyFeedbackFrequency,
 } from "@/lib/feedback/feedback.functions";
 import { publicUrl } from "@/lib/public-url";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações — FitJourney" }] }),

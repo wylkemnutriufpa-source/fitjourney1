@@ -18,7 +18,6 @@ import { VideoLoader } from "@/components/VideoLoader";
 import { FoodPickerDialog } from "@/components/FoodPickerDialog";
 import type { CatalogFood } from "@/lib/food-catalog";
 import {
-import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   ArrowLeft,
   ArrowDown,
   ArrowUp,
@@ -79,6 +78,7 @@ import {
 import { saveEditedPlan } from "@/lib/plans/plans.functions";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
 import { EquivalentsBlock, toPlannerFoodItem } from "@/components/meal-editor";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Plano do paciente — FitJourney" }] }),

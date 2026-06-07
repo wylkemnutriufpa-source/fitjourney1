@@ -8,11 +8,11 @@ import { getMyNutritionistProfile } from "@/lib/profile/nutritionist-profile.fun
 import { listMyPatientsForPlan } from "@/lib/plans/plans.functions";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import {
-import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
   getMyWeeklyActivity,
   getMyGoalDistribution,
   getMyAdherenceAverage,
 } from "@/lib/dashboard/dashboard.functions";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — FitJourney" }] }),
