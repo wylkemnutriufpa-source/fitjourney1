@@ -440,7 +440,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
               <p className="text-xs font-medium flex items-center gap-1.5 justify-end">
                 {displayName}
                 {isAdmin && (
-                  <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase text-primary border border-primary/40 rounded px-1.5 py-0.5">
+                  <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase text-[var(--gold)] border border-[var(--gold)]/50 rounded px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--gold)_8%,transparent)]">
                     <ShieldCheck className="size-2.5" />
                     Admin
                   </span>
@@ -454,7 +454,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
               type="button"
               onClick={() => setAvatarMenuOpen(true)}
               title="Abrir menu da conta"
-              className="size-9 sm:size-10 rounded-full bg-surface border border-border overflow-hidden grid place-items-center text-xs font-mono shrink-0 hover:border-primary/60 transition-colors"
+              className="size-9 sm:size-10 rounded-full bg-surface border-2 border-[var(--gold)]/40 overflow-hidden grid place-items-center text-xs font-mono shrink-0 hover:border-[var(--gold)] hover:shadow-[0_0_0_3px_color-mix(in_oklab,var(--gold)_18%,transparent)] transition-all"
             >
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Avatar" className="size-full object-cover" />
