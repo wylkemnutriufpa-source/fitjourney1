@@ -658,7 +658,7 @@ function Landing() {
       <section className="py-28 px-4 bg-muted/20 border-y border-border/30">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
-            <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">Para Pacientes</span>
+            <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 border border-[var(--gold)]/40 uppercase tracking-widest">Para Pacientes</span>
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
               Acesso seguro por <span className="text-gradient-animated">convite do profissional</span>
             </h2>
