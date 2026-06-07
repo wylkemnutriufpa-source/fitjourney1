@@ -62,6 +62,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "ovo-galinha", name: "Ovo cozido", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "cafe-com-leite", name: "Café com leite desnatado", qty: 200, unit: "ml", kcal: 90, scaleGroup: "beverage" },
         ],
+        alternatives: [
+          {
+            title: "Pão francês + Ovo + Café",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 50, unit: "g", kcal: 148, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovo cozido", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "cafe-com-leite", name: "Café com leite desnatado", qty: 200, unit: "ml", kcal: 90, scaleGroup: "beverage" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Ovo + Café",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 50, unit: "g", kcal: 194, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovo cozido", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "cafe-com-leite", name: "Café com leite desnatado", qty: 200, unit: "ml", kcal: 90, scaleGroup: "beverage" },
+            ],
+          },
+        ],
       },
       {
         time: "12:30",
@@ -71,6 +91,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 130, unit: "g", kcal: 215, scaleGroup: "protein" },
           { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 120, unit: "g", kcal: 154, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Filé de tilápia grelhado + Arroz + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 130, unit: "g", kcal: 124, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 120, unit: "g", kcal: 154, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Arroz + Azeite",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 130, unit: "g", kcal: 176, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 120, unit: "g", kcal: 154, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
       {
@@ -89,6 +129,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
         items: [
           { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 120, unit: "g", kcal: 114, scaleGroup: "protein" },
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 150, unit: "g", kcal: 117, scaleGroup: "carb" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Batata",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 120, unit: "g", kcal: 198, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 150, unit: "g", kcal: 117, scaleGroup: "carb" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Batata",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 120, unit: "g", kcal: 162, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 150, unit: "g", kcal: 117, scaleGroup: "carb" },
+            ],
+          },
         ],
       },
     ],
@@ -111,6 +169,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
           { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Ovos + Banana",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 100, unit: "g", kcal: 242, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+              { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Ovos + Banana",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 100, unit: "g", kcal: 389, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+              { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "10:00",
@@ -119,6 +197,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
         items: [
           { foodKey: "tapioca", name: "Tapioca", qty: 60, unit: "g", kcal: 146, scaleGroup: "carb" },
           { foodKey: "pasta-amendoim", name: "Pasta de amendoim", qty: 20, unit: "g", kcal: 118, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Pão francês + Pasta",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 60, unit: "g", kcal: 178, scaleGroup: "carb" },
+              { foodKey: "pasta-amendoim", name: "Pasta de amendoim", qty: 20, unit: "g", kcal: 118, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Pasta",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 60, unit: "g", kcal: 233, scaleGroup: "carb" },
+              { foodKey: "pasta-amendoim", name: "Pasta de amendoim", qty: 20, unit: "g", kcal: 118, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
       {
@@ -130,6 +226,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate em fatias", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Arroz + Abacate",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 180, unit: "g", kcal: 297, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate em fatias", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Arroz + Abacate",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 180, unit: "g", kcal: 171, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate em fatias", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "16:00",
@@ -139,6 +255,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 200, unit: "g", kcal: 156, scaleGroup: "carb" },
           { foodKey: "ovo-galinha", name: "Claras + 1 ovo inteiro", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Claras",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 200, unit: "g", kcal: 484, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Claras + 1 ovo inteiro", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+            ],
+          },
+          {
+            title: "Pão francês + Claras",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 200, unit: "g", kcal: 594, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Claras + 1 ovo inteiro", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+            ],
+          },
+        ],
       },
       {
         time: "20:00",
@@ -147,6 +281,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
         items: [
           { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 180, unit: "g", kcal: 297, scaleGroup: "protein" },
           { foodKey: "macarrao-espaguete", name: "Macarrão integral cozido", qty: 150, unit: "g", kcal: 234, scaleGroup: "carb" },
+        ],
+        alternatives: [
+          {
+            title: "Filé de tilápia grelhado + Macarrão",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 180, unit: "g", kcal: 171, scaleGroup: "protein" },
+              { foodKey: "macarrao-espaguete", name: "Macarrão integral cozido", qty: 150, unit: "g", kcal: 234, scaleGroup: "carb" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Macarrão",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 180, unit: "g", kcal: 243, scaleGroup: "protein" },
+              { foodKey: "macarrao-espaguete", name: "Macarrão integral cozido", qty: 150, unit: "g", kcal: 234, scaleGroup: "carb" },
+            ],
+          },
         ],
       },
     ],
@@ -178,6 +330,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "contrafile-bovino", name: "Contrafilé bovino grelhado", qty: 150, unit: "g", kcal: 327, scaleGroup: "protein" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Azeite",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 142, scaleGroup: "protein" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "16:00",
@@ -195,6 +365,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
         items: [
           { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "abacate", name: "Abacate em cubos", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Abacate",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+              { foodKey: "abacate", name: "Abacate em cubos", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Abacate",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 150, unit: "g", kcal: 202, scaleGroup: "protein" },
+              { foodKey: "abacate", name: "Abacate em cubos", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
@@ -218,6 +406,28 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 10, unit: "g", kcal: 49, scaleGroup: "fat" },
           { foodKey: "morango", name: "Morangos", qty: 100, unit: "g", kcal: 32, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Ovo + Chia",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 40, unit: "g", kcal: 97, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovo mexido", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 10, unit: "g", kcal: 49, scaleGroup: "fat" },
+              { foodKey: "morango", name: "Morangos", qty: 100, unit: "g", kcal: 32, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Pão francês + Ovo + Chia",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 40, unit: "g", kcal: 119, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovo mexido", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 10, unit: "g", kcal: 49, scaleGroup: "fat" },
+              { foodKey: "morango", name: "Morangos", qty: 100, unit: "g", kcal: 32, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "10:00", label: "Lanche da manhã", heroKey: "usda-greek-yogurt-nonfat",
@@ -233,6 +443,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate em fatias", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Filé de tilápia grelhado + Quinoa + Abacate",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 142, scaleGroup: "protein" },
+              { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate em fatias", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Quinoa + Abacate",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 150, unit: "g", kcal: 202, scaleGroup: "protein" },
+              { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate em fatias", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "16:30", label: "Lanche da tarde", heroKey: "maca",
@@ -247,6 +477,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 140, unit: "g", kcal: 134, scaleGroup: "protein" },
           { foodKey: "usda-lentils-cooked", name: "Lentilhas cozidas", qty: 120, unit: "g", kcal: 139, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Lentilhas + Azeite",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 140, unit: "g", kcal: 231, scaleGroup: "protein" },
+              { foodKey: "usda-lentils-cooked", name: "Lentilhas cozidas", qty: 120, unit: "g", kcal: 139, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Lentilhas + Azeite",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 140, unit: "g", kcal: 189, scaleGroup: "protein" },
+              { foodKey: "usda-lentils-cooked", name: "Lentilhas cozidas", qty: 120, unit: "g", kcal: 139, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
@@ -269,6 +519,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
           { foodKey: "usda-walnuts", name: "Nozes", qty: 15, unit: "g", kcal: 98, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Banana + Nozes",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 50, unit: "g", kcal: 121, scaleGroup: "carb" },
+              { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+              { foodKey: "usda-walnuts", name: "Nozes", qty: 15, unit: "g", kcal: 98, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Pão francês + Banana + Nozes",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 50, unit: "g", kcal: 148, scaleGroup: "carb" },
+              { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+              { foodKey: "usda-walnuts", name: "Nozes", qty: 15, unit: "g", kcal: 98, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "12:30", label: "Almoço", heroKey: "peito-frango",
@@ -276,6 +546,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "peito-frango", name: "Peito de frango (rico em triptofano)", qty: 140, unit: "g", kcal: 231, scaleGroup: "protein" },
           { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 120, unit: "g", kcal: 154, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Filé de tilápia grelhado + Arroz + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 140, unit: "g", kcal: 133, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 120, unit: "g", kcal: 154, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Arroz + Azeite",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 140, unit: "g", kcal: 189, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 120, unit: "g", kcal: 154, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
       {
@@ -290,6 +580,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
         items: [
           { foodKey: "merluza-file", name: "Merluza grelhada (ômega-3)", qty: 130, unit: "g", kcal: 122, scaleGroup: "protein" },
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 130, unit: "g", kcal: 101, scaleGroup: "carb" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Batata",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 130, unit: "g", kcal: 214, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 130, unit: "g", kcal: 101, scaleGroup: "carb" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Batata",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 130, unit: "g", kcal: 124, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 130, unit: "g", kcal: 101, scaleGroup: "carb" },
+            ],
+          },
         ],
       },
       {
@@ -319,6 +627,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-blueberries", name: "Mirtilos", qty: 100, unit: "g", kcal: 57, scaleGroup: "fruit" },
           { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 15, unit: "g", kcal: 74, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Mirtilos + Chia",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 40, unit: "g", kcal: 97, scaleGroup: "carb" },
+              { foodKey: "usda-blueberries", name: "Mirtilos", qty: 100, unit: "g", kcal: 57, scaleGroup: "fruit" },
+              { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 15, unit: "g", kcal: 74, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Pão francês + Mirtilos + Chia",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 40, unit: "g", kcal: 119, scaleGroup: "carb" },
+              { foodKey: "usda-blueberries", name: "Mirtilos", qty: 100, unit: "g", kcal: 57, scaleGroup: "fruit" },
+              { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 15, unit: "g", kcal: 74, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "12:30", label: "Almoço", heroKey: "usda-salmon-atlantic-raw",
@@ -326,6 +654,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-salmon-atlantic-raw", name: "Filé de peixe rico em ômega-3", qty: 130, unit: "g", kcal: 268, scaleGroup: "protein" },
           { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Quinoa + Azeite",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 130, unit: "g", kcal: 214, scaleGroup: "protein" },
+              { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Quinoa + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 130, unit: "g", kcal: 124, scaleGroup: "protein" },
+              { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
       {
@@ -342,6 +690,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "tilapia-file", name: "Tilápia grelhada com cúrcuma", qty: 140, unit: "g", kcal: 134, scaleGroup: "protein" },
           { foodKey: "batata-doce", name: "Batata doce assada", qty: 150, unit: "g", kcal: 117, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Batata + Abacate",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 140, unit: "g", kcal: 231, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce assada", qty: 150, unit: "g", kcal: 117, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Batata + Abacate",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 140, unit: "g", kcal: 189, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce assada", qty: 150, unit: "g", kcal: 117, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
@@ -363,6 +731,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-oats-rolled", name: "Mingau de aveia leve", qty: 30, unit: "g", kcal: 117, scaleGroup: "carb" },
           { foodKey: "banana", name: "Banana amassada", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Banana",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 30, unit: "g", kcal: 73, scaleGroup: "carb" },
+              { foodKey: "banana", name: "Banana amassada", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Pão francês + Banana",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 30, unit: "g", kcal: 89, scaleGroup: "carb" },
+              { foodKey: "banana", name: "Banana amassada", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "12:30", label: "Almoço — Caldo 1", heroKey: "caldo-frango-legumes",
@@ -382,6 +768,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
         items: [
           { foodKey: "caldo-abobora-gengibre", name: "Caldo de abóbora com gengibre", qty: 400, unit: "ml", kcal: 220, scaleGroup: "mixed" },
           { foodKey: "ovo-galinha", name: "Ovo pochê adicionado", qty: 50, unit: "g", kcal: 72, scaleGroup: "protein" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Caldo",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "caldo-abobora-gengibre", name: "Caldo de abóbora com gengibre", qty: 400, unit: "ml", kcal: 220, scaleGroup: "mixed" },
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 50, unit: "g", kcal: 82, scaleGroup: "protein" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Caldo",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "caldo-abobora-gengibre", name: "Caldo de abóbora com gengibre", qty: 400, unit: "ml", kcal: 220, scaleGroup: "mixed" },
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 50, unit: "g", kcal: 48, scaleGroup: "protein" },
+            ],
+          },
         ],
       },
       {
@@ -410,6 +814,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Pão francês + Ovos + Mamão",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 60, unit: "g", kcal: 178, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Ovos + Mamão",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 60, unit: "g", kcal: 233, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "12:30", label: "Almoço", heroKey: "usda-lentils-cooked",
@@ -417,6 +841,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-lentils-cooked", name: "Lentilhas cozidas", qty: 180, unit: "g", kcal: 208, scaleGroup: "carb" },
           { foodKey: "usda-tofu-firm", name: "Tofu firme grelhado", qty: 120, unit: "g", kcal: 173, scaleGroup: "protein" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Lentilhas + Azeite",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "usda-lentils-cooked", name: "Lentilhas cozidas", qty: 180, unit: "g", kcal: 208, scaleGroup: "carb" },
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 120, unit: "g", kcal: 198, scaleGroup: "protein" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Lentilhas + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "usda-lentils-cooked", name: "Lentilhas cozidas", qty: 180, unit: "g", kcal: 208, scaleGroup: "carb" },
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 120, unit: "g", kcal: 114, scaleGroup: "protein" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
       {
@@ -432,6 +876,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-chickpeas-cooked", name: "Grão-de-bico cozido", qty: 150, unit: "g", kcal: 246, scaleGroup: "carb" },
           { foodKey: "ovo-galinha", name: "Ovo cozido", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Grão-de-bico + Abacate",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "usda-chickpeas-cooked", name: "Grão-de-bico cozido", qty: 150, unit: "g", kcal: 246, scaleGroup: "carb" },
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 100, unit: "g", kcal: 165, scaleGroup: "protein" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Grão-de-bico + Abacate",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "usda-chickpeas-cooked", name: "Grão-de-bico cozido", qty: 150, unit: "g", kcal: 246, scaleGroup: "carb" },
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 100, unit: "g", kcal: 95, scaleGroup: "protein" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
@@ -454,6 +918,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "manteiga", name: "Manteiga", qty: 10, unit: "g", kcal: 76, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Ovos + Manteiga",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 100, unit: "g", kcal: 242, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "manteiga", name: "Manteiga", qty: 10, unit: "g", kcal: 76, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Ovos + Manteiga",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 100, unit: "g", kcal: 389, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "manteiga", name: "Manteiga", qty: 10, unit: "g", kcal: 76, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "12:30", label: "Almoço", heroKey: "patinho-bovino",
@@ -462,12 +946,50 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "arroz-branco", name: "Arroz branco", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Arroz + Azeite",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 170, unit: "g", kcal: 280, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Arroz + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 170, unit: "g", kcal: 162, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "16:30", label: "Pré-treino", heroKey: "banana",
         items: [
           { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
           { foodKey: "usda-oats-rolled", name: "Aveia (shake)", qty: 30, unit: "g", kcal: 117, scaleGroup: "carb" },
+        ],
+        alternatives: [
+          {
+            title: "Tapioca + Banana",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+              { foodKey: "tapioca", name: "Tapioca", qty: 30, unit: "g", kcal: 73, scaleGroup: "carb" },
+            ],
+          },
+          {
+            title: "Pão francês + Banana",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+              { foodKey: "pao-frances", name: "Pão francês", qty: 30, unit: "g", kcal: 89, scaleGroup: "carb" },
+            ],
+          },
         ],
       },
       {
@@ -476,6 +998,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-whey-protein", name: "Whey protein isolado", qty: 35, unit: "g", kcal: 130, scaleGroup: "protein" },
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 200, unit: "g", kcal: 156, scaleGroup: "carb" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Whey",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "usda-whey-protein", name: "Whey protein isolado", qty: 35, unit: "g", kcal: 130, scaleGroup: "protein" },
+              { foodKey: "tapioca", name: "Tapioca", qty: 200, unit: "g", kcal: 484, scaleGroup: "carb" },
+            ],
+          },
+          {
+            title: "Pão francês + Whey",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "usda-whey-protein", name: "Whey protein isolado", qty: 35, unit: "g", kcal: 130, scaleGroup: "protein" },
+              { foodKey: "pao-frances", name: "Pão francês", qty: 200, unit: "g", kcal: 594, scaleGroup: "carb" },
+            ],
+          },
+        ],
       },
       {
         time: "21:00", label: "Jantar", heroKey: "peito-frango",
@@ -483,6 +1023,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 170, unit: "g", kcal: 281, scaleGroup: "protein" },
           { foodKey: "macarrao-espaguete", name: "Macarrão integral", qty: 150, unit: "g", kcal: 234, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Filé de tilápia grelhado + Macarrão + Abacate",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 170, unit: "g", kcal: 162, scaleGroup: "protein" },
+              { foodKey: "macarrao-espaguete", name: "Macarrão integral", qty: 150, unit: "g", kcal: 234, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Macarrão + Abacate",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 170, unit: "g", kcal: 230, scaleGroup: "protein" },
+              { foodKey: "macarrao-espaguete", name: "Macarrão integral", qty: 150, unit: "g", kcal: 234, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
@@ -506,6 +1066,28 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
           { foodKey: "manteiga", name: "Manteiga", qty: 10, unit: "g", kcal: 76, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Ovos + Banana",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 100, unit: "g", kcal: 242, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+              { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+              { foodKey: "manteiga", name: "Manteiga", qty: 10, unit: "g", kcal: 76, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Ovos + Banana",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 100, unit: "g", kcal: 389, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+              { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+              { foodKey: "manteiga", name: "Manteiga", qty: 10, unit: "g", kcal: 76, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "10:00", label: "Lanche da manhã", heroKey: "usda-greek-yogurt-nonfat",
@@ -513,6 +1095,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 200, unit: "g", kcal: 117, scaleGroup: "protein" },
           { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 40, unit: "g", kcal: 156, scaleGroup: "carb" },
           { foodKey: "pasta-amendoim", name: "Pasta de amendoim integral", qty: 20, unit: "g", kcal: 118, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Tapioca + Iogurte + Pasta",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 200, unit: "g", kcal: 117, scaleGroup: "protein" },
+              { foodKey: "tapioca", name: "Tapioca", qty: 40, unit: "g", kcal: 97, scaleGroup: "carb" },
+              { foodKey: "pasta-amendoim", name: "Pasta de amendoim integral", qty: 20, unit: "g", kcal: 118, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Pão francês + Iogurte + Pasta",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 200, unit: "g", kcal: 117, scaleGroup: "protein" },
+              { foodKey: "pao-frances", name: "Pão francês", qty: 40, unit: "g", kcal: 119, scaleGroup: "carb" },
+              { foodKey: "pasta-amendoim", name: "Pasta de amendoim integral", qty: 20, unit: "g", kcal: 118, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
       {
@@ -522,12 +1124,50 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 200, unit: "g", kcal: 257, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate em fatias", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Arroz + Abacate",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 200, unit: "g", kcal: 330, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 200, unit: "g", kcal: 257, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate em fatias", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Arroz + Abacate",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 200, unit: "g", kcal: 190, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 200, unit: "g", kcal: 257, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate em fatias", qty: 60, unit: "g", kcal: 115, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "16:30", label: "Pré-treino", heroKey: "batata-doce",
         items: [
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 250, unit: "g", kcal: 195, scaleGroup: "carb" },
           { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+        ],
+        alternatives: [
+          {
+            title: "Tapioca + Peito",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 250, unit: "g", kcal: 605, scaleGroup: "carb" },
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+            ],
+          },
+          {
+            title: "Pão francês + Peito",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 250, unit: "g", kcal: 742, scaleGroup: "carb" },
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+            ],
+          },
         ],
       },
       {
@@ -536,6 +1176,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-whey-protein", name: "Whey protein isolado", qty: 35, unit: "g", kcal: 130, scaleGroup: "protein" },
           { foodKey: "macarrao-espaguete", name: "Macarrão integral cozido", qty: 180, unit: "g", kcal: 281, scaleGroup: "carb" },
           { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Macarrão + Peito",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 35, unit: "g", kcal: 58, scaleGroup: "protein" },
+              { foodKey: "macarrao-espaguete", name: "Macarrão integral cozido", qty: 180, unit: "g", kcal: 281, scaleGroup: "carb" },
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Macarrão + Peito",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 35, unit: "g", kcal: 33, scaleGroup: "protein" },
+              { foodKey: "macarrao-espaguete", name: "Macarrão integral cozido", qty: 180, unit: "g", kcal: 281, scaleGroup: "carb" },
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+            ],
+          },
         ],
       },
     ],
@@ -558,6 +1218,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Pão francês + Ovos + Mamão",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 60, unit: "g", kcal: 178, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Ovos + Mamão",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 60, unit: "g", kcal: 233, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "10:00", label: "Lanche da manhã", heroKey: "usda-greek-yogurt-nonfat",
@@ -566,6 +1246,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 30, unit: "g", kcal: 117, scaleGroup: "carb" },
           { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 10, unit: "g", kcal: 49, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Iogurte + Chia",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 170, unit: "g", kcal: 99, scaleGroup: "protein" },
+              { foodKey: "tapioca", name: "Tapioca", qty: 30, unit: "g", kcal: 73, scaleGroup: "carb" },
+              { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 10, unit: "g", kcal: 49, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Pão francês + Iogurte + Chia",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 170, unit: "g", kcal: 99, scaleGroup: "protein" },
+              { foodKey: "pao-frances", name: "Pão francês", qty: 30, unit: "g", kcal: 89, scaleGroup: "carb" },
+              { foodKey: "usda-chia-seeds", name: "Chia hidratada", qty: 10, unit: "g", kcal: 49, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "13:00", label: "Almoço", heroKey: "patinho-bovino",
@@ -573,6 +1273,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 150, unit: "g", kcal: 204, scaleGroup: "protein" },
           { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 150, unit: "g", kcal: 193, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Arroz + Azeite",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 150, unit: "g", kcal: 193, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Arroz + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 142, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 150, unit: "g", kcal: 193, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
       {
@@ -588,6 +1308,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 180, unit: "g", kcal: 140, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Batata + Abacate",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 180, unit: "g", kcal: 140, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Batata + Abacate",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 150, unit: "g", kcal: 202, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 180, unit: "g", kcal: 140, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
@@ -610,6 +1350,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 40, unit: "g", kcal: 156, scaleGroup: "carb" },
           { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Ovos + Banana",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+              { foodKey: "tapioca", name: "Tapioca", qty: 40, unit: "g", kcal: 97, scaleGroup: "carb" },
+              { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Pão francês + Ovos + Banana",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+              { foodKey: "pao-frances", name: "Pão francês", qty: 40, unit: "g", kcal: 119, scaleGroup: "carb" },
+              { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "10:00", label: "Lanche da manhã", heroKey: "usda-greek-yogurt-nonfat",
@@ -625,12 +1385,50 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 130, unit: "g", kcal: 167, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Filé de tilápia grelhado + Arroz + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 200, unit: "g", kcal: 190, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 130, unit: "g", kcal: 167, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Arroz + Azeite",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 200, unit: "g", kcal: 270, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 130, unit: "g", kcal: 167, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "16:30", label: "Pré-treino", heroKey: "batata-doce",
         items: [
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 200, unit: "g", kcal: 156, scaleGroup: "carb" },
           { foodKey: "usda-whey-protein", name: "Whey protein", qty: 25, unit: "g", kcal: 93, scaleGroup: "protein" },
+        ],
+        alternatives: [
+          {
+            title: "Tapioca + Whey",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 200, unit: "g", kcal: 484, scaleGroup: "carb" },
+              { foodKey: "usda-whey-protein", name: "Whey protein", qty: 25, unit: "g", kcal: 93, scaleGroup: "protein" },
+            ],
+          },
+          {
+            title: "Pão francês + Whey",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 200, unit: "g", kcal: 594, scaleGroup: "carb" },
+              { foodKey: "usda-whey-protein", name: "Whey protein", qty: 25, unit: "g", kcal: 93, scaleGroup: "protein" },
+            ],
+          },
         ],
       },
       {
@@ -639,6 +1437,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-salmon-atlantic-raw", name: "Salmão grelhado", qty: 150, unit: "g", kcal: 309, scaleGroup: "protein" },
           { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate", qty: 40, unit: "g", kcal: 77, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Quinoa + Abacate",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+              { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 40, unit: "g", kcal: 77, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Quinoa + Abacate",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 142, scaleGroup: "protein" },
+              { foodKey: "usda-quinoa-cooked", name: "Quinoa cozida", qty: 130, unit: "g", kcal: 159, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 40, unit: "g", kcal: 77, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
@@ -661,6 +1479,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "morango", name: "Morangos", qty: 100, unit: "g", kcal: 32, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Pão francês + Ovos + Morangos",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "pao-frances", name: "Pão francês", qty: 40, unit: "g", kcal: 119, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "morango", name: "Morangos", qty: 100, unit: "g", kcal: 32, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Ovos + Morangos",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 40, unit: "g", kcal: 156, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "morango", name: "Morangos", qty: 100, unit: "g", kcal: 32, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "12:30", label: "Almoço", heroKey: "peito-frango",
@@ -668,6 +1506,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
           { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 100, unit: "g", kcal: 128, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Filé de tilápia grelhado + Arroz + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 142, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 100, unit: "g", kcal: 128, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Arroz + Azeite",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 150, unit: "g", kcal: 202, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz integral cozido", qty: 100, unit: "g", kcal: 128, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 5, unit: "g", kcal: 45, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
       {
@@ -683,6 +1541,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 150, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 130, unit: "g", kcal: 101, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate", qty: 40, unit: "g", kcal: 77, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Batata + Abacate",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 150, unit: "g", kcal: 248, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 130, unit: "g", kcal: 101, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 40, unit: "g", kcal: 77, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Batata + Abacate",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 150, unit: "g", kcal: 202, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 130, unit: "g", kcal: 101, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 40, unit: "g", kcal: 77, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
@@ -705,6 +1583,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 50, unit: "g", kcal: 195, scaleGroup: "carb" },
           { foodKey: "pasta-amendoim", name: "Pasta de amendoim", qty: 15, unit: "g", kcal: 89, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Banana + Pasta",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+              { foodKey: "tapioca", name: "Tapioca", qty: 50, unit: "g", kcal: 121, scaleGroup: "carb" },
+              { foodKey: "pasta-amendoim", name: "Pasta de amendoim", qty: 15, unit: "g", kcal: 89, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Pão francês + Banana + Pasta",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "banana", name: "Banana", qty: 120, unit: "g", kcal: 117, scaleGroup: "fruit" },
+              { foodKey: "pao-frances", name: "Pão francês", qty: 50, unit: "g", kcal: 148, scaleGroup: "carb" },
+              { foodKey: "pasta-amendoim", name: "Pasta de amendoim", qty: 15, unit: "g", kcal: 89, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "10:00", label: "Pós-treino", heroKey: "pao-frances",
@@ -712,6 +1610,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "pao-frances", name: "Pão francês", qty: 100, unit: "g", kcal: 297, scaleGroup: "carb" },
           { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
           { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+        ],
+        alternatives: [
+          {
+            title: "Tapioca + Ovos + Mamão",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "tapioca", name: "Tapioca", qty: 100, unit: "g", kcal: 242, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Ovos + Mamão",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 100, unit: "g", kcal: 389, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+            ],
+          },
         ],
       },
       {
@@ -721,6 +1639,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 200, unit: "g", kcal: 257, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Filé de tilápia grelhado + Arroz + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 170, unit: "g", kcal: 162, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 200, unit: "g", kcal: 257, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Arroz + Azeite",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 170, unit: "g", kcal: 230, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 200, unit: "g", kcal: 257, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "16:30", label: "Lanche", heroKey: "usda-greek-yogurt-nonfat",
@@ -729,6 +1667,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-oats-rolled", name: "Granola caseira", qty: 30, unit: "g", kcal: 117, scaleGroup: "carb" },
           { foodKey: "usda-blueberries", name: "Mirtilos", qty: 80, unit: "g", kcal: 46, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Tapioca + Iogurte + Mirtilos",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 170, unit: "g", kcal: 99, scaleGroup: "protein" },
+              { foodKey: "tapioca", name: "Tapioca", qty: 30, unit: "g", kcal: 73, scaleGroup: "carb" },
+              { foodKey: "usda-blueberries", name: "Mirtilos", qty: 80, unit: "g", kcal: 46, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Pão francês + Iogurte + Mirtilos",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "usda-greek-yogurt-nonfat", name: "Iogurte grego natural", qty: 170, unit: "g", kcal: 99, scaleGroup: "protein" },
+              { foodKey: "pao-frances", name: "Pão francês", qty: 30, unit: "g", kcal: 89, scaleGroup: "carb" },
+              { foodKey: "usda-blueberries", name: "Mirtilos", qty: 80, unit: "g", kcal: 46, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "20:00", label: "Jantar", heroKey: "usda-salmon-atlantic-raw",
@@ -736,6 +1694,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-salmon-atlantic-raw", name: "Salmão grelhado", qty: 130, unit: "g", kcal: 268, scaleGroup: "protein" },
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 200, unit: "g", kcal: 156, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Peito de frango grelhado + Batata + Abacate",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 130, unit: "g", kcal: 214, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 200, unit: "g", kcal: 156, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Filé de tilápia grelhado + Batata + Abacate",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 130, unit: "g", kcal: 124, scaleGroup: "protein" },
+              { foodKey: "batata-doce", name: "Batata doce cozida", qty: 200, unit: "g", kcal: 156, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
@@ -759,6 +1737,28 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "tapioca", name: "Tapioca", qty: 50, unit: "g", kcal: 121, scaleGroup: "carb" },
           { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Pão francês + Ovos + Abacate",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+              { foodKey: "abacate", name: "Abacate", qty: 80, unit: "g", kcal: 154, scaleGroup: "fat" },
+              { foodKey: "pao-frances", name: "Pão francês", qty: 50, unit: "g", kcal: 148, scaleGroup: "carb" },
+              { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Aveia em flocos + Ovos + Abacate",
+            imageKey: "usda-oats-rolled",
+            items: [
+              { foodKey: "ovo-galinha", name: "Ovos mexidos", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+              { foodKey: "abacate", name: "Abacate", qty: 80, unit: "g", kcal: 154, scaleGroup: "fat" },
+              { foodKey: "usda-oats-rolled", name: "Aveia em flocos", qty: 50, unit: "g", kcal: 194, scaleGroup: "carb" },
+              { foodKey: "mamao", name: "Mamão papaia", qty: 150, unit: "g", kcal: 65, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "16:00", label: "Refeição 2 (pré/pós-treino)", heroKey: "peito-frango",
@@ -768,6 +1768,28 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
           { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Filé de tilápia grelhado + Arroz + Azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 180, unit: "g", kcal: 171, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+              { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Patinho bovino grelhado + Arroz + Azeite",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho bovino grelhado", qty: 180, unit: "g", kcal: 243, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 10, unit: "g", kcal: 90, scaleGroup: "fat" },
+              { foodKey: "banana", name: "Banana", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "19:30", label: "Última refeição da janela", heroKey: "usda-salmon-atlantic-raw",
@@ -775,6 +1797,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "usda-salmon-atlantic-raw", name: "Salmão grelhado", qty: 150, unit: "g", kcal: 309, scaleGroup: "protein" },
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 180, unit: "g", kcal: 140, scaleGroup: "carb" },
           { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Tapioca + Salmão + Abacate",
+            imageKey: "tapioca",
+            items: [
+              { foodKey: "usda-salmon-atlantic-raw", name: "Salmão grelhado", qty: 150, unit: "g", kcal: 309, scaleGroup: "protein" },
+              { foodKey: "tapioca", name: "Tapioca", qty: 180, unit: "g", kcal: 436, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Pão francês + Salmão + Abacate",
+            imageKey: "pao-frances",
+            items: [
+              { foodKey: "usda-salmon-atlantic-raw", name: "Salmão grelhado", qty: 150, unit: "g", kcal: 309, scaleGroup: "protein" },
+              { foodKey: "pao-frances", name: "Pão francês", qty: 180, unit: "g", kcal: 535, scaleGroup: "carb" },
+              { foodKey: "abacate", name: "Abacate", qty: 50, unit: "g", kcal: 96, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
