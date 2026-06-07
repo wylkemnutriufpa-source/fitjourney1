@@ -35,7 +35,7 @@ import {
 import reel1 from "@/assets/reels/reel-1.mp4.asset.json";
 import reel2 from "@/assets/reels/reel-2.mp4.asset.json";
 import reel3 from "@/assets/reels/reel-3.mp4.asset.json";
-import reel4 from "@/assets/reels/reel-4.mp4.asset.json";
+
 
 
 
