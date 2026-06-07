@@ -335,15 +335,18 @@ function Landing() {
           <div className="grid lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-8 items-center">
             {/* — Coluna esquerda: copy — */}
             <motion.div variants={stagger} initial={false} animate="show" className="text-center lg:text-left">
-              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-premium text-primary text-sm font-semibold mb-8 gradient-border">
+              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-premium text-[var(--gold)] text-sm font-semibold mb-8 border border-[var(--gold)]/40 shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_18%,transparent),0_8px_24px_-12px_color-mix(in_oklab,var(--gold)_45%,transparent)]">
                 <Sparkles className="w-4 h-4" />
                 {c.hero.badge}
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse shadow-[0_0_8px_color-mix(in_oklab,var(--gold)_70%,transparent)]" />
               </motion.div>
 
               <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] mb-6 tracking-tight">
                 {c.hero.title_line1}{" "}
-                <span className="text-gradient-animated">{c.hero.title_line2}</span>
+                <span className="relative inline-block">
+                  <span className="text-gradient-animated">{c.hero.title_line2}</span>
+                  <span aria-hidden className="absolute left-0 right-0 -bottom-1 h-[3px] rounded-full bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-80" />
+                </span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
