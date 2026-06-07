@@ -538,7 +538,12 @@ function MealCard({
   const equivalents: any[] = Array.isArray(meal?.equivalents)
     ? meal.equivalents
     : [];
-  const heroUrl = imgFor(meal?.heroKey || main?.imageKey || "");
+  const heroUrl = resolveBlockImage({
+    heroKey: meal?.heroKey,
+    imageKey: main?.imageKey,
+    items,
+    mealKind: detectMealKind(meal?.label, meal?.time),
+  });
   const kcal = mealKcal(main);
   const mealKind: MealKind = detectMealKind(meal?.label, meal?.time);
   const { isMealOpen, toggleMeal } = useExpansion();
