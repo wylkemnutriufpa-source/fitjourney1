@@ -135,6 +135,35 @@ function PatientOnboardingPage() {
               </div>
             </label>
 
+            <div className="space-y-2 p-4 rounded-lg border border-border">
+              <label
+                htmlFor="onb-phone"
+                className="text-sm font-medium flex items-center gap-2"
+              >
+                <Phone className="size-4 text-primary" />
+                WhatsApp para contato
+              </label>
+              <input
+                id="onb-phone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                placeholder="+55 (11) 99999-9999"
+                value={phone}
+                onChange={(e) => setPhone(maskPhoneBR(e.target.value))}
+                className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <p className="text-xs text-muted-foreground">
+                Seu nutricionista usa esse número para enviar lembretes e
+                acompanhar sua evolução.
+              </p>
+              {phone && !phoneValid && (
+                <p className="text-xs text-destructive">
+                  Telefone incompleto. Use DDD + número (ex: 11 99999-9999).
+                </p>
+              )}
+            </div>
+
             {error && (
               <p className="text-xs text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
                 {error}
@@ -144,7 +173,7 @@ function PatientOnboardingPage() {
             <button
               type="button"
               onClick={handleConsent}
-              disabled={!lgpd || !clinical || savingConsent}
+              disabled={!lgpd || !clinical || !phoneValid || savingConsent}
               className="w-full bg-primary text-primary-foreground rounded-md py-3 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 disabled:opacity-50"
             >
               {savingConsent && <Loader2 className="size-4 animate-spin" />}
