@@ -350,6 +350,15 @@ function Landing() {
                 {c.hero.description}
               </motion.p>
 
+              <motion.div variants={fadeUp} className="mb-6">
+                <img
+                  src={evolucaoPraticaClinica.url}
+                  alt="Você não entrega dietas. Você conduz transformações metabólicas."
+                  className="w-full h-auto rounded-2xl border border-border/40 shadow-2xl"
+                  loading="eager"
+                />
+              </motion.div>
+
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-5">
                 <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-8 h-14 font-semibold hover:scale-[1.03] active:scale-[0.98] transition-transform">
                   {c.hero.cta_primary} <ArrowRight className="w-4 h-4" />
@@ -818,14 +827,6 @@ function Landing() {
               <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
                 {c.final_cta.description}
               </p>
-              <div className="max-w-3xl mx-auto mb-10">
-                <img
-                  src={evolucaoPraticaClinica.url}
-                  alt="Você não entrega dietas. Você conduz transformações metabólicas."
-                  className="w-full h-auto rounded-2xl border border-border/40 shadow-2xl"
-                  loading="lazy"
-                />
-              </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-12 h-14 font-semibold hover:scale-105 active:scale-[0.98] transition-transform">
                   <Sparkles className="w-4 h-4" /> {c.final_cta.cta_primary}
