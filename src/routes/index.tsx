@@ -366,7 +366,7 @@ function Landing() {
                 <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-8 h-14 font-semibold hover:scale-[1.03] active:scale-[0.98] transition-transform">
                   {c.hero.cta_primary} <ArrowRight className="w-4 h-4" />
                 </Link>
-                <a href="#features" className="inline-flex items-center justify-center gap-2 border border-border glass rounded-md text-base px-7 h-14 font-medium hover:bg-muted transition-colors">
+                <a href="#features" className="inline-flex items-center justify-center gap-2 border border-[var(--gold)]/60 text-[var(--gold)] glass rounded-md text-base px-7 h-14 font-medium hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] hover:border-[var(--gold)] transition-colors">
                   <Play className="w-4 h-4" /> {c.hero.cta_secondary}
                 </a>
               </motion.div>
