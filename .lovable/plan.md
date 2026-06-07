@@ -1,164 +1,81 @@
-## Plano único editável — versionamento invisível
+# Plano — Corrigir geração de imagens e substituições nos templates
 
-Princípio: para o nutricionista existe **uma** entidade — "Plano do paciente". Abre, edita, salva. Paciente vê. Fim. Nada de draft, clone, republicar, marcar entregue.
+Aplica as regras da skill `fitjourney-template-rules` no código. Sem mudar UI, sem mudar contrato de snapshot, sem tocar planos já publicados.
 
-A arquitetura cumpre isso **sem violar a invariante do snapshot imutável**: cada "salvar" insere uma nova linha `status='published'` no banco. As linhas antigas permanecem como histórico técnico, invisíveis ao usuário. A query do paciente (`patient-plan.functions.ts`) já retorna sempre a mais recente — o comportamento já está pronto, só precisamos da UI de edição e do save.
+## Fix 1 — Acompanhamentos do almoço/jantar com `foodKey` canônico (CRÍTICO)
 
----
+**Onde:** `src/lib/meal-planner.ts`, função `withLunchSides` (linhas 661–681).
 
-### Bloco 1 — Edição direta do plano (UX única)
+**Problema:** os 4 itens injetados (Arroz, Feijão, Salada, Fruta) não têm `foodKey`. O `scaleItem` faz fallback para a `imageKey` da opção (a proteína), o que confunde `recalcMaterializedEquivalents` e gera ruído no QA.
 
-**1.1 Tela única** `/_authenticated/patients/$id/diet`
+**Correção:** declarar `foodKey` canônico para cada acompanhamento, alinhado ao catálogo TACO:
 
-Hoje é read-only com CTA para "Publicar a partir de template". Vai virar editor inline:
+```ts
+{ foodKey: "arroz-cozido",        name: "Arroz cozido",           ... scaleGroup: "carb" }
+{ foodKey: "feijao-cozido",       name: "Feijão cozido",          ... scaleGroup: "protein" }
+{ foodKey: "salada-verde-livre",  name: "Salada verde (livre)",   ... scaleGroup: "vegetable" }
+{ foodKey: "fruta-sobremesa",     name: "Fruta de sobremesa",     ... scaleGroup: "fruit" }
+```
 
-- Se **não há plano publicado** → mantém o estado vazio atual com CTA "Criar a partir de template" (primeiro plano precisa de origem clínica).
-- Se **há plano publicado** → renderiza o snapshot em modo edição direta:
-  - Cada refeição é editável (horário, label, título).
-  - Cada item editável (nome, qty, unit, kcal/macros) usando `FoodPickerDialog` já existente.
-  - Adicionar/remover refeição. Adicionar/remover item. Reordenar.
-  - Barra fixa com totais (kcal/macros) recalculados em runtime apenas para a UI — **não** persiste cálculo derivado.
-- Botão único: **Salvar alterações**. Sem "publicar", sem "draft", sem "entregue".
-- Sem aviso de "vai criar nova versão". Sem histórico exposto. A seção "Histórico de planos" da tela atual será **removida** do contexto do nutricionista (continua existindo no banco para auditoria).
+Acompanhamento **não gera imagem própria** (regra 2 da skill) — o QA já ignora itens não-âncora.
 
-**1.2 Server fn** `saveEditedPlan({ patientId, snapshot })`
+## Fix 2 — `recalcMaterializedEquivalents` só roda em itens-âncora
 
-Em `src/lib/plans/plans.functions.ts`:
+**Onde:** `src/lib/meal-planner.ts`, função `materializeOptionEquivalents` (caminho que itera `option.items`).
 
-- Auth: `requireSupabaseAuth` + dono do paciente (nutricionista).
-- Valida snapshot com `snapshotV3Schema` já existente.
-- Preserva `clinicalAudit` e `clinical_review` do snapshot anterior (não roda motor de novo — esta é edição manual; auditoria registra `editedFromPlanId`).
-- INSERT nova linha `plans` com `status='published'`, `published_at=now()`, `source_template_id` herdado, `schema_version=3`.
-- Não toca em linhas antigas. Trigger `plans_snapshot_immutable` continua intocado — invariante preservada.
-- Retorna `{ id, publishedAt }`.
+**Problema:** hoje tenta materializar substituições para todo item, inclusive acompanhamento/recheio/bebida/fruta — gera 169 falsos positivos "sub sem imagem" e "âncora sem cobertura".
 
-**1.3 Cliente: substitui CTA "Publicar novo"**
+**Correção:** materializar somente:
+- almoço/jantar → primeiro item `scaleGroup === "protein"` que não seja acompanhamento (feijão/salada/fruta);
+- café/lanche → primeiro item do bloco (carboidrato base).
 
-Botão "Publicar novo plano" (que leva pra `/templates`) só aparece quando **não há plano publicado**. Quando há, vira "Editar plano" inline na própria tela.
+Demais itens ficam sem `materializedEquivalents` (paciente não vê "Trocar" neles, o que é o comportamento desejado: acompanhamento livre, recheio acompanha base).
 
----
+## Fix 3 — Imagens: âncora apenas, sem compostos
 
-### Bloco 2 — Remover conceito de "entregue"
+**Onde:** `src/lib/food-images.ts` (fallbacks categóricos) + renderers.
 
-- **Não cria** colunas `delivered_at` / `delivered_by` / `delivered_note`.
-- **Não afrouxa** trigger `plans_snapshot_immutable`. Permanece como está.
-- Filtro "Planos pendentes" em `listPatients`: critério passa a ser `anamnesisStatus='approved' AND NOT EXISTS plan WHERE status='published'`. Já é o comportamento atual (`hasPublishedPlan`) — só remove o vocabulário "delivered" do código.
-- Modal do avatar (nutri): "feedbacks pendentes" e "pacientes sem plano" usam o mesmo critério.
+**Problema:** QA reporta 130 itens sem imagem porque cai em recheios/acompanhamentos.
 
----
+**Correção:**
+1. Manter fallback categórico só para **proteínas** (almoço/jantar) e **carboidratos base** (café/lanche). Lista já existe — apenas garantir cobertura completa do pool oficial:
+   - Carb base: pão, tapioca, cuscuz, wrap, bolo-de-milho, bolo-de-macaxeira, panqueca-de-banana, vitamina-de-frutas.
+   - Proteínas faltantes detectadas no QA: `carne-moida-refogada` → fallback `carne-grelhada`; `queijo-minas` → sem imagem (recheio, não âncora) — remover do warning; `inhame` → adicionar como carb base se aparecer no pool.
+2. Renderers do café/lanche resolvem imagem a partir do **primeiro item** do bloco (carb base), não de slug composto.
+3. Não criar nenhum arquivo `pao-com-*.jpg` / `tapioca-com-*.jpg`.
 
-### Bloco 3 — Próximas tarefas (na ordem que você pediu)
+## Fix 4 — Rotação de café/lanche: pool oficial garantido
 
-3.1 **Filtros de pacientes** — revisar a listagem `/patients` para usar o mesmo critério unificado ("sem plano publicado") e adicionar atalho "Pacientes pendentes".
+**Onde:** `src/lib/substitutions/taco-catalog.ts` + `src/lib/substitutions/equivalents.ts`.
 
-3.2 **Avaliação física unificada** — discovery (bloqueado até mapear fonte canônica). Entrego sub-plano depois.
+**Correção:** garantir que o pool de carboidrato base em café/lanche tenha **8 opções** (pão, tapioca, cuscuz, wrap, bolo-de-milho, bolo-de-macaxeira, panqueca-de-banana, vitamina-de-frutas) com `scaleGroup="carb"` e `subGroup="cafe-lanche-base"`. Motor já rotaciona por offset — só precisa do pool completo.
 
-3.3 **Navegação mobile** — auditar sidebar/sheet em telas <768px, fechar ao navegar (já validado parcialmente), adicionar bottom-nav se necessário.
+## Validação
 
-3.4 **Dashboard do paciente** — revisar hierarquia: plano contratado, próxima janela de feedback, atalho rápido para refeição atual.
+Após cada fix, rodar:
+```
+bun run scripts/qa-templates.ts
+```
 
----
+Meta:
+- 0 issues CRÍTICAS
+- 0 `anchor-image-missing` em proteína de almoço/jantar
+- 0 `anchor-image-missing` em carb base de café/lanche
+- `rotation-pool-too-small` zerado nos 18 smart-seeds
+- Ruído de acompanhamento/recheio desaparece (não é reportado)
 
-### Detalhes técnicos
+## Não-regressão (Matriz de Impacto)
 
-- **Migração**: nenhuma. Zero DDL. Zero alteração de trigger/RLS.
-- **Arquivos novos**: nenhum componente novo — reaproveita `FoodPickerDialog`, `NutritionTargetCard`.
-- **Arquivos alterados**:
-  - `src/lib/plans/plans.functions.ts` — adicionar `saveEditedPlan`.
-  - `src/routes/_authenticated/patients/$id/diet.tsx` — transformar em editor.
-  - `src/lib/plans/patient-plan.functions.ts` — sem mudança (já retorna o mais recente).
-- **Invariantes preservadas** (todas):
-  - Snapshot V3 imutável após published_at ✓ (nunca damos UPDATE).
-  - Anamnese aprovada é verdade clínica ✓ (não tocamos).
-  - Vínculo paciente↔nutricionista intocado ✓.
-  - Patient App read-only ✓.
-  - Sem CASCADE, sem fallback silencioso, sem refactor cross-módulo ✓.
-- **Auditoria invisível**: cada edição vira nova linha `plans`. Histórico continua acessível via SQL/admin se algum dia precisar — só não aparece na UI do nutricionista.
+- Planos publicados: intactos (snapshot V3 imutável; só mudamos geração futura).
+- Patient App: continua render-burro; resolve imagem a partir do primeiro item do bloco.
+- V2 Piloto: não materializa substituições por design — fica fora do escopo deste fix.
+- PDF: idêntico (consome snapshot).
+- Sem migration de banco. Sem mudança de RLS. Sem mudança em vínculo paciente↔nutricionista.
 
----
+## Ordem de execução
 
-### Decisão pendente (1 só)
-
-**Confirmação do princípio:** edição manual **não re-roda** o motor clínico (TDEE/macros/matcher). O nutricionista é soberano: o que ele salvar, é o que vai pro paciente. O snapshot novo herda `clinicalAudit` do anterior + marca `manualEdit: true` na auditoria, mas alvo clínico do motor original fica preservado para referência. **OK?**
-
-Se sim, respondo `APPROVED FOR EXECUTION` e executo Bloco 1+2 em sequência. Bloco 3 vem depois com sub-planos separados. 
-
-&nbsp;
-
-&nbsp;
-
-Uma observação que eu adicionaria para ele:
-
-Não esconda apenas o histórico.
-
-Esconda também o conceito de versão.
-
-Porque se aparecer:
-
-Plain text
-
-Plano v1
-
-Plano v2
-
-Plano v3
-
-Plano v4
-
-o nutricionista vai começar a perguntar:
-
-Qual eu devo editar?
-
-E você recria o problema.
-
-Para ele deve existir apenas:
-
-Plain text
-
-Plano Atual
-
-Internamente pode ter 500 versões.
-
-Ele nunca precisa saber.
-
-Minha única alteração no plano dele:
-
-No saveEditedPlan, ao criar a nova linha publicada, marcar a anterior como substituída.
-
-Exemplo:
-
-JSON
-
-{
-
-  "supersededBy": "novoPlanId"
-
-}
-
-ou
-
-JSON
-
-{
-
-  "isCurrent": false
-
-}
-
-Porque daqui a 1 ano um paciente pode ter:
-
-27 versões publicadas
-
-14 ajustes
-
-3 reformulações
-
-e você vai querer identificar instantaneamente qual é a versão ativa sem depender apenas de published_at.
-
-Fora isso, o plano está alinhado com o que você vem defendendo desde o começo:
-
-o sistema sugere, o nutricionista decide.
-
-E principalmente:
-
-nenhuma regra técnica pode obrigar o nutricionista a refazer trabalho.
+1. Fix 1 (`withLunchSides` com `foodKey`).
+2. Fix 2 (materialização só na âncora).
+3. Fix 4 (pool de carb base completo).
+4. Fix 3 (fallbacks de imagem revisados).
+5. Rodar QA e reportar contagem final por severidade.
