@@ -1169,6 +1169,32 @@ function FjLandingTheme() {
         }
         .fj-landing .fj-sub-dark { color: #4A5A4E; }
 
+        /* Inline reel (single video centralizado) */
+        .fj-landing .fj-inline-reel {
+          position: relative;
+          aspect-ratio: 9/16;
+          max-width: 340px;
+          margin: 0 auto;
+          border-radius: 22px;
+          overflow: hidden;
+          border: 1px solid var(--border);
+          background: var(--ivory);
+          box-shadow: 0 30px 80px -30px rgba(31,58,42,0.45);
+        }
+        @media (min-width: 768px) {
+          .fj-landing .fj-inline-reel { max-width: 380px; aspect-ratio: 9/16; }
+        }
+        .fj-landing .fj-inline-reel video {
+          width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        /* Máscara que cobre o badge "AI" no canto superior direito do vídeo */
+        .fj-landing .fj-inline-reel-mask {
+          position: absolute; top: 0; right: 0;
+          width: 88px; height: 44px; pointer-events: none; z-index: 2;
+          background: linear-gradient(225deg, rgba(20,39,28,0.92) 0%, rgba(20,39,28,0.6) 60%, rgba(20,39,28,0) 100%);
+          border-top-right-radius: 22px;
+        }
+
         /* Reels */
         .fj-landing .fj-reels-sec { padding: 80px 24px; background: var(--cream); }
         @media (min-width: 1024px) { .fj-landing .fj-reels-sec { padding: 120px 56px; } }
