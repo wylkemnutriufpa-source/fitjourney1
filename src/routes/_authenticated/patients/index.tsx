@@ -289,8 +289,8 @@ function Patients() {
                     className={
                       "flex min-h-10 items-center justify-center gap-2 rounded-md border text-xs font-semibold disabled:opacity-50 " +
                       (p.isActive
-                        ? "border-border text-foreground hover:border-primary/40 hover:text-primary"
-                        : "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10")
+                        ? "border-rose-500/30 text-rose-300/90 hover:bg-rose-500/10 hover:border-rose-500/50"
+                        : "border-emerald-500/30 text-emerald-300/90 hover:bg-emerald-500/10 hover:border-emerald-500/50")
                     }
                   >
                     <Power className="size-4" />
