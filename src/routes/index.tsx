@@ -35,7 +35,7 @@ import {
 import reel1 from "@/assets/reels/reel-1.mp4.asset.json";
 import reel2 from "@/assets/reels/reel-2.mp4.asset.json";
 import reel3 from "@/assets/reels/reel-3.mp4.asset.json";
-import reel4 from "@/assets/reels/reel-4.mp4.asset.json";
+
 
 
 
@@ -474,6 +474,11 @@ function Landing() {
               </p>
             </motion.div>
 
+            <div className="fj-inline-reel mb-12">
+              <video src={reel1.url} autoPlay muted loop playsInline preload="metadata" />
+              <span className="fj-inline-reel-mask" aria-hidden />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {c.obstacle.cards.map((p, i) => (
                 <motion.div
@@ -538,6 +543,12 @@ function Landing() {
       {/* ══════════ FEATURES ══════════ */}
       {c.features.visible && (
         <section id="features" className="py-28 px-4 relative noise-overlay">
+          <div className="max-w-3xl mx-auto mb-16">
+            <div className="fj-inline-reel">
+              <video src={reel2.url} autoPlay muted loop playsInline preload="metadata" />
+              <span className="fj-inline-reel-mask" aria-hidden />
+            </div>
+          </div>
           <div className="max-w-7xl mx-auto relative z-10">
             <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
               <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.features.eyebrow}</span>
@@ -619,6 +630,13 @@ function Landing() {
                 <p className="text-sm text-muted-foreground">{step.desc}</p>
               </motion.div>
             ))}
+          </div>
+
+          <div className="max-w-3xl mx-auto mt-20">
+            <div className="fj-inline-reel">
+              <video src={reel3.url} autoPlay muted loop playsInline preload="metadata" />
+              <span className="fj-inline-reel-mask" aria-hidden />
+            </div>
           </div>
         </div>
       </section>
@@ -780,33 +798,8 @@ function Landing() {
         </section>
       )}
 
-      {/* ══════════ REELS — A plataforma em ação ══════════ */}
-      <section className="fj-reels-sec">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest fj-tag-gold">Em movimento</span>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-5 fj-h-dark">
-              A plataforma <span className="fj-h-accent">em ação.</span>
-            </h2>
-            <p className="text-base md:text-lg mt-4 max-w-2xl mx-auto fj-sub-dark">
-              Quatro cenas reais — do protocolo clínico ao acompanhamento do paciente.
-            </p>
-          </div>
-          <div className="fj-reels-strip">
-            {[
-              { src: reel1.url, label: "// 01 · Protocolo" },
-              { src: reel2.url, label: "// 02 · Inteligência" },
-              { src: reel3.url, label: "// 03 · Evolução" },
-              { src: reel4.url, label: "// 04 · Paciente" },
-            ].map((r) => (
-              <div className="fj-reel" key={r.label}>
-                <span className="fj-reel-corner">{r.label}</span>
-                <video src={r.src} autoPlay muted loop playsInline preload="metadata" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
+
 
       {/* ══════════ FINAL CTA ══════════ */}
 
@@ -1175,6 +1168,32 @@ function FjLandingTheme() {
           color: transparent;
         }
         .fj-landing .fj-sub-dark { color: #4A5A4E; }
+
+        /* Inline reel (single video centralizado) */
+        .fj-landing .fj-inline-reel {
+          position: relative;
+          aspect-ratio: 9/16;
+          max-width: 340px;
+          margin: 0 auto;
+          border-radius: 22px;
+          overflow: hidden;
+          border: 1px solid var(--border);
+          background: var(--ivory);
+          box-shadow: 0 30px 80px -30px rgba(31,58,42,0.45);
+        }
+        @media (min-width: 768px) {
+          .fj-landing .fj-inline-reel { max-width: 380px; aspect-ratio: 9/16; }
+        }
+        .fj-landing .fj-inline-reel video {
+          width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        /* Máscara que cobre o badge "AI" no canto superior direito do vídeo */
+        .fj-landing .fj-inline-reel-mask {
+          position: absolute; top: 0; right: 0;
+          width: 88px; height: 44px; pointer-events: none; z-index: 2;
+          background: linear-gradient(225deg, rgba(20,39,28,0.92) 0%, rgba(20,39,28,0.6) 60%, rgba(20,39,28,0) 100%);
+          border-top-right-radius: 22px;
+        }
 
         /* Reels */
         .fj-landing .fj-reels-sec { padding: 80px 24px; background: var(--cream); }
