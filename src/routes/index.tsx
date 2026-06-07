@@ -784,3 +784,51 @@ function LandingPage() {
     </div>
   );
 }
+
+function ContactModal({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <div className="fj-cm-overlay" onClick={onClose}>
+      <div className="fj-cm-card" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="fj-cm-close" onClick={onClose} aria-label="Fechar">×</button>
+        <div className="fj-cm-tag">Atendimento premium</div>
+        <h2 className="fj-cm-title">Fale com a gente</h2>
+        <p className="fj-cm-sub">Escolha o canal de sua preferência ou entre na plataforma.</p>
+        <div className="fj-cm-list">
+          <a href={CONTACT_WHATSAPP} target="_blank" rel="noopener noreferrer" className="fj-cm-item">
+            <span className="fj-cm-icon wa"><WhatsAppIcon className="w-5 h-5" /></span>
+            <span style={{ flex: 1 }}>
+              <span className="fj-cm-label">WhatsApp</span>
+              <div className="fj-cm-meta">{CONTACT_WHATSAPP_LABEL}</div>
+            </span>
+            <ArrowRight size={16} style={{ opacity: 0.5 }} />
+          </a>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="fj-cm-item">
+            <span className="fj-cm-icon mail"><Mail size={20} /></span>
+            <span style={{ flex: 1 }}>
+              <span className="fj-cm-label">E-mail</span>
+              <div className="fj-cm-meta">{CONTACT_EMAIL}</div>
+            </span>
+            <ArrowRight size={16} style={{ opacity: 0.5 }} />
+          </a>
+          <a href={CONTACT_INSTAGRAM} target="_blank" rel="noopener noreferrer" className="fj-cm-item">
+            <span className="fj-cm-icon ig"><Instagram size={20} /></span>
+            <span style={{ flex: 1 }}>
+              <span className="fj-cm-label">Instagram</span>
+              <div className="fj-cm-meta">@fitjourney_system</div>
+            </span>
+            <ArrowRight size={16} style={{ opacity: 0.5 }} />
+          </a>
+        </div>
+        <div className="fj-cm-cta-row">
+          <a href="/app" className="fj-cm-btn ghost">Entrar</a>
+          <a href="/signup/nutritionist" className="fj-cm-btn solid">Cadastrar</a>
+        </div>
+      </div>
+    </div>
+  );
+}
