@@ -784,6 +784,8 @@ function Landing() {
         </section>
       )}
 
+      <div aria-hidden className="flex justify-center py-2"><span className="block w-32 h-px bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-70" /></div>
+
       {/* ══════════ FAQ ══════════ */}
       {c.faq.visible && (
         <section id="faq" className="py-28 px-4">
