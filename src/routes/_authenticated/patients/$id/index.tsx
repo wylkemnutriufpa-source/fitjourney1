@@ -12,6 +12,7 @@ import { listPatientFeedbacks } from "@/lib/feedback/feedback.functions";
 import { adherenceLabel, resultLabel } from "@/lib/feedback/copy";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
 import { VideoLoader } from "@/components/VideoLoader";
+import { maskPhoneBR } from "@/lib/phone-mask";
 import {
   ArrowLeft,
   FileText,
@@ -278,7 +279,7 @@ function PatientProfile() {
               </div>
               <div className="flex items-center gap-3 min-w-0">
                 <Phone className="size-4 shrink-0 text-muted-foreground" />
-                <span className="font-mono text-xs">{p.phone ?? "—"}</span>
+                <span className="font-mono text-xs">{p.phone ? maskPhoneBR(p.phone) : "—"}</span>
               </div>
             </dl>
           </div>

@@ -22,6 +22,7 @@ import {
 } from "@/lib/anamnesis/review.functions";
 import { describeFlag } from "@/lib/anamnesis/v2/alerts.catalog";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
+import { maskPhoneBR } from "@/lib/phone-mask";
 import {
   Dialog,
   DialogContent,
@@ -128,7 +129,7 @@ function AnamnesisDetailPage() {
               {data.patient.phone && (
                 <span className="flex items-center gap-1.5">
                   <Phone className="size-3.5" />
-                  {data.patient.phone}
+                  {maskPhoneBR(data.patient.phone)}
                 </span>
               )}
             </div>
