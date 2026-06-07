@@ -1190,9 +1190,10 @@ function FjLandingTheme() {
         /* Máscara que cobre o badge "AI" no canto superior direito do vídeo */
         .fj-landing .fj-inline-reel-mask {
           position: absolute; top: 0; right: 0;
-          width: 88px; height: 44px; pointer-events: none; z-index: 2;
-          background: linear-gradient(225deg, rgba(20,39,28,0.92) 0%, rgba(20,39,28,0.6) 60%, rgba(20,39,28,0) 100%);
+          width: 34%; height: 12%; pointer-events: none; z-index: 3;
+          background: var(--ivory);
           border-top-right-radius: 22px;
+          box-shadow: -8px 8px 16px -8px var(--ivory);
         }
 
         /* Reels */
