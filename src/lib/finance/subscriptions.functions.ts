@@ -30,6 +30,7 @@ export type SubscriptionPaymentMethod =
 export interface Subscription {
   id: string;
   patientId: string;
+  patientName?: string | null;
   nutritionistId: string;
   planKind: SubscriptionPlanKind;
   priceCents: number;
@@ -320,7 +321,18 @@ export const getFinanceOverview = createServerFn({ method: "POST" })
       .order("starts_at", { ascending: false });
     if (error) throw new Error(error.message);
 
-    const all = (rows as Row[]).map(fromRow);
+    const baseAll = (rows as Row[]).map(fromRow);
+    // Hidrata nome do paciente (UI lista global mostra nome, não UUID).
+    const patientIds = Array.from(new Set(baseAll.map((s) => s.patientId)));
+    const nameById = new Map<string, string>();
+    if (patientIds.length > 0) {
+      const { data: pats } = await supabase
+        .from("patients")
+        .select("id, full_name")
+        .in("id", patientIds);
+      for (const p of pats ?? []) nameById.set(p.id, p.full_name);
+    }
+    const all = baseAll.map((s) => ({ ...s, patientName: nameById.get(s.patientId) ?? null }));
     const today = new Date();
     const todayIso = today.toISOString().slice(0, 10);
     const in30 = new Date(today);

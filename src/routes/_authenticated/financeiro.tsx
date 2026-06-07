@@ -157,7 +157,7 @@ function FinanceiroPage() {
                               params={{ id: s.patientId }}
                               className="text-primary hover:underline"
                             >
-                              {s.patientId.slice(0, 8)}…
+                              {s.patientName ?? `${s.patientId.slice(0, 8)}…`}
                             </Link>
                           </td>
                           <td className="px-5 py-2">
@@ -269,7 +269,7 @@ function SubscriptionList({
               params={{ id: s.patientId }}
               className="text-primary hover:underline truncate"
             >
-              {s.patientId.slice(0, 8)}…
+              {s.patientName ?? `${s.patientId.slice(0, 8)}…`}
             </Link>
             <span className="text-xs font-mono text-muted-foreground">
               {formatShortDate(s.endsAt)}
