@@ -370,23 +370,23 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                   }
                 }}
                 className={
-                  "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors " +
+                  "relative flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors " +
                   (active
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50")
+                    ? "bg-primary/10 text-primary border-l-2 border-[var(--gold)] shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--gold)_18%,transparent)]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50 border-l-2 border-transparent")
                 }
               >
-                <Icon className="size-4" />
+                <Icon className={"size-4 " + (active ? "text-[var(--gold)]" : "")} />
                 <span className="flex-1">{item.label}</span>
                 {badgeCount > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-mono">
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--gold)] text-[var(--gold-foreground)] text-[10px] font-mono shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_45%,transparent)]">
                     {badgeCount}
                   </span>
                 )}
                 {showDot && (
                   <span
                     title="Feedback pendente"
-                    className="size-2 rounded-full bg-primary animate-pulse"
+                    className="size-2 rounded-full bg-[var(--gold)] animate-pulse shadow-[0_0_8px_color-mix(in_oklab,var(--gold)_70%,transparent)]"
                   />
                 )}
               </Link>
