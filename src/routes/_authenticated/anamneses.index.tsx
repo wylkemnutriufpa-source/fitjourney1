@@ -45,11 +45,23 @@ function fmtDate(iso: string | null) {
 function AnamnesesQueuePage() {
   const [status, setStatus] = useState<StatusFilter>("submitted");
   const fetchList = useServerFn(listAnamnesesForNutritionist);
+  const reviewFn = useServerFn(reviewAnamnesis);
+  const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["nutri", "anamneses", status],
     queryFn: () => fetchList({ data: { status } }),
     staleTime: 15_000,
+  });
+
+  const approveMut = useMutation({
+    mutationFn: (anamnesisId: string) =>
+      reviewFn({ data: { anamnesisId, decision: "approved" } }),
+    onSuccess: () => {
+      toast.success("Anamnese aprovada");
+      queryClient.invalidateQueries({ queryKey: ["nutri", "anamneses"] });
+    },
+    onError: (e: Error) => toast.error(e.message ?? "Falha ao aprovar"),
   });
 
   return (
