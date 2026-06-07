@@ -1,32 +1,65 @@
-# Testes E2E (Playwright)
+# Testes E2E — FitJourney
 
-## Setup local
+Suite Playwright cobrindo os fluxos críticos do nutricionista.
 
-1. `cp .env.test.example .env.test`
-2. Preencha `E2E_NUTRITIONIST_EMAIL` / `E2E_NUTRITIONIST_PASSWORD` com uma
-   conta de teste real (não use credenciais de produção compartilhadas).
-3. `bunx playwright install chromium` (1ª vez)
-4. `bun run test:e2e` — roda headless contra `bun run dev` (porta 5173).
-5. `bun run test:e2e:ui` — abre o Playwright UI mode.
+## Setup (uma vez)
+
+```bash
+# 1. Instalar browsers do Playwright
+bunx playwright install chromium
+
+# 2. Copiar template e preencher credenciais
+cp .env.test.example .env.test
+# edite .env.test com:
+#   E2E_NUTRITIONIST_EMAIL=<seu email>
+#   E2E_NUTRITIONIST_PASSWORD=<sua senha>
+#   E2E_BASE_URL=https://id-preview--<project-id>.lovable.app   (opcional)
+```
+
+`.env.test` está no `.gitignore`. Nunca commitar.
+
+## Rodar
+
+```bash
+# Todos os specs
+bun run test:e2e
+
+# UI interativa (debug visual)
+bun run test:e2e:ui
+
+# Spec específico
+bunx playwright test tests/e2e/03-financeiro.spec.ts
+
+# Ver relatório HTML após falhas
+bun run test:e2e:report
+```
 
 ## Estrutura
 
-- `auth.setup.ts` — faz login uma vez e salva storageState em
-  `tests/e2e/.auth/nutritionist.json` (gitignored). Todos os specs reutilizam.
-- `login.spec.ts` — valida persistência da sessão e fluxo de erro.
-- `patient-flow.spec.ts` — fluxo crítico (lista de pacientes).
+| Spec | Cobre |
+|---|---|
+| `auth.setup.ts` | Login do nutri → salva sessão em `.auth/nutritionist.json` |
+| `login.spec.ts` | Sanidade: sessão persiste + credenciais inválidas mostram erro |
+| `01-public-invite.spec.ts` | Landing pública `/c/{slug}/{code}` (sem login) |
+| `02-nutri-workflow.spec.ts` | Fila de anamneses + perfil de paciente (read-only) |
+| `03-financeiro.spec.ts` | KPIs MRR/ARR/Ativos/Ticket + ausência de UUIDs vazando |
+| `04-mobile-smoke.spec.ts` | Mesmos fluxos em viewport iPhone 13 |
+| `patient-flow.spec.ts` | Smoke da lista de pacientes |
 
-## CI
+## O que NÃO está coberto (e por quê)
 
-`.github/workflows/e2e.yml` roda em PR. Credenciais via GitHub Secrets:
-- `E2E_NUTRITIONIST_EMAIL`
-- `E2E_NUTRITIONIST_PASSWORD`
+- **Aprovar anamnese / publicar plano**: efeito imutável no banco real.
+  Precisaria de ambiente de staging dedicado com seed isolado. Hoje é
+  validação manual.
+- **Onboarding de paciente novo**: requer signup Google interativo
+  (OAuth real). Coberto parcialmente pela landing pública.
+- **Geração de PDF**: depende de assets pesados; melhor cobrir em
+  teste unitário do gerador.
 
-## Rodar contra preview publicado
+## Convenções
 
-```bash
-E2E_BASE_URL=https://id-preview--61ea7b22-72bd-452d-9f74-74ffe941d313.lovable.app \
-  bun run test:e2e
-```
-
-Quando `E2E_BASE_URL` está definido, o Playwright NÃO sobe `bun run dev`.
+- Specs são resilientes a banco vazio (usam `test.skip()` quando não há
+  dados).
+- Asserts focam em **invariantes** (botão visível, sem erro 500, sem UUID
+  vazando), não em pixel.
+- Mobile usa preset `devices["iPhone 13"]` do Playwright.
