@@ -1455,16 +1455,22 @@ function MealEditor({
         }
       }
       const nextMain = { ...m.main, imageKey: mainImage, items: [...m.main.items, food] };
-      // Auto-injeção de equivalentes só dispara no primeiro alimento da refeição.
-      // Alimentos seguintes entram apenas na opção principal — sem amontoar substituições.
+      // Primeiro alimento cria as opções equivalentes. Os próximos itens (ex.: café)
+      // entram também em cada opção já existente, mantendo o bloco café/lanche íntegro.
       const auto = isFirst
         ? buildAutoEquivalents({ ...m, main: nextMain, heroKey }, food, candidates)
         : [];
+      const nextEquivalents = isFirst
+        ? [...m.equivalents, ...auto]
+        : m.equivalents.map((eq) => ({
+            ...eq,
+            items: [...eq.items, createEmptyFoodItem({ ...food, id: undefined })],
+          }));
       return {
         ...m,
         heroKey,
         main: nextMain,
-        equivalents: [...m.equivalents, ...auto],
+        equivalents: nextEquivalents,
       };
     });
   }
