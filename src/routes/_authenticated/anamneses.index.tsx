@@ -196,6 +196,30 @@ function AnamnesesQueuePage() {
                   <ChevronRight className="size-4 text-muted-foreground shrink-0 mt-1" />
                 </div>
               </Link>
+              {(item.reviewStatus === "submitted" || item.reviewStatus === "needs_changes") && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (approveMut.isPending) return;
+                    const ok = window.confirm(
+                      `Aprovar a anamnese de ${item.patientName} (v${item.version})?\n\nA aprovação é imutável e dispara os alertas clínicos no app do paciente.`,
+                    );
+                    if (ok) approveMut.mutate(item.id);
+                  }}
+                  disabled={approveMut.isPending && approveMut.variables === item.id}
+                  className="absolute top-3 right-3 sm:top-1/2 sm:-translate-y-1/2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                  aria-label={`Aprovar anamnese de ${item.patientName}`}
+                >
+                  {approveMut.isPending && approveMut.variables === item.id ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="size-3.5" />
+                  )}
+                  Aprovar
+                </button>
+              )}
             </li>
           ))}
         </ul>
