@@ -1197,14 +1197,8 @@ function FjLandingTheme() {
         .fj-landing .fj-inline-reel video {
           width: 100%; height: 100%; object-fit: cover; display: block;
         }
-        /* Máscara que cobre o badge "AI" no canto superior direito do vídeo */
-        .fj-landing .fj-inline-reel-mask {
-          position: absolute; top: 0; right: 0;
-          width: 34%; height: 12%; pointer-events: none; z-index: 3;
-          background: var(--ivory);
-          border-top-right-radius: 22px;
-          box-shadow: -8px 8px 16px -8px var(--ivory);
-        }
+        /* Máscara desativada — vídeos novos já vêm sem badge */
+        .fj-landing .fj-inline-reel-mask { display: none; }
 
         /* Reels */
         .fj-landing .fj-reels-sec { padding: 80px 24px; background: var(--cream); }
