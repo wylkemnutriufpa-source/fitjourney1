@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { LogoOrbital } from "@/components/LogoOrbital";
+import reel1 from "@/assets/reels/reel-1.mp4.asset.json";
+import reel2 from "@/assets/reels/reel-2.mp4.asset.json";
+import reel3 from "@/assets/reels/reel-3.mp4.asset.json";
+import reel4 from "@/assets/reels/reel-4.mp4.asset.json";
+import imgEvolucao from "@/assets/reels/evolucao-pratica.png.asset.json";
+import imgDuradouras from "@/assets/reels/mudancas-duradouras.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
