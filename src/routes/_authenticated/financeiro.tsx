@@ -64,7 +64,7 @@ function FinanceiroPage() {
           <p className="text-sm text-muted-foreground">Carregando…</p>
         ) : (
           <>
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <section className="grid grid-cols-2 gap-3">
               <Kpi
                 icon={DollarSign}
                 label="MRR"
@@ -91,7 +91,7 @@ function FinanceiroPage() {
               />
             </section>
 
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <section className="grid grid-cols-1 gap-4">
               <Panel
                 title="Vencendo em 30 dias"
                 count={data.expiringIn30.length}
