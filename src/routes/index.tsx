@@ -798,33 +798,8 @@ function Landing() {
         </section>
       )}
 
-      {/* ══════════ REELS — A plataforma em ação ══════════ */}
-      <section className="fj-reels-sec">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest fj-tag-gold">Em movimento</span>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-5 fj-h-dark">
-              A plataforma <span className="fj-h-accent">em ação.</span>
-            </h2>
-            <p className="text-base md:text-lg mt-4 max-w-2xl mx-auto fj-sub-dark">
-              Quatro cenas reais — do protocolo clínico ao acompanhamento do paciente.
-            </p>
-          </div>
-          <div className="fj-reels-strip">
-            {[
-              { src: reel1.url, label: "// 01 · Protocolo" },
-              { src: reel2.url, label: "// 02 · Inteligência" },
-              { src: reel3.url, label: "// 03 · Evolução" },
-              { src: reel4.url, label: "// 04 · Paciente" },
-            ].map((r) => (
-              <div className="fj-reel" key={r.label}>
-                <span className="fj-reel-corner">{r.label}</span>
-                <video src={r.src} autoPlay muted loop playsInline preload="metadata" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
+
 
       {/* ══════════ FINAL CTA ══════════ */}
 
