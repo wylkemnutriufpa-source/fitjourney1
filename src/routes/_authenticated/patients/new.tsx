@@ -499,6 +499,7 @@ function NewPatient() {
           </aside>
         </div>
       </div>
+      <OnlineInviteDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
     </AppShell>
   );
 }
