@@ -1111,6 +1111,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "ovo-galinha", name: "Ovos mexidos no azeite", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
           { foodKey: "banana", name: "Banana madura", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Panqueca de banana + ovo extra + mamão",
+            imageKey: "panqueca-banana",
+            items: [
+              { foodKey: "panqueca-banana", name: "Panqueca de banana (2 ovos + 1 banana)", qty: 1, unit: "unid", kcal: 290, scaleGroup: "mixed" },
+              { foodKey: "ovo-galinha", name: "Ovo cozido extra", qty: 50, unit: "g", kcal: 72, scaleGroup: "protein" },
+              { foodKey: "mamao", name: "Mamão papaya", qty: 100, unit: "g", kcal: 43, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Inhame + ovos mexidos + banana",
+            imageKey: "inhame",
+            items: [
+              { foodKey: "inhame", name: "Inhame cozido", qty: 150, unit: "g", kcal: 143, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovos mexidos no azeite", qty: 150, unit: "g", kcal: 215, scaleGroup: "protein" },
+              { foodKey: "banana", name: "Banana madura", qty: 100, unit: "g", kcal: 98, scaleGroup: "fruit" },
+            ],
+          },
+        ],
       },
       {
         time: "10:00",
@@ -1119,6 +1139,24 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
         items: [
           { foodKey: "mamao", name: "Mamão papaya", qty: 200, unit: "g", kcal: 86, scaleGroup: "fruit" },
           { foodKey: "pasta-amendoim", name: "Pasta de amendoim 100%", qty: 15, unit: "g", kcal: 89, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Banana + pasta de amendoim",
+            imageKey: "banana",
+            items: [
+              { foodKey: "banana", name: "Banana madura", qty: 120, unit: "g", kcal: 118, scaleGroup: "fruit" },
+              { foodKey: "pasta-amendoim", name: "Pasta de amendoim 100%", qty: 15, unit: "g", kcal: 89, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Morangos + ovo cozido",
+            imageKey: "morango",
+            items: [
+              { foodKey: "morango", name: "Morangos", qty: 200, unit: "g", kcal: 60, scaleGroup: "fruit" },
+              { foodKey: "ovo-galinha", name: "Ovo cozido", qty: 50, unit: "g", kcal: 72, scaleGroup: "protein" },
+            ],
+          },
         ],
       },
       {
@@ -1131,6 +1169,28 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "macaxeira", name: "Mandioca cozida", qty: 100, unit: "g", kcal: 125, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
         ],
+        alternatives: [
+          {
+            title: "Frango grelhado + arroz branco + batata-doce + azeite",
+            imageKey: "peito-frango",
+            items: [
+              { foodKey: "peito-frango", name: "Peito de frango grelhado", qty: 160, unit: "g", kcal: 264, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 150, unit: "g", kcal: 193, scaleGroup: "carb" },
+              { foodKey: "batata-doce", name: "Batata-doce cozida", qty: 100, unit: "g", kcal: 78, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Merluza + arroz branco + mandioca + azeite",
+            imageKey: "merluza-file",
+            items: [
+              { foodKey: "merluza-file", name: "Filé de merluza assado", qty: 170, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+              { foodKey: "macaxeira", name: "Mandioca cozida", qty: 100, unit: "g", kcal: 125, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+            ],
+          },
+        ],
       },
       {
         time: "16:00",
@@ -1141,6 +1201,25 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "peito-frango", name: "Frango desfiado", qty: 80, unit: "g", kcal: 132, scaleGroup: "protein" },
           { foodKey: "morango", name: "Morangos", qty: 100, unit: "g", kcal: 30, scaleGroup: "fruit" },
         ],
+        alternatives: [
+          {
+            title: "Inhame + ovo cozido + banana",
+            imageKey: "inhame",
+            items: [
+              { foodKey: "inhame", name: "Inhame cozido", qty: 100, unit: "g", kcal: 95, scaleGroup: "carb" },
+              { foodKey: "ovo-galinha", name: "Ovo cozido", qty: 100, unit: "g", kcal: 143, scaleGroup: "protein" },
+              { foodKey: "banana", name: "Banana madura", qty: 80, unit: "g", kcal: 78, scaleGroup: "fruit" },
+            ],
+          },
+          {
+            title: "Panqueca de banana + frango desfiado",
+            imageKey: "panqueca-banana",
+            items: [
+              { foodKey: "panqueca-banana", name: "Panqueca de banana (1 ovo + 1 banana)", qty: 1, unit: "unid", kcal: 200, scaleGroup: "mixed" },
+              { foodKey: "peito-frango", name: "Frango desfiado", qty: 50, unit: "g", kcal: 83, scaleGroup: "protein" },
+            ],
+          },
+        ],
       },
       {
         time: "19:30",
@@ -1150,6 +1229,26 @@ export const SMART_TEMPLATE_SEEDS: readonly SmartTemplateSeed[] = [
           { foodKey: "merluza-file", name: "Filé de merluza assado", qty: 160, unit: "g", kcal: 134, scaleGroup: "protein" },
           { foodKey: "batata-doce", name: "Batata doce cozida", qty: 220, unit: "g", kcal: 172, scaleGroup: "carb" },
           { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+        ],
+        alternatives: [
+          {
+            title: "Tilápia + purê de batata + azeite",
+            imageKey: "tilapia-file",
+            items: [
+              { foodKey: "tilapia-file", name: "Filé de tilápia grelhado", qty: 160, unit: "g", kcal: 152, scaleGroup: "protein" },
+              { foodKey: "pure-batata", name: "Purê de batata inglesa (sem leite)", qty: 220, unit: "g", kcal: 128, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+            ],
+          },
+          {
+            title: "Patinho desfiado + arroz branco + azeite",
+            imageKey: "patinho-bovino",
+            items: [
+              { foodKey: "patinho-bovino", name: "Patinho cozido/desfiado", qty: 140, unit: "g", kcal: 187, scaleGroup: "protein" },
+              { foodKey: "arroz-branco", name: "Arroz branco cozido", qty: 180, unit: "g", kcal: 231, scaleGroup: "carb" },
+              { foodKey: "azeite-oliva", name: "Azeite extravirgem", qty: 8, unit: "g", kcal: 72, scaleGroup: "fat" },
+            ],
+          },
         ],
       },
     ],
