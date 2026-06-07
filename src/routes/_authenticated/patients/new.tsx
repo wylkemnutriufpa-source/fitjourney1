@@ -1,14 +1,27 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 import { calcTMB } from "@/lib/engine/tdee";
-import { Calculator, Save, Activity, ChevronDown } from "lucide-react";
+import { Calculator, Activity, ChevronDown, UserPlus, Info } from "lucide-react";
 
 type Goal = "Performance" | "Hipertrofia" | "Emagrecimento" | "Manutenção";
 
 export const Route = createFileRoute("/_authenticated/patients/new")({
-  head: () => ({ meta: [{ title: "Nova Anamnese — FitJourney" }] }),
+  head: () => ({ meta: [{ title: "Calculadora TDEE — FitJourney" }] }),
   component: NewPatient,
+  errorComponent: ({ error, reset }) => (
+    <AppShell>
+      <div className="max-w-md mx-auto py-16 space-y-4 text-center">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-destructive">Erro</p>
+        <h2 className="text-2xl font-bold">Não foi possível carregar a calculadora.</h2>
+        <p className="text-sm text-muted-foreground">{error.message}</p>
+        <button onClick={reset} className="px-4 py-2 rounded bg-primary text-primary-foreground text-xs">
+          Tentar novamente
+        </button>
+      </div>
+    </AppShell>
+  ),
 });
 
 function CollapsibleSection({
