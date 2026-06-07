@@ -7,13 +7,14 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { Save, Loader2, ArrowLeft, Sun, Moon, Monitor, Camera, User, KeyRound, Trash2, AlertTriangle } from "lucide-react";
+import { Save, Loader2, ArrowLeft, Sun, Moon, Monitor, Camera, User, KeyRound, Trash2, AlertTriangle, Download, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import {
   getMyPatientProfile,
   updateMyPatientProfile,
   softDeleteMyPatientAccount,
 } from "@/lib/profile/patient-profile.functions";
+import { exportMyPatientData, getMyConsents } from "@/lib/profile/patient-lgpd.functions";
 import { getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { AvatarCropDialog } from "@/components/AvatarCropDialog";
@@ -35,7 +36,37 @@ function PatientSettings() {
   const fetchProfile = useServerFn(getMyPatientProfile);
   const updateProfile = useServerFn(updateMyPatientProfile);
   const deleteAccount = useServerFn(softDeleteMyPatientAccount);
+  const exportData = useServerFn(exportMyPatientData);
+  const fetchConsents = useServerFn(getMyConsents);
   const navigate = useNavigate();
+
+  const { data: consents } = useQuery({
+    queryKey: ["my-patient-consents"],
+    queryFn: () => fetchConsents(),
+    staleTime: 60_000,
+  });
+  const [exporting, setExporting] = useState(false);
+
+  async function handleExport() {
+    setExporting(true);
+    try {
+      const payload = await exportData();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `fitjourney-meus-dados-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Download iniciado");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao exportar");
+    } finally {
+      setExporting(false);
+    }
+  }
 
 
   const { data, isLoading, refetch } = useQuery({
