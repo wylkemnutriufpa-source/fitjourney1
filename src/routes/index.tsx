@@ -388,7 +388,11 @@ function Landing() {
                       className="text-center glass-premium rounded-xl p-2.5 gradient-border"
                     >
                       <p className="font-display text-lg md:text-2xl font-bold text-gradient-animated leading-none">
-                        <AnimatedCounter value={stat.value.replace(/[^0-9]/g, "")} suffix={stat.value.replace(/[0-9.]/g, "")} />
+                        {/^[\d.]+[^\d]*$/.test(stat.value) ? (
+                          <AnimatedCounter value={stat.value.replace(/[^0-9]/g, "")} suffix={stat.value.replace(/[0-9.]/g, "")} />
+                        ) : (
+                          stat.value
+                        )}
                       </p>
                       <p className="text-[10px] text-muted-foreground mt-1.5 font-medium leading-tight">{stat.label}</p>
                     </motion.div>
