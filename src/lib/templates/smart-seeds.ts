@@ -18,11 +18,19 @@ type SeedFoodItem = {
   scaleGroup: ScaleGroup;
 };
 
+type SeedAlternative = {
+  title: string;
+  imageKey: string;
+  items: SeedFoodItem[];
+};
+
 type SeedMeal = {
   time: string;
   label: string;
   heroKey: string;
   items: SeedFoodItem[];
+  /** Opções equivalentes que SUBSTITUEM a refeição inteira (não materializam por item). */
+  alternatives?: SeedAlternative[];
 };
 
 export type SmartTemplateSeed = {
