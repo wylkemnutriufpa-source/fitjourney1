@@ -200,7 +200,15 @@ function deriveImageKeyForFood(food: PlannerFoodItem): string | undefined {
     const pref = allFoodKeys.find((k) => k.startsWith(slug));
     if (pref) return pref;
     const words = slug.split("-").filter((w) => w.length >= 3 && !STOP.has(w));
-    // 2) cobertura múltipla: chave que contenha o maior nº de palavras significativas
+    // 2) prefixo de qualquer palavra significativa (preferimos âncora real do
+    //    alimento — ex.: "Goma de tapioca" deve casar com `tapioca-com-*`,
+    //    NUNCA com `acai-com-tapioca`, que tem outro grupo como prefixo).
+    for (const w of words) {
+      const m = allFoodKeys.find((k) => k.startsWith(w));
+      if (m) return m;
+    }
+    // 3) fallback: cobertura múltipla (qualquer ocorrência da palavra),
+    //    desempate por número de palavras casadas, depois ordem alfabética.
     let best: { key: string; score: number } | null = null;
     for (const k of allFoodKeys) {
       let score = 0;
@@ -208,11 +216,6 @@ function deriveImageKeyForFood(food: PlannerFoodItem): string | undefined {
       if (score > 0 && (!best || score > best.score)) best = { key: k, score };
     }
     if (best) return best.key;
-    // 3) prefixo da primeira palavra significativa
-    for (const w of words) {
-      const m = allFoodKeys.find((k) => k.startsWith(w));
-      if (m) return m;
-    }
   }
   return undefined;
 }
