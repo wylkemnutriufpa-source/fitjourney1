@@ -995,7 +995,20 @@ export function seedToPlannerTemplate(seed: SmartTemplateSeed): PlannerTemplate 
         imageKey: m.heroKey,
         items,
       },
-      equivalents: [],
+      equivalents: (m.alternatives ?? []).map((alt) => ({
+        id: seedId("option"),
+        title: alt.title,
+        imageKey: alt.imageKey,
+        items: alt.items.map((it) => ({
+          id: seedId("food"),
+          foodKey: it.foodKey,
+          name: it.name,
+          qty: it.qty,
+          unit: it.unit,
+          kcal: it.kcal,
+          scaleGroup: it.scaleGroup,
+        })),
+      })),
     };
   });
   const totalKcal = meals.reduce(
