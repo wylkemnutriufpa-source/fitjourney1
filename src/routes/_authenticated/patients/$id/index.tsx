@@ -224,8 +224,8 @@ function PatientProfile() {
               className={
                 "flex min-h-10 items-center justify-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold transition-colors disabled:opacity-50 " +
                 (p.isActive
-                  ? "border-rose-500/30 text-rose-300/90 hover:bg-rose-500/10 hover:border-rose-500/50"
-                  : "border-emerald-500/30 text-emerald-300/90 hover:bg-emerald-500/10 hover:border-emerald-500/50")
+                  ? "border-rose-700/40 text-rose-200 hover:bg-rose-900/20 hover:border-rose-700/60"
+                  : "border-emerald-800/50 text-emerald-200 hover:bg-emerald-900/25 hover:border-emerald-700/70")
               }
             >
               {activeMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Power className="size-3.5" />}
@@ -254,25 +254,25 @@ function PatientProfile() {
             <Link
               to="/templates"
               search={{ patientId: p.id, patientName: p.fullName }}
-              className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              className="col-span-2 sm:col-span-1 flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-[var(--gold)]/70 bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] px-4 py-2.5 text-xs font-bold tracking-wide text-[var(--gold)] shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_25%,transparent),0_6px_24px_-8px_color-mix(in_oklab,var(--gold)_45%,transparent)] hover:bg-[color-mix(in_oklab,var(--gold)_18%,transparent)] hover:border-[var(--gold)] transition-all"
             >
-              <Sparkles className="size-3.5" />
+              <Sparkles className="size-4" />
               Plano com Smart-templates
             </Link>
             <Link
               to="/templates"
               search={{ blank: 1, patientId: p.id, patientName: p.fullName }}
-              className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              className="col-span-2 sm:col-span-1 flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-[var(--gold)]/70 bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] px-4 py-2.5 text-xs font-bold tracking-wide text-[var(--gold)] shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_25%,transparent),0_6px_24px_-8px_color-mix(in_oklab,var(--gold)_45%,transparent)] hover:bg-[color-mix(in_oklab,var(--gold)_18%,transparent)] hover:border-[var(--gold)] transition-all"
             >
-              <FileText className="size-3.5" />
+              <FileText className="size-4" />
               {hasPublishedPlan ? "Novo plano com IA" : "Plano com IA FitJourney"}
             </Link>
           </div>
         </div>
 
 
-        {/* Dados básicos / contato */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Contato */}
+        <section className="grid grid-cols-1 gap-6">
           <div className="bg-surface border border-border rounded-lg p-5 space-y-4 sm:p-6">
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Contato · {p.isActive ? "Paciente ativo" : "Paciente inativo"}
@@ -285,27 +285,6 @@ function PatientProfile() {
               <div className="flex items-center gap-3 min-w-0">
                 <Phone className="size-4 shrink-0 text-muted-foreground" />
                 <span className="font-mono text-xs">{p.phone ? maskPhoneBR(p.phone) : "—"}</span>
-              </div>
-            </dl>
-          </div>
-
-          <div className="bg-surface border border-border rounded-lg p-5 space-y-4 sm:p-6">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Dados básicos
-            </p>
-            <dl className="text-sm space-y-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <Calendar className="size-4 shrink-0 text-muted-foreground" />
-                <span className="min-w-0 font-mono text-xs">
-                  Nascimento: {formatDate(p.birthDate)}
-                  {age != null && <span className="text-muted-foreground"> · {age} anos</span>}
-                </span>
-              </div>
-              <div className="flex items-center gap-3 min-w-0">
-                <Ruler className="size-4 shrink-0 text-muted-foreground" />
-                <span className="font-mono text-xs">
-                  Altura: {p.heightCm != null ? `${p.heightCm} cm` : "—"}
-                </span>
               </div>
             </dl>
           </div>
