@@ -474,6 +474,11 @@ function Landing() {
               </p>
             </motion.div>
 
+            <div className="fj-inline-reel mb-12">
+              <video src={reel1.url} autoPlay muted loop playsInline preload="metadata" />
+              <span className="fj-inline-reel-mask" aria-hidden />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {c.obstacle.cards.map((p, i) => (
                 <motion.div
