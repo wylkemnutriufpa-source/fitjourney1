@@ -73,7 +73,8 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
       .from("patients")
       .select("id, full_name, email, phone, is_active, created_at")
       .eq("nutritionist_id", nutri.id)
-      .order("full_name", { ascending: true });
+      .order("full_name", { ascending: true })
+      .limit(500); // teto defensivo — paginação cursor-based pendente
     if (error) throw new Error(error.message);
 
     const patients = data ?? [];
@@ -84,7 +85,8 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
       .from("anamneses")
       .select("patient_id, review_status, updated_at, approved_at")
       .in("patient_id", patientIds)
-      .order("updated_at", { ascending: false });
+      .order("updated_at", { ascending: false })
+      .limit(2000); // ~4 anamneses por paciente em média
     if (aErr) throw new Error(aErr.message);
 
     // Anamnese mais relevante por paciente: aprovada vence; senão a mais recente.
