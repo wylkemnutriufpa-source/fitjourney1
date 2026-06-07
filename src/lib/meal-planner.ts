@@ -652,12 +652,17 @@ function materializeOptionEquivalents(opt: PlannerMealOption, mealKind: MealKind
 export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate): PlannerTemplate {
   const maybePlanner = template as PlannerTemplate;
   if (maybePlanner.meals?.every((meal) => isPlannerMealOption((meal as PlannerMeal).main))) {
-    const normalizedMeals = maybePlanner.meals.map((meal) => ({
-      ...meal,
-      main: materializeOptionEquivalents(normalizePlannerMealOption(meal.main)),
-      equivalents: meal.equivalents.map((o) => materializeOptionEquivalents(normalizePlannerMealOption(o))),
-      heroKey: meal.heroKey || meal.main.imageKey,
-    }));
+    const normalizedMeals = maybePlanner.meals.map((meal) => {
+      const kind = classifyMealLabel(meal.label);
+      return {
+        ...meal,
+        main: materializeOptionEquivalents(normalizePlannerMealOption(meal.main), kind),
+        equivalents: meal.equivalents.map((o) =>
+          materializeOptionEquivalents(normalizePlannerMealOption(o), kind),
+        ),
+        heroKey: meal.heroKey || meal.main.imageKey,
+      };
+    });
 
     return {
       ...maybePlanner,
@@ -668,7 +673,8 @@ export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate
 
   const legacy = template as LegacyDietTemplate;
   const meals = legacy.meals.map((meal: LegacyMealSlot) => {
-    const isMainMeal = /almo[çc]o|jantar/i.test(meal.label);
+    const kind = classifyMealLabel(meal.label);
+    const isMainMeal = kind === "main-meal";
     const main = legacyFoodToOption(meal.main);
     const equivalents = meal.equivalents.map(legacyFoodToOption);
     const finalMain = isMainMeal ? withLunchSides(main) : main;
@@ -678,10 +684,11 @@ export function toPlannerTemplate(template: LegacyDietTemplate | PlannerTemplate
       time: meal.time,
       label: meal.label,
       heroKey: meal.heroKey ?? meal.main.foodKey,
-      main: materializeOptionEquivalents(finalMain),
-      equivalents: finalEqs.map(materializeOptionEquivalents),
+      main: materializeOptionEquivalents(finalMain, kind),
+      equivalents: finalEqs.map((o) => materializeOptionEquivalents(o, kind)),
     };
   });
+
 
   return {
     ...legacy,
