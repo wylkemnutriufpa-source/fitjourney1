@@ -801,6 +801,11 @@ export function findTacoCandidate(input: {
   if (input.foodKey) {
     const hit = indexByFoodKey.get(input.foodKey);
     if (hit) return hit;
+    const aliased = FOODKEY_ALIASES[input.foodKey];
+    if (aliased) {
+      const aliasHit = indexByFoodKey.get(aliased);
+      if (aliasHit) return aliasHit;
+    }
   }
   const norm = normalizeTacoName(input.name);
   if (!norm) return null;
