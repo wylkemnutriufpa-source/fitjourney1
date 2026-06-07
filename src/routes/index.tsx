@@ -350,6 +350,15 @@ function Landing() {
                 {c.hero.description}
               </motion.p>
 
+              <motion.div variants={fadeUp} className="mb-6">
+                <img
+                  src={evolucaoPraticaClinica.url}
+                  alt="Você não entrega dietas. Você conduz transformações metabólicas."
+                  className="w-full h-auto rounded-2xl border border-border/40 shadow-2xl"
+                  loading="eager"
+                />
+              </motion.div>
+
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-5">
                 <Link to="/signup/nutritionist" className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground shadow-glow rounded-md text-base px-8 h-14 font-semibold hover:scale-[1.03] active:scale-[0.98] transition-transform">
                   {c.hero.cta_primary} <ArrowRight className="w-4 h-4" />
