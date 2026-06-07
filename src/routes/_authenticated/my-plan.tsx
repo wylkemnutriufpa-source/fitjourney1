@@ -545,7 +545,7 @@ function resolveBlockImage(opts: {
     const u = imgFor(imageKey);
     if (u) return u;
   }
-  const isBreakfastLike = mealKind === "cafe" || mealKind === "lanche";
+  const isBreakfastLike = mealKind === "breakfast" || mealKind === "snack";
   const anchorGroup = isBreakfastLike ? "carb" : "protein";
   // 1) preferência: item com scaleGroup âncora correto
   for (const it of items) {
