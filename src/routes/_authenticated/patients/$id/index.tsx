@@ -157,7 +157,7 @@ function PatientProfile() {
   }
 
   const p = data;
-  const age = ageFromBirth(p.birthDate);
+  void ageFromBirth;
   const st = statusMeta(p.anamnesis?.reviewStatus);
   const hasApprovedAnamnesis = p.anamnesis?.reviewStatus === "approved";
 
