@@ -731,7 +731,7 @@ function Landing() {
         <section id="pricing" className="py-28 px-4 bg-muted/20 border-y border-border/30">
           <div className="max-w-5xl mx-auto">
             <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center mb-20">
-              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-primary text-xs font-bold mb-5 gradient-border uppercase tracking-widest">{c.pricing.eyebrow}</span>
+              <span className="inline-block px-4 py-1.5 rounded-full glass-premium text-[var(--gold)] text-xs font-bold mb-5 border border-[var(--gold)]/40 uppercase tracking-widest">{c.pricing.eyebrow}</span>
               <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
                 {c.pricing.title_line1} <span className="text-gradient-animated">{c.pricing.title_line2}</span>
               </h2>
