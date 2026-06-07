@@ -522,6 +522,46 @@ function mealKcal(option: any): number {
   );
 }
 
+/**
+ * Resolve a imagem ILUSTRATIVA do bloco da refeição.
+ * Skill `fitjourney-template-rules`:
+ *  - Almoço/jantar → primeira PROTEÍNA do bloco (acompanhamentos não geram imagem).
+ *  - Café/lanche  → primeiro CARB base do bloco (recheios/bebidas não geram imagem).
+ * Tenta heroKey/imageKey explícito primeiro; cai para o primeiro item-âncora compatível.
+ * Retorna undefined se nada resolver — o caller decide se mostra placeholder ou nada.
+ */
+function resolveBlockImage(opts: {
+  heroKey?: string;
+  imageKey?: string;
+  items: any[];
+  mealKind: MealKind;
+}): string | undefined {
+  const { heroKey, imageKey, items, mealKind } = opts;
+  if (heroKey) {
+    const u = imgFor(heroKey);
+    if (u) return u;
+  }
+  if (imageKey) {
+    const u = imgFor(imageKey);
+    if (u) return u;
+  }
+  const isBreakfastLike = mealKind === "breakfast" || mealKind === "snack";
+  const anchorGroup = isBreakfastLike ? "carb" : "protein";
+  // 1) preferência: item com scaleGroup âncora correto
+  for (const it of items) {
+    if (it?.scaleGroup === anchorGroup) {
+      const u = imgFor(it?.foodKey || "", it?.name);
+      if (u) return u;
+    }
+  }
+  // 2) fallback: qualquer item resolvível (último recurso)
+  for (const it of items) {
+    const u = imgFor(it?.foodKey || "", it?.name);
+    if (u) return u;
+  }
+  return undefined;
+}
+
 function MealCard({
   meal,
   index,
@@ -538,7 +578,12 @@ function MealCard({
   const equivalents: any[] = Array.isArray(meal?.equivalents)
     ? meal.equivalents
     : [];
-  const heroUrl = imgFor(meal?.heroKey || main?.imageKey || "");
+  const heroUrl = resolveBlockImage({
+    heroKey: meal?.heroKey,
+    imageKey: main?.imageKey,
+    items,
+    mealKind: detectMealKind(meal?.label, meal?.time),
+  });
   const kcal = mealKcal(main);
   const mealKind: MealKind = detectMealKind(meal?.label, meal?.time);
   const { isMealOpen, toggleMeal } = useExpansion();
@@ -911,7 +956,11 @@ function EquivalentCard({
   mealKind: MealKind;
 }) {
   const items: any[] = Array.isArray(option?.items) ? option.items : [];
-  const imgUrl = imgFor(option?.imageKey || "");
+  const imgUrl = resolveBlockImage({
+    imageKey: option?.imageKey,
+    items,
+    mealKind,
+  });
   const kcal = mealKcal(option);
   return (
     <div className="border border-border rounded-md overflow-hidden">
