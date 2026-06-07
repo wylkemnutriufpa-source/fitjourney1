@@ -1,4 +1,5 @@
 // Paciente vê a própria avaliação física — read-only.
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 // Atual + histórico simplificado. Sem edição.
 
 import { createFileRoute, Link } from "@tanstack/react-router";

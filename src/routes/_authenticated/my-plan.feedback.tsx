@@ -1,4 +1,5 @@
 // Patient — módulo Feedback (peso, fotos, aderência, resultado, notas)
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 // + histórico imutável + gráfico premium de evolução.
 
 import { createFileRoute, Link } from "@tanstack/react-router";

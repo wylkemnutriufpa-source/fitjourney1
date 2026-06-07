@@ -1,4 +1,5 @@
 // Atualização da anamnese pós-onboarding. Não confundir com /onboarding/patient
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 // (primeira entrada, bloqueada após conclusão). Aqui o paciente cria uma NOVA
 // versão da anamnese — supersedes_id encadeia, version+1, review_status=submitted.
 

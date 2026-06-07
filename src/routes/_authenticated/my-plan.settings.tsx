@@ -1,4 +1,5 @@
 // Patient Settings — paciente edita nome e WhatsApp.
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 // Dados clínicos NÃO entram aqui: vão pelo Runner (anamnese versionada).
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
