@@ -351,10 +351,16 @@ function LandingPage() {
       <div className="fj-grid-bg" />
 
       <nav className="fj-nav">
-        <a href="/" className="fj-nav-logo" style={{ textDecoration: "none" }}>
+        <button
+          type="button"
+          onClick={() => playIntro()}
+          className="fj-nav-logo"
+          style={{ background: "transparent", border: 0, cursor: "pointer", padding: 0 }}
+          aria-label="Reproduzir intro FitJourney"
+        >
           <LogoOrbital sizePx={64} effect="orbit" slot="landing-header" />
           <span style={{ background: "var(--silver-metal)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>FITJOURNEY</span>
-        </a>
+        </button>
         <div className="fj-nav-links">
           <a href="#capacidades">O que você faz</a>
           <a href="#inteligencia">Inteligência</a>
@@ -362,7 +368,16 @@ function LandingPage() {
           <a href="#vs">Comparativo</a>
           <a href="/signup/nutritionist" className="fj-nav-cta">Começar grátis →</a>
         </div>
+        <button
+          type="button"
+          className="fj-nav-burger"
+          onClick={() => setContactOpen(true)}
+          aria-label="Abrir menu de contato"
+        >
+          <Menu size={22} />
+        </button>
       </nav>
+      {contactOpen && <ContactModal onClose={() => setContactOpen(false)} />}
 
       {/* HERO */}
       <section className="fj-hero">
