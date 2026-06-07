@@ -20,8 +20,6 @@ import {
   
   Mail,
   Phone,
-  Calendar,
-  Ruler,
   ClipboardList,
   Loader2,
   CheckCircle2,
