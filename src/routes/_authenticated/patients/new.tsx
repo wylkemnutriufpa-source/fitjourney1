@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
@@ -104,7 +104,6 @@ const inputCls =
   "w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary";
 
 function NewPatient() {
-  const navigate = useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [sex, setSex] = useState<"M" | "F">("M");
   const [age, setAge] = useState(30);
