@@ -7,13 +7,14 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { Save, Loader2, ArrowLeft, Sun, Moon, Monitor, Camera, User, KeyRound, Trash2, AlertTriangle } from "lucide-react";
+import { Save, Loader2, ArrowLeft, Sun, Moon, Monitor, Camera, User, KeyRound, Trash2, AlertTriangle, Download, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import {
   getMyPatientProfile,
   updateMyPatientProfile,
   softDeleteMyPatientAccount,
 } from "@/lib/profile/patient-profile.functions";
+import { exportMyPatientData, getMyConsents } from "@/lib/profile/patient-lgpd.functions";
 import { getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { AvatarCropDialog } from "@/components/AvatarCropDialog";
@@ -35,7 +36,37 @@ function PatientSettings() {
   const fetchProfile = useServerFn(getMyPatientProfile);
   const updateProfile = useServerFn(updateMyPatientProfile);
   const deleteAccount = useServerFn(softDeleteMyPatientAccount);
+  const exportData = useServerFn(exportMyPatientData);
+  const fetchConsents = useServerFn(getMyConsents);
   const navigate = useNavigate();
+
+  const { data: consents } = useQuery({
+    queryKey: ["my-patient-consents"],
+    queryFn: () => fetchConsents(),
+    staleTime: 60_000,
+  });
+  const [exporting, setExporting] = useState(false);
+
+  async function handleExport() {
+    setExporting(true);
+    try {
+      const payload = await exportData();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `fitjourney-meus-dados-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Download iniciado");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao exportar");
+    } finally {
+      setExporting(false);
+    }
+  }
 
 
   const { data, isLoading, refetch } = useQuery({
@@ -356,9 +387,63 @@ function PatientSettings() {
           </div>
         </section>
 
+        <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
+          <h2 className="text-sm font-mono uppercase tracking-widest text-primary">
+            05 · Privacidade & LGPD
+          </h2>
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="space-y-1 min-w-0">
+              <p className="text-sm font-medium">Baixar meus dados</p>
+              <p className="text-xs text-muted-foreground">
+                Exporta em JSON tudo que você tem na plataforma: perfil, anamneses,
+                planos, feedbacks, avaliações e consentimentos.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleExport}
+              disabled={exporting}
+              className="inline-flex items-center gap-2 text-xs font-semibold py-2 px-3 rounded-md border border-border hover:border-primary hover:text-primary transition-colors disabled:opacity-60"
+            >
+              {exporting ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+              {exporting ? "Gerando..." : "Baixar JSON"}
+            </button>
+          </div>
+
+          <div className="border-t border-border pt-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="size-3.5 text-primary" />
+              <p className="text-sm font-medium">Histórico de consentimentos</p>
+            </div>
+            {!consents || consents.length === 0 ? (
+              <p className="text-xs text-muted-foreground">Nenhum consentimento registrado ainda.</p>
+            ) : (
+              <ul className="space-y-1.5">
+                {consents.map((c) => (
+                  <li key={c.id} className="text-xs text-muted-foreground flex flex-wrap gap-x-2">
+                    <span className="font-mono text-foreground">{c.consentType}</span>
+                    <span>·</span>
+                    <span>{c.consentVersion}</span>
+                    <span>·</span>
+                    <span>{new Date(c.acceptedAt).toLocaleString("pt-BR")}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <p className="text-[10px] text-muted-foreground/70 pt-2">
+            Veja a{" "}
+            <Link to="/privacidade" className="text-primary hover:underline">
+              Política de Privacidade
+            </Link>{" "}
+            completa.
+          </p>
+        </section>
+
         <section className="bg-surface border border-destructive/40 rounded-lg p-6 space-y-4">
           <h2 className="text-sm font-mono uppercase tracking-widest text-destructive">
-            05 · Excluir conta
+            06 · Excluir conta
           </h2>
           <p className="text-sm text-muted-foreground">
             Ao excluir sua conta você perde acesso ao app e ao seu plano. Seu
