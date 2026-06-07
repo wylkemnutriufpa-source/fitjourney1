@@ -58,7 +58,7 @@ function wm(partial: Partial<WordmarkConfig> = {}): WordmarkConfig {
 }
 
 export const DEFAULTS: Record<LogoSlot, SlotConfig> = {
-  "landing-header": { sizePx: 56, effect: "halo", variant: "orbital", ...baseDefaults, wordmark: wm({ position: "right", gap: 12, sizePx: 20 }) },
+  "landing-header": { sizePx: 64, effect: "halo", variant: "video", ...baseDefaults, wordmark: wm({ position: "right", gap: 12, sizePx: 20 }) },
   "landing-footer": { sizePx: 56, effect: "halo", variant: "orbital", ...baseDefaults, wordmark: wm({ position: "right", gap: 10, sizePx: 18 }) },
   "auth-form":      { sizePx: 56, effect: "halo", variant: "video",   ...baseDefaults, wordmark: wm({ position: "right", gap: 10, sizePx: 24 }) },
   "auth-hero":      { sizePx: 128, effect: "halo", variant: "video",  ...baseDefaults, wordmark: wm({ position: "below", gap: 12, sizePx: 24 }) },
