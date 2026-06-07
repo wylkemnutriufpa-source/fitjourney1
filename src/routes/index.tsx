@@ -1,6 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Menu, X, Mail, Instagram, ArrowRight } from "lucide-react";
 import { LogoOrbital } from "@/components/LogoOrbital";
+import { playIntro } from "@/components/IntroOverlay";
+
+const CONTACT_INSTAGRAM = "https://www.instagram.com/fitjourney_system?igsh=eWlodHhjN2l4ZjVu";
+const CONTACT_WHATSAPP = "https://wa.me/message/G3GN7VMIMTAWA1";
+const CONTACT_WHATSAPP_LABEL = "(91) 98415-5365";
+const CONTACT_EMAIL = "sistemafitjourney.suporte@gmail.com";
+
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} fill="currentColor" aria-hidden="true">
+      <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.09-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.478-1.318.13-.27.21-.6.21-.96 0-.16-.044-.215-.115-.34-.214-.4-2.105-1.435-2.564-1.435m-3.04-13.05c-7.115 0-12.93 5.815-12.93 12.93 0 2.49.715 4.92 2.078 7.02L3 28l4.135-1.293a12.91 12.91 0 0 0 6.93 2.05c7.115 0 12.93-5.815 12.93-12.93C26.995 8.7 22.18 4.155 16.07 4.155m0 23.515a10.7 10.7 0 0 1-5.7-1.625l-.405-.245-2.45.77.78-2.392-.27-.405a10.6 10.6 0 0 1-1.625-5.7c0-5.844 4.83-10.675 10.67-10.675a10.7 10.7 0 0 1 10.67 10.675c0 5.84-4.825 10.675-10.67 10.675"/>
+    </svg>
+  );
+}
 import reel1 from "@/assets/reels/reel-1.mp4.asset.json";
 import reel2 from "@/assets/reels/reel-2.mp4.asset.json";
 import reel3 from "@/assets/reels/reel-3.mp4.asset.json";
@@ -270,9 +285,34 @@ html { scroll-behavior: smooth; }
 .fj-vis-title { font-family: var(--syne); font-size: 1.6rem; font-weight: 800; color: var(--forest-deep); line-height: 1.15; margin-bottom: 14px; }
 @media (min-width: 1024px) { .fj-vis-title { font-size: 2.2rem; } }
 .fj-vis-desc { font-size: .9rem; color: var(--muted); line-height: 1.7; }
+.fj-nav-burger { background: rgba(31,58,42,0.08); border: 1px solid var(--border); color: var(--forest-deep); width: 40px; height: 40px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; }
+.fj-nav-burger:hover { background: var(--neon-dim); border-color: var(--neon); color: var(--neon); }
+.fj-cm-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 16px; background: radial-gradient(ellipse at center, rgba(20,39,28,0.78) 0%, rgba(10,18,12,0.94) 70%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); animation: fj-fade-in .2s ease-out; }
+.fj-cm-card { position: relative; width: 100%; max-width: 420px; border-radius: 18px; padding: 28px; background: var(--gradient-forest); border: 1px solid rgba(201,162,76,0.35); box-shadow: 0 30px 100px -20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(230,199,122,0.12); animation: fj-fade-up .25s cubic-bezier(.2,.7,.2,1); }
+.fj-cm-close { position: absolute; top: 12px; right: 14px; background: transparent; border: 0; color: rgba(255,255,255,0.5); font-size: 24px; line-height: 1; cursor: pointer; }
+.fj-cm-close:hover { color: white; }
+.fj-cm-tag { font-family: var(--mono); font-size: .6rem; letter-spacing: .35em; text-transform: uppercase; color: var(--gold-soft); text-align: center; margin-bottom: 10px; }
+.fj-cm-title { font-family: var(--syne); font-size: 1.6rem; font-weight: 700; color: white; text-align: center; margin-bottom: 8px; }
+.fj-cm-sub { font-size: .82rem; color: rgba(255,255,255,0.65); text-align: center; margin-bottom: 22px; line-height: 1.6; }
+.fj-cm-list { display: flex; flex-direction: column; gap: 10px; }
+.fj-cm-item { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: white; text-decoration: none; transition: all .2s; }
+.fj-cm-item:hover { background: rgba(255,255,255,0.08); border-color: var(--gold); transform: translateX(2px); }
+.fj-cm-icon { width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; color: white; }
+.fj-cm-icon.wa { background: #25D366; }
+.fj-cm-icon.mail { background: linear-gradient(135deg, #2A4A38, #1F3A2A); }
+.fj-cm-icon.ig { background: linear-gradient(135deg,#f09433,#dc2743 50%,#bc1888); }
+.fj-cm-label { font-family: var(--syne); font-size: .9rem; font-weight: 600; color: white; }
+.fj-cm-meta { font-size: .72rem; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.fj-cm-cta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); }
+.fj-cm-btn { padding: 12px; border-radius: 10px; text-align: center; font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; transition: all .2s; }
+.fj-cm-btn.ghost { color: white; border: 1px solid rgba(255,255,255,0.18); background: transparent; }
+.fj-cm-btn.ghost:hover { border-color: var(--gold); color: var(--gold-soft); }
+.fj-cm-btn.solid { color: var(--forest-deep); background: var(--gradient-gold); font-weight: 700; }
+.fj-cm-btn.solid:hover { filter: brightness(1.08); }
 `;
 
 function LandingPage() {
+  const [contactOpen, setContactOpen] = useState(false);
   useEffect(() => {
     // Carrega fontes
     const fontLink = document.createElement("link");
@@ -335,10 +375,16 @@ function LandingPage() {
       <div className="fj-grid-bg" />
 
       <nav className="fj-nav">
-        <a href="/" className="fj-nav-logo" style={{ textDecoration: "none" }}>
+        <button
+          type="button"
+          onClick={() => playIntro()}
+          className="fj-nav-logo"
+          style={{ background: "transparent", border: 0, cursor: "pointer", padding: 0 }}
+          aria-label="Reproduzir intro FitJourney"
+        >
           <LogoOrbital sizePx={64} effect="orbit" slot="landing-header" />
           <span style={{ background: "var(--silver-metal)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>FITJOURNEY</span>
-        </a>
+        </button>
         <div className="fj-nav-links">
           <a href="#capacidades">O que você faz</a>
           <a href="#inteligencia">Inteligência</a>
@@ -346,7 +392,16 @@ function LandingPage() {
           <a href="#vs">Comparativo</a>
           <a href="/signup/nutritionist" className="fj-nav-cta">Começar grátis →</a>
         </div>
+        <button
+          type="button"
+          className="fj-nav-burger"
+          onClick={() => setContactOpen(true)}
+          aria-label="Abrir menu de contato"
+        >
+          <Menu size={22} />
+        </button>
       </nav>
+      {contactOpen && <ContactModal onClose={() => setContactOpen(false)} />}
 
       {/* HERO */}
       <section className="fj-hero">
@@ -726,6 +781,54 @@ function LandingPage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function ContactModal({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <div className="fj-cm-overlay" onClick={onClose}>
+      <div className="fj-cm-card" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="fj-cm-close" onClick={onClose} aria-label="Fechar">×</button>
+        <div className="fj-cm-tag">Atendimento premium</div>
+        <h2 className="fj-cm-title">Fale com a gente</h2>
+        <p className="fj-cm-sub">Escolha o canal de sua preferência ou entre na plataforma.</p>
+        <div className="fj-cm-list">
+          <a href={CONTACT_WHATSAPP} target="_blank" rel="noopener noreferrer" className="fj-cm-item">
+            <span className="fj-cm-icon wa"><WhatsAppIcon className="w-5 h-5" /></span>
+            <span style={{ flex: 1 }}>
+              <span className="fj-cm-label">WhatsApp</span>
+              <div className="fj-cm-meta">{CONTACT_WHATSAPP_LABEL}</div>
+            </span>
+            <ArrowRight size={16} style={{ opacity: 0.5 }} />
+          </a>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="fj-cm-item">
+            <span className="fj-cm-icon mail"><Mail size={20} /></span>
+            <span style={{ flex: 1 }}>
+              <span className="fj-cm-label">E-mail</span>
+              <div className="fj-cm-meta">{CONTACT_EMAIL}</div>
+            </span>
+            <ArrowRight size={16} style={{ opacity: 0.5 }} />
+          </a>
+          <a href={CONTACT_INSTAGRAM} target="_blank" rel="noopener noreferrer" className="fj-cm-item">
+            <span className="fj-cm-icon ig"><Instagram size={20} /></span>
+            <span style={{ flex: 1 }}>
+              <span className="fj-cm-label">Instagram</span>
+              <div className="fj-cm-meta">@fitjourney_system</div>
+            </span>
+            <ArrowRight size={16} style={{ opacity: 0.5 }} />
+          </a>
+        </div>
+        <div className="fj-cm-cta-row">
+          <a href="/app" className="fj-cm-btn ghost">Entrar</a>
+          <a href="/signup/nutritionist" className="fj-cm-btn solid">Cadastrar</a>
+        </div>
+      </div>
     </div>
   );
 }
