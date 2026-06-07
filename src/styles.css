@@ -109,48 +109,55 @@
   --sidebar-ring: oklch(0.62 0.16 155);
 }
 
-/* Light theme — opt-in via classe `.light` no <html>. */
+/* Light theme — alinhado à paleta da landing (cream/ivory + forest/sage/gold).
+   Botões e títulos puxam tons de verde; destructive usa vermelho terroso. */
 .light {
-  --background: oklch(0.99 0.003 165);
-  --foreground: oklch(0.16 0.012 165);
-  --surface: oklch(0.97 0.005 165);
+  /* Fundo cream/ivory da landing */
+  --background: oklch(0.965 0.018 92);   /* cream #F5F0E6 */
+  --foreground: oklch(0.22 0.04 155);    /* forest-deep #14271C */
+  --surface: oklch(0.975 0.022 90);      /* ivory #FBF7EE */
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.16 0.012 165);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0.012 165);
+  --card: oklch(0.985 0.012 90);
+  --card-foreground: oklch(0.22 0.04 155);
+  --popover: oklch(0.985 0.012 90);
+  --popover-foreground: oklch(0.22 0.04 155);
 
-  --primary: oklch(0.48 0.16 155);
-  --primary-foreground: oklch(0.99 0.003 165);
+  /* Verde profundo (forest) para botões/títulos primários */
+  --primary: oklch(0.32 0.07 155);       /* forest #1F3A2A */
+  --primary-foreground: oklch(0.975 0.022 90);
 
-  --secondary: oklch(0.94 0.008 165);
-  --secondary-foreground: oklch(0.16 0.012 165);
+  /* Verde sálvia para superfícies secundárias */
+  --secondary: oklch(0.88 0.04 150);     /* sage-soft */
+  --secondary-foreground: oklch(0.22 0.04 155);
 
-  --muted: oklch(0.94 0.008 165);
-  --muted-foreground: oklch(0.42 0.014 165);
+  --muted: oklch(0.93 0.015 90);
+  --muted-foreground: oklch(0.42 0.03 155);
 
-  --accent: oklch(0.92 0.05 155);
-  --accent-foreground: oklch(0.16 0.012 165);
+  /* Verde sálvia médio para accents/hovers */
+  --accent: oklch(0.78 0.06 150);        /* sage #8FB59A */
+  --accent-foreground: oklch(0.22 0.04 155);
 
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.99 0.003 165);
+  /* Vermelho terroso/burnt para fechar/sair/excluir/inativar */
+  --destructive: oklch(0.55 0.18 28);    /* terracotta red */
+  --destructive-foreground: oklch(0.985 0.012 90);
 
-  --border: oklch(0.88 0.008 165);
-  --input: oklch(0.90 0.008 165);
-  --ring: oklch(0.48 0.16 155);
+  --border: oklch(0.86 0.025 150);
+  --input: oklch(0.90 0.02 150);
+  --ring: oklch(0.45 0.10 155);          /* forest-mid */
 
-  --gold: oklch(0.62 0.14 88);
-  --gold-foreground: oklch(0.99 0.003 165);
+  /* Dourado (gold da landing) para destaques premium */
+  --gold: oklch(0.72 0.13 85);           /* gold #C9A24C */
+  --gold-foreground: oklch(0.22 0.04 155);
   --steel: oklch(0.45 0.012 220);
 
-  --sidebar: oklch(0.97 0.005 165);
-  --sidebar-foreground: oklch(0.16 0.012 165);
-  --sidebar-primary: oklch(0.48 0.16 155);
-  --sidebar-primary-foreground: oklch(0.99 0.003 165);
-  --sidebar-accent: oklch(0.92 0.05 155);
-  --sidebar-accent-foreground: oklch(0.16 0.012 165);
-  --sidebar-border: oklch(0.88 0.008 165);
-  --sidebar-ring: oklch(0.48 0.16 155);
+  --sidebar: oklch(0.945 0.025 92);
+  --sidebar-foreground: oklch(0.22 0.04 155);
+  --sidebar-primary: oklch(0.32 0.07 155);
+  --sidebar-primary-foreground: oklch(0.975 0.022 90);
+  --sidebar-accent: oklch(0.88 0.04 150);
+  --sidebar-accent-foreground: oklch(0.22 0.04 155);
+  --sidebar-border: oklch(0.86 0.025 150);
+  --sidebar-ring: oklch(0.45 0.10 155);
 }
 
 @layer base {
