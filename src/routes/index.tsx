@@ -591,6 +591,30 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* REELS SHOWCASE */}
+      <section className="fj-reels-sec">
+        <div className="fj-s-tag">Em movimento</div>
+        <h2 className="fj-s-h2 fj-reveal" style={{ textAlign: "center", marginBottom: 14 }}>
+          A plataforma<br /><span className="neon">em ação.</span>
+        </h2>
+        <p className="fj-s-sub fj-reveal" style={{ textAlign: "center" }}>
+          Veja como o FitJourney transforma a prática clínica e a experiência do paciente — em quatro cenas reais.
+        </p>
+        <div className="fj-reels-strip fj-reveal">
+          {[
+            { src: reel1.url, label: "// 01 · Protocolo" },
+            { src: reel2.url, label: "// 02 · Inteligência" },
+            { src: reel3.url, label: "// 03 · Evolução" },
+            { src: reel4.url, label: "// 04 · Paciente" },
+          ].map((r) => (
+            <div className="fj-reel" key={r.label}>
+              <span className="fj-reel-corner">{r.label}</span>
+              <video src={r.src} autoPlay muted loop playsInline preload="metadata" />
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* MANIFESTO FINAL */}
       <section className="fj-manifesto">
         <div className="fj-mq fj-reveal">
@@ -599,6 +623,12 @@ function LandingPage() {
         </div>
         <p className="fj-ms fj-reveal">Uma nova geração de acompanhamento nutricional, onde tecnologia, ciência e prática clínica trabalham juntas para acelerar transformações corporais de forma segura e sustentável — com você no controle.</p>
       </section>
+
+      {/* CTA FINAL */}
+      <section className="fj-final">
+        <h2 className="fj-f-h2 fj-reveal">
+          Mais ciência.<br />Mais estratégia.<br /><span className="neon">Mais resultado real.</span>
+        </h2>
 
       {/* CTA FINAL */}
       <section className="fj-final">
