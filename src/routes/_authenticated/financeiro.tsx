@@ -23,6 +23,7 @@ import {
   formatMoneyBRL,
   formatShortDate,
   planKindLabel,
+  shortName,
   statusLabel,
 } from "@/lib/finance/format";
 
