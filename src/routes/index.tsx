@@ -1074,3 +1074,160 @@ function ContactModal({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
+
+// ════════════════════════════════════════════════════════════════
+// FjLandingTheme — re-skin escopado para .fj-landing
+// Substitui o verde neon por uma paleta de verdes (cream/forest/sage/gold),
+// troca tipografia para Fraunces (serifa) + Inter (corpo) e adiciona
+// animações fade-up/fade-in leves e premium. NÃO afeta o resto do app.
+// ════════════════════════════════════════════════════════════════
+function FjLandingTheme() {
+  return (
+    <>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@300;400;500;600;700&display=swap"
+      />
+      <style>{`
+        /* ─── Paleta de verdes escopada ─────────────────────────── */
+        .fj-landing {
+          --cream: #F5F0E6;
+          --ivory: #FBF7EE;
+          --forest-deep: #14271C;
+          --forest: #1F3A2A;
+          --forest-mid: #234334;
+          --sage: #8FB59A;
+          --sage-soft: #B8D1BF;
+          --gold: #C9A24C;
+          --gold-soft: #E6C77A;
+
+          /* sobrescreve tokens globais APENAS dentro da landing */
+          background: var(--cream) !important;
+          color: var(--forest-deep);
+
+          --background: var(--cream);
+          --foreground: var(--forest-deep);
+          --primary: var(--forest);
+          --primary-foreground: #FBF7EE;
+          --muted: #EFE8D9;
+          --muted-foreground: #4A5A4E;
+          --card: var(--ivory);
+          --card-foreground: var(--forest-deep);
+          --border: rgba(31,58,42,0.14);
+
+          font-family: 'Inter', 'IBM Plex Sans', system-ui, sans-serif;
+        }
+
+        /* Tipografia */
+        .fj-landing .font-display,
+        .fj-landing h1, .fj-landing h2, .fj-landing h3 {
+          font-family: 'Fraunces', 'Playfair Display', Georgia, serif !important;
+          letter-spacing: -0.01em;
+        }
+
+        /* Painéis escuros (cards / glass-premium) usam verde profundo */
+        .fj-landing .glass-premium,
+        .fj-landing .gradient-border,
+        .fj-landing .bg-card,
+        .fj-landing .bg-background\\/55,
+        .fj-landing .bg-background\\/10 {
+          background-color: var(--ivory) !important;
+          border-color: var(--border) !important;
+        }
+        .fj-landing nav.fj-header-shimmer + *,
+        .fj-landing nav {
+          background-color: rgba(245, 240, 230, 0.85) !important;
+          backdrop-filter: blur(20px);
+        }
+
+        /* Botões / acentos primary -> forest deep */
+        .fj-landing .gradient-primary,
+        .fj-landing .bg-primary {
+          background: linear-gradient(135deg, var(--forest), var(--forest-mid)) !important;
+          color: #FBF7EE !important;
+        }
+        .fj-landing .text-primary { color: var(--forest) !important; }
+        .fj-landing .border-primary { border-color: var(--forest) !important; }
+
+        /* Gold permanece dourado, só ajusta saturação */
+        .fj-landing .text-\\[var\\(--gold\\)\\] { color: var(--gold) !important; }
+        .fj-landing .bg-\\[var\\(--gold\\)\\]\\/10 { background-color: rgba(201,162,76,0.12) !important; }
+        .fj-landing .fill-\\[var\\(--gold\\)\\] { fill: var(--gold) !important; }
+
+        /* Texto secundário legível sobre cream */
+        .fj-landing .text-muted-foreground { color: #4A5A4E !important; }
+        .fj-landing .text-foreground { color: var(--forest-deep) !important; }
+
+        /* Tag dourada usada no bloco de reels */
+        .fj-landing .fj-tag-gold {
+          background: rgba(201,162,76,0.14);
+          color: var(--gold);
+          border: 1px solid rgba(201,162,76,0.35);
+        }
+        .fj-landing .fj-h-dark { color: var(--forest-deep); }
+        .fj-landing .fj-h-accent {
+          background: linear-gradient(135deg, var(--forest), var(--gold));
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        }
+        .fj-landing .fj-sub-dark { color: #4A5A4E; }
+
+        /* Reels */
+        .fj-landing .fj-reels-sec { padding: 80px 24px; background: var(--cream); }
+        @media (min-width: 1024px) { .fj-landing .fj-reels-sec { padding: 120px 56px; } }
+        .fj-landing .fj-reels-strip {
+          display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+          max-width: 1200px; margin: 0 auto;
+        }
+        @media (min-width: 768px) {
+          .fj-landing .fj-reels-strip { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+        }
+        .fj-landing .fj-reel {
+          position: relative; aspect-ratio: 9/16; border-radius: 18px; overflow: hidden;
+          border: 1px solid var(--border); background: var(--ivory);
+          box-shadow: 0 20px 60px -30px rgba(31,58,42,0.35);
+          transition: transform .4s ease, box-shadow .4s ease, border-color .4s ease;
+        }
+        .fj-landing .fj-reel:hover {
+          transform: translateY(-4px);
+          border-color: rgba(201,162,76,0.55);
+          box-shadow: 0 30px 80px -30px rgba(31,58,42,0.5);
+        }
+        .fj-landing .fj-reel video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .fj-landing .fj-reel::after {
+          content: ''; position: absolute; inset: 0; pointer-events: none;
+          background: linear-gradient(180deg, transparent 60%, rgba(20,39,28,0.55) 100%);
+        }
+        .fj-landing .fj-reel-corner {
+          position: absolute; top: 10px; left: 10px;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: .55rem; letter-spacing: .25em; color: var(--ivory);
+          background: rgba(20,39,28,0.65); backdrop-filter: blur(8px);
+          padding: 5px 9px; border-radius: 6px;
+          border: 1px solid rgba(255,255,255,0.1); z-index: 2;
+        }
+
+        /* Animações leves premium — fade-up e fade-in */
+        @keyframes fj-fade-up {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fj-fade-in {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+          .fj-landing section > *,
+          .fj-landing .fj-reel,
+          .fj-landing .glass-premium {
+            animation: fj-fade-up .9s cubic-bezier(.2,.7,.2,1) both;
+          }
+          .fj-landing nav { animation: fj-fade-in .8s ease-out both; }
+        }
+      `}</style>
+    </>
+  );
+}
