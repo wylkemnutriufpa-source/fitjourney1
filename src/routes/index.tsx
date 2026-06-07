@@ -218,7 +218,9 @@ function Landing() {
   }, []);
 
   return (
-    <div ref={rootRef} className="min-h-screen bg-background overflow-x-hidden">
+    <div ref={rootRef} className="fj-landing min-h-screen bg-background overflow-x-hidden">
+      <FjLandingTheme />
+
       {/* ══════════ NAV — Premium Reveal ══════════ */}
       <motion.nav
         initial={false}
