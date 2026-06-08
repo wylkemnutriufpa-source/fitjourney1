@@ -21,6 +21,7 @@ import {
   ArrowLeft,
   ArrowDown,
   ArrowUp,
+  BookmarkPlus,
   ChevronRight,
   Clock,
   Copy,
