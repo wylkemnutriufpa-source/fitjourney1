@@ -4,8 +4,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { ClipboardList, ChevronRight, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ClipboardList, ChevronRight, AlertCircle, CheckCircle2, Loader2, CheckSquare, Square } from "lucide-react";
 import { toast } from "sonner";
 import { listAnamnesesForNutritionist, reviewAnamnesis } from "@/lib/anamnesis/review.functions";
 import { AppShell } from "@/components/AppShell";
