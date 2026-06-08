@@ -235,13 +235,22 @@ function AnamnesisDetailPage() {
                     </span>
                   </div>
                   {data.patient?.id && (
-                    <Link
-                      to="/patients/$id/diet"
-                      params={{ id: data.patient.id }}
-                      className="w-full bg-primary text-primary-foreground rounded-md py-2 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/90"
-                    >
-                      <ClipboardEdit className="size-4" /> Elaborar plano alimentar
-                    </Link>
+                    <>
+                      <Link
+                        to="/templates"
+                        search={{ patientId: data.patient.id, patientName: data.patient.fullName }}
+                        className="w-full bg-primary text-primary-foreground rounded-md py-2 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/90"
+                      >
+                        <ClipboardEdit className="size-4" /> Plano com Smart-templates
+                      </Link>
+                      <Link
+                        to="/templates"
+                        search={{ blank: 1, patientId: data.patient.id, patientName: data.patient.fullName }}
+                        className="w-full bg-emerald-600 text-white rounded-md py-2 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500"
+                      >
+                        <ClipboardEdit className="size-4" /> Plano com IA FitJourney
+                      </Link>
+                    </>
                   )}
                   {data.patient?.id && (
                     <Link
