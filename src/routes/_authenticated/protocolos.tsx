@@ -83,12 +83,10 @@ function ProtocolosPage() {
             const Icon = ICONS[p.icon];
             // Apenas IFJ (exclusive) é trancado para não-admin. Demais sempre abertos.
             const locked = !!p.exclusive && !isAdmin;
-            return (
-              <div
-                key={p.id}
-                className="group relative overflow-hidden rounded-lg border border-[var(--gold)]/25 bg-surface p-4 flex flex-col gap-3 animate-fade-in hover:border-[var(--gold)]/60 transition-colors shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)]"
-              >
-                {/* sparkle suave — fade animado no canto */}
+            const cardClasses =
+              "group relative overflow-hidden rounded-lg border border-[var(--gold)]/25 bg-surface p-4 flex flex-col gap-3 animate-fade-in hover:border-[var(--gold)]/60 transition-colors shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)] text-left";
+            const inner = (
+              <>
                 <Sparkles
                   className="pointer-events-none absolute -top-1 -right-1 size-6 text-[var(--gold)]/40 animate-pulse"
                   aria-hidden
@@ -141,21 +139,43 @@ function ProtocolosPage() {
                   <span className="text-[10px] font-mono uppercase text-muted-foreground">
                     {locked ? "requer premium" : "disponível"}
                   </span>
-                  {locked ? (
-                    <span className="text-[10px] font-mono uppercase px-2 py-1 rounded border border-border text-muted-foreground inline-flex items-center gap-1">
-                      <Lock className="size-3" /> bloqueado
-                    </span>
-                  ) : (
-                    <Link
-                      to="/protocolos/$protocolId"
-                      params={{ protocolId: p.id }}
-                      className="text-[10px] font-mono uppercase px-2 py-1 rounded border border-[var(--gold)]/60 text-[var(--gold)] hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] transition-colors"
-                    >
-                      abrir
-                    </Link>
-                  )}
+                  <span
+                    className={
+                      "text-[10px] font-mono uppercase px-2 py-1 rounded inline-flex items-center gap-1 " +
+                      (locked
+                        ? "border border-border text-muted-foreground"
+                        : "border border-[var(--gold)]/60 text-[var(--gold)] group-hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] transition-colors")
+                    }
+                  >
+                    {locked ? (
+                      <>
+                        <Lock className="size-3" /> bloqueado
+                      </>
+                    ) : (
+                      "abrir"
+                    )}
+                  </span>
                 </div>
-              </div>
+              </>
+            );
+
+            if (locked) {
+              return (
+                <div key={p.id} className={cardClasses + " opacity-80 cursor-not-allowed"}>
+                  {inner}
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={p.id}
+                to="/protocolos/$protocolId"
+                params={{ protocolId: p.id }}
+                className={cardClasses}
+              >
+                {inner}
+              </Link>
             );
           })}
         </div>
