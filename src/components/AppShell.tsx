@@ -19,6 +19,7 @@ import {
   Moon,
   Monitor,
   Search,
+  Sparkles,
 } from "lucide-react";
 import { GlobalSearchDialog } from "@/components/layout/GlobalSearchDialog";
 import { useEffect, useState, type ReactNode } from "react";
@@ -77,6 +78,7 @@ const nutritionistNav = [
   { to: "/anamneses", label: "Anamneses", icon: ClipboardList, badgeKey: "pending-anamneses" as const },
   { to: "/feedbacks", label: "Feedbacks", icon: MessageSquareHeart, badgeKey: "pending-feedbacks" as const },
   { to: "/templates", label: "Templates", icon: FileStack },
+  { to: "/protocolos", label: "Protocolos", icon: Sparkles },
   { to: "/financeiro", label: "Financeiro", icon: DollarSign },
   { to: "/settings", label: "Configurações", icon: Settings },
 ] as const;
@@ -97,6 +99,7 @@ function Crumbs() {
     patients: "Pacientes",
     new: "Nova Anamnese",
     templates: "Templates",
+    protocolos: "Protocolos",
     settings: "Configurações",
     diet: "Dieta",
   };
