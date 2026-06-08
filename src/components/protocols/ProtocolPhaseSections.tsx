@@ -10,7 +10,7 @@
 // Determinístico, sem IO.
 
 import { useState } from "react";
-import { ChevronDown, Leaf, ListChecks } from "lucide-react";
+import { ChevronDown, Leaf, ListChecks, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProtocolPhase, PhaseTea } from "@/lib/protocols/catalog";
 
@@ -45,11 +45,33 @@ export function ProtocolPhaseSections({
 }) {
   const teas = buildTeaRows(phase);
   const strategies = phase.recommendations.strategies ?? [];
+  const special = phase.specialFeature;
   const hasStrategies = strategies.length > 0;
   const hasTeas = teas.length > 0;
+  const hasSpecial = !!special;
 
   return (
     <div className={cn("space-y-3", className)}>
+      {hasSpecial && (
+        <SectionCollapsible
+          title="Elementos especiais"
+          icon={<Sparkles className="size-3.5" />}
+          countLabel={special!.name}
+          defaultOpen
+        >
+          <div className="space-y-1.5">
+            <p className="text-sm font-medium text-foreground">{special!.name}</p>
+            <dl className="space-y-1.5 text-xs">
+              {special!.description && <DetailRow label="Descrição" value={special!.description} />}
+              {special!.recipe && <DetailRow label="Receita" value={special!.recipe} />}
+              {special!.usage && <DetailRow label="Como usar" value={special!.usage} />}
+              {special!.benefits && <DetailRow label="Benefícios" value={special!.benefits} />}
+              {special!.notes && <DetailRow label="Observação" value={special!.notes} />}
+            </dl>
+          </div>
+        </SectionCollapsible>
+      )}
+
       {hasStrategies && (
         <SectionCollapsible
           title="Estratégias-chave"
