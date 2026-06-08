@@ -116,11 +116,14 @@ import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBou
 
 export const Route = createFileRoute("/_authenticated/templates")({
   head: () => ({ meta: [{ title: "Templates — FitJourney" }] }),
-  validateSearch: (search: Record<string, unknown>): { blank?: number; patientId?: string; patientName?: string; draftPlanId?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { blank?: number; patientId?: string; patientName?: string; draftPlanId?: string; fromProtocol?: string; module?: string; phase?: number } => ({
     blank: search.blank === "1" || search.blank === 1 ? 1 : undefined,
     patientId: typeof search.patientId === "string" ? search.patientId : undefined,
     patientName: typeof search.patientName === "string" ? search.patientName : undefined,
     draftPlanId: typeof search.draftPlanId === "string" ? search.draftPlanId : undefined,
+    fromProtocol: typeof search.fromProtocol === "string" ? search.fromProtocol : undefined,
+    module: typeof search.module === "string" ? search.module : undefined,
+    phase: typeof search.phase === "string" ? Number(search.phase) : typeof search.phase === "number" ? search.phase : undefined,
   }),
   component: TemplatesPage,
   errorComponent: ({ error, reset }) => (
@@ -503,11 +506,38 @@ function TemplatesPage() {
   // Entrada "?blank=1" abre direto o editor com esqueleto vazio.
   const blankHandled = useRef(false);
   useEffect(() => {
-    if (search.blank === 1 && !blankHandled.current && !editing) {
+    if (search.blank === 1 && !blankHandled.current && !editing && !search.fromProtocol) {
       blankHandled.current = true;
       setEditing({ tpl: createEmptyTemplate(), isMine: false });
     }
-  }, [search.blank, editing]);
+  }, [search.blank, search.fromProtocol, editing]);
+
+  // Entrada "?fromProtocol=…&module=…&phase=…" abre o editor com a fase do protocolo
+  // convertida em PlannerTemplate (totalmente editável: substituições, drag&drop, etc.).
+  const protocolHandled = useRef<string | null>(null);
+  useEffect(() => {
+    const pid = search.fromProtocol;
+    const mid = search.module;
+    const phid = search.phase;
+    if (!pid || !mid || !phid || editing) return;
+    const key = `${pid}::${mid}::${phid}`;
+    if (protocolHandled.current === key) return;
+    protocolHandled.current = key;
+    (async () => {
+      const [{ findProtocolPhase }, { protocolPhaseToPlannerTemplate }] = await Promise.all([
+        import("@/lib/protocols/catalog"),
+        import("@/lib/protocols/phase-to-template"),
+      ]);
+      const found = findProtocolPhase(pid, mid, phid);
+      if (!found) {
+        toast.error("Fase do protocolo não encontrada.");
+        return;
+      }
+      const tpl = protocolPhaseToPlannerTemplate(found.protocol, found.module, found.phase);
+      setEditing({ tpl, isMine: false });
+      toast.success(`Editando ${found.phase.name}.`);
+    })();
+  }, [search.fromProtocol, search.module, search.phase, editing]);
 
   // Entrada "?draftPlanId=…" abre o editor já carregado com o pré-plano sugerido.
   const getDraftFn = useServerFn(getDraftPlanForEdit);

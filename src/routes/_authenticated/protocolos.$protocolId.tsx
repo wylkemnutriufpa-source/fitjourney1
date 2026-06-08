@@ -3,7 +3,7 @@
 // e grava em patient_active_protocols (snapshot imutável da fase).
 
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Send,
   CheckCircle2,
+  Pencil,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/auth-context";
@@ -447,17 +448,47 @@ function PhaseDetailsDialog({
           )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between">
           <Button variant="outline" onClick={onClose}>
             Fechar
           </Button>
-          <Button onClick={() => onApply(phase)}>
-            <Send className="size-4" />
-            Aplicar esta Fase
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <EditPhaseButton protocolId={protocol.id} moduleId={m.id} phaseId={phase.id} />
+            <Button onClick={() => onApply(phase)}>
+              <Send className="size-4" />
+              Aplicar esta Fase
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function EditPhaseButton({
+  protocolId,
+  moduleId,
+  phaseId,
+}: {
+  protocolId: string;
+  moduleId: string;
+  phaseId: number;
+}) {
+  const navigate = useNavigate();
+  return (
+    <Button
+      variant="secondary"
+      onClick={() =>
+        navigate({
+          to: "/templates",
+          search: { fromProtocol: protocolId, module: moduleId, phase: phaseId },
+        })
+      }
+      className="border border-[var(--gold)]/60 text-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] hover:bg-[color-mix(in_oklab,var(--gold)_18%,transparent)]"
+    >
+      <Pencil className="size-4" />
+      Editar esta Fase
+    </Button>
   );
 }
 
