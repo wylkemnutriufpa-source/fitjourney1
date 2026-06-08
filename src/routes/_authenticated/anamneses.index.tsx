@@ -186,6 +186,52 @@ function AnamnesesQueuePage() {
           </div>
         )}
 
+        {approvableItems.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 rounded-lg border border-border bg-surface p-3">
+            <button
+              type="button"
+              onClick={toggleSelectAll}
+              disabled={bulkRunning}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground hover:text-primary disabled:opacity-60"
+            >
+              {selected.size === approvableItems.length ? (
+                <CheckSquare className="size-4 text-primary" />
+              ) : (
+                <Square className="size-4" />
+              )}
+              {selected.size === approvableItems.length ? "Desmarcar todas" : "Selecionar todas"}
+            </button>
+            <span className="text-xs text-muted-foreground">
+              {selected.size} de {approvableItems.length} selecionada{approvableItems.length === 1 ? "" : "s"}
+            </span>
+            <div className="ml-auto flex items-center gap-2">
+              {bulkProgress && (
+                <span className="text-[11px] font-mono text-muted-foreground">
+                  {bulkProgress.done}/{bulkProgress.total}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => bulkApprove(Array.from(selected))}
+                disabled={bulkRunning || selected.size === 0}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold border border-emerald-600/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {bulkRunning ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCircle2 className="size-3.5" />}
+                Aprovar selecionadas
+              </button>
+              <button
+                type="button"
+                onClick={() => bulkApprove(approvableItems.map((it) => it.id))}
+                disabled={bulkRunning}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+              >
+                {bulkRunning ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCircle2 className="size-3.5" />}
+                Aprovar todas ({approvableItems.length})
+              </button>
+            </div>
+          </div>
+        )}
+
         <ul className="space-y-2">
           {(data?.items ?? []).map((item) => (
                       <li key={item.id} className="relative">
