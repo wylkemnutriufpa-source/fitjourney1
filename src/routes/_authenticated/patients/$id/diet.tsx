@@ -484,6 +484,26 @@ function PlanEditor({
     }
   }
 
+  // Regenera substituições passando o snapshot atual pelo motor vigente
+  // (planos antigos publicados antes da nova rotação ficam com equivalents=[]).
+  function regenerateSubstitutions() {
+    try {
+      const stripped = JSON.parse(JSON.stringify(draft));
+      for (const meal of stripped.meals ?? []) {
+        const wipe = (opt: any) => {
+          if (!opt) return;
+          for (const it of opt.items ?? []) delete it.materializedEquivalents;
+        };
+        wipe(meal.main);
+        for (const eq of meal.equivalents ?? []) wipe(eq);
+      }
+      const refreshed = toPlannerTemplate(stripped) as unknown as EditSnapshot;
+      patch(refreshed);
+      toast.success("Substituições regeneradas com o motor atual. Clique em Salvar para publicar.");
+    } catch (e) {
+      toast.error(`Não foi possível regenerar: ${(e as Error).message ?? "erro"}`);
+    }
+
   return (
     <section className="space-y-4 pb-28">
       {/* Toggle Edição ↔ Visualização */}
