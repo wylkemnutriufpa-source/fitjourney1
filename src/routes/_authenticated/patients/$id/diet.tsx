@@ -598,6 +598,66 @@ function PlanEditor({
           }}
         />
       )}
+
+      <Dialog open={!!saveAsTpl} onOpenChange={(o) => !o && setSaveAsTpl(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Salvar como modelo</DialogTitle>
+            <DialogDescription>
+              Cria um modelo reutilizável a partir deste plano. O plano do paciente
+              não é alterado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="tpl-name">Nome do modelo</Label>
+            <Input
+              id="tpl-name"
+              value={saveAsTpl?.name ?? ""}
+              onChange={(e) =>
+                setSaveAsTpl((s) => (s ? { ...s, name: e.target.value } : s))
+              }
+              placeholder="Ex.: Cutting 1800kcal — 5 refeições"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSaveAsTpl(null)} disabled={saveAsTpl?.saving}>
+              Cancelar
+            </Button>
+            <Button
+              disabled={!saveAsTpl?.name.trim() || saveAsTpl?.saving}
+              onClick={async () => {
+                if (!saveAsTpl) return;
+                const name = saveAsTpl.name.trim();
+                if (!name) return;
+                setSaveAsTpl({ ...saveAsTpl, saving: true });
+                try {
+                  await saveTemplateFn({
+                    data: {
+                      name,
+                      basedOn: `patient-plan:${plan.id}`,
+                      template: { ...draft, name, kcal: Math.round(totalKcal) },
+                    },
+                  });
+                  toast.success("Modelo salvo na sua biblioteca.");
+                  setSaveAsTpl(null);
+                } catch (e) {
+                  toast.error(
+                    `Não consegui salvar o modelo: ${(e as Error).message ?? "erro"}`,
+                  );
+                  setSaveAsTpl((s) => (s ? { ...s, saving: false } : s));
+                }
+              }}
+            >
+              {saveAsTpl?.saving ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <BookmarkPlus className="size-3.5" />
+              )}
+              Salvar modelo
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
