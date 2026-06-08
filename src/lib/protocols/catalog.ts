@@ -125,9 +125,41 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
             time: "07:00",
             totalKcal: 380,
             items: [
-              { foodKey: "aveia", name: "Aveia", quantityG: 40, householdMeasure: "4 colheres de sopa cheias", kcal: 150 },
-              { foodKey: "whey", name: "Whey Protein Isolado", quantityG: 25, householdMeasure: "1 scoop", kcal: 100 },
-              { foodKey: "maca", name: "Maçã com casca", quantityG: 150, householdMeasure: "1 unidade média", kcal: 80 },
+              {
+                foodKey: "ovo",
+                name: "Ovo",
+                quantityG: 100,
+                householdMeasure: "2 unidades",
+                kcal: 156,
+                substitutions: [
+                  { foodKey: "frango-desfiado", name: "Frango desfiado", quantityG: 80, householdMeasure: "4 colheres de sopa cheias", kcal: 95 },
+                  { foodKey: "whey", name: "Whey Protein Isolado", quantityG: 25, householdMeasure: "1 scoop", kcal: 100 },
+                  { foodKey: "iogurte-grego", name: "Iogurte Grego Natural", quantityG: 170, householdMeasure: "1 pote", kcal: 105 },
+                ],
+              },
+              {
+                foodKey: "aveia",
+                name: "Aveia",
+                quantityG: 40,
+                householdMeasure: "4 colheres de sopa cheias",
+                kcal: 150,
+                substitutions: [
+                  { foodKey: "tapioca", name: "Tapioca", quantityG: 60, householdMeasure: "2 discos médios", kcal: 145 },
+                  { foodKey: "cuscuz", name: "Cuscuz", quantityG: 90, householdMeasure: "½ xícara", kcal: 140 },
+                  { foodKey: "pao-integral", name: "Pão integral", quantityG: 50, householdMeasure: "2 fatias", kcal: 140 },
+                ],
+              },
+              {
+                foodKey: "maca",
+                name: "Maçã com casca",
+                quantityG: 150,
+                householdMeasure: "1 unidade média",
+                kcal: 80,
+                substitutions: [
+                  { foodKey: "banana", name: "Banana", quantityG: 100, householdMeasure: "1 unidade", kcal: 89 },
+                  { foodKey: "mamao", name: "Mamão papaia", quantityG: 200, householdMeasure: "1 fatia grande", kcal: 80 },
+                ],
+              },
             ],
           },
           {
