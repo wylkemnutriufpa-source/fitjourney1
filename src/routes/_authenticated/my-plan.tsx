@@ -249,6 +249,10 @@ function MyPlanPage() {
 
         <PlanMeals planId={data.id} meals={meals} foods={foods} />
 
+        <WaterCalculatorCard />
+
+
+
         {orientacoes && (
           <section className="border border-border rounded-lg p-5 bg-surface space-y-2">
             <h2 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
