@@ -144,14 +144,7 @@ function SnapshotView({
   const day = snapshot.days.find((d) => d.id === activeDayId) ?? snapshot.days[0];
   const { meals, items, setMeals, setItems, hydrated } = useExpansion(snapshot.id);
 
-  // Defaults após hydrate: abre só a primeira refeição se nada salvo
-  useEffect(() => {
-    if (!hydrated) return;
-    if (Object.keys(meals).length === 0 && day?.meals[0]) {
-      setMeals({ [day.meals[0].id]: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, day?.id]);
+  // Padrão: tudo colapsado (usuário expande clicando).
 
   const allMealIds = useMemo(() => day?.meals.map((m) => m.id) ?? [], [day]);
   const allItemIds = useMemo(
