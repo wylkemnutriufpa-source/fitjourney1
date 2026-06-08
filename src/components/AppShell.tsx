@@ -72,8 +72,8 @@ function ThemeToggle() {
 
 
 
-const nutritionistNav = [
-  { to: "/protocolos", label: "Protocolos", icon: Sparkles },
+const nutritionistNavBase = [
+  { to: "/protocolos", label: "Protocolos", icon: Sparkles, proOnly: true as const },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/patients", label: "Pacientes", icon: Users },
   { to: "/anamneses", label: "Anamneses", icon: ClipboardList, badgeKey: "pending-anamneses" as const },
