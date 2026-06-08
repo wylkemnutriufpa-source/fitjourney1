@@ -68,11 +68,21 @@ function planBadgeClass(t: NutriPlanTier | undefined): string {
 
 function ProfessionalsPage() {
   const fetchAll = useServerFn(listProfessionals);
+  const setTierFn = useServerFn(setNutritionistPlanTier);
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin", "professionals"],
     queryFn: () => fetchAll(),
   });
   const [editing, setEditing] = useState<AdminNutritionistRow | null>(null);
+  const tierMut = useMutation({
+    mutationFn: (vars: { nutritionist_id: string; plan_tier: NutriPlanTier }) =>
+      setTierFn({ data: vars }),
+    onSuccess: (_r, vars) => {
+      toast.success(vars.plan_tier === "pro" ? "Upgrade para PRO aplicado" : "Plano alterado para BASIC");
+      refetch();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <div className="space-y-4">
