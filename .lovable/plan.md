@@ -1,81 +1,75 @@
-# Plano — Corrigir geração de imagens e substituições nos templates
+## Contexto
 
-Aplica as regras da skill `fitjourney-template-rules` no código. Sem mudar UI, sem mudar contrato de snapshot, sem tocar planos já publicados.
+Hoje o catálogo `foods` armazena tudo em **g/ml** (`default_qty`, `default_unit`). As "medidas caseiras" existem em `food_household_measures` (ex.: *Ovo cozido — 1 unidade = 50 g*), mas o editor de plano e o motor de equivalências **só calculam quando `unit ∈ {g, ml}**`:
 
-## Fix 1 — Acompanhamentos do almoço/jantar com `foodKey` canônico (CRÍTICO)
+- `recalc.ts` linha 33: se a unidade não for g/ml, devolve `defaultQty` cru (não escala).
+- `equivalents.ts` linha 99: `nutrientPer100g` assume base em 100 g; itens em "unidade" não entram na fórmula.
+- Macros do item (`EditItem`) são derivados de `kcal_per_100g * qty/100` — quebra para "unid".
 
-**Onde:** `src/lib/meal-planner.ts`, função `withLunchSides` (linhas 661–681).
+Resultado: ovo, banana, maçã, tangerina, mamão, laranja em unidade ficam com macros zerados e nunca geram bloco de equivalentes.
 
-**Problema:** os 4 itens injetados (Arroz, Feijão, Salada, Fruta) não têm `foodKey`. O `scaleItem` faz fallback para a `imageKey` da opção (a proteína), o que confunde `recalcMaterializedEquivalents` e gera ruído no QA.
+## Objetivo
 
-**Correção:** declarar `foodKey` canônico para cada acompanhamento, alinhado ao catálogo TACO:
+Permitir que o nutri escolha **unidade** como a forma natural de prescrever ovo e frutas, mantendo gramas como alternativa, e que **todo o motor** (macros do item, alvos do plano, blocos de equivalentes, snapshot) **calcule corretamente** convertendo unidade → gramas via medida caseira padrão.
+
+Sem migration de banco — todos os dados necessários (`food_household_measures.grams_equivalent` + `is_default`) já existem. Só falta o frontend/motor usarem.
+
+## Mudanças
+
+### 1. Helper único de conversão — `src/lib/foods/unit-bridge.ts` (novo)
 
 ```ts
-{ foodKey: "arroz-cozido",        name: "Arroz cozido",           ... scaleGroup: "carb" }
-{ foodKey: "feijao-cozido",       name: "Feijão cozido",          ... scaleGroup: "protein" }
-{ foodKey: "salada-verde-livre",  name: "Salada verde (livre)",   ... scaleGroup: "vegetable" }
-{ foodKey: "fruta-sobremesa",     name: "Fruta de sobremesa",     ... scaleGroup: "fruit" }
+gramsFromQty(food, qty, unit) → number   // unid → g via measure default
+qtyFromGrams(food, grams, unit) → number // g → unid (round 0.5 p/ ovo, 1 p/ fruta)
 ```
 
-Acompanhamento **não gera imagem própria** (regra 2 da skill) — o QA já ignora itens não-âncora.
+Regra: se `unit === "unid"` e existe `householdMeasures` com `isDefault`, usa `gramsEquivalent`. Senão, fallback para `defaultQty` (compat retro).
 
-## Fix 2 — `recalcMaterializedEquivalents` só roda em itens-âncora
+### 2. `src/lib/foods.functions.ts`
 
-**Onde:** `src/lib/meal-planner.ts`, função `materializeOptionEquivalents` (caminho que itera `option.items`).
+`FoodDTO.kcal` (e demais por-porção exibidos) hoje só consideram g/ml. Estender para `unid`: usar `gramsEquivalent` da medida default para calcular `kcal/protein/carb/fat` da porção padrão (1 unidade).
 
-**Problema:** hoje tenta materializar substituições para todo item, inclusive acompanhamento/recheio/bebida/fruta — gera 169 falsos positivos "sub sem imagem" e "âncora sem cobertura".
+### 3. `src/components/meal-editor/recalc.ts`
 
-**Correção:** materializar somente:
-- almoço/jantar → primeiro item `scaleGroup === "protein"` que não seja acompanhamento (feijão/salada/fruta);
-- café/lanche → primeiro item do bloco (carboidrato base).
+- `equivalentQtyFromPlannerQty`: quando base é `unid`, converter para gramas via `gramsFromQty` antes de passar para o motor.
+- Após `calculateEquivalents`, se o candidato original é "unid" (ovo etc.), reconverter `qty` final de g para unidades via `qtyFromGrams` (preservando step de 0,5 unid para ovo, 1 unid para fruta inteira).
 
-Demais itens ficam sem `materializedEquivalents` (paciente não vê "Trocar" neles, o que é o comportamento desejado: acompanhamento livre, recheio acompanha base).
+### 4. `src/lib/substitutions/equivalents.ts`
 
-## Fix 3 — Imagens: âncora apenas, sem compostos
+Trocar a guarda `isMassOrVol` por: **se a base tem `gramsEquivalent` (próprio ou via measure), normalizar internamente para gramas** e rodar a fórmula como hoje. A saída usa a unidade do candidato (g ou unid, com conversão de volta).
 
-**Onde:** `src/lib/food-images.ts` (fallbacks categóricos) + renderers.
+Sem mudar a fórmula nem o arredondamento clínico (ceil p/ proteína, floor p/ carb/fruta) — esses já estão certos, só passam a operar sobre o equivalente em gramas.
 
-**Problema:** QA reporta 130 itens sem imagem porque cai em recheios/acompanhamentos.
+### 5. Editor do plano — `src/routes/_authenticated/patients/$id/diet.tsx`
 
-**Correção:**
-1. Manter fallback categórico só para **proteínas** (almoço/jantar) e **carboidratos base** (café/lanche). Lista já existe — apenas garantir cobertura completa do pool oficial:
-   - Carb base: pão, tapioca, cuscuz, wrap, bolo-de-milho, bolo-de-macaxeira, panqueca-de-banana, vitamina-de-frutas.
-   - Proteínas faltantes detectadas no QA: `carne-moida-refogada` → fallback `carne-grelhada`; `queijo-minas` → sem imagem (recheio, não âncora) — remover do warning; `inhame` → adicionar como carb base se aparecer no pool.
-2. Renderers do café/lanche resolvem imagem a partir do **primeiro item** do bloco (carb base), não de slug composto.
-3. Não criar nenhum arquivo `pao-com-*.jpg` / `tapioca-com-*.jpg`.
+- No seletor de unidade do `EditItem`, oferecer `unid` quando o alimento tem ao menos uma medida caseira com `is_default` e `gramsEquivalent`.
+- Ao trocar entre `g` ↔ `unid`, converter a `qty` automaticamente (não zerar) e **recalcular macros** do item via novo helper.
+- Default para ovo (`scaleGroup=protein` + nome contém "ovo") e frutas inteiras (banana, maçã, tangerina, laranja, pera, mamão): preselecionar `unid`.
 
-## Fix 4 — Rotação de café/lanche: pool oficial garantido
+### 6. Snapshot — `src/lib/v2/snapshot/build.ts`
 
-**Onde:** `src/lib/substitutions/taco-catalog.ts` + `src/lib/substitutions/equivalents.ts`.
+Garantir que o item persiste `qty` + `unit` consistentes (em unidades se assim foi prescrito) e que `gramsEquivalent` da medida usada vai no snapshot — Patient App e PDF apenas renderizam, sem recalcular (invariante #4 do pipeline soberano).
 
-**Correção:** garantir que o pool de carboidrato base em café/lanche tenha **8 opções** (pão, tapioca, cuscuz, wrap, bolo-de-milho, bolo-de-macaxeira, panqueca-de-banana, vitamina-de-frutas) com `scaleGroup="carb"` e `subGroup="cafe-lanche-base"`. Motor já rotaciona por offset — só precisa do pool completo.
+### 7. Testes
 
-## Validação
+- `src/lib/substitutions/__tests__/equivalents.test.ts`: novo caso "ovo cozido 2 unid ↔ ovo mexido X unid", "banana 1 unid ↔ maçã 1 unid".
+- `src/components/meal-editor/__tests__/recalc.test.ts` (se existir; senão criar): macros do item em unidade.
 
-Após cada fix, rodar:
-```
-bun run scripts/qa-templates.ts
-```
+## Fora de escopo
 
-Meta:
-- 0 issues CRÍTICAS
-- 0 `anchor-image-missing` em proteína de almoço/jantar
-- 0 `anchor-image-missing` em carb base de café/lanche
-- `rotation-pool-too-small` zerado nos 18 smart-seeds
-- Ruído de acompanhamento/recheio desaparece (não é reportado)
+- Adicionar novas frutas/medidas no catálogo (já tem o que importa; falta UI/motor usar).
+- Mexer em planos já publicados (snapshot é imutável).
+- Mudar TACO/USDA — continuam fonte por 100 g; só adicionamos a camada de conversão.
 
-## Não-regressão (Matriz de Impacto)
+## Risco / Rollback
 
-- Planos publicados: intactos (snapshot V3 imutável; só mudamos geração futura).
-- Patient App: continua render-burro; resolve imagem a partir do primeiro item do bloco.
-- V2 Piloto: não materializa substituições por design — fica fora do escopo deste fix.
-- PDF: idêntico (consome snapshot).
-- Sem migration de banco. Sem mudança de RLS. Sem mudança em vínculo paciente↔nutricionista.
+- Helper isolado + guarda nova no engine. Itens hoje em g continuam idênticos (fallback).
+- Rollback: reverter os 4 arquivos do motor/editor; banco intacto.
 
-## Ordem de execução
+## Validação (checklist)     
 
-1. Fix 1 (`withLunchSides` com `foodKey`).
-2. Fix 2 (materialização só na âncora).
-3. Fix 4 (pool de carb base completo).
-4. Fix 3 (fallbacks de imagem revisados).
-5. Rodar QA e reportar contagem final por severidade.
+- Angela: editar ovo cozido → trocar para `2 unid` → macros aparecem corretos (≈156 kcal, 13 g prot).
+- Bloco de equivalentes do ovo gera opções em unid (ex.: claras, ovo mexido).
+- Banana 1 unid → equivalente em maçã ≈ 1 unid (não 90 g).
+- Item em gramas (frango 120 g) continua exatamente como antes.
+- Plano publicado antigo continua renderizando idêntico (snapshot imutável).
