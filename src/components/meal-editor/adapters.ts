@@ -54,6 +54,10 @@ export function toPlannerFoodItem(raw: unknown): PlannerFoodItem {
     kcal: numberOr(o.kcal, 0),
     scaleGroup: normalizeScaleGroup(o.scaleGroup),
   };
+  const householdMeasure = stringOr(o.householdMeasure, "");
+  if (householdMeasure) item.householdMeasure = householdMeasure;
+  const gramsEquivalent = numberOr(o.gramsEquivalent, NaN);
+  if (Number.isFinite(gramsEquivalent)) item.gramsEquivalent = gramsEquivalent;
   if (o.materializedEquivalents) {
     item.materializedEquivalents = o.materializedEquivalents as PlannerFoodItem["materializedEquivalents"];
   }
