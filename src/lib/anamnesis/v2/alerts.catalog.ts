@@ -30,6 +30,18 @@ const CLINICAL_TAGS: Record<string, AlertDescriptor> = {
   pregnancy: { label: "Gestante", severity: "warning" },
   sleep_apnea: { label: "Apneia do sono", severity: "info" },
   high_training_volume: { label: "Volume de treino alto", severity: "info" },
+  // Triagem de protocolos
+  anxiety: { label: "Ansiedade frequente", severity: "info" },
+  migraine: { label: "Enxaqueca recorrente", severity: "info" },
+  parasitosis_suspected: { label: "Suspeita de parasitose", severity: "info" },
+  cellulite_concern: { label: "Queixa de celulite", severity: "info" },
+  hair_loss: { label: "Queda de cabelo", severity: "info" },
+  chronic_inflammation: { label: "Inflamação crônica", severity: "info" },
+  bloating: { label: "Inchaço frequente", severity: "info" },
+  beauty_concern: { label: "Foco em beleza (pele/cabelo/unhas)", severity: "info" },
+  low_hydration: { label: "Baixa hidratação", severity: "info" },
+  anemia: { label: "Anemia", severity: "warning" },
+  high_appetite: { label: "Compulsão / fome excessiva", severity: "info" },
 };
 
 // Risk flags (canonical.riskFlags)
