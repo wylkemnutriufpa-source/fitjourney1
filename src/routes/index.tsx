@@ -579,25 +579,37 @@ function Landing() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {c.features.items.map((f, i) => (
+              {c.features.items.map((f, i) => {
+                const isSoon = f.tag === "Em breve";
+                return (
                 <motion.div
                   key={f.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className="group relative glass-premium rounded-2xl p-6 card-hover-glow shimmer-sweep cursor-default gradient-border"
+                  className={`group relative glass-premium rounded-2xl p-6 card-hover-glow shimmer-sweep cursor-default gradient-border ${isSoon ? "ring-1 ring-amber-400/40" : ""}`}
                 >
                   <div className="absolute top-4 right-4">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[color-mix(in_oklab,var(--gold)_14%,transparent)] text-[var(--gold)] border border-[var(--gold)]/30">{f.tag}</span>
+                    {isSoon ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/50">
+                        <Lock className="w-3 h-3" /> {f.tag}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[color-mix(in_oklab,var(--gold)_14%,transparent)] text-[var(--gold)] border border-[var(--gold)]/30">{f.tag}</span>
+                    )}
                   </div>
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-[color-mix(in_oklab,var(--gold)_18%,transparent)] ring-1 ring-[var(--gold)]/30 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:ring-[var(--gold)]/60 group-hover:shadow-[0_0_24px_-6px_color-mix(in_oklab,var(--gold)_55%,transparent)] transition-all duration-500">
-                    <Icon name={f.icon} className="w-6 h-6 text-[var(--gold)]" />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110 ${isSoon ? "bg-amber-400/10 ring-1 ring-amber-400/40 group-hover:ring-amber-400/70" : "bg-gradient-to-br from-primary/10 to-[color-mix(in_oklab,var(--gold)_18%,transparent)] ring-1 ring-[var(--gold)]/30 group-hover:ring-[var(--gold)]/60 group-hover:shadow-[0_0_24px_-6px_color-mix(in_oklab,var(--gold)_55%,transparent)]"}`}>
+                    <Icon name={f.icon} className={`w-6 h-6 ${isSoon ? "text-amber-300" : "text-[var(--gold)]"}`} />
                   </div>
-                  <h3 className="font-display font-semibold text-lg mb-2">{f.title}</h3>
+                  <h3 className="font-display font-semibold text-lg mb-2 inline-flex items-center gap-2">
+                    {f.title}
+                    {isSoon && <Lock className="w-4 h-4 text-amber-300" />}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
