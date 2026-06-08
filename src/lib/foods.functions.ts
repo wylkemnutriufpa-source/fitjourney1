@@ -3,6 +3,7 @@
 // as medidas caseiras de cada alimento.
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { cleanFoodDisplayName } from "@/lib/foods/display-name";
 
 export type HouseholdMeasureDTO = {
   id: string;
@@ -99,7 +100,7 @@ export const listFoods = createServerFn({ method: "GET" })
       return {
         id: f.id,
         foodKey: f.food_key ?? "frango-grelhado",
-        name: f.name,
+        name: cleanFoodDisplayName(f.name),
         category: f.category,
         qty: defaultQty,
         unit: f.default_unit,

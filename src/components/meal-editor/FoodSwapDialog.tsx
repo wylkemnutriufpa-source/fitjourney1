@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { imgFor } from "@/lib/food-images";
+import { cleanFoodDisplayName } from "@/lib/foods/display-name";
 
 import type { EquivalentCandidate } from "@/lib/substitutions/equivalents";
 import type { MaterializedEquivalentOption } from "./types";
@@ -42,7 +43,7 @@ function swapKcalPreserving(
   const qtyG = Math.max(1, Math.round((targetKcal / per100) * 100));
   return {
     foodKey: cand.foodKey,
-    name: cand.name,
+    name: cleanFoodDisplayName(cand.name),
     qty: qtyG,
     unit: cand.unit === "unid" ? "g" : cand.unit,
     kcal: Math.round((qtyG * per100) / 100),
@@ -86,7 +87,7 @@ export function FoodSwapDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ArrowRightLeft className="h-4 w-4 text-primary" />
-            Trocar “{current.name}” por outro alimento
+            Trocar “{cleanFoodDisplayName(current.name)}” por outro alimento
           </DialogTitle>
           <DialogDescription>
             Mantém aproximadamente a mesma energia ({current.kcal} kcal).
@@ -139,7 +140,7 @@ export function FoodSwapDialog({
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-foreground">
-                          {c.name}
+                          {cleanFoodDisplayName(c.name)}
                           {isCurrent ? (
                             <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground">
                               atual
