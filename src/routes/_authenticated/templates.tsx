@@ -22,6 +22,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -2024,6 +2025,43 @@ function FoodItemRow({
     }, catalogMatch, item));
   }
 
+  const measuresForUnit = catalogMatch?.householdMeasures ?? [];
+  const currentUnitValue =
+    item.householdMeasure && measuresForUnit.some((m) => m.measureName === item.householdMeasure)
+      ? `m:${item.householdMeasure}`
+      : `u:${item.unit || "g"}`;
+
+  function pickUnit(value: string) {
+    if (value.startsWith("m:")) {
+      const name = value.slice(2);
+      const m = measuresForUnit.find((x) => x.measureName === name);
+      if (m) applyMeasure(m.gramsEquivalent, m.measureName);
+      return;
+    }
+    updatePortion({ unit: value.slice(2) });
+  }
+
+  const unitSelect = (
+    <Select value={currentUnitValue} onValueChange={pickUnit}>
+      <SelectTrigger
+        className="h-9 w-24 text-sm md:h-7 md:w-20 md:text-xs"
+        title="Escolher unidade — recalcula kcal"
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="u:g">g</SelectItem>
+        <SelectItem value="u:ml">ml</SelectItem>
+        <SelectItem value="u:unid">unid</SelectItem>
+        {measuresForUnit.map((m) => (
+          <SelectItem key={m.id} value={`m:${m.measureName}`}>
+            {m.measureName} · {m.gramsEquivalent}g
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+
   const baseClass =
     "flex items-center gap-2 rounded-md p-1.5 border " +
     (primary ? "bg-primary/5 border-primary/20" : "bg-muted/40 border-border");
@@ -2099,12 +2137,7 @@ function FoodItemRow({
         className="h-9 w-20 text-sm text-right md:h-7 md:w-16 md:text-xs"
         title="Quantidade"
       />
-      <Input
-        value={item.unit}
-        onChange={(e) => updatePortion({ unit: e.target.value })}
-        className="h-9 w-16 text-sm md:h-7 md:w-14 md:text-xs"
-        title="Unidade"
-      />
+      {unitSelect}
       <Input
         type="number"
         inputMode="decimal"
@@ -2181,11 +2214,7 @@ function FoodItemRow({
                 </label>
                 <label className="block text-xs text-muted-foreground">
                   Unidade
-                  <Input
-                    value={item.unit}
-                    onChange={(e) => updatePortion({ unit: e.target.value })}
-                    className="mt-1 h-10 text-sm"
-                  />
+                  <div className="mt-1">{unitSelect}</div>
                 </label>
               </div>
               <label className="block text-xs text-muted-foreground">
