@@ -160,6 +160,51 @@ export const upsertProfessionalSubscription = createServerFn({ method: "POST" })
     return { id: ins.id, updated: false };
   });
 
+// Upgrade/downgrade rápido do plano do nutricionista (admin only).
+// Preserva sub existente (apenas troca plan_tier); cria sub mínima se não houver.
+const SetTierInput = z.object({
+  nutritionist_id: z.string().uuid(),
+  plan_tier: z.enum(["basic", "pro"]),
+});
+
+export const setNutritionistPlanTier = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SetTierInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertAdmin(supabase, userId);
+
+    const { data: existing } = await supabase
+      .from("nutritionist_subscriptions")
+      .select("id")
+      .eq("nutritionist_id", data.nutritionist_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (existing) {
+      const { error } = await supabase
+        .from("nutritionist_subscriptions")
+        .update({ plan_tier: data.plan_tier })
+        .eq("id", existing.id);
+      if (error) throw new Error(error.message);
+      return { id: existing.id, created: false };
+    }
+
+    const { data: ins, error } = await supabase
+      .from("nutritionist_subscriptions")
+      .insert({
+        nutritionist_id: data.nutritionist_id,
+        plan_tier: data.plan_tier,
+        monthly_price_cents: 0,
+        status: "active",
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: ins.id, created: true };
+  });
+
 export type AdminPatientRow = {
   id: string;
   full_name: string;
