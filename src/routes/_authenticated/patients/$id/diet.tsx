@@ -791,7 +791,7 @@ function MealCard({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.15 } }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="space-y-2 rounded-md border border-border/40 bg-background/40 p-2 md:space-y-0 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:grid md:grid-cols-[minmax(0,1fr)_72px_64px_auto_auto] md:items-center md:gap-2"
+            className="space-y-2 rounded-md border border-border/40 bg-background/40 p-2 md:space-y-0 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:grid md:grid-cols-[minmax(140px,1.2fr)_64px_minmax(180px,2fr)_auto_auto] md:items-center md:gap-2"
           >
             <Input
               value={cleanFoodDisplayName(it.name)}
@@ -872,7 +872,7 @@ function MealCard({
                   <div
                     role="radiogroup"
                     aria-label="Unidade ou medida caseira"
-                    className="flex flex-wrap gap-1 items-center"
+                    className="flex flex-wrap md:flex-nowrap gap-1 items-center min-w-0"
                   >
                     {opts.map((opt) => {
                       const selected = opt.value === currentValue;
