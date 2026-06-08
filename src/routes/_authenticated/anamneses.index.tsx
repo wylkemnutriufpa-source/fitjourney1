@@ -257,7 +257,11 @@ function AnamnesesQueuePage() {
               <Link
                 to="/anamneses/$id"
                 params={{ id: item.id }}
-                className="block rounded-lg border border-border hover:border-primary/50 transition-colors p-4 pr-4 sm:pr-44"
+                className={
+                  "block rounded-lg border transition-colors p-4 pr-4 sm:pr-44 " +
+                  (isSelected ? "border-primary/60 bg-primary/5" : "border-border hover:border-primary/50") +
+                  (isApprovable ? " pl-10" : "")
+                }
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
