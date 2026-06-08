@@ -307,7 +307,7 @@ function Landing() {
             </Link>
           </motion.div>
 
-          <div className="md:hidden flex items-center gap-1">
+          <div className="md:hidden flex items-center gap-1 flex-shrink-0">
             <button
               type="button"
               onClick={() => setContactOpen(true)}
@@ -316,6 +316,12 @@ function Landing() {
             >
               <MessageCircle className="w-5 h-5" />
             </button>
+            <Link
+              to="/app"
+              className="px-3 py-1.5 text-xs font-semibold rounded-full border border-border/60 bg-card/40 text-foreground"
+            >
+              Entrar
+            </Link>
             <button className="p-2" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Menu">
               {mobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
