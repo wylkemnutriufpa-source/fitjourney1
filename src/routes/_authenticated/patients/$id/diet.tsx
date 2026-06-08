@@ -370,22 +370,40 @@ function PlanEditor({
 
   function addFoodToMeal(mealId: string, food: CatalogFood) {
     const newId = uid();
+    // Se o alimento tem medida caseira default, já abre o item com ela
+    // selecionada — a dor relatada (ovo em gramas, banana em gramas) some
+    // sem o nutri precisar trocar nada à mão.
+    const defaultMeasure =
+      food.householdMeasures?.find((m) => m.isDefault) ??
+      food.householdMeasures?.[0];
+    const baseItem: any = {
+      id: newId,
+      foodKey: food.foodKey,
+      name: food.name,
+      qty: food.qty,
+      unit: food.unit,
+      kcal: food.kcal,
+      scaleGroup: food.scaleGroup,
+      kcalPer100g: food.kcalPer100g,
+      householdMeasures: food.householdMeasures,
+    };
+    if (defaultMeasure && food.kcalPer100g) {
+      baseItem.householdMeasure = {
+        label: defaultMeasure.measureName,
+        grams: defaultMeasure.gramsEquivalent,
+        measureId: defaultMeasure.id,
+      };
+      baseItem.qty = 1;
+      baseItem.unit = "medida";
+      baseItem.kcal = Math.round(
+        (food.kcalPer100g * defaultMeasure.gramsEquivalent) / 100,
+      );
+    }
     updateMeal(mealId, (m) => ({
       ...m,
       main: {
         ...m.main,
-        items: [
-          ...m.main.items,
-          {
-            id: newId,
-            foodKey: food.foodKey,
-            name: food.name,
-            qty: food.qty,
-            unit: food.unit,
-            kcal: food.kcal,
-            scaleGroup: food.scaleGroup,
-          },
-        ],
+        items: [...m.main.items, baseItem],
       },
     }));
     // Abre o modal pós-adição para decidir Replicar / Gerar equivalentes.
