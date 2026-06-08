@@ -2025,6 +2025,43 @@ function FoodItemRow({
     }, catalogMatch, item));
   }
 
+  const measuresForUnit = catalogMatch?.householdMeasures ?? [];
+  const currentUnitValue =
+    item.householdMeasure && measuresForUnit.some((m) => m.measureName === item.householdMeasure)
+      ? `m:${item.householdMeasure}`
+      : `u:${item.unit || "g"}`;
+
+  function pickUnit(value: string) {
+    if (value.startsWith("m:")) {
+      const name = value.slice(2);
+      const m = measuresForUnit.find((x) => x.measureName === name);
+      if (m) applyMeasure(m.gramsEquivalent, m.measureName);
+      return;
+    }
+    updatePortion({ unit: value.slice(2) });
+  }
+
+  const unitSelect = (
+    <Select value={currentUnitValue} onValueChange={pickUnit}>
+      <SelectTrigger
+        className="h-9 w-24 text-sm md:h-7 md:w-20 md:text-xs"
+        title="Escolher unidade — recalcula kcal"
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="u:g">g</SelectItem>
+        <SelectItem value="u:ml">ml</SelectItem>
+        <SelectItem value="u:unid">unid</SelectItem>
+        {measuresForUnit.map((m) => (
+          <SelectItem key={m.id} value={`m:${m.measureName}`}>
+            {m.measureName} · {m.gramsEquivalent}g
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+
   const baseClass =
     "flex items-center gap-2 rounded-md p-1.5 border " +
     (primary ? "bg-primary/5 border-primary/20" : "bg-muted/40 border-border");
