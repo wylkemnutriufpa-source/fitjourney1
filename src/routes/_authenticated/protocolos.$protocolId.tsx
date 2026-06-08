@@ -15,11 +15,14 @@ import {
   Moon,
   Leaf,
   ChevronRight,
+  ChevronDown,
   Send,
   CheckCircle2,
   Pencil,
   Replace,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/auth-context";
 import {
