@@ -125,14 +125,27 @@ const howItWorksPatient = [
   { step: "03", title: "Siga seu plano", desc: "Acesse dietas, checklists, receitas e acompanhe sua evolução.", icon: Target },
   { step: "04", title: "Evolua com dados", desc: "Sua jornada é acompanhada por inteligência clínica em tempo real.", icon: Brain },
 ];
-const allFeaturesList = [
-  "Dashboard inteligente", "Gestão de pacientes", "Anamnese com IA", "Planos alimentares",
-  "Avaliação física completa", "Análise corporal por foto", "Protocolos reutilizáveis",
-  "Programas em grupo", "Gamificação (XP/streaks)", "Desafios semanais", "Metas semanais",
-  "Chat em tempo real", "Receitas com IA", "Banco de dados com 600+ alimentos",
-  "Lista de compras", "Suplementação", "Relatórios semanais", "Agenda de consultas",
-  "Push notifications", "Branding personalizado", "Financeiro multi-gateway", "Feedbacks",
-  "Dicas globais", "Biblioteca do paciente", "Calculadoras (peso/água)", "Health Check Quiz",
+const allFeaturesList: { label: string; soon?: boolean }[] = [
+  { label: "Dashboard inteligente" },
+  { label: "Gestão de pacientes" },
+  { label: "Anamnese Inteligente" },
+  { label: "Planos alimentares personalizados" },
+  { label: "Avaliação física completa" },
+  { label: "Análise corporal por foto", soon: true },
+  { label: "Protocolos reutilizáveis" },
+  { label: "Programas em grupo" },
+  { label: "Receitas com IA", soon: true },
+  { label: "Banco de dados com 600+ alimentos" },
+  { label: "Lista de compras automática" },
+  { label: "Relatórios semanais" },
+  { label: "Agenda de consultas" },
+  { label: "Push notifications", soon: true },
+  { label: "Branding personalizado (landing por profissional)" },
+  { label: "Financeiro (simulador de receita)" },
+  { label: "Feedbacks a cada 15 dias" },
+  { label: "Dicas globais", soon: true },
+  { label: "Biblioteca do paciente" },
+  { label: "Calculadora de água inteligente", soon: true },
 ];
 
 function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: string }) {
@@ -619,14 +632,15 @@ function Landing() {
       <section className="py-16 px-4 bg-muted/20 border-y border-border/30">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="text-center mb-10">
-            <h3 className="font-display text-2xl md:text-3xl font-bold mb-2">+27 funcionalidades integradas</h3>
+            <h3 className="font-display text-2xl md:text-3xl font-bold mb-2">+{allFeaturesList.length} funcionalidades integradas</h3>
             <p className="text-muted-foreground">Acesso completo a todas as funcionalidades no plano <span className="text-primary font-semibold">Premium</span>.</p>
           </motion.div>
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {allFeaturesList.map((f) => (
-              <motion.div key={f} variants={fadeUp} className="flex items-center gap-2 text-sm py-2.5 px-3 rounded-xl glass-premium border border-border/30 hover:border-primary/20 transition-colors">
-                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="font-medium">{f}</span>
+              <motion.div key={f.label} variants={fadeUp} className={"flex items-center gap-2 text-sm py-2.5 px-3 rounded-xl glass-premium border transition-colors " + (f.soon ? "border-amber-400/30 hover:border-amber-400/50" : "border-border/30 hover:border-primary/20")}>
+                {f.soon ? <Lock className="w-4 h-4 text-amber-400 flex-shrink-0" /> : <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />}
+                <span className="font-medium flex-1">{f.label}</span>
+                {f.soon && <span className="text-[9px] font-mono uppercase text-amber-400/90">em breve</span>}
               </motion.div>
             ))}
           </motion.div>
