@@ -56,6 +56,15 @@ export interface PhaseMeal {
   readonly items: ReadonlyArray<PhaseMealItem>;
 }
 
+export interface PhaseSpecialFeature {
+  readonly name: string;
+  readonly description?: string;
+  readonly recipe?: string;
+  readonly usage?: string;
+  readonly benefits?: string;
+  readonly notes?: string;
+}
+
 export interface ProtocolPhase {
   readonly id: number;
   readonly name: string;
@@ -65,6 +74,7 @@ export interface ProtocolPhase {
   readonly macros?: PhaseMacros;
   readonly meals?: ReadonlyArray<PhaseMeal>;
   readonly teaSchedule?: ReadonlyArray<PhaseTea>;
+  readonly specialFeature?: PhaseSpecialFeature;
   readonly recommendations: {
     readonly waterMl: number;
     readonly sleepHours: number;
