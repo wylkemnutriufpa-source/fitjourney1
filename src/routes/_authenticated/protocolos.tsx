@@ -142,31 +142,18 @@ function ProtocolosPage() {
                   <span className="text-[10px] font-mono uppercase text-muted-foreground">
                     {locked ? "requer premium" : "disponível"}
                   </span>
-                  {!locked && p.id === "ifj" ? (
+                  {locked ? (
+                    <span className="text-[10px] font-mono uppercase px-2 py-1 rounded border border-border text-muted-foreground inline-flex items-center gap-1">
+                      <Lock className="size-3" /> bloqueado
+                    </span>
+                  ) : (
                     <Link
-                      to="/protocolos/ifj"
+                      to="/protocolos/$protocolId"
+                      params={{ protocolId: p.id }}
                       className="text-[10px] font-mono uppercase px-2 py-1 rounded border border-[var(--gold)]/60 text-[var(--gold)] hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] transition-colors"
                     >
                       abrir
                     </Link>
-                  ) : (
-                    <button
-                      disabled={locked}
-                      className={
-                        "text-[10px] font-mono uppercase px-2 py-1 rounded border transition-colors " +
-                        (locked
-                          ? "border-border text-muted-foreground cursor-not-allowed"
-                          : "border-[var(--gold)]/60 text-[var(--gold)] hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)]")
-                      }
-                    >
-                      {locked ? (
-                        <span className="inline-flex items-center gap-1">
-                          <Lock className="size-3" /> bloqueado
-                        </span>
-                      ) : (
-                        "abrir"
-                      )}
-                    </button>
                   )}
                 </div>
               </div>

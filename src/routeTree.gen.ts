@@ -38,11 +38,13 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients/index'
 import { Route as AuthenticatedAnamnesesIndexRouteImport } from './routes/_authenticated/anamneses.index'
 import { Route as CSlugCodeRouteImport } from './routes/c.$slug.$code'
+import { Route as AuthenticatedProtocolosProtocolIdRouteImport } from './routes/_authenticated/protocolos.$protocolId'
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients/new'
 import { Route as AuthenticatedOnboardingPatientRouteImport } from './routes/_authenticated/onboarding/patient'
 import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './routes/_authenticated/onboarding/nutritionist'
 import { Route as AuthenticatedMyPlanUpdateHealthProfileRouteImport } from './routes/_authenticated/my-plan.update-health-profile'
 import { Route as AuthenticatedMyPlanSettingsRouteImport } from './routes/_authenticated/my-plan.settings'
+import { Route as AuthenticatedMyPlanProtocolosRouteImport } from './routes/_authenticated/my-plan.protocolos'
 import { Route as AuthenticatedMyPlanPhysicalAssessmentRouteImport } from './routes/_authenticated/my-plan.physical-assessment'
 import { Route as AuthenticatedMyPlanFeedbackRouteImport } from './routes/_authenticated/my-plan.feedback'
 import { Route as AuthenticatedMyPlanAnamneseRouteImport } from './routes/_authenticated/my-plan.anamnese'
@@ -206,6 +208,12 @@ const CSlugCodeRoute = CSlugCodeRouteImport.update({
   path: '/$code',
   getParentRoute: () => CSlugRoute,
 } as any)
+const AuthenticatedProtocolosProtocolIdRoute =
+  AuthenticatedProtocolosProtocolIdRouteImport.update({
+    id: '/$protocolId',
+    path: '/$protocolId',
+    getParentRoute: () => AuthenticatedProtocolosRoute,
+  } as any)
 const AuthenticatedPatientsNewRoute =
   AuthenticatedPatientsNewRouteImport.update({
     id: '/patients/new',
@@ -234,6 +242,12 @@ const AuthenticatedMyPlanSettingsRoute =
   AuthenticatedMyPlanSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => AuthenticatedMyPlanRoute,
+  } as any)
+const AuthenticatedMyPlanProtocolosRoute =
+  AuthenticatedMyPlanProtocolosRouteImport.update({
+    id: '/protocolos',
+    path: '/protocolos',
     getParentRoute: () => AuthenticatedMyPlanRoute,
   } as any)
 const AuthenticatedMyPlanPhysicalAssessmentRoute =
@@ -330,7 +344,7 @@ export interface FileRoutesByFullPath {
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
-  '/protocolos': typeof AuthenticatedProtocolosRoute
+  '/protocolos': typeof AuthenticatedProtocolosRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
@@ -349,11 +363,13 @@ export interface FileRoutesByFullPath {
   '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/my-plan/physical-assessment': typeof AuthenticatedMyPlanPhysicalAssessmentRoute
+  '/my-plan/protocolos': typeof AuthenticatedMyPlanProtocolosRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/protocolos/$protocolId': typeof AuthenticatedProtocolosProtocolIdRoute
   '/c/$slug/$code': typeof CSlugCodeRoute
   '/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
@@ -378,7 +394,7 @@ export interface FileRoutesByTo {
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
-  '/protocolos': typeof AuthenticatedProtocolosRoute
+  '/protocolos': typeof AuthenticatedProtocolosRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
@@ -397,11 +413,13 @@ export interface FileRoutesByTo {
   '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/my-plan/physical-assessment': typeof AuthenticatedMyPlanPhysicalAssessmentRoute
+  '/my-plan/protocolos': typeof AuthenticatedMyPlanProtocolosRoute
   '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/protocolos/$protocolId': typeof AuthenticatedProtocolosProtocolIdRoute
   '/c/$slug/$code': typeof CSlugCodeRoute
   '/anamneses': typeof AuthenticatedAnamnesesIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
@@ -428,7 +446,7 @@ export interface FileRoutesById {
   '/_authenticated/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/_authenticated/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/_authenticated/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
-  '/_authenticated/protocolos': typeof AuthenticatedProtocolosRoute
+  '/_authenticated/protocolos': typeof AuthenticatedProtocolosRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/_authenticated/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
@@ -447,11 +465,13 @@ export interface FileRoutesById {
   '/_authenticated/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
   '/_authenticated/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
   '/_authenticated/my-plan/physical-assessment': typeof AuthenticatedMyPlanPhysicalAssessmentRoute
+  '/_authenticated/my-plan/protocolos': typeof AuthenticatedMyPlanProtocolosRoute
   '/_authenticated/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
   '/_authenticated/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/_authenticated/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/_authenticated/protocolos/$protocolId': typeof AuthenticatedProtocolosProtocolIdRoute
   '/c/$slug/$code': typeof CSlugCodeRoute
   '/_authenticated/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
@@ -497,11 +517,13 @@ export interface FileRouteTypes {
     | '/my-plan/anamnese'
     | '/my-plan/feedback'
     | '/my-plan/physical-assessment'
+    | '/my-plan/protocolos'
     | '/my-plan/settings'
     | '/my-plan/update-health-profile'
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
+    | '/protocolos/$protocolId'
     | '/c/$slug/$code'
     | '/anamneses/'
     | '/patients/'
@@ -545,11 +567,13 @@ export interface FileRouteTypes {
     | '/my-plan/anamnese'
     | '/my-plan/feedback'
     | '/my-plan/physical-assessment'
+    | '/my-plan/protocolos'
     | '/my-plan/settings'
     | '/my-plan/update-health-profile'
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
+    | '/protocolos/$protocolId'
     | '/c/$slug/$code'
     | '/anamneses'
     | '/patients'
@@ -594,11 +618,13 @@ export interface FileRouteTypes {
     | '/_authenticated/my-plan/anamnese'
     | '/_authenticated/my-plan/feedback'
     | '/_authenticated/my-plan/physical-assessment'
+    | '/_authenticated/my-plan/protocolos'
     | '/_authenticated/my-plan/settings'
     | '/_authenticated/my-plan/update-health-profile'
     | '/_authenticated/onboarding/nutritionist'
     | '/_authenticated/onboarding/patient'
     | '/_authenticated/patients/new'
+    | '/_authenticated/protocolos/$protocolId'
     | '/c/$slug/$code'
     | '/_authenticated/anamneses/'
     | '/_authenticated/patients/'
@@ -829,6 +855,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CSlugCodeRouteImport
       parentRoute: typeof CSlugRoute
     }
+    '/_authenticated/protocolos/$protocolId': {
+      id: '/_authenticated/protocolos/$protocolId'
+      path: '/$protocolId'
+      fullPath: '/protocolos/$protocolId'
+      preLoaderRoute: typeof AuthenticatedProtocolosProtocolIdRouteImport
+      parentRoute: typeof AuthenticatedProtocolosRoute
+    }
     '/_authenticated/patients/new': {
       id: '/_authenticated/patients/new'
       path: '/patients/new'
@@ -862,6 +895,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/my-plan/settings'
       preLoaderRoute: typeof AuthenticatedMyPlanSettingsRouteImport
+      parentRoute: typeof AuthenticatedMyPlanRoute
+    }
+    '/_authenticated/my-plan/protocolos': {
+      id: '/_authenticated/my-plan/protocolos'
+      path: '/protocolos'
+      fullPath: '/my-plan/protocolos'
+      preLoaderRoute: typeof AuthenticatedMyPlanProtocolosRouteImport
       parentRoute: typeof AuthenticatedMyPlanRoute
     }
     '/_authenticated/my-plan/physical-assessment': {
@@ -983,6 +1023,7 @@ interface AuthenticatedMyPlanRouteChildren {
   AuthenticatedMyPlanAnamneseRoute: typeof AuthenticatedMyPlanAnamneseRoute
   AuthenticatedMyPlanFeedbackRoute: typeof AuthenticatedMyPlanFeedbackRoute
   AuthenticatedMyPlanPhysicalAssessmentRoute: typeof AuthenticatedMyPlanPhysicalAssessmentRoute
+  AuthenticatedMyPlanProtocolosRoute: typeof AuthenticatedMyPlanProtocolosRoute
   AuthenticatedMyPlanSettingsRoute: typeof AuthenticatedMyPlanSettingsRoute
   AuthenticatedMyPlanUpdateHealthProfileRoute: typeof AuthenticatedMyPlanUpdateHealthProfileRoute
 }
@@ -992,6 +1033,7 @@ const AuthenticatedMyPlanRouteChildren: AuthenticatedMyPlanRouteChildren = {
   AuthenticatedMyPlanFeedbackRoute: AuthenticatedMyPlanFeedbackRoute,
   AuthenticatedMyPlanPhysicalAssessmentRoute:
     AuthenticatedMyPlanPhysicalAssessmentRoute,
+  AuthenticatedMyPlanProtocolosRoute: AuthenticatedMyPlanProtocolosRoute,
   AuthenticatedMyPlanSettingsRoute: AuthenticatedMyPlanSettingsRoute,
   AuthenticatedMyPlanUpdateHealthProfileRoute:
     AuthenticatedMyPlanUpdateHealthProfileRoute,
@@ -999,6 +1041,21 @@ const AuthenticatedMyPlanRouteChildren: AuthenticatedMyPlanRouteChildren = {
 
 const AuthenticatedMyPlanRouteWithChildren =
   AuthenticatedMyPlanRoute._addFileChildren(AuthenticatedMyPlanRouteChildren)
+
+interface AuthenticatedProtocolosRouteChildren {
+  AuthenticatedProtocolosProtocolIdRoute: typeof AuthenticatedProtocolosProtocolIdRoute
+}
+
+const AuthenticatedProtocolosRouteChildren: AuthenticatedProtocolosRouteChildren =
+  {
+    AuthenticatedProtocolosProtocolIdRoute:
+      AuthenticatedProtocolosProtocolIdRoute,
+  }
+
+const AuthenticatedProtocolosRouteWithChildren =
+  AuthenticatedProtocolosRoute._addFileChildren(
+    AuthenticatedProtocolosRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
@@ -1009,7 +1066,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMyDashboardRoute: typeof AuthenticatedMyDashboardRoute
   AuthenticatedMyPlanRoute: typeof AuthenticatedMyPlanRouteWithChildren
   AuthenticatedMyPlanV2PreviewRoute: typeof AuthenticatedMyPlanV2PreviewRoute
-  AuthenticatedProtocolosRoute: typeof AuthenticatedProtocolosRoute
+  AuthenticatedProtocolosRoute: typeof AuthenticatedProtocolosRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
   AuthenticatedTemplatesV2EditorRoute: typeof AuthenticatedTemplatesV2EditorRoute
@@ -1033,7 +1090,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMyDashboardRoute: AuthenticatedMyDashboardRoute,
   AuthenticatedMyPlanRoute: AuthenticatedMyPlanRouteWithChildren,
   AuthenticatedMyPlanV2PreviewRoute: AuthenticatedMyPlanV2PreviewRoute,
-  AuthenticatedProtocolosRoute: AuthenticatedProtocolosRoute,
+  AuthenticatedProtocolosRoute: AuthenticatedProtocolosRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
   AuthenticatedTemplatesV2EditorRoute: AuthenticatedTemplatesV2EditorRoute,
@@ -1082,13 +1139,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

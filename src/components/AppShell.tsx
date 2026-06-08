@@ -86,6 +86,7 @@ const nutritionistNav = [
 const patientNav = [
   { to: "/my-dashboard", label: "Início", icon: LayoutDashboard },
   { to: "/my-plan", label: "Meu Plano", icon: LayoutDashboard },
+  { to: "/my-plan/protocolos", label: "Protocolos Ativos", icon: Sparkles },
   { to: "/my-plan/feedback", label: "Feedback", icon: MessageSquareHeart, badgeKey: "feedback-pending" as const },
   { to: "/my-plan/settings", label: "Configurações", icon: Settings },
 ] as const;

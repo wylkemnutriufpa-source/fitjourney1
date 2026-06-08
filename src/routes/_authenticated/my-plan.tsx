@@ -10,6 +10,7 @@ import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
+import { DailyProtocolBanner } from "@/components/patient/DailyProtocolBanner";
 import { WaterCalculatorCard } from "@/components/patient/WaterCalculatorCard";
 import { ShoppingListCard } from "@/components/patient/ShoppingListCard";
 import {
@@ -216,6 +217,7 @@ function MyPlanPage() {
   return (
     <AppShell>
       <div className="space-y-8 max-w-3xl">
+        <DailyProtocolBanner />
         <ClinicalAlerts />
         <header className="border-b border-border pb-5 space-y-2">
           <p className="text-2xl sm:text-3xl font-bold tracking-tight">
