@@ -10,7 +10,7 @@
 // Determinístico, sem IO.
 
 import { useState } from "react";
-import { ChevronDown, Leaf, ListChecks } from "lucide-react";
+import { ChevronDown, Leaf, ListChecks, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProtocolPhase, PhaseTea } from "@/lib/protocols/catalog";
 
