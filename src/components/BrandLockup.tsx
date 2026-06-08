@@ -67,13 +67,9 @@ export function BrandLockup({
 
   const alignment = isVertical ? "items-center" : "items-center";
 
-  const wordmarkNode = wordmarkAs ? (
-    <span className="inline-flex leading-none" style={wordmarkStyle}>
-      {wordmarkAs}
-    </span>
-  ) : (
+  const wordmarkNode = (
     <span className={wordmarkClassName} style={wordmarkStyle}>
-      {wordmarkText}
+      {wordmarkAs ?? wordmarkText}
     </span>
   );
 
