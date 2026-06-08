@@ -239,7 +239,7 @@ function MealCard({ meal }: { meal: PhaseMeal }) {
 function FoodRow({ item }: { item: PhaseMealItem }) {
   const subs = item.substitutions ?? [];
   const hasSubs = subs.length > 0;
-  const [open, setOpen] = useState(hasSubs);
+  const [open, setOpen] = useState(false);
   return (
     <div className="rounded-lg border border-border/60 bg-surface/40 first:mt-2">
       <button
