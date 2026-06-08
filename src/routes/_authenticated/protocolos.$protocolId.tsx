@@ -177,17 +177,20 @@ function ModulesGrid({
   protocol: ProtocolDescriptor;
   modules: ReadonlyArray<ProtocolModule>;
 }) {
+  const [intro, setIntro] = useState<ProtocolModule | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState<ProtocolModule | null>(null);
+  const navigate = useNavigate();
+
   return (
     <section className="space-y-4 animate-fade-in">
       <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Fases / Módulos</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {modules.map((m) => (
-          <Link
+          <button
             key={m.id}
-            to="/protocolos/$protocolId"
-            params={{ protocolId: protocol.id }}
-            search={{ module: m.id }}
-            className="group relative overflow-hidden rounded-lg border border-[var(--gold)]/30 bg-surface p-5 flex flex-col gap-3 hover:border-[var(--gold)]/70 transition-colors shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)]"
+            type="button"
+            onClick={() => setIntro(m)}
+            className="group relative overflow-hidden rounded-lg border border-[var(--gold)]/30 bg-surface p-5 flex flex-col gap-3 hover:border-[var(--gold)]/70 transition-colors shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)] text-left"
           >
             <Sparkles
               className="pointer-events-none absolute -top-1 -right-1 size-7 text-[var(--gold)]/40 animate-pulse"
@@ -214,10 +217,200 @@ function ModulesGrid({
                 abrir <ChevronRight className="size-3" />
               </span>
             </div>
-          </Link>
+          </button>
         ))}
       </div>
+
+      <ModuleIntroDialog
+        protocol={protocol}
+        module={intro}
+        onClose={() => setIntro(null)}
+        onDetails={(m) => {
+          setIntro(null);
+          setDetailsOpen(m);
+        }}
+        onStart={(m) => {
+          setIntro(null);
+          navigate({
+            to: "/protocolos/$protocolId",
+            params: { protocolId: protocol.id },
+            search: { module: m.id },
+          });
+        }}
+      />
+
+      <ModuleDetailsDialog
+        protocol={protocol}
+        module={detailsOpen}
+        onClose={() => setDetailsOpen(null)}
+        onStart={(m) => {
+          setDetailsOpen(null);
+          navigate({
+            to: "/protocolos/$protocolId",
+            params: { protocolId: protocol.id },
+            search: { module: m.id },
+          });
+        }}
+      />
     </section>
+  );
+}
+
+function ModuleIntroDialog({
+  protocol,
+  module: m,
+  onClose,
+  onDetails,
+  onStart,
+}: {
+  protocol: ProtocolDescriptor;
+  module: ProtocolModule | null;
+  onClose: () => void;
+  onDetails: (m: ProtocolModule) => void;
+  onStart: (m: ProtocolModule) => void;
+}) {
+  const open = !!m;
+  if (!m) {
+    return (
+      <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+        <DialogContent />
+      </Dialog>
+    );
+  }
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogDescription className="text-[10px] font-mono uppercase tracking-widest">
+            {protocol.name}
+          </DialogDescription>
+          <DialogTitle
+            className="text-[var(--gold)] uppercase tracking-wide flex items-center gap-2"
+            style={{ textShadow: "0 0 12px color-mix(in oklab, var(--gold) 30%, transparent)" }}
+          >
+            <Sparkles className="size-4" />
+            {m.name}
+          </DialogTitle>
+        </DialogHeader>
+
+        <p className="text-sm text-muted-foreground">{m.tagline}</p>
+        <div className="flex items-center gap-2 text-[10px] font-mono uppercase text-muted-foreground">
+          <span className="inline-flex items-center gap-1">
+            <Clock className="size-3 text-[var(--gold)]/70" />
+            {m.phases.length} {m.phases.length === 1 ? "fase" : "fases"}
+          </span>
+        </div>
+
+        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <Button variant="outline" onClick={() => onDetails(m)}>
+            Detalhes
+          </Button>
+          <Button onClick={() => onStart(m)} className="bg-[var(--gold)] text-background hover:bg-[var(--gold)]/90">
+            <Send className="size-4" />
+            Iniciar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ModuleDetailsDialog({
+  protocol,
+  module: m,
+  onClose,
+  onStart,
+}: {
+  protocol: ProtocolDescriptor;
+  module: ProtocolModule | null;
+  onClose: () => void;
+  onStart: (m: ProtocolModule) => void;
+}) {
+  const open = !!m;
+  if (!m) {
+    return (
+      <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+        <DialogContent />
+      </Dialog>
+    );
+  }
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogDescription className="text-[10px] font-mono uppercase tracking-widest">
+            {protocol.name} · Detalhes
+          </DialogDescription>
+          <DialogTitle
+            className="text-[var(--gold)] uppercase tracking-wide flex items-center gap-2"
+            style={{ textShadow: "0 0 12px color-mix(in oklab, var(--gold) 30%, transparent)" }}
+          >
+            <Sparkles className="size-4" />
+            {m.name}
+          </DialogTitle>
+        </DialogHeader>
+
+        <p className="text-sm text-muted-foreground">{m.tagline}</p>
+
+        <div className="space-y-3 py-2">
+          {m.phases.map((p, idx) => (
+            <div
+              key={p.id}
+              className="rounded-lg border border-[var(--gold)]/25 bg-background/60 p-4 space-y-2"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <p
+                  className="text-sm font-bold uppercase tracking-wide text-[var(--gold)]"
+                  style={{ textShadow: "0 0 10px color-mix(in oklab, var(--gold) 30%, transparent)" }}
+                >
+                  Fase {idx + 1} · {p.name}
+                </p>
+                <span className="text-[10px] font-mono uppercase text-muted-foreground inline-flex items-center gap-1">
+                  <Clock className="size-3" />
+                  {p.durationWeeks} sem
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">{p.description}</p>
+              <div className="flex flex-wrap gap-2 text-[10px] font-mono text-muted-foreground">
+                {p.dailyKcalTarget && (
+                  <span className="border border-[var(--gold)]/20 rounded px-1.5 py-0.5">
+                    {p.dailyKcalTarget} kcal/dia
+                  </span>
+                )}
+                <span className="border border-[var(--gold)]/20 rounded px-1.5 py-0.5 inline-flex items-center gap-1">
+                  <Droplets className="size-3" />
+                  {(p.recommendations.waterMl / 1000).toFixed(1)}L
+                </span>
+                <span className="border border-[var(--gold)]/20 rounded px-1.5 py-0.5 inline-flex items-center gap-1">
+                  <Moon className="size-3" />
+                  {p.recommendations.sleepHours}h
+                </span>
+              </div>
+              {p.recommendations.strategies.length > 0 && (
+                <ul className="text-xs space-y-1 pt-1">
+                  {p.recommendations.strategies.slice(0, 4).map((s, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="text-[var(--gold)]">•</span>
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between">
+          <Button variant="outline" onClick={onClose}>
+            Fechar
+          </Button>
+          <Button onClick={() => onStart(m)} className="bg-[var(--gold)] text-background hover:bg-[var(--gold)]/90">
+            <Send className="size-4" />
+            Iniciar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
