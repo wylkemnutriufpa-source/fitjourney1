@@ -1,75 +1,99 @@
-## Contexto
-
-Hoje o catálogo `foods` armazena tudo em **g/ml** (`default_qty`, `default_unit`). As "medidas caseiras" existem em `food_household_measures` (ex.: *Ovo cozido — 1 unidade = 50 g*), mas o editor de plano e o motor de equivalências **só calculam quando `unit ∈ {g, ml}**`:
-
-- `recalc.ts` linha 33: se a unidade não for g/ml, devolve `defaultQty` cru (não escala).
-- `equivalents.ts` linha 99: `nutrientPer100g` assume base em 100 g; itens em "unidade" não entram na fórmula.
-- Macros do item (`EditItem`) são derivados de `kcal_per_100g * qty/100` — quebra para "unid".
-
-Resultado: ovo, banana, maçã, tangerina, mamão, laranja em unidade ficam com macros zerados e nunca geram bloco de equivalentes.
-
 ## Objetivo
 
-Permitir que o nutri escolha **unidade** como a forma natural de prescrever ovo e frutas, mantendo gramas como alternativa, e que **todo o motor** (macros do item, alvos do plano, blocos de equivalentes, snapshot) **calcule corretamente** convertendo unidade → gramas via medida caseira padrão.
+Padronizar a abertura de TODOS os protocolos no mesmo modelo premium do IFJ (módulos → fases → aplicar a paciente) e fechar o loop no app do paciente: sidebar com "Protocolos Ativos" + banner diário no primeiro acesso do dia avisando em que semana ele está e o que fazer.
 
-Sem migration de banco — todos os dados necessários (`food_household_measures.grams_equivalent` + `is_default`) já existem. Só falta o frontend/motor usarem.
+## Arquitetura (sem criar motor novo)
+
+Mantém os motores atuais. Adicionamos apenas:
+
+- **1 tabela nova**: `patient_active_protocols` — vínculo paciente↔fase ativa (snapshot imutável da fase aplicada).
+- **1 catálogo unificado**: cada protocolo do `PROTOCOL_CATALOG` ganha `modules[]` opcional (mesma forma do IFJ). Protocolos simples = 1 módulo, 1+ fases.
+- **2 server fns puras** (read/write fina, sem cálculo clínico): aplicar fase + listar ativos do paciente.
+- **0 alterações nos motores** TDEE/macros/matcher/gate/router. `suggest.ts` continua puro reader.
+
+Não fere os invariantes (`fitjourney-clinical-invariants`): suggest segue determinístico, snapshot da fase é imutável depois de aplicado, Patient App permanece read-only (apenas lê `patient_active_protocols`).
 
 ## Mudanças
 
-### 1. Helper único de conversão — `src/lib/foods/unit-bridge.ts` (novo)
+### 1. Banco (1 migration)
 
-```ts
-gramsFromQty(food, qty, unit) → number   // unid → g via measure default
-qtyFromGrams(food, grams, unit) → number // g → unid (round 0.5 p/ ovo, 1 p/ fruta)
+```
+patient_active_protocols (
+  id uuid pk,
+  patient_id uuid → patients,
+  nutritionist_id uuid → nutritionists,
+  protocol_id text,         -- ex: 'ifj', 'anemia'
+  module_id text,           -- ex: 'fit-glp' (ou 'default')
+  phase_id int,
+  phase_snapshot jsonb,     -- congelado no momento da aplicação
+  started_at timestamptz default now(),
+  ends_at timestamptz,      -- now() + durationWeeks
+  status text check in ('active','completed','cancelled') default 'active',
+  last_banner_shown_date date,  -- controle do 1x/dia
+  created_at, updated_at
+)
 ```
 
-Regra: se `unit === "unid"` e existe `householdMeasures` com `isDefault`, usa `gramsEquivalent`. Senão, fallback para `defaultQty` (compat retro).
+- RLS: nutricionista vê/escreve só dos seus pacientes; paciente vê só os próprios; `service_role` all.
+- GRANT padrão authenticated/service_role.
+- Trigger: bloqueia UPDATE em `phase_snapshot` (imutável).
 
-### 2. `src/lib/foods.functions.ts`
+### 2. Catálogo unificado (`src/lib/protocols/catalog.ts`)
 
-`FoodDTO.kcal` (e demais por-porção exibidos) hoje só consideram g/ml. Estender para `unid`: usar `gramsEquivalent` da medida default para calcular `kcal/protein/carb/fat` da porção padrão (1 unidade).
+Adicionar campo opcional `modules?: ReadonlyArray<IFJModule>` a cada `ProtocolDescriptor`. Migrar IFJ existente para esse campo. Protocolos simples (Anemia, SOP, etc.) ganham 1 módulo padrão "Protocolo" com fases base (durationWeeks + recommendations placeholder editável depois).
 
-### 3. `src/components/meal-editor/recalc.ts`
+### 3. Rota genérica `/protocolos/$protocolId`
 
-- `equivalentQtyFromPlannerQty`: quando base é `unid`, converter para gramas via `gramsFromQty` antes de passar para o motor.
-- Após `calculateEquivalents`, se o candidato original é "unid" (ovo etc.), reconverter `qty` final de g para unidades via `qtyFromGrams` (preservando step de 0,5 unid para ovo, 1 unid para fruta inteira).
+Substitui a rota fixa `protocolos.ifj.tsx` por `protocolos.$protocolId.tsx` reutilizando exatamente o mesmo layout premium (header gold, módulos grid, phases grid, ApplyPhaseDialog). IFJ vira só `/protocolos/ifj` — mesmo código.
 
-### 4. `src/lib/substitutions/equivalents.ts`
+Página `/protocolos` (lista) passa todos os cards para `Link to="/protocolos/$protocolId"`.
 
-Trocar a guarda `isMassOrVol` por: **se a base tem `gramsEquivalent` (próprio ou via measure), normalizar internamente para gramas** e rodar a fórmula como hoje. A saída usa a unidade do candidato (g ou unid, com conversão de volta).
+### 4. Server fns (`src/lib/protocols/active.functions.ts`)
 
-Sem mudar a fórmula nem o arredondamento clínico (ceil p/ proteína, floor p/ carb/fruta) — esses já estão certos, só passam a operar sobre o equivalente em gramas.
+- `applyProtocolPhase({ patientId, protocolId, moduleId, phaseId })` — congela snapshot da fase e insere/upsert.
+- `listActiveProtocolsForPatient({ patientId })` — leitura.
+- `markBannerShownToday({ activeProtocolId })` — só atualiza `last_banner_shown_date`.
 
-### 5. Editor do plano — `src/routes/_authenticated/patients/$id/diet.tsx`
+ApplyPhaseDialog passa a chamar `applyProtocolPhase` (hoje só faz `toast`).
 
-- No seletor de unidade do `EditItem`, oferecer `unid` quando o alimento tem ao menos uma medida caseira com `is_default` e `gramsEquivalent`.
-- Ao trocar entre `g` ↔ `unid`, converter a `qty` automaticamente (não zerar) e **recalcular macros** do item via novo helper.
-- Default para ovo (`scaleGroup=protein` + nome contém "ovo") e frutas inteiras (banana, maçã, tangerina, laranja, pera, mamão): preselecionar `unid`.
+### 5. Sidebar do paciente — "Protocolos Ativos"
 
-### 6. Snapshot — `src/lib/v2/snapshot/build.ts`
+Em `src/components/AppShell.tsx` (sidebar paciente), adicionar item "Protocolos Ativos" → rota nova `src/routes/_authenticated/my-plan.protocolos.tsx` que lista os protocolos ativos do paciente (cards com nome, fase atual, semana, recomendações da fase).
 
-Garantir que o item persiste `qty` + `unit` consistentes (em unidades se assim foi prescrito) e que `gramsEquivalent` da medida usada vai no snapshot — Patient App e PDF apenas renderizam, sem recalcular (invariante #4 do pipeline soberano).
+### 6. Banner diário no primeiro acesso
 
-### 7. Testes
+Componente `<DailyProtocolBanner />` montado em `my-plan.tsx` (entrada do paciente):
 
-- `src/lib/substitutions/__tests__/equivalents.test.ts`: novo caso "ovo cozido 2 unid ↔ ovo mexido X unid", "banana 1 unid ↔ maçã 1 unid".
-- `src/components/meal-editor/__tests__/recalc.test.ts` (se existir; senão criar): macros do item em unidade.
+- Busca protocolos ativos.
+- Compara `last_banner_shown_date` com hoje.
+- Se diferente: mostra dialog/banner com "Você está no Protocolo X — Semana N: faça isso, isso e isso" (lê `phase_snapshot.recommendations` + calcula semana via `started_at`).
+- Ao fechar, chama `markBannerShownToday`.
 
-## Fora de escopo
+## Detalhes técnicos
 
-- Adicionar novas frutas/medidas no catálogo (já tem o que importa; falta UI/motor usar).
-- Mexer em planos já publicados (snapshot é imutável).
-- Mudar TACO/USDA — continuam fonte por 100 g; só adicionamos a camada de conversão.
+- Cálculo de semana atual: `Math.floor((now - started_at)/7d) + 1`, capado em `durationWeeks`.
+- Snapshot da fase é cópia profunda de `IFJPhase` (já readonly) — qualquer edição futura no catálogo NÃO afeta protocolos já aplicados (segue regra de imutabilidade pós-publicação).
+- `phase_snapshot` inclui `protocolName`, `moduleName`, `phase` completa.
+- IFJ continua gated por premium; demais protocolos abertos a todos os nutricionistas autenticados.
+- Nada de IA. Tudo determinístico.
 
-## Risco / Rollback
+## Arquivos
 
-- Helper isolado + guarda nova no engine. Itens hoje em g continuam idênticos (fallback).
-- Rollback: reverter os 4 arquivos do motor/editor; banco intacto.
+- **migration**: criar `patient_active_protocols` + RLS + grants + trigger.
+- **edit** `src/lib/protocols/catalog.ts`: campo `modules?` + fases default para cada protocolo simples.
+- **edit** `src/lib/protocols/ifj-catalog.ts`: re-exporta para compat ou some (mover dados para o catalog principal).
+- **rename/create** `src/routes/_authenticated/protocolos.$protocolId.tsx` (substitui `protocolos.ifj.tsx`).
+- **edit** `src/routes/_authenticated/protocolos.tsx`: cards viram Link para `/protocolos/$protocolId`.
+- **create** `src/lib/protocols/active.functions.ts`.
+- **edit** `src/components/AppShell.tsx`: nav item paciente "Protocolos Ativos".
+- **create** `src/routes/_authenticated/my-plan.protocolos.tsx`.
+- **create** `src/components/patient/DailyProtocolBanner.tsx`.
+- **edit** `src/routes/_authenticated/my-plan.tsx`: monta banner.
 
-## Validação (checklist)     
+## Não escopo (deixa para depois)
 
-- Angela: editar ovo cozido → trocar para `2 unid` → macros aparecem corretos (≈156 kcal, 13 g prot).
-- Bloco de equivalentes do ovo gera opções em unid (ex.: claras, ovo mexido).
-- Banana 1 unid → equivalente em maçã ≈ 1 unid (não 90 g).
-- Item em gramas (frango 120 g) continua exatamente como antes.
-- Plano publicado antigo continua renderizando idêntico (snapshot imutável).
+- Editar conteúdo de cada fase pelo profissional (vamos detalhar cardápios na próxima rodada — você mesmo disse).
+- Histórico de protocolos concluídos (entra junto com a tela de detalhe).
+- Notificação push real (banner in-app já cobre o "1x ao dia").
+
+Posso prosseguir? os modulos = fases.. exemplo cada protocolo tem seus modulos/fases veja qual cai melhor,, modulo 1 modulo 2 ou modulo 3? ou fica melhor fase 1, fase 2 ou fase 3? fases neh? creio que fica melhor
