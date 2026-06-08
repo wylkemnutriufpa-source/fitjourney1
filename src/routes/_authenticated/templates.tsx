@@ -2137,12 +2137,7 @@ function FoodItemRow({
         className="h-9 w-20 text-sm text-right md:h-7 md:w-16 md:text-xs"
         title="Quantidade"
       />
-      <Input
-        value={item.unit}
-        onChange={(e) => updatePortion({ unit: e.target.value })}
-        className="h-9 w-16 text-sm md:h-7 md:w-14 md:text-xs"
-        title="Unidade"
-      />
+      {unitSelect}
       <Input
         type="number"
         inputMode="decimal"
