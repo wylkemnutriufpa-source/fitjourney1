@@ -36,6 +36,13 @@ function dtoToCatalogFood(f: FoodDTO): CatalogFood {
     unit: f.unit,
     kcal: f.kcal,
     scaleGroup: f.scaleGroup as CatalogFood["scaleGroup"],
+    kcalPer100g: f.kcalPer100g,
+    householdMeasures: f.householdMeasures?.map((m) => ({
+      id: m.id,
+      measureName: m.measureName,
+      gramsEquivalent: m.gramsEquivalent,
+      isDefault: m.isDefault,
+    })),
   };
 }
 

@@ -370,22 +370,40 @@ function PlanEditor({
 
   function addFoodToMeal(mealId: string, food: CatalogFood) {
     const newId = uid();
+    // Se o alimento tem medida caseira default, já abre o item com ela
+    // selecionada — a dor relatada (ovo em gramas, banana em gramas) some
+    // sem o nutri precisar trocar nada à mão.
+    const defaultMeasure =
+      food.householdMeasures?.find((m) => m.isDefault) ??
+      food.householdMeasures?.[0];
+    const baseItem: any = {
+      id: newId,
+      foodKey: food.foodKey,
+      name: food.name,
+      qty: food.qty,
+      unit: food.unit,
+      kcal: food.kcal,
+      scaleGroup: food.scaleGroup,
+      kcalPer100g: food.kcalPer100g,
+      householdMeasures: food.householdMeasures,
+    };
+    if (defaultMeasure && food.kcalPer100g) {
+      baseItem.householdMeasure = {
+        label: defaultMeasure.measureName,
+        grams: defaultMeasure.gramsEquivalent,
+        measureId: defaultMeasure.id,
+      };
+      baseItem.qty = 1;
+      baseItem.unit = "medida";
+      baseItem.kcal = Math.round(
+        (food.kcalPer100g * defaultMeasure.gramsEquivalent) / 100,
+      );
+    }
     updateMeal(mealId, (m) => ({
       ...m,
       main: {
         ...m.main,
-        items: [
-          ...m.main.items,
-          {
-            id: newId,
-            foodKey: food.foodKey,
-            name: food.name,
-            qty: food.qty,
-            unit: food.unit,
-            kcal: food.kcal,
-            scaleGroup: food.scaleGroup,
-          },
-        ],
+        items: [...m.main.items, baseItem],
       },
     }));
     // Abre o modal pós-adição para decidir Replicar / Gerar equivalentes.
@@ -789,7 +807,7 @@ function MealCard({
                   onUpdateItem(it.id, (x) => {
                     const prevQty = Number(x.qty) || 0;
                     const prevKcal = Number(x.kcal) || 0;
-                    // Escala kcal proporcionalmente. Vale p/ g, ml, unid, fatia:
+                    // Escala kcal proporcionalmente. Vale p/ g, ml, unid, fatia, medida:
                     // mantém a densidade kcal/qty que o item já tinha.
                     const nextKcal =
                       prevQty > 0 ? Math.round((prevKcal * nextQty) / prevQty) : prevKcal;
@@ -799,14 +817,68 @@ function MealCard({
                 aria-label="Quantidade"
                 className="flex-1 md:flex-none text-xs font-mono h-11 md:h-9"
               />
-              <Input
-                value={it.unit}
-                onChange={(e) =>
-                  onUpdateItem(it.id, (x) => ({ ...x, unit: e.target.value }))
-                }
-                aria-label="Unidade"
-                className="w-20 md:w-auto text-xs font-mono h-11 md:h-9"
-              />
+              {(() => {
+                const measures = (it as any).householdMeasures as
+                  | Array<{ id?: string; measureName: string; gramsEquivalent: number; isDefault?: boolean }>
+                  | undefined;
+                const kcalPer100g = (it as any).kcalPer100g as number | undefined;
+                const currentMeasure = (it as any).householdMeasure as
+                  | { label: string; grams: number; measureId?: string }
+                  | undefined;
+                const value = currentMeasure ? `m:${currentMeasure.label}` : `u:${it.unit}`;
+                const hasMeasures = (measures?.length ?? 0) > 0;
+                return (
+                  <select
+                    value={value}
+                    onChange={(e) => {
+                      const [kind, ...rest] = e.target.value.split(":");
+                      const val = rest.join(":");
+                      onUpdateItem(it.id, (x) => {
+                        const next: any = { ...x };
+                        if (kind === "u") {
+                          // Voltou para g/ml/unid livre — limpa medida caseira
+                          delete next.householdMeasure;
+                          next.unit = val;
+                          return next;
+                        }
+                        const m = measures?.find((mm) => mm.measureName === val);
+                        if (!m) return x;
+                        next.householdMeasure = {
+                          label: m.measureName,
+                          grams: m.gramsEquivalent,
+                          measureId: m.id,
+                        };
+                        next.unit = "medida";
+                        const qtyMult = Number(next.qty) || 1;
+                        if (kcalPer100g) {
+                          next.kcal = Math.round(
+                            (kcalPer100g * m.gramsEquivalent * qtyMult) / 100,
+                          );
+                        }
+                        return next;
+                      });
+                    }}
+                    aria-label="Unidade ou medida caseira"
+                    className="w-28 md:w-auto text-xs font-mono h-11 md:h-9 rounded-md border border-input bg-background px-2"
+                  >
+                    <option value="u:g">g</option>
+                    <option value="u:ml">ml</option>
+                    <option value="u:unid">unid</option>
+                    {!hasMeasures && it.unit && !["g", "ml", "unid"].includes(it.unit) && (
+                      <option value={`u:${it.unit}`}>{it.unit}</option>
+                    )}
+                    {hasMeasures && (
+                      <optgroup label="Medidas caseiras">
+                        {measures!.map((m) => (
+                          <option key={m.measureName} value={`m:${m.measureName}`}>
+                            {m.measureName}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
+                );
+              })()}
             </div>
             <EquivalentsBlock
               base={toPlannerFoodItem(it)}
