@@ -412,66 +412,12 @@ function PhaseDetailsDialog({
           {/* Cardápio */}
           {phase.meals && phase.meals.length > 0 && (
             <Section title="Cardápio do Dia">
-              <div className="space-y-3">
+              <p className="text-[11px] text-muted-foreground mb-2">
+                Clique em uma refeição para ver os alimentos, e em um alimento para ver as substituições.
+              </p>
+              <div className="space-y-2">
                 {phase.meals.map((meal) => (
-                  <div
-                    key={meal.id}
-                    className="rounded-lg border border-[var(--gold)]/20 bg-background p-3"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-[10px] text-[var(--gold)]">
-                          {meal.time}
-                        </span>
-                        <span className="text-sm font-semibold">{meal.name}</span>
-                      </div>
-                      <span className="text-[10px] font-mono text-muted-foreground">
-                        {meal.totalKcal} kcal
-                      </span>
-                    </div>
-                    <ul className="space-y-2 text-xs">
-                      {meal.items.map((it, i) => (
-                        <li
-                          key={i}
-                          className="rounded-md border border-border/50 bg-surface/40 p-2"
-                        >
-                          <div className="flex items-baseline justify-between gap-2">
-                            <div className="min-w-0">
-                              <span className="font-medium">{it.name}</span>
-                              <span className="text-muted-foreground"> · {it.householdMeasure}</span>
-                            </div>
-                            <span className="font-mono text-[10px] text-muted-foreground shrink-0">
-                              {it.quantityG}g · {it.kcal} kcal
-                            </span>
-                          </div>
-                          {it.substitutions && it.substitutions.length > 0 && (
-                            <div className="mt-2 space-y-1 border-t border-border/40 pt-2">
-                              <p className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-[var(--gold)]/80">
-                                <Replace className="size-3" />
-                                Substituições já prontas
-                              </p>
-                              <ul className="space-y-1">
-                                {it.substitutions.map((s, subIndex) => (
-                                  <li
-                                    key={`${s.foodKey}-${subIndex}`}
-                                    className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/70 px-2 py-1"
-                                  >
-                                    <span className="min-w-0">
-                                      <span className="font-medium">{s.name}</span>
-                                      <span className="text-muted-foreground"> · {s.householdMeasure}</span>
-                                    </span>
-                                    <span className="font-mono text-[10px] text-muted-foreground shrink-0">
-                                      {s.quantityG}g · {s.kcal} kcal
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <PreviewMealCard key={meal.id} meal={meal} />
                 ))}
               </div>
             </Section>
