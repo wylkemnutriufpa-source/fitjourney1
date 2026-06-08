@@ -364,55 +364,97 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
       },
       {
         id: 2,
-        name: "Fase 2 — Desinflamação e Ajuste Metabólico",
-        durationWeeks: 4,
+        name: "Fase 2 — Consolidação da Saciedade",
+        durationWeeks: 3,
         description:
-          "Reduz processo inflamatório de baixo grau e melhora sensibilidade à insulina.",
-        dailyKcalTarget: 1500,
+          "Manutenção da saciedade elevada e introdução de maior volume de vegetais.",
+        dailyKcalTarget: 1600,
+        macros: { protein: 38, carb: 37, fat: 25 },
+        specialFeature: {
+          name: "Tempero da Saciedade Fit GLP",
+          description:
+            "Mistura especial anti-inflamatória e estimulante natural de GLP-1, mantida da Fase 1.",
+          recipe:
+            "1 colher de chá de cúrcuma + ½ colher de chá de gengibre em pó + ½ colher de chá de canela Ceylon + pitada de pimenta preta.",
+          usage:
+            "Adicionar 1 colher de chá em pelo menos 2 refeições principais do dia.",
+          benefits:
+            "Aumenta saciedade, reduz inflamação e potencializa o efeito natural do GLP-1.",
+        },
+        teaSchedule: [
+          { time: "07:30", name: "Chá de gengibre + cúrcuma + limão", benefits: "Anti-inflamatório e estimulante de GLP-1" },
+          { time: "20:00", name: "Chá de camomila + melissa", benefits: "Melhora qualidade do sono e reduz ansiedade" },
+        ],
         recommendations: {
-          waterMl: 3500,
+          waterMl: 3800,
           sleepHours: 8,
-          teaRoutine: ["Cúrcuma com gengibre", "Camomila à noite"],
+          teaRoutine: [
+            "Chá de gengibre + cúrcuma + limão (07:30)",
+            "Chá de camomila + melissa (20:00)",
+          ],
           strategies: [
-            "Ômega-3 diário",
-            "Janela alimentar de 12h",
-            "Eliminar ultraprocessados",
+            "Aumentar volume de vegetais nas refeições principais",
+            "Manter proteína alta no início de cada refeição",
+            "Incluir psyllium em uma refeição por dia",
           ],
         },
       },
       {
         id: 3,
-        name: "Fase 3 — Recomposição Corporal",
-        durationWeeks: 4,
+        name: "Fase 3 — Adaptação Metabólica",
+        durationWeeks: 1,
         description:
-          "Preserva massa magra e otimiza queima de gordura com ciclo proteico estratégico.",
-        dailyKcalTarget: 1600,
+          "Ajuste metabólico e preparação para a fase de manutenção, com refeed estratégico de carboidratos.",
+        dailyKcalTarget: 1700,
+        macros: { protein: 35, carb: 40, fat: 25 },
+        specialFeature: {
+          name: "Tempero da Saciedade Fit GLP",
+          description:
+            "Mantém o tempero funcional do protocolo, agora opcional conforme preferência.",
+          recipe:
+            "1 colher de chá de cúrcuma + ½ colher de chá de gengibre em pó + ½ colher de chá de canela Ceylon + pitada de pimenta preta.",
+          usage: "Adicionar em pelo menos 1 refeição principal do dia.",
+          benefits: "Sustenta o efeito anti-inflamatório acumulado nas fases anteriores.",
+        },
         recommendations: {
-          waterMl: 3500,
+          waterMl: 4000,
           sleepHours: 8,
-          teaRoutine: ["Chá verde pré-treino", "Hortelã pós-treino"],
+          teaRoutine: [],
           strategies: [
-            "1,8g proteína/kg de peso",
-            "Treino de força 4x/semana",
-            "Carboidrato cíclico no pós-treino",
+            "Introduzir refeed estratégico de carboidratos 1–2x/semana",
+            "Manter alta saciedade com proteína e fibras",
+            "Observar resposta corporal ao ajuste calórico",
           ],
         },
       },
       {
         id: 4,
         name: "Fase 4 — Manutenção e Autonomia",
-        durationWeeks: 6,
+        durationWeeks: 1,
         description:
-          "Consolida hábitos e calibra novo set point metabólico do paciente.",
+          "Transição para manutenção sustentável com maior flexibilidade alimentar.",
         dailyKcalTarget: 1750,
+        macros: { protein: 35, carb: 40, fat: 25 },
+        specialFeature: {
+          name: "Tempero da Saciedade Fit GLP",
+          description:
+            "Tempero do protocolo agora como hábito permanente — uso livre conforme preferência.",
+          recipe:
+            "1 colher de chá de cúrcuma + ½ colher de chá de gengibre em pó + ½ colher de chá de canela Ceylon + pitada de pimenta preta.",
+          usage: "Usar livremente nas refeições do dia a dia.",
+          benefits: "Hábito anti-inflamatório consolidado para a manutenção de longo prazo.",
+        },
+        teaSchedule: [
+          { time: "07:30", name: "Chá de gengibre + cúrcuma + limão", benefits: "Hábito matinal de manutenção" },
+        ],
         recommendations: {
-          waterMl: 3000,
+          waterMl: 4000,
           sleepHours: 8,
-          teaRoutine: ["Chá da preferência do paciente"],
+          teaRoutine: ["Chá de gengibre + cúrcuma + limão (07:30)"],
           strategies: [
-            "Refeição livre 1x/semana planejada",
-            "Monitoramento quinzenal de medidas",
-            "Suplementação ajustada por exames",
+            "Manter hábitos de saciedade adquiridos",
+            "Aumentar variedade alimentar com segurança",
+            "Preparação para manutenção de longo prazo",
           ],
         },
       },
