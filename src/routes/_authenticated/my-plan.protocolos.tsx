@@ -11,8 +11,6 @@ import {
   Clock,
   Droplets,
   Moon,
-  Leaf,
-  CheckCircle2,
   Info,
   ChevronDown,
   Replace,
@@ -20,6 +18,7 @@ import {
   Flame,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import {
   listMyActiveProtocols,
   type ActiveProtocolRow,
