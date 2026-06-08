@@ -137,8 +137,9 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
             totalKcal: 520,
             items: [
               { foodKey: "frango-grelhado", name: "Frango grelhado", quantityG: 150, householdMeasure: "1 filé médio", kcal: 248 },
+              { foodKey: "arroz-integral", name: "Arroz integral", quantityG: 80, householdMeasure: "4 colheres de sopa", kcal: 110 },
               { foodKey: "feijao", name: "Feijão", quantityG: 100, householdMeasure: "1 concha", kcal: 80 },
-              { foodKey: "salada-verde", name: "Salada verde + azeite", quantityG: 200, householdMeasure: "2 xícaras", kcal: 120 },
+              { foodKey: "salada-verde", name: "Salada verde + azeite", quantityG: 200, householdMeasure: "2 xícaras", kcal: 82 },
             ],
           },
           {
