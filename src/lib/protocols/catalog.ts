@@ -239,6 +239,18 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
 
 export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
   {
+    id: "ifj",
+    name: "Protocolo IFJ — Inteligência FitJourney",
+    tagline: "Cardápio focado em emagrecimento com análogos GLP-1.",
+    icon: "Sparkles",
+    exclusive: true,
+    triggers: {
+      anyClinicalTag: ["high_appetite", "insulin_resistance", "pre_diabetes", "diabetes_type2"],
+      anyGoal: ["cut"],
+    },
+    modules: IFJ_MODULES,
+  },
+  {
     id: "jejum-intermitente",
     name: "Jejum Intermitente",
     tagline: "Janelas 16/8 · 14/10 · OMAD — editável como template.",
