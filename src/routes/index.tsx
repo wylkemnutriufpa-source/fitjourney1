@@ -29,7 +29,6 @@ import { LogoMark } from "@/components/LogoMark";
 import { BrandLockup } from "@/components/BrandLockup";
 import {
   DEFAULT_LANDING_CONTENT,
-  fetchLandingContent,
   type LandingContent,
 } from "@/lib/landing/landing-content";
 import { getLandingContent } from "@/lib/landing/landing-content.functions";
