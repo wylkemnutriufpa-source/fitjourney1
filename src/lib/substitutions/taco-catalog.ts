@@ -734,7 +734,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   // ------ Frutas adicionais ------
   {
     foodKey: "goiaba",
-    name: "Goiaba vermelha crua",
+    name: "Goiaba vermelha",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 130,
@@ -756,7 +756,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "melancia",
-    name: "Melancia crua",
+    name: "Melancia",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 200,
