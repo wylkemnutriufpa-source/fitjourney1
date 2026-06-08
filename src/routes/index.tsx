@@ -256,12 +256,12 @@ function Landing() {
           aria-hidden="true"
         />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[92px] flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-[92px] flex items-center justify-between gap-2">
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-3 min-w-0 flex-shrink overflow-hidden"
           >
             <BrandLockup
               slot="landing-header"
@@ -307,7 +307,7 @@ function Landing() {
             </Link>
           </motion.div>
 
-          <div className="md:hidden flex items-center gap-1">
+          <div className="md:hidden flex items-center gap-1 flex-shrink-0">
             <button
               type="button"
               onClick={() => setContactOpen(true)}
@@ -316,6 +316,12 @@ function Landing() {
             >
               <MessageCircle className="w-5 h-5" />
             </button>
+            <Link
+              to="/app"
+              className="px-3 py-1.5 text-xs font-semibold rounded-full border border-border/60 bg-card/40 text-foreground"
+            >
+              Entrar
+            </Link>
             <button className="p-2" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Menu">
               {mobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
