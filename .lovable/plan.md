@@ -1,99 +1,69 @@
 ## Objetivo
 
-Padronizar a abertura de TODOS os protocolos no mesmo modelo premium do IFJ (módulos → fases → aplicar a paciente) e fechar o loop no app do paciente: sidebar com "Protocolos Ativos" + banner diário no primeiro acesso do dia avisando em que semana ele está e o que fazer.
+Aplicar o mesmo padrão visual/interativo da página de protocolos (que você aprovou) em todas as telas onde o paciente vê o plano:
 
-## Arquitetura (sem criar motor novo)
+- `/my-plan` (plano publicado do paciente)
+- `/c/{slug}/{code}` e `/c/{slug}` (visualização pública/compartilhada)
+- `/my-plan-v2-preview` (preview V2)
 
-Mantém os motores atuais. Adicionamos apenas:
+Padrão alvo (idêntico ao de `protocolos.$protocolId` e `my-plan.protocolos`):
 
-- **1 tabela nova**: `patient_active_protocols` — vínculo paciente↔fase ativa (snapshot imutável da fase aplicada).
-- **1 catálogo unificado**: cada protocolo do `PROTOCOL_CATALOG` ganha `modules[]` opcional (mesma forma do IFJ). Protocolos simples = 1 módulo, 1+ fases.
-- **2 server fns puras** (read/write fina, sem cálculo clínico): aplicar fase + listar ativos do paciente.
-- **0 alterações nos motores** TDEE/macros/matcher/gate/router. `suggest.ts` continua puro reader.
+1. Tudo abre **retraído** (colapsado).
+2. Card de refeição mostra: hora · nome · qtd de alimentos · kcal.
+3. Clique na refeição → expande lista de alimentos.
+4. Clique no alimento → expande as substituições daquele alimento.
+5. Animações suaves + acessibilidade (`aria-expanded`).
+6. Funciona muito bem no mobile.
 
-Não fere os invariantes (`fitjourney-clinical-invariants`): suggest segue determinístico, snapshot da fase é imutável depois de aplicado, Patient App permanece read-only (apenas lê `patient_active_protocols`).
+## Escopo das mudanças
 
-## Mudanças
+### 1. `/my-plan` (refator principal) aproveite e troque esse My-plan Para: Meu plano.
 
-### 1. Banco (1 migration)
+Substituir `MealCard` + `FoodItemReadonlyRow` + `EquivalentsButton` (modal/sheet de equivalentes inteiros) pelo padrão novo:
 
-```
-patient_active_protocols (
-  id uuid pk,
-  patient_id uuid → patients,
-  nutritionist_id uuid → nutritionists,
-  protocol_id text,         -- ex: 'ifj', 'anemia'
-  module_id text,           -- ex: 'fit-glp' (ou 'default')
-  phase_id int,
-  phase_snapshot jsonb,     -- congelado no momento da aplicação
-  started_at timestamptz default now(),
-  ends_at timestamptz,      -- now() + durationWeeks
-  status text check in ('active','completed','cancelled') default 'active',
-  last_banner_shown_date date,  -- controle do 1x/dia
-  created_at, updated_at
-)
-```
+- `MealCard`: header colapsável simples (hora, nome, contagem, kcal). Mantém a imagem ilustrativa pequena.
+- `FoodRow`: cada item do `main.items` vira linha colapsável. Substituições do item são derivadas por `getSubstitutionsFor()` (já existe) e renderizadas inline na expansão, com `Replace` icon + medida caseira + qtd + kcal.
+- **Remover** o dialog/sheet "Ver equivalentes" — as substituições agora ficam embutidas por alimento (mesma UX dos protocolos).
+- Manter expansão persistente em localStorage por plano (chave já existente `myplan:exp:${planId}`).
+- Padrão inicial: tudo colapsado (mudar de "primeira refeição aberta" para tudo fechado, igual aos protocolos).
+- Botão "Expandir/Recolher tudo" preservado.
 
-- RLS: nutricionista vê/escreve só dos seus pacientes; paciente vê só os próprios; `service_role` all.
-- GRANT padrão authenticated/service_role.
-- Trigger: bloqueia UPDATE em `phase_snapshot` (imutável).
+### 2. `/c/{slug}/{code}` e `/c/{slug}`
 
-### 2. Catálogo unificado (`src/lib/protocols/catalog.ts`)
+Após confirmar que reusam o componente do my-plan, garantir que a mesma renderização aparece. Se forem renderers próprios, aplicar o mesmo padrão lá.
 
-Adicionar campo opcional `modules?: ReadonlyArray<IFJModule>` a cada `ProtocolDescriptor`. Migrar IFJ existente para esse campo. Protocolos simples (Anemia, SOP, etc.) ganham 1 módulo padrão "Protocolo" com fases base (durationWeeks + recommendations placeholder editável depois).
+### 3. `/my-plan-v2-preview`
 
-### 3. Rota genérica `/protocolos/$protocolId`
+Substituir `V2MealCard` e linha de item por componentes equivalentes do novo padrão, usando o shape V2 (`day.meals[].items[].substitutions[]`).
 
-Substitui a rota fixa `protocolos.ifj.tsx` por `protocolos.$protocolId.tsx` reutilizando exatamente o mesmo layout premium (header gold, módulos grid, phases grid, ApplyPhaseDialog). IFJ vira só `/protocolos/ifj` — mesmo código.
+## Itens preservados (não-regressão)
 
-Página `/protocolos` (lista) passa todos os cards para `Link to="/protocolos/$protocolId"`.
+- Snapshot continua imutável (zero recálculo / normalização no renderer — invariante #2).
+- Lista de compras (`ShoppingListCard`) continua consumindo `meals` no formato atual.
+- `ClinicalAlerts`, `DailyProtocolBanner`, `WaterCalculatorCard`, orientações nutricionais — intocados.
+- Persistência de expansão por plano mantida.
+- Acessibilidade (`aria-expanded`, `aria-controls`, focus ring) mantida.
 
-### 4. Server fns (`src/lib/protocols/active.functions.ts`)
+## Itens removidos
 
-- `applyProtocolPhase({ patientId, protocolId, moduleId, phaseId })` — congela snapshot da fase e insere/upsert.
-- `listActiveProtocolsForPatient({ patientId })` — leitura.
-- `markBannerShownToday({ activeProtocolId })` — só atualiza `last_banner_shown_date`.
+- Modal/Sheet "Ver equivalentes" do my-plan (substituído por expansão inline por alimento).
+- `EquivalentsButton`, `EquivalentsSheet` (se existir) e Dialog de equivalentes ficam mortos — serão deletados se sem outros usos.
 
-ApplyPhaseDialog passa a chamar `applyProtocolPhase` (hoje só faz `toast`).
+## Riscos
 
-### 5. Sidebar do paciente — "Protocolos Ativos"
+- O modal de equivalentes do my-plan hoje mostra a opção alternativa **inteira** (bloco completo). O novo padrão mostra substituições **por alimento individual**. Isso é uma mudança de semântica — é exatamente o que você aprovou na tela de protocolos.
+- Se algum plano antigo só tiver `meal.equivalents` (blocos) e nenhum `item.substitutions`, a expansão do item virá vazia. Mitigação: derivar substituições do alimento via `getSubstitutionsFor()` (já é usado hoje no renderer) ou, na ausência, esconder o chevron do item.
 
-Em `src/components/AppShell.tsx` (sidebar paciente), adicionar item "Protocolos Ativos" → rota nova `src/routes/_authenticated/my-plan.protocolos.tsx` que lista os protocolos ativos do paciente (cards com nome, fase atual, semana, recomendações da fase).
+## Validação pós-implementação
 
-### 6. Banner diário no primeiro acesso
+- Abrir `/my-plan` com um plano publicado real, verificar visualmente: tudo colapsado, expandir refeição, expandir alimento, ver substituições.
+- Verificar console/network sem erros.
+- Verificar mobile (384px).
+- Verificar `/c/{slug}/{code}` com link real.
+- Não declarar concluído sem validação visual (regra de accountability).
 
-Componente `<DailyProtocolBanner />` montado em `my-plan.tsx` (entrada do paciente):
+## Arquivos a alterar
 
-- Busca protocolos ativos.
-- Compara `last_banner_shown_date` com hoje.
-- Se diferente: mostra dialog/banner com "Você está no Protocolo X — Semana N: faça isso, isso e isso" (lê `phase_snapshot.recommendations` + calcula semana via `started_at`).
-- Ao fechar, chama `markBannerShownToday`.
-
-## Detalhes técnicos
-
-- Cálculo de semana atual: `Math.floor((now - started_at)/7d) + 1`, capado em `durationWeeks`.
-- Snapshot da fase é cópia profunda de `IFJPhase` (já readonly) — qualquer edição futura no catálogo NÃO afeta protocolos já aplicados (segue regra de imutabilidade pós-publicação).
-- `phase_snapshot` inclui `protocolName`, `moduleName`, `phase` completa.
-- IFJ continua gated por premium; demais protocolos abertos a todos os nutricionistas autenticados.
-- Nada de IA. Tudo determinístico.
-
-## Arquivos
-
-- **migration**: criar `patient_active_protocols` + RLS + grants + trigger.
-- **edit** `src/lib/protocols/catalog.ts`: campo `modules?` + fases default para cada protocolo simples.
-- **edit** `src/lib/protocols/ifj-catalog.ts`: re-exporta para compat ou some (mover dados para o catalog principal).
-- **rename/create** `src/routes/_authenticated/protocolos.$protocolId.tsx` (substitui `protocolos.ifj.tsx`).
-- **edit** `src/routes/_authenticated/protocolos.tsx`: cards viram Link para `/protocolos/$protocolId`.
-- **create** `src/lib/protocols/active.functions.ts`.
-- **edit** `src/components/AppShell.tsx`: nav item paciente "Protocolos Ativos".
-- **create** `src/routes/_authenticated/my-plan.protocolos.tsx`.
-- **create** `src/components/patient/DailyProtocolBanner.tsx`.
-- **edit** `src/routes/_authenticated/my-plan.tsx`: monta banner.
-
-## Não escopo (deixa para depois)
-
-- Editar conteúdo de cada fase pelo profissional (vamos detalhar cardápios na próxima rodada — você mesmo disse).
-- Histórico de protocolos concluídos (entra junto com a tela de detalhe).
-- Notificação push real (banner in-app já cobre o "1x ao dia").
-
-Posso prosseguir? os modulos = fases.. exemplo cada protocolo tem seus modulos/fases veja qual cai melhor,, modulo 1 modulo 2 ou modulo 3? ou fica melhor fase 1, fase 2 ou fase 3? fases neh? creio que fica melhor
+- `src/routes/_authenticated/my-plan.tsx` (refator dos componentes de refeição)
+- `src/routes/_authenticated/my-plan-v2-preview.tsx` (mesmo padrão sobre shape V2)
+- `src/routes/c.$slug.$code.tsx` e `src/routes/c.$slug.tsx` (verificar e ajustar se renderer próprio)
