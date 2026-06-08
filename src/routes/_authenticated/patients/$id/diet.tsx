@@ -77,6 +77,7 @@ import {
   type PatientPlanFull,
 } from "@/lib/plans/patient-plan.functions";
 import { saveEditedPlan } from "@/lib/plans/plans.functions";
+import { saveMyTemplate } from "@/lib/templates/templates.functions";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
 import { EquivalentsBlock, toPlannerFoodItem } from "@/components/meal-editor";
 import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
