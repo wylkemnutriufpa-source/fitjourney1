@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { Activity, Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { signupNutritionist } from "@/lib/phase2/signup.functions";
+import authBg from "@/assets/auth-bg.mp4.asset.json";
 
 export const Route = createFileRoute("/signup/nutritionist")({
   head: () => ({
