@@ -293,13 +293,38 @@ function ModuleIntroDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <p className="text-sm text-muted-foreground">{m.tagline}</p>
-        <div className="flex items-center gap-2 text-[10px] font-mono uppercase text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <Clock className="size-3 text-[var(--gold)]/70" />
-            {m.phases.length} {m.phases.length === 1 ? "fase" : "fases"}
-          </span>
+        <div className="space-y-3">
+          <div className="rounded-lg border border-[var(--gold)]/20 bg-background/60 p-3 space-y-1">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+              Sobre o protocolo
+            </p>
+            <p className="text-sm text-foreground/90">{protocol.tagline}</p>
+          </div>
+
+          <div className="rounded-lg border border-[var(--gold)]/20 bg-background/60 p-3 space-y-1">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+              Objetivo deste módulo
+            </p>
+            <p className="text-sm text-foreground/90">{m.tagline}</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono uppercase text-muted-foreground">
+            <span className="inline-flex items-center gap-1 border border-[var(--gold)]/20 rounded px-1.5 py-0.5">
+              <Clock className="size-3 text-[var(--gold)]/70" />
+              {m.phases.length} {m.phases.length === 1 ? "fase" : "fases"}
+            </span>
+            <span className="inline-flex items-center gap-1 border border-[var(--gold)]/20 rounded px-1.5 py-0.5">
+              {m.phases.reduce((acc, p) => acc + p.durationWeeks, 0)} semanas no total
+            </span>
+          </div>
+
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Em <strong>Detalhes</strong> você vê o protocolo descrito fase a fase (duração, kcal,
+            hidratação, sono e estratégias). Em <strong>Iniciar</strong> abre o fluxo das 4 fases
+            para aplicar ao paciente.
+          </p>
         </div>
+
 
         <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-end gap-2">
           <Button variant="outline" onClick={() => onDetails(m)}>
