@@ -21,6 +21,7 @@
 //
 // O profissional pode sobrepor o critério por bloco (parâmetro `criterion`).
 
+import { cleanFoodDisplayName } from "@/lib/foods/display-name";
 import { inferGramsPerUnit, unitFromGrams } from "@/lib/foods/unit-bridge";
 
 export type MatchCriterion = "protein" | "carb" | "fat" | "energy";
@@ -146,7 +147,7 @@ export function calculateEquivalentQty(
   const factor = outGrams / 100;
   return {
     foodKey: candidate.foodKey,
-    name: candidate.name,
+    name: cleanFoodDisplayName(candidate.name),
     scaleGroup: candidate.scaleGroup,
     qty: outQty,
     unit: outUnit,

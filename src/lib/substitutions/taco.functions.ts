@@ -4,6 +4,7 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { cleanFoodDisplayName } from "@/lib/foods/display-name";
 import type { EquivalentCandidate } from "./equivalents";
 
 export const listTacoFoods = createServerFn({ method: "GET" })
@@ -24,7 +25,7 @@ export const listTacoFoods = createServerFn({ method: "GET" })
 
     return (data ?? []).map((row) => ({
       foodKey: row.food_key,
-      name: row.name,
+      name: cleanFoodDisplayName(row.name),
       scaleGroup: row.scale_group,
       unit: row.unit,
       defaultQty: Number(row.default_qty),
