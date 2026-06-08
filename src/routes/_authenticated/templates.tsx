@@ -1834,8 +1834,16 @@ function findCatalogFood(foods: FoodDTO[] | undefined, item: PlannerFoodItem) {
 
 function gramsForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
   if (item.unit === "g" || item.unit === "ml") return item.qty;
+  if (typeof item.gramsEquivalent === "number" && Number.isFinite(item.gramsEquivalent)) {
+    return item.gramsEquivalent;
+  }
   const defaultMeasure = food.householdMeasures.find((measure) => measure.isDefault) ?? food.householdMeasures[0];
   return item.qty * (defaultMeasure?.gramsEquivalent ?? food.qty);
+}
+
+function formatFoodPortion(item: PlannerFoodItem): string {
+  const amount = `${item.qty} ${item.unit}`;
+  return item.householdMeasure ? `${item.householdMeasure} · ${amount}` : amount;
 }
 
 function nutritionForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
@@ -1996,12 +2004,19 @@ function FoodItemRow({
       ...item,
       qty: grams,
       unit: "g",
+      householdMeasure: measureName,
+      gramsEquivalent: grams,
     }, catalogMatch, item));
     setInfoOpen(false);
   }
 
   function updatePortion(patch: Partial<PlannerFoodItem>) {
-    onChange(withCatalogKcal({ ...item, ...patch }, catalogMatch, item));
+    const clearsMeasure = "qty" in patch || "unit" in patch;
+    onChange(withCatalogKcal({
+      ...item,
+      ...(clearsMeasure ? { householdMeasure: undefined, gramsEquivalent: undefined } : {}),
+      ...patch,
+    }, catalogMatch, item));
   }
 
   const baseClass =
@@ -2018,7 +2033,7 @@ function FoodItemRow({
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium truncate">{item.name}</p>
           <p className="text-[10px] text-muted-foreground font-mono">
-            {item.qty} {item.unit} · {item.kcal} kcal
+            {formatFoodPortion(item)} · {item.kcal} kcal
           </p>
         </div>
         <Popover open={infoOpen} onOpenChange={setFoodInfoOpen}>
@@ -2104,7 +2119,7 @@ function FoodItemRow({
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium truncate">{item.name}</p>
             <p className="text-[10px] text-muted-foreground font-mono">
-              {item.qty} {item.unit} · {item.kcal} kcal
+              {formatFoodPortion(item)} · {item.kcal} kcal
             </p>
           </div>
           <button
@@ -2135,7 +2150,7 @@ function FoodItemRow({
             <SheetHeader className="sticky top-0 z-10 bg-background border-b border-border p-4 text-left">
               <SheetTitle className="truncate pr-8">{item.name || "Editar alimento"}</SheetTitle>
               <SheetDescription>
-                {item.qty} {item.unit} · {item.kcal} kcal
+                {formatFoodPortion(item)} · {item.kcal} kcal
               </SheetDescription>
             </SheetHeader>
             <div className="p-4 space-y-3">

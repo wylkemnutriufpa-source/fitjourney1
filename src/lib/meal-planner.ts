@@ -24,6 +24,10 @@ export type PlannerFoodItem = {
   unit: string;
   kcal: number;
   scaleGroup: ScaleGroup;
+  /** Medida caseira exibida ao profissional/paciente, preservada do protocolo/template. */
+  householdMeasure?: string;
+  /** Equivalência em gramas/ml da medida exibida, usada só para referência/cálculo no editor. */
+  gramsEquivalent?: number;
   /**
    * Templates Inteligentes — Fase 1.
    * Substituições materializadas (congeladas no momento do save).
@@ -44,6 +48,8 @@ export type MaterializedEquivalentOption = {
   qty: number;
   unit: string;
   kcal: number;
+  householdMeasure?: string;
+  gramsEquivalent?: number;
   proteinG?: number;
   carbG?: number;
   fatG?: number;

@@ -79,6 +79,8 @@ function toFoodItem(it: PhaseMealItem): PlannerFoodItem {
     unit: "g",
     kcal: it.kcal,
     scaleGroup,
+    householdMeasure: it.householdMeasure,
+    gramsEquivalent: it.quantityG,
   };
   if (it.substitutions && it.substitutions.length > 0) {
     item.materializedEquivalents = {
@@ -92,6 +94,8 @@ function toFoodItem(it: PhaseMealItem): PlannerFoodItem {
         qty: s.quantityG,
         unit: "g",
         kcal: s.kcal,
+        householdMeasure: s.householdMeasure,
+        gramsEquivalent: s.quantityG,
         imageSlug: s.foodKey,
       })),
     };
