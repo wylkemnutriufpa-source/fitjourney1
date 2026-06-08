@@ -375,18 +375,6 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     icon: "CircleDot",
     triggers: { anyClinicalTag: ["sop", "insulin_resistance"] },
   },
-  {
-    id: "ifj",
-    name: "Protocolo IFJ — Inteligência FitJourney",
-    tagline: "Cardápio focado em emagrecimento com análogos GLP-1.",
-    icon: "Sparkles",
-    exclusive: true,
-    triggers: {
-      anyClinicalTag: ["high_appetite", "insulin_resistance", "pre_diabetes", "diabetes_type2"],
-      anyGoal: ["cut"],
-    },
-    modules: IFJ_MODULES,
-  },
 ];
 
 // ---------------------------------------------------------------------------
