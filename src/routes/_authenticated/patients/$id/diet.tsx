@@ -845,12 +845,19 @@ function MealCard({
                   opts.push({ value: `m:${m.measureName}`, label: m.measureName, kind: "m", payload: m });
                 });
 
-                const pick = (opt: Opt) => {
+                const pick = (value: string) => {
+                  const opt = opts.find((o) => o.value === value);
+                  if (!opt) return;
                   onUpdateItem(it.id, (x) => {
                     const next: any = { ...x };
+                    const qtyMult = Number(next.qty) || 1;
                     if (opt.kind === "u") {
                       delete next.householdMeasure;
                       next.unit = opt.value.slice(2);
+                      // Auto-ajusta kcal quando há densidade conhecida (g/ml ≈ 1g)
+                      if (kcalPer100g && (next.unit === "g" || next.unit === "ml")) {
+                        next.kcal = Math.round((kcalPer100g * qtyMult) / 100);
+                      }
                       return next;
                     }
                     const m = opt.payload as { id?: string; measureName: string; gramsEquivalent: number };
@@ -860,7 +867,6 @@ function MealCard({
                       measureId: m.id,
                     };
                     next.unit = "medida";
-                    const qtyMult = Number(next.qty) || 1;
                     if (kcalPer100g) {
                       next.kcal = Math.round((kcalPer100g * m.gramsEquivalent * qtyMult) / 100);
                     }
@@ -868,33 +874,27 @@ function MealCard({
                   });
                 };
 
+                const currentLabel = opts.find((o) => o.value === currentValue)?.label ?? it.unit ?? "—";
+
                 return (
-                  <div
-                    role="radiogroup"
-                    aria-label="Unidade ou medida caseira"
-                    className="flex flex-wrap md:flex-nowrap gap-1 items-center min-w-0"
-                  >
-                    {opts.map((opt) => {
-                      const selected = opt.value === currentValue;
-                      return (
-                        <button
-                          type="button"
-                          key={opt.value}
-                          role="radio"
-                          aria-checked={selected}
-                          onClick={() => pick(opt)}
-                          className={
-                            "px-2 h-9 md:h-8 rounded-md border text-xs font-mono transition-colors " +
-                            (selected
-                              ? "bg-primary text-primary-foreground border-primary"
-                              : "bg-background text-foreground border-input hover:bg-accent")
-                          }
-                        >
+                  <Select value={currentValue} onValueChange={pick}>
+                    <SelectTrigger
+                      aria-label="Unidade ou medida caseira"
+                      className="h-11 md:h-8 px-2 text-xs font-mono min-w-0 w-full"
+                    >
+                      <span className="truncate">{currentLabel}</span>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {opts.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value} className="text-xs font-mono">
                           {opt.label}
-                        </button>
-                      );
-                    })}
-                  </div>
+                          {opt.kind === "m" && opt.payload?.gramsEquivalent ? (
+                            <span className="text-muted-foreground"> · {opt.payload.gramsEquivalent}g</span>
+                          ) : null}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 );
               })()}
             </div>
