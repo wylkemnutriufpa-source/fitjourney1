@@ -872,7 +872,7 @@ function MealCard({
                   <div
                     role="radiogroup"
                     aria-label="Unidade ou medida caseira"
-                    className="flex flex-wrap gap-1 items-center"
+                    className="flex flex-wrap md:flex-nowrap gap-1 items-center min-w-0"
                   >
                     {opts.map((opt) => {
                       const selected = opt.value === currentValue;
