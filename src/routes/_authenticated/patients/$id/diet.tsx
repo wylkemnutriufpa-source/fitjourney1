@@ -161,10 +161,17 @@ function PatientPlanPage() {
 
   const patientName = detail?.fullName ?? "Paciente";
 
-  function publishNew() {
+  function publishFromTemplate() {
     navigate({
       to: "/templates",
       search: { patientId: id, patientName },
+    });
+  }
+
+  function publishWithAI() {
+    navigate({
+      to: "/templates",
+      search: { blank: 1, patientId: id, patientName },
     });
   }
 
@@ -216,7 +223,7 @@ function PatientPlanPage() {
                 }}
               />
             ) : (
-              <EmptyPlanState onPublish={publishNew} />
+              <EmptyPlanState onTemplate={publishFromTemplate} onAI={publishWithAI} />
             )}
           </>
         )}
@@ -225,7 +232,13 @@ function PatientPlanPage() {
   );
 }
 
-function EmptyPlanState({ onPublish }: { readonly onPublish: () => void }) {
+function EmptyPlanState({
+  onTemplate,
+  onAI,
+}: {
+  readonly onTemplate: () => void;
+  readonly onAI: () => void;
+}) {
   return (
     <div className="bg-surface border border-dashed border-border rounded-lg p-8 sm:p-10 text-center space-y-4">
       <div className="mx-auto size-12 grid place-items-center rounded-full bg-primary/10 border border-primary/30">
@@ -234,14 +247,21 @@ function EmptyPlanState({ onPublish }: { readonly onPublish: () => void }) {
       <div className="space-y-1">
         <h2 className="text-lg font-semibold">Sem plano publicado</h2>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">
-          Crie o primeiro plano deste paciente a partir de um template. Depois,
-          você poderá editar tudo direto aqui.
+          Crie o primeiro plano deste paciente. Você pode partir de um
+          smart-template homologado ou montar com a IA FitJourney a partir da
+          tabela de alimentos.
         </p>
       </div>
-      <Button onClick={onPublish}>
-        <Send className="size-3.5" />
-        Criar a partir de um template
-      </Button>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2">
+        <Button onClick={onTemplate} variant="outline">
+          <Sparkles className="size-3.5" />
+          Plano com Smart-templates
+        </Button>
+        <Button onClick={onAI}>
+          <Send className="size-3.5" />
+          Plano com IA FitJourney
+        </Button>
+      </div>
     </div>
   );
 }

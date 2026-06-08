@@ -58,7 +58,7 @@ function AnamnesisDetailPage() {
 
   const [notes, setNotes] = useState<string>("");
   const [actionError, setActionError] = useState<string | null>(null);
-  const [postApprove, setPostApprove] = useState<{ patientId: string } | null>(null);
+  const [postApprove, setPostApprove] = useState<{ patientId: string; patientName: string } | null>(null);
 
   const mut = useMutation({
     mutationFn: (decision: "approved" | "needs_changes") =>
@@ -72,7 +72,7 @@ function AnamnesisDetailPage() {
       if (decision === "approved" && data?.patient?.id) {
         // Regra Canônica #1: sistema sugere, nutri decide o próximo passo.
         // Não auto-navega: abre escolha entre editar plano agora ou voltar à fila.
-        setPostApprove({ patientId: data.patient.id });
+        setPostApprove({ patientId: data.patient.id, patientName: data.patient.fullName });
       } else {
         navigate({ to: "/anamneses" });
       }
@@ -235,13 +235,22 @@ function AnamnesisDetailPage() {
                     </span>
                   </div>
                   {data.patient?.id && (
-                    <Link
-                      to="/patients/$id/diet"
-                      params={{ id: data.patient.id }}
-                      className="w-full bg-primary text-primary-foreground rounded-md py-2 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/90"
-                    >
-                      <ClipboardEdit className="size-4" /> Elaborar plano alimentar
-                    </Link>
+                    <>
+                      <Link
+                        to="/templates"
+                        search={{ patientId: data.patient.id, patientName: data.patient.fullName }}
+                        className="w-full bg-primary text-primary-foreground rounded-md py-2 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/90"
+                      >
+                        <ClipboardEdit className="size-4" /> Plano com Smart-templates
+                      </Link>
+                      <Link
+                        to="/templates"
+                        search={{ blank: 1, patientId: data.patient.id, patientName: data.patient.fullName }}
+                        className="w-full bg-emerald-600 text-white rounded-md py-2 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500"
+                      >
+                        <ClipboardEdit className="size-4" /> Plano com IA FitJourney
+                      </Link>
+                    </>
                   )}
                   {data.patient?.id && (
                     <Link
@@ -299,7 +308,7 @@ function AnamnesisDetailPage() {
               deste paciente ou voltar para a fila de revisões.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-2">
+          <DialogFooter className="gap-2 sm:gap-2 flex-col sm:flex-row">
             <button
               type="button"
               onClick={() => {
@@ -314,19 +323,36 @@ function AnamnesisDetailPage() {
             <button
               type="button"
               onClick={() => {
-                const pid = postApprove?.patientId;
+                const pa = postApprove;
                 setPostApprove(null);
-                if (pid) {
+                if (pa) {
                   navigate({
-                    to: "/patients/$id/diet",
-                    params: { id: pid },
+                    to: "/templates",
+                    search: { patientId: pa.patientId, patientName: pa.patientName },
                   });
                 }
               }}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/15"
             >
               <ClipboardEdit className="size-4" />
-              Editar plano agora
+              Plano com Smart-templates
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const pa = postApprove;
+                setPostApprove(null);
+                if (pa) {
+                  navigate({
+                    to: "/templates",
+                    search: { blank: 1, patientId: pa.patientId, patientName: pa.patientName },
+                  });
+                }
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+            >
+              <ClipboardEdit className="size-4" />
+              Plano com IA FitJourney
             </button>
           </DialogFooter>
         </DialogContent>

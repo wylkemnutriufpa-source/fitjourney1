@@ -1,4 +1,4 @@
-import { useState } from "react";
+// removed unused useState import
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -483,100 +483,24 @@ function BuildPlanCTA({
   readonly patientId: string;
   readonly patientName: string;
 }) {
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="bg-emerald-600 text-white text-xs font-semibold py-2 px-3 inline-flex items-center gap-2 rounded-md hover:bg-emerald-500"
+      <Link
+        to="/templates"
+        search={{ patientId, patientName }}
+        className="text-xs font-semibold py-2 px-3 inline-flex items-center gap-2 rounded-md border-2 border-[var(--gold)]/70 bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] text-[var(--gold)] hover:bg-[color-mix(in_oklab,var(--gold)_18%,transparent)] hover:border-[var(--gold)] transition-all"
       >
         <Sparkles className="size-3.5" />
+        Plano com Smart-templates
+      </Link>
+      <Link
+        to="/templates"
+        search={{ blank: 1, patientId, patientName }}
+        className="bg-emerald-600 text-white text-xs font-semibold py-2 px-3 inline-flex items-center gap-2 rounded-md hover:bg-emerald-500"
+      >
+        <FileText className="size-3.5" />
         Plano com IA FitJourney
-      </button>
-
-      {open && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="build-plan-title"
-          className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-sm p-4"
-          onClick={() => setOpen(false)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-surface border border-border rounded-lg p-6 w-full max-w-md space-y-4"
-          >
-            <div className="space-y-1">
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                {patientName}
-              </p>
-              <h3 id="build-plan-title" className="text-lg font-semibold">
-                Como você quer começar?
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                Escolha o ponto de partida. Você pode editar tudo depois.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                navigate({
-                  to: "/templates",
-                  search: { patientId, patientName },
-                });
-              }}
-              className="w-full text-left p-3 rounded-md border border-border hover:border-primary/50 hover:bg-primary/5 flex items-start gap-3 transition-colors"
-            >
-              <FileText className="size-4 mt-0.5 text-primary shrink-0" />
-              <div className="space-y-0.5">
-                <p className="text-sm font-semibold">Usar Template</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Parta de um modelo pronto com refeições e blocos de
-                  substituição já calculados.
-                </p>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                navigate({
-                  to: "/templates",
-                  search: { blank: 1, patientId, patientName },
-                });
-              }}
-              className="w-full text-left p-3 rounded-md border border-border hover:border-primary/50 hover:bg-primary/5 flex items-start gap-3 transition-colors"
-            >
-              <Sparkles className="size-4 mt-0.5 text-primary shrink-0" />
-              <div className="space-y-0.5">
-                <p className="text-sm font-semibold">
-                  Montar por Tabela de Alimentos
-                </p>
-                <p className="text-[11px] text-muted-foreground">
-                  Comece do zero escolhendo alimentos do catálogo. Próximo
-                  passo: blocos de substituição automáticos.
-                </p>
-              </div>
-            </button>
-
-            <div className="flex justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="text-xs font-medium text-muted-foreground hover:text-foreground px-3 py-1.5"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </Link>
     </>
   );
 }
