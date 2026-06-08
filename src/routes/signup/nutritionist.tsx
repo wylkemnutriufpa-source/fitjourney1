@@ -165,7 +165,8 @@ function SignupNutritionistPage() {
             Entrar na minha conta
           </Link>
         </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
