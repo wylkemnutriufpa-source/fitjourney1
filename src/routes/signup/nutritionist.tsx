@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
-import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
+import { Activity, Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { signupNutritionist } from "@/lib/phase2/signup.functions";
 
 export const Route = createFileRoute("/signup/nutritionist")({
