@@ -11,6 +11,7 @@ import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
 import { WaterCalculatorCard } from "@/components/patient/WaterCalculatorCard";
+import { ShoppingListCard } from "@/components/patient/ShoppingListCard";
 import {
   Clock,
   AlertTriangle,
