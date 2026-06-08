@@ -223,15 +223,27 @@ function PhasesGrid({
   protocol: ProtocolDescriptor;
   module: ProtocolModule;
 }) {
+  const [detailsPhase, setDetailsPhase] = useState<ProtocolPhase | null>(null);
   const [applyPhase, setApplyPhase] = useState<ProtocolPhase | null>(null);
   return (
     <section className="space-y-4 animate-fade-in">
       <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Fases</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {m.phases.map((p) => (
-          <PhaseCard key={p.id} phase={p} onApply={() => setApplyPhase(p)} />
+          <PhaseCard key={p.id} phase={p} onOpen={() => setDetailsPhase(p)} />
         ))}
       </div>
+
+      <PhaseDetailsDialog
+        protocol={protocol}
+        module={m}
+        phase={detailsPhase}
+        onClose={() => setDetailsPhase(null)}
+        onApply={(ph) => {
+          setDetailsPhase(null);
+          setApplyPhase(ph);
+        }}
+      />
 
       <ApplyPhaseDialog
         protocol={protocol}
@@ -243,9 +255,13 @@ function PhasesGrid({
   );
 }
 
-function PhaseCard({ phase, onApply }: { phase: ProtocolPhase; onApply: () => void }) {
+function PhaseCard({ phase, onOpen }: { phase: ProtocolPhase; onOpen: () => void }) {
   return (
-    <div className="group relative overflow-hidden rounded-lg border border-[var(--gold)]/25 bg-surface p-4 flex flex-col gap-3 hover:border-[var(--gold)]/60 transition-colors">
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group relative overflow-hidden rounded-lg border border-[var(--gold)]/25 bg-surface p-4 flex flex-col gap-3 hover:border-[var(--gold)]/60 transition-colors text-left"
+    >
       <Sparkles
         className="pointer-events-none absolute -top-1 -right-1 size-6 text-[var(--gold)]/30 animate-pulse"
         aria-hidden
@@ -282,13 +298,194 @@ function PhaseCard({ phase, onApply }: { phase: ProtocolPhase; onApply: () => vo
         </span>
       </div>
 
-      <button
-        onClick={onApply}
-        className="relative w-full mt-1 text-[11px] font-mono uppercase tracking-wider px-3 py-2 rounded border border-[var(--gold)]/60 text-[var(--gold)] hover:bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] transition-colors inline-flex items-center justify-center gap-2"
-      >
-        <Send className="size-3" />
-        Aplicar esta Fase
-      </button>
+      <span className="relative w-full mt-1 text-[11px] font-mono uppercase tracking-wider px-3 py-2 rounded border border-[var(--gold)]/60 text-[var(--gold)] inline-flex items-center justify-center gap-2 group-hover:bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] transition-colors">
+        Ver detalhes <ChevronRight className="size-3" />
+      </span>
+    </button>
+  );
+}
+
+function PhaseDetailsDialog({
+  protocol,
+  module: m,
+  phase,
+  onClose,
+  onApply,
+}: {
+  protocol: ProtocolDescriptor;
+  module: ProtocolModule;
+  phase: ProtocolPhase | null;
+  onClose: () => void;
+  onApply: (p: ProtocolPhase) => void;
+}) {
+  const open = !!phase;
+  if (!phase) {
+    return (
+      <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+        <DialogContent />
+      </Dialog>
+    );
+  }
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogDescription className="text-[10px] font-mono uppercase tracking-widest">
+            {protocol.name} · {m.name}
+          </DialogDescription>
+          <DialogTitle
+            className="text-[var(--gold)] uppercase tracking-wide flex items-center gap-2"
+            style={{ textShadow: "0 0 12px color-mix(in oklab, var(--gold) 30%, transparent)" }}
+          >
+            <Sparkles className="size-4" />
+            {phase.name}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-5 py-2">
+          <p className="text-sm text-muted-foreground">{phase.description}</p>
+
+          {/* Métricas */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+            <Metric label="Duração" value={`${phase.durationWeeks} sem`} />
+            {phase.dailyKcalTarget && (
+              <Metric label="Kcal/dia" value={String(phase.dailyKcalTarget)} />
+            )}
+            <Metric label="Água" value={`${(phase.recommendations.waterMl / 1000).toFixed(1)}L`} />
+            <Metric label="Sono" value={`${phase.recommendations.sleepHours}h`} />
+          </div>
+
+          {/* Macros */}
+          {phase.macros && (
+            <Section title="Distribuição de Macros">
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <MacroPill label="Proteína" pct={phase.macros.protein} />
+                <MacroPill label="Carbo" pct={phase.macros.carb} />
+                <MacroPill label="Gordura" pct={phase.macros.fat} />
+              </div>
+            </Section>
+          )}
+
+          {/* Estratégias */}
+          {phase.recommendations.strategies.length > 0 && (
+            <Section title="Estratégias-chave">
+              <ul className="space-y-1.5 text-sm">
+                {phase.recommendations.strategies.map((s, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="text-[var(--gold)]">•</span>
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
+
+          {/* Chás programados */}
+          {phase.teaSchedule && phase.teaSchedule.length > 0 && (
+            <Section title="Rotina de Chás">
+              <div className="space-y-2">
+                {phase.teaSchedule.map((t, i) => (
+                  <div
+                    key={i}
+                    className="rounded border border-[var(--gold)]/20 bg-background px-3 py-2 text-xs flex flex-col gap-0.5"
+                  >
+                    <div className="flex items-center gap-2">
+                      {t.time && (
+                        <span className="font-mono text-[10px] text-[var(--gold)]">{t.time}</span>
+                      )}
+                      <span className="font-medium">{t.name}</span>
+                    </div>
+                    {t.benefits && (
+                      <span className="text-[11px] text-muted-foreground">{t.benefits}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Section>
+          )}
+
+          {/* Cardápio */}
+          {phase.meals && phase.meals.length > 0 && (
+            <Section title="Cardápio do Dia">
+              <div className="space-y-3">
+                {phase.meals.map((meal) => (
+                  <div
+                    key={meal.id}
+                    className="rounded-lg border border-[var(--gold)]/20 bg-background p-3"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] text-[var(--gold)]">
+                          {meal.time}
+                        </span>
+                        <span className="text-sm font-semibold">{meal.name}</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-muted-foreground">
+                        {meal.totalKcal} kcal
+                      </span>
+                    </div>
+                    <ul className="space-y-1 text-xs">
+                      {meal.items.map((it, i) => (
+                        <li
+                          key={i}
+                          className="flex items-baseline justify-between gap-2 border-t border-border/40 pt-1 first:border-t-0 first:pt-0"
+                        >
+                          <div className="min-w-0">
+                            <span className="font-medium">{it.name}</span>
+                            <span className="text-muted-foreground"> · {it.householdMeasure}</span>
+                          </div>
+                          <span className="font-mono text-[10px] text-muted-foreground shrink-0">
+                            {it.quantityG}g · {it.kcal} kcal
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Fechar
+          </Button>
+          <Button onClick={() => onApply(phase)}>
+            <Send className="size-4" />
+            Aplicar esta Fase
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-2">
+      <h3 className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded border border-[var(--gold)]/20 bg-background px-2 py-1.5">
+      <div className="text-[9px] font-mono uppercase text-muted-foreground">{label}</div>
+      <div className="text-sm font-semibold text-[var(--gold)]">{value}</div>
+    </div>
+  );
+}
+
+function MacroPill({ label, pct }: { label: string; pct: number }) {
+  return (
+    <div className="rounded border border-[var(--gold)]/20 bg-background px-2 py-2 text-center">
+      <div className="text-[9px] font-mono uppercase text-muted-foreground">{label}</div>
+      <div className="text-base font-bold text-[var(--gold)]">{pct}%</div>
     </div>
   );
 }
