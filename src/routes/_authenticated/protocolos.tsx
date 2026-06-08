@@ -3,7 +3,22 @@
 // Editor / motor virão nas próximas instruções do produto.
 
 import { createFileRoute } from "@tanstack/react-router";
-import { Lock, Sparkles, Timer } from "lucide-react";
+import {
+  Lock,
+  Sparkles,
+  Timer,
+  Droplets,
+  Wheat,
+  Repeat,
+  Brain,
+  Activity,
+  Bug,
+  HeartPulse,
+  Scissors,
+  Flame,
+  Wind,
+  Gem,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 
 export const Route = createFileRoute("/_authenticated/protocolos")({
@@ -25,6 +40,83 @@ const PROTOCOLOS: ReadonlyArray<ProtocoloCard> = [
     name: "Jejum Intermitente",
     tagline: "Janelas 16/8 · 14/10 · OMAD — editável como template.",
     icon: Timer,
+    premium: true,
+  },
+  {
+    id: "low-carb",
+    name: "Protocolo Low Carb",
+    tagline: "Redução estratégica de carboidratos — foco em saciedade e perda de gordura.",
+    icon: Wheat,
+    premium: true,
+  },
+  {
+    id: "agua",
+    name: "Protocolo da Água",
+    tagline: "Hidratação calculada por peso/atividade com lembretes e metas diárias.",
+    icon: Droplets,
+    premium: true,
+  },
+  {
+    id: "ciclo-carbo",
+    name: "Protocolo Ciclo de Carboidratos",
+    tagline: "Dias high/low/no carb alternados — performance e composição corporal.",
+    icon: Repeat,
+    premium: true,
+  },
+  {
+    id: "anti-ansiedade",
+    name: "Protocolo Anti-Ansiedade",
+    tagline: "Triptofano, magnésio, ômega-3 — eixo intestino-cérebro.",
+    icon: Brain,
+    premium: true,
+  },
+  {
+    id: "anti-enxaqueca",
+    name: "Protocolo Anti-Enxaqueca",
+    tagline: "Exclusão de gatilhos + magnésio, riboflavina e CoQ10.",
+    icon: Activity,
+    premium: true,
+  },
+  {
+    id: "antiparasitario",
+    name: "Protocolo Antiparasitário",
+    tagline: "Alimentos vermífugos naturais e suporte intestinal.",
+    icon: Bug,
+    premium: true,
+  },
+  {
+    id: "anticelulite",
+    name: "Protocolo Anticelulite",
+    tagline: "Drenagem, anti-inflamatórios e suporte ao colágeno.",
+    icon: HeartPulse,
+    premium: true,
+  },
+  {
+    id: "antiqueda",
+    name: "Protocolo Antiqueda de Cabelo",
+    tagline: "Ferro, zinco, biotina e proteína — saúde capilar.",
+    icon: Scissors,
+    premium: true,
+  },
+  {
+    id: "anti-inflamatorio",
+    name: "Protocolo Anti-inflamatório",
+    tagline: "Ômega-3, polifenóis e exclusão de pró-inflamatórios.",
+    icon: Flame,
+    premium: true,
+  },
+  {
+    id: "antiinchaco",
+    name: "Protocolo Antiinchaço",
+    tagline: "Sódio controlado, potássio e diuréticos naturais.",
+    icon: Wind,
+    premium: true,
+  },
+  {
+    id: "beleza",
+    name: "Protocolo da Beleza",
+    tagline: "Foco em unhas, cabelo e pele — colágeno, silício e antioxidantes.",
+    icon: Gem,
     premium: true,
   },
   {
