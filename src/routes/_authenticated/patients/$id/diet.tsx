@@ -85,6 +85,7 @@ import { EquivalentsBlock, toPlannerFoodItem } from "@/components/meal-editor";
 import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 import { cleanFoodDisplayName, cleanFoodNamesDeep } from "@/lib/foods/display-name";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { toPlannerTemplate } from "@/lib/meal-planner";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Plano do paciente — FitJourney" }] }),
@@ -483,6 +484,28 @@ function PlanEditor({
     }
   }
 
+  // Regenera substituições passando o snapshot atual pelo motor vigente
+  // (planos antigos publicados antes da nova rotação ficam com equivalents=[]).
+  function regenerateSubstitutions() {
+    try {
+      const stripped = JSON.parse(JSON.stringify(draft));
+      for (const meal of stripped.meals ?? []) {
+        const wipe = (opt: any) => {
+          if (!opt) return;
+          for (const it of opt.items ?? []) delete it.materializedEquivalents;
+        };
+        wipe(meal.main);
+        for (const eq of meal.equivalents ?? []) wipe(eq);
+      }
+      const refreshed = toPlannerTemplate(stripped) as unknown as EditSnapshot;
+      patch(refreshed);
+      toast.success("Substituições regeneradas com o motor atual. Clique em Salvar para publicar.");
+    } catch (e) {
+      toast.error(`Não foi possível regenerar: ${(e as Error).message ?? "erro"}`);
+    }
+  }
+
+
   return (
     <section className="space-y-4 pb-28">
       {/* Toggle Edição ↔ Visualização */}
@@ -588,7 +611,16 @@ function PlanEditor({
           <div className="text-xs text-muted-foreground">
             {dirty ? "Alterações não salvas" : "Tudo salvo"}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            <Button
+              variant="outline"
+              onClick={regenerateSubstitutions}
+              disabled={saving}
+              title="Reaplica o motor atual de substituições em todas as refeições deste plano"
+            >
+              <Sparkles className="size-3.5" />
+              Regenerar substituições
+            </Button>
             <Button
               variant="outline"
               onClick={() => setSaveAsTpl({ name: draft.name || "Modelo do plano", saving: false })}
