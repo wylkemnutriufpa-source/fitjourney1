@@ -81,8 +81,8 @@ function ProtocolosPage() {
         </header>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          {PROTOCOLOS.map((p) => {
-            const Icon = p.icon;
+          {PROTOCOL_CATALOG.map((p) => {
+            const Icon = ICONS[p.icon];
             const locked = !hasPremium;
             return (
               <div
