@@ -612,7 +612,7 @@ function MealCard({
         onClick={() => toggleMeal(mealId)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="w-full grid grid-cols-[88px_1fr_auto] sm:grid-cols-[112px_1fr_auto] gap-3 items-center text-left hover:bg-primary/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="w-full grid grid-cols-[72px_1fr_auto] sm:grid-cols-[88px_1fr_auto] gap-3 items-center text-left hover:bg-primary/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <div className="relative aspect-square bg-muted">
           {heroUrl ? (
@@ -673,46 +673,23 @@ function MealCard({
             transition={{ duration: reduce ? 0 : 0.25, ease: "easeInOut" }}
             className="overflow-hidden border-t border-border"
           >
-            <div className="p-3 space-y-2.5">
-              <ul className="text-sm">
-                {items.map((it, i) => (
-                  <FoodItemReadonlyRow
+            <div className="p-3 space-y-2">
+              {items.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">
+                  Sem alimentos registrados.
+                </p>
+              ) : (
+                items.map((it, i) => (
+                  <FoodRow
                     key={it?.id ?? i}
                     item={it}
+                    itemIndex={i}
                     foods={foods}
                     mealKind={mealKind}
+                    equivalents={equivalents}
                     itemId={`${mealId}-item-${it?.id ?? i}`}
                   />
-                ))}
-                {items.length === 0 && (
-                  <li className="text-xs text-muted-foreground italic">
-                    Sem alimentos registrados.
-                  </li>
-                )}
-              </ul>
-
-              {main?.recipe && (
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="recipe" className="border-0">
-                    <AccordionTrigger className="py-1.5 text-xs font-mono uppercase tracking-widest text-primary hover:no-underline">
-                      <span className="inline-flex items-center gap-1.5">
-                        <ChefHat className="size-3.5" aria-hidden /> Modo de preparo
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm whitespace-pre-wrap text-muted-foreground leading-relaxed">
-                      {main.recipe}
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              )}
-
-              {equivalents.length > 0 && (
-                <EquivalentsButton
-                  mealLabel={meal?.label ?? `Refeição ${index + 1}`}
-                  equivalents={equivalents}
-                  foods={foods}
-                  mealKind={mealKind}
-                />
+                ))
               )}
             </div>
           </motion.div>
@@ -723,297 +700,182 @@ function MealCard({
 }
 
 // ====================================================================
-// Linha de alimento — inline no desktop, Sheet (drawer) no mobile
+// Linha de alimento colapsável (mesmo padrão da tela de Protocolos)
 // ====================================================================
-function FoodItemReadonlyRow({
+type SubOption = {
+  name: string;
+  householdMeasure?: string;
+  qty?: number | string;
+  unit?: string;
+  kcal?: number;
+  note?: string;
+};
+
+function buildItemSubstitutions(opts: {
+  item: any;
+  itemIndex: number;
+  equivalents: any[];
+  foods: FoodDTO[] | undefined;
+  mealKind: MealKind;
+}): SubOption[] {
+  const { item, itemIndex, equivalents, foods, mealKind } = opts;
+  // 1) Fonte primária: snapshot.meal.equivalents — item na MESMA posição
+  //    de cada bloco equivalente. É dado persistido, não inferência.
+  const fromSnapshot: SubOption[] = [];
+  for (const eq of equivalents) {
+    const eqItems: any[] = Array.isArray(eq?.items) ? eq.items : [];
+    const alt = eqItems[itemIndex];
+    if (!alt || !alt.name) continue;
+    // não duplica o próprio alimento
+    if (
+      typeof alt.name === "string" &&
+      typeof item?.name === "string" &&
+      normalizeFoodLabel(alt.name) === normalizeFoodLabel(item.name)
+    ) {
+      continue;
+    }
+    const match = findCatalogFood(foods, alt);
+    const measure = match?.householdMeasures?.[0]?.measureName;
+    fromSnapshot.push({
+      name: cleanFoodDisplayName(alt.name),
+      householdMeasure: measure,
+      qty: alt.qty,
+      unit: alt.unit,
+      kcal: Number.isFinite(alt.kcal) ? Number(alt.kcal) : undefined,
+    });
+  }
+  if (fromSnapshot.length > 0) return fromSnapshot;
+
+  // 2) Fallback (planos antigos sem equivalents): regras categóricas.
+  const itemKcal = Number.isFinite(item?.kcal) ? Number(item.kcal) : 0;
+  const subs = getSubstitutionsFor(item?.name ?? "", mealKind, itemKcal);
+  return subs.map((s) => ({
+    name: cleanFoodDisplayName(s.name),
+    qty: s.qty,
+    unit: s.unit,
+    kcal: s.kcal,
+    note: s.note,
+  }));
+}
+
+function FoodRow({
   item,
+  itemIndex,
   foods,
   mealKind,
+  equivalents,
   itemId,
 }: {
   item: any;
+  itemIndex: number;
   foods: FoodDTO[] | undefined;
   mealKind: MealKind;
-  itemId?: string;
+  equivalents: any[];
+  itemId: string;
 }) {
-  const autoId = useId();
-  const stableId = itemId ?? `eq-item-${autoId}`;
-  const { isItemOpen, toggleItem, setItemOpen } = useExpansion();
-  // Para rows dentro do modal de equivalentes (sem itemId persistente),
-  // usamos estado local efêmero.
-  const persistent = !!itemId;
-  const [localOpen, setLocalOpen] = useState(false);
-  const open = persistent ? isItemOpen(stableId) : localOpen;
-  const setOpen = (next: boolean) => {
-    if (persistent) setItemOpen(stableId, next);
-    else setLocalOpen(next);
-  };
-  const handleToggle = () => {
-    if (persistent) toggleItem(stableId);
-    else setLocalOpen((v) => !v);
-  };
-  const isMobile = useIsMobile();
-  const reduce = useReducedMotion();
-  const panelId = `${stableId}-panel`;
+  const { isItemOpen, toggleItem } = useExpansion();
+  const open = isItemOpen(itemId);
 
   const match = useMemo(
     () => (item?.name ? findCatalogFood(foods, item) : null),
     [foods, item?.name, item?.foodKey],
   );
-  const measures = match?.householdMeasures ?? [];
-  const hasMeasures = measures.length > 0;
-
-  const itemKcal = Number.isFinite(item?.kcal) ? Number(item.kcal) : 0;
+  const householdMeasure = match?.householdMeasures?.[0]?.measureName;
 
   const substitutions = useMemo(
-    () => getSubstitutionsFor(item?.name ?? "", mealKind, itemKcal),
-    [item?.name, mealKind, itemKcal],
+    () =>
+      buildItemSubstitutions({
+        item,
+        itemIndex,
+        equivalents,
+        foods,
+        mealKind,
+      }),
+    [item, itemIndex, equivalents, foods, mealKind],
   );
+  const hasSubs = substitutions.length > 0;
 
-  const triggerLabel = (
-    <>
-      <span className="flex items-center gap-1.5 min-w-0">
-        <span className="text-sm leading-none shrink-0" aria-hidden>
+  return (
+    <div className="rounded-lg border border-border/60 bg-surface/40">
+      <button
+        type="button"
+        onClick={() => hasSubs && toggleItem(itemId)}
+        aria-expanded={hasSubs ? open : undefined}
+        disabled={!hasSubs}
+        className={`w-full flex items-center gap-3 p-2.5 text-left ${
+          hasSubs ? "hover:bg-primary/5 transition-colors" : ""
+        }`}
+      >
+        <span className="text-base leading-none shrink-0" aria-hidden>
           {emojiForFood(item?.name)}
         </span>
-        <span className="truncate">{cleanFoodDisplayName(item?.name) || "—"}</span>
-      </span>
-      <span className="flex items-center gap-1.5 shrink-0">
-        <span className="text-muted-foreground tabular-nums text-xs">
-          {item?.qty} {item?.unit}
-          {Number.isFinite(item?.kcal) ? ` · ${item.kcal} kcal` : ""}
-        </span>
-        <ChevronDown
-          aria-hidden
-          className={`size-3.5 text-muted-foreground transition-transform motion-reduce:transition-none ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </span>
-    </>
-  );
-
-  const detailsBody = (
-    <div className="space-y-4">
-      <section className="space-y-1.5" aria-label="Medidas caseiras">
-        <h4 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1">
-          <Scale className="size-3" aria-hidden /> Medidas caseiras
-        </h4>
-        {hasMeasures ? (
-          <div className="grid grid-cols-1 gap-1">
-            {measures.map((m) => (
-              <div
-                key={m.id}
-                className="text-sm border border-border rounded px-2.5 py-2 flex items-center justify-between gap-2"
-              >
-                <span>{m.measureName}</span>
-                <span className="font-mono text-xs text-muted-foreground tabular-nums">
-                  {m.gramsEquivalent} g
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-muted-foreground italic">
-            Sem medidas caseiras cadastradas.
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-foreground truncate">
+            {cleanFoodDisplayName(item?.name) || "—"}
           </p>
-        )}
-      </section>
-
-      <section className="space-y-1.5" aria-label="Substituições">
-        <div className="flex items-center justify-between gap-2">
-          <h4 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1">
-            <Repeat2 className="size-3" aria-hidden /> Substituições
-          </h4>
-          <span className="text-[10px] font-mono text-muted-foreground">
-            ~{itemKcal || 0} kcal
-          </span>
+          <p className="text-[11px] text-muted-foreground">
+            {householdMeasure ? (
+              <>
+                {householdMeasure}
+                <span className="text-muted-foreground/60">
+                  {" "}
+                  · {item?.qty} {item?.unit}
+                </span>
+              </>
+            ) : (
+              <>
+                {item?.qty} {item?.unit}
+              </>
+            )}
+            {Number.isFinite(item?.kcal) ? (
+              <span className="text-muted-foreground/60"> · {item.kcal} kcal</span>
+            ) : null}
+          </p>
         </div>
-        {substitutions.length > 0 ? (
+        {hasSubs && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-primary/80 shrink-0">
+            <Repeat2 className="size-3" />
+            {substitutions.length} substitui{substitutions.length === 1 ? "ção" : "ções"}
+            <ChevronDown
+              className={`size-3 transition-transform ${open ? "rotate-180" : ""}`}
+              aria-hidden
+            />
+          </span>
+        )}
+      </button>
+
+      {hasSubs && open && (
+        <div className="px-2.5 pb-2.5 space-y-1.5 border-t border-border/40 pt-2 animate-fade-in">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+            Substituições equivalentes
+          </p>
           <ul className="space-y-1">
             {substitutions.map((s, i) => (
               <li
                 key={`${s.name}-${i}`}
-                className="text-sm border border-border rounded px-2.5 py-2"
+                className="flex items-baseline justify-between gap-2 rounded border border-border/60 bg-background/60 px-2 py-1.5 text-xs"
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium truncate">{cleanFoodDisplayName(s.name)}</span>
-                  <span className="font-mono text-xs text-muted-foreground tabular-nums shrink-0">
-                    {s.qty} {s.unit}
-                    {s.kcal ? ` · ${s.kcal} kcal` : ""}
-                  </span>
+                <div className="min-w-0">
+                  <span className="font-medium text-foreground">{s.name}</span>
+                  {s.householdMeasure && (
+                    <span className="text-muted-foreground"> · {s.householdMeasure}</span>
+                  )}
+                  {s.note && (
+                    <p className="text-[11px] text-muted-foreground/80 mt-0.5">
+                      {s.note}
+                    </p>
+                  )}
                 </div>
-                {s.note && (
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {s.note}
-                  </p>
-                )}
+                <span className="font-mono text-[10px] text-muted-foreground shrink-0 tabular-nums">
+                  {s.qty} {s.unit}
+                  {s.kcal ? ` · ${s.kcal} kcal` : ""}
+                </span>
               </li>
             ))}
           </ul>
-        ) : (
-          <p className="text-xs text-muted-foreground italic">
-            Sem substituições sugeridas para este alimento.
-          </p>
-        )}
-      </section>
-    </div>
-  );
-
-  return (
-    <li className="border-b border-border/50 last:border-0">
-      <button
-        type="button"
-        onClick={handleToggle}
-        aria-expanded={open}
-        aria-controls={isMobile ? undefined : panelId}
-        className="w-full min-h-11 flex items-center justify-between gap-3 py-2 text-left hover:bg-primary/5 rounded-sm px-1 -mx-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
-      >
-        {triggerLabel}
-      </button>
-
-      {/* Mobile: Sheet/Drawer com melhor legibilidade */}
-      {isMobile ? (
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
-            <SheetHeader className="text-left">
-              <SheetTitle className="flex items-center gap-2">
-                <span aria-hidden>{emojiForFood(item?.name)}</span>
-                <span>{cleanFoodDisplayName(item?.name) || "—"}</span>
-              </SheetTitle>
-              <SheetDescription className="font-mono text-xs">
-                {item?.qty} {item?.unit}
-                {Number.isFinite(item?.kcal) ? ` · ${item.kcal} kcal` : ""}
-              </SheetDescription>
-            </SheetHeader>
-            <div className="mt-4 pb-6">{detailsBody}</div>
-          </SheetContent>
-        </Sheet>
-      ) : (
-        <AnimatePresence initial={false}>
-          {open && (
-            <motion.div
-              id={panelId}
-              role="region"
-              key="details"
-              initial={reduce ? false : { height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.22, ease: "easeInOut" }}
-              className="overflow-hidden"
-            >
-              <div className="px-1 pb-3 pt-1">{detailsBody}</div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        </div>
       )}
-    </li>
-  );
-}
-
-function EquivalentsButton({
-  mealLabel,
-  equivalents,
-  foods,
-  mealKind,
-}: {
-  mealLabel: string;
-  equivalents: any[];
-  foods: FoodDTO[] | undefined;
-  mealKind: MealKind;
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
-        >
-          <Repeat2 className="size-3.5" /> Ver substituições (
-          {equivalents.length})
-        </button>
-      </DialogTrigger>
-      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Substituições — {mealLabel}</DialogTitle>
-        </DialogHeader>
-        <p className="text-xs text-muted-foreground">
-          Cada opção abaixo substitui a refeição inteira.
-        </p>
-        <div className="space-y-3 pt-2">
-          {equivalents.map((eq, i) => (
-            <EquivalentCard
-              key={eq?.id ?? i}
-              option={eq}
-              foods={foods}
-              mealKind={mealKind}
-            />
-          ))}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function EquivalentCard({
-  option,
-  foods,
-  mealKind,
-}: {
-  option: any;
-  foods: FoodDTO[] | undefined;
-  mealKind: MealKind;
-}) {
-  const items: any[] = Array.isArray(option?.items) ? option.items : [];
-  const imgUrl = resolveBlockImage({
-    imageKey: option?.imageKey,
-    items,
-    mealKind,
-  });
-  const kcal = mealKcal(option);
-  return (
-    <div className="border border-border rounded-md overflow-hidden">
-      <div className="grid grid-cols-[88px_1fr] gap-0">
-        <div className="relative aspect-square bg-muted">
-          {imgUrl ? (
-            <img
-              src={imgUrl}
-              alt={option?.title ?? ""}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0 grid place-items-center text-muted-foreground">
-              <ImageOff className="size-4" />
-            </div>
-          )}
-        </div>
-        <div className="p-3 space-y-2">
-          <div className="flex items-baseline justify-between gap-2">
-            <p className="text-sm font-medium">
-              {option?.title ?? "Opção equivalente"}
-            </p>
-            <span className="text-[10px] font-mono text-muted-foreground">
-              {kcal} kcal
-            </span>
-          </div>
-          <ul className="text-xs space-y-0.5">
-            {items.map((it, i) => (
-              <FoodItemReadonlyRow
-                key={it?.id ?? i}
-                item={it}
-                foods={foods}
-                mealKind={mealKind}
-              />
-            ))}
-          </ul>
-          {option?.recipe && (
-            <p className="text-[11px] text-muted-foreground whitespace-pre-wrap pt-1 border-t border-border/50">
-              {option.recipe}
-            </p>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
+
