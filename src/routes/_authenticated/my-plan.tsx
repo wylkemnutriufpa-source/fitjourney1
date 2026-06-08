@@ -250,7 +250,7 @@ function MyPlanPage() {
 
         <PlanMeals planId={data.id} meals={meals} foods={foods} />
 
-        <ShoppingListCard meals={meals} foods={foods} />
+        <ShoppingListCard meals={meals} foods={foods ?? []} />
 
         <WaterCalculatorCard />
 
