@@ -1,17 +1,32 @@
 // Protocolos Ativos — visão do paciente.
 // READ ONLY: lista os protocolos que o profissional aplicou para o paciente.
-// Mostra fase atual, semana, recomendações e duração.
+// Experiência premium: refeições e alimentos expansíveis com substituições.
 
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { Sparkles, Clock, Droplets, Moon, Leaf, CheckCircle2, Info } from "lucide-react";
+import {
+  Sparkles,
+  Clock,
+  Droplets,
+  Moon,
+  Leaf,
+  CheckCircle2,
+  Info,
+  ChevronDown,
+  Replace,
+  UtensilsCrossed,
+  Flame,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   listMyActiveProtocols,
   type ActiveProtocolRow,
 } from "@/lib/protocols/active.functions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
 
 export const Route = createFileRoute("/_authenticated/my-plan/protocolos")({
   head: () => ({ meta: [{ title: "Protocolos Ativos — FitJourney" }] }),
@@ -97,7 +112,7 @@ function ActiveProtocolCard({ row }: { row: ActiveProtocolRow }) {
   const phase = row.phase_snapshot;
   const week = computeCurrentWeek(row);
   return (
-    <article className="relative overflow-hidden rounded-lg border border-[var(--gold)]/30 bg-surface p-5 space-y-4 shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)]">
+    <article className="relative overflow-hidden rounded-2xl border border-[var(--gold)]/30 bg-gradient-to-br from-surface to-background p-5 space-y-5 shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)]">
       <Sparkles
         className="pointer-events-none absolute -top-1 -right-1 size-7 text-[var(--gold)]/40 animate-pulse"
         aria-hidden
@@ -115,20 +130,27 @@ function ActiveProtocolCard({ row }: { row: ActiveProtocolRow }) {
         <p className="text-xs text-muted-foreground">{phase.description}</p>
       </header>
 
-      <div className="grid grid-cols-3 gap-3 text-[10px] font-mono text-muted-foreground border-t border-[var(--gold)]/15 pt-3">
-        <span className="inline-flex items-center gap-1">
-          <Clock className="size-3 text-[var(--gold)]/70" />
-          Semana {week} / {phase.durationWeeks}
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <Droplets className="size-3 text-[var(--gold)]/70" />
-          {(phase.recommendations.waterMl / 1000).toFixed(1)}L
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <Moon className="size-3 text-[var(--gold)]/70" />
-          {phase.recommendations.sleepHours}h sono
-        </span>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] font-mono">
+        <MetricChip icon={<Clock className="size-3" />} label={`Sem ${week}/${phase.durationWeeks}`} />
+        <MetricChip icon={<Droplets className="size-3" />} label={`${(phase.recommendations.waterMl / 1000).toFixed(1)}L água`} />
+        <MetricChip icon={<Moon className="size-3" />} label={`${phase.recommendations.sleepHours}h sono`} />
+        {phase.dailyKcalTarget && (
+          <MetricChip icon={<Flame className="size-3" />} label={`${phase.dailyKcalTarget} kcal/dia`} />
+        )}
       </div>
+
+      {phase.meals && phase.meals.length > 0 && (
+        <section className="space-y-2">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] flex items-center gap-1.5">
+            <UtensilsCrossed className="size-3" /> Cardápio do dia
+          </p>
+          <div className="space-y-2">
+            {phase.meals.map((m) => (
+              <MealCard key={m.id} meal={m} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {phase.recommendations.strategies.length > 0 && (
         <section className="space-y-1.5">
@@ -161,12 +183,116 @@ function ActiveProtocolCard({ row }: { row: ActiveProtocolRow }) {
           </ul>
         </section>
       )}
-
-      {phase.dailyKcalTarget && (
-        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-          Meta calórica diária: {phase.dailyKcalTarget} kcal
-        </p>
-      )}
     </article>
+  );
+}
+
+function MetricChip({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <span className="inline-flex items-center justify-center gap-1 rounded-md border border-[var(--gold)]/20 bg-background/60 px-2 py-1.5 text-muted-foreground">
+      <span className="text-[var(--gold)]/80">{icon}</span>
+      {label}
+    </span>
+  );
+}
+
+function MealCard({ meal }: { meal: PhaseMeal }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-[var(--gold)]/20 bg-background/60 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-3 p-3 text-left hover:bg-[color-mix(in_oklab,var(--gold)_5%,transparent)] transition-colors"
+        aria-expanded={open}
+      >
+        <span className="inline-flex size-9 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] text-[var(--gold)] font-mono text-[10px] shrink-0">
+          {meal.time}
+        </span>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold uppercase tracking-wide text-foreground truncate">
+            {meal.name}
+          </p>
+          <p className="text-[10px] font-mono text-muted-foreground">
+            {meal.items.length} {meal.items.length === 1 ? "alimento" : "alimentos"} · {meal.totalKcal} kcal
+          </p>
+        </div>
+        <ChevronDown
+          className={cn(
+            "size-4 text-[var(--gold)] transition-transform shrink-0",
+            open && "rotate-180",
+          )}
+        />
+      </button>
+
+      {open && (
+        <div className="px-3 pb-3 space-y-2 border-t border-[var(--gold)]/15 animate-fade-in">
+          {meal.items.map((it, i) => (
+            <FoodRow key={`${meal.id}-${i}`} item={it} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FoodRow({ item }: { item: PhaseMealItem }) {
+  const [open, setOpen] = useState(false);
+  const subs = item.substitutions ?? [];
+  const hasSubs = subs.length > 0;
+  return (
+    <div className="rounded-lg border border-border/60 bg-surface/40 first:mt-2">
+      <button
+        type="button"
+        onClick={() => hasSubs && setOpen((v) => !v)}
+        className={cn(
+          "w-full flex items-center gap-3 p-2.5 text-left",
+          hasSubs && "hover:bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] transition-colors",
+        )}
+        aria-expanded={open}
+        disabled={!hasSubs}
+      >
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+          <p className="text-[11px] text-muted-foreground">
+            {item.householdMeasure}
+            <span className="text-muted-foreground/60"> · {item.quantityG}g · {item.kcal} kcal</span>
+          </p>
+        </div>
+        {hasSubs && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-[var(--gold)]/80 shrink-0">
+            <Replace className="size-3" />
+            {subs.length} sub
+            <ChevronDown
+              className={cn("size-3 transition-transform", open && "rotate-180")}
+            />
+          </span>
+        )}
+      </button>
+
+      {hasSubs && open && (
+        <div className="px-2.5 pb-2.5 space-y-1.5 border-t border-border/40 pt-2 animate-fade-in">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+            Substituições equivalentes
+          </p>
+          <ul className="space-y-1">
+            {subs.map((s, i) => (
+              <li
+                key={`${s.foodKey}-${i}`}
+                className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/60 px-2 py-1.5 text-xs"
+              >
+                <div className="min-w-0">
+                  <span className="font-medium text-foreground">{s.name}</span>
+                  <span className="text-muted-foreground"> · {s.householdMeasure}</span>
+                </div>
+                <span className="font-mono text-[10px] text-muted-foreground shrink-0">
+                  {s.quantityG}g · {s.kcal} kcal
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
