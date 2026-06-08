@@ -36,6 +36,7 @@ import {
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { imgFor } from "@/lib/food-images";
 import { emojiForFood } from "@/lib/food-emojis";
+import { cleanFoodDisplayName } from "@/lib/foods/display-name";
 import {
   detectMealKind,
   getSubstitutionsFor,
@@ -776,7 +777,7 @@ function FoodItemReadonlyRow({
         <span className="text-sm leading-none shrink-0" aria-hidden>
           {emojiForFood(item?.name)}
         </span>
-        <span className="truncate">{item?.name ?? "—"}</span>
+        <span className="truncate">{cleanFoodDisplayName(item?.name) || "—"}</span>
       </span>
       <span className="flex items-center gap-1.5 shrink-0">
         <span className="text-muted-foreground tabular-nums text-xs">
@@ -837,7 +838,7 @@ function FoodItemReadonlyRow({
                 className="text-sm border border-border rounded px-2.5 py-2"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium truncate">{s.name}</span>
+                  <span className="font-medium truncate">{cleanFoodDisplayName(s.name)}</span>
                   <span className="font-mono text-xs text-muted-foreground tabular-nums shrink-0">
                     {s.qty} {s.unit}
                     {s.kcal ? ` · ${s.kcal} kcal` : ""}
@@ -879,7 +880,7 @@ function FoodItemReadonlyRow({
             <SheetHeader className="text-left">
               <SheetTitle className="flex items-center gap-2">
                 <span aria-hidden>{emojiForFood(item?.name)}</span>
-                <span>{item?.name ?? "—"}</span>
+                <span>{cleanFoodDisplayName(item?.name) || "—"}</span>
               </SheetTitle>
               <SheetDescription className="font-mono text-xs">
                 {item?.qty} {item?.unit}
