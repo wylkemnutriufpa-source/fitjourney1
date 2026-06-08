@@ -2,7 +2,7 @@
 // Lê o catálogo único em src/lib/protocols/catalog.ts (mesma fonte usada pelo
 // motor de sugestão que cruza com a anamnese aprovada).
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Lock,
   Sparkles,
@@ -142,23 +142,32 @@ function ProtocolosPage() {
                   <span className="text-[10px] font-mono uppercase text-muted-foreground">
                     {locked ? "requer premium" : "disponível"}
                   </span>
-                  <button
-                    disabled={locked}
-                    className={
-                      "text-[10px] font-mono uppercase px-2 py-1 rounded border transition-colors " +
-                      (locked
-                        ? "border-border text-muted-foreground cursor-not-allowed"
-                        : "border-[var(--gold)]/60 text-[var(--gold)] hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)]")
-                    }
-                  >
-                    {locked ? (
-                      <span className="inline-flex items-center gap-1">
-                        <Lock className="size-3" /> bloqueado
-                      </span>
-                    ) : (
-                      "abrir"
-                    )}
-                  </button>
+                  {!locked && p.id === "ifj" ? (
+                    <Link
+                      to="/protocolos/ifj"
+                      className="text-[10px] font-mono uppercase px-2 py-1 rounded border border-[var(--gold)]/60 text-[var(--gold)] hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] transition-colors"
+                    >
+                      abrir
+                    </Link>
+                  ) : (
+                    <button
+                      disabled={locked}
+                      className={
+                        "text-[10px] font-mono uppercase px-2 py-1 rounded border transition-colors " +
+                        (locked
+                          ? "border-border text-muted-foreground cursor-not-allowed"
+                          : "border-[var(--gold)]/60 text-[var(--gold)] hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)]")
+                      }
+                    >
+                      {locked ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Lock className="size-3" /> bloqueado
+                        </span>
+                      ) : (
+                        "abrir"
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             );
