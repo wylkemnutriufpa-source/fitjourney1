@@ -1,5 +1,6 @@
 // Protocolos — aba "premium" do FitJourney.
-// Todos os protocolos são premium e trancados por padrão; ADMIN sempre tem acesso total.
+// Lê o catálogo único em src/lib/protocols/catalog.ts (mesma fonte usada pelo
+// motor de sugestão que cruza com a anamnese aprovada).
 
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -25,39 +26,35 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/auth-context";
+import {
+  PROTOCOL_CATALOG,
+  type ProtocolDescriptor,
+} from "@/lib/protocols/catalog";
 
 export const Route = createFileRoute("/_authenticated/protocolos")({
   component: ProtocolosPage,
 });
 
-type ProtocoloCard = {
-  readonly id: string;
-  readonly name: string;
-  readonly tagline: string;
-  readonly icon: typeof Timer;
-  readonly exclusive?: boolean;
+const ICONS: Record<ProtocolDescriptor["icon"], typeof Timer> = {
+  Timer,
+  Wheat,
+  Droplets,
+  Repeat,
+  Brain,
+  Activity,
+  Bug,
+  HeartPulse,
+  Scissors,
+  Flame,
+  Wind,
+  Gem,
+  Leaf,
+  Baby,
+  TrendingDown,
+  Droplet,
+  CircleDot,
+  Sparkles,
 };
-
-const PROTOCOLOS: ReadonlyArray<ProtocoloCard> = [
-  { id: "jejum-intermitente", name: "Jejum Intermitente", tagline: "Janelas 16/8 · 14/10 · OMAD — editável como template.", icon: Timer },
-  { id: "low-carb", name: "Protocolo Low Carb", tagline: "Redução estratégica de carboidratos — saciedade e perda de gordura.", icon: Wheat },
-  { id: "agua", name: "Protocolo da Água", tagline: "Hidratação calculada por peso/atividade com lembretes diários.", icon: Droplets },
-  { id: "ciclo-carbo", name: "Protocolo Ciclo de Carboidratos", tagline: "Dias high/low/no carb — performance e composição corporal.", icon: Repeat },
-  { id: "anti-ansiedade", name: "Protocolo Anti-Ansiedade", tagline: "Triptofano, magnésio, ômega-3 — eixo intestino-cérebro.", icon: Brain },
-  { id: "anti-enxaqueca", name: "Protocolo Anti-Enxaqueca", tagline: "Exclusão de gatilhos + magnésio, riboflavina e CoQ10.", icon: Activity },
-  { id: "antiparasitario", name: "Protocolo Antiparasitário", tagline: "Alimentos vermífugos naturais e suporte intestinal.", icon: Bug },
-  { id: "anticelulite", name: "Protocolo Anticelulite", tagline: "Drenagem, anti-inflamatórios e suporte ao colágeno.", icon: HeartPulse },
-  { id: "antiqueda", name: "Protocolo Antiqueda de Cabelo", tagline: "Ferro, zinco, biotina e proteína — saúde capilar.", icon: Scissors },
-  { id: "anti-inflamatorio", name: "Protocolo Anti-inflamatório", tagline: "Ômega-3, polifenóis e exclusão de pró-inflamatórios.", icon: Flame },
-  { id: "antiinchaco", name: "Protocolo Antiinchaço", tagline: "Sódio controlado, potássio e diuréticos naturais.", icon: Wind },
-  { id: "beleza", name: "Protocolo da Beleza", tagline: "Unhas, cabelo e pele — colágeno, silício e antioxidantes.", icon: Gem },
-  { id: "anticonstipacao", name: "Protocolo Anticonstipação", tagline: "Fibras, hidratação e probióticos — trânsito intestinal regular.", icon: Leaf },
-  { id: "pre-natal", name: "Protocolo Pré-Natal", tagline: "Ácido fólico, ferro, ômega-3 — nutrição materno-fetal.", icon: Baby },
-  { id: "resistencia-insulina", name: "Protocolo Resistência à Insulina", tagline: "Baixo índice glicêmico, cromo e fracionamento estratégico.", icon: TrendingDown },
-  { id: "anemia", name: "Protocolo Anemia", tagline: "Ferro heme, vitamina C e B12 — recuperação hematológica.", icon: Droplet },
-  { id: "sop", name: "Protocolo SOP", tagline: "Inositol, baixo carbo e anti-inflamatórios — equilíbrio hormonal.", icon: CircleDot },
-  { id: "ifj", name: "Protocolo IFJ — Inteligência FitJourney", tagline: "Cardápio focado em emagrecimento com análogos GLP-1.", icon: Sparkles, exclusive: true },
-];
 
 function ProtocolosPage() {
   const { roles } = useAuth();
@@ -84,8 +81,8 @@ function ProtocolosPage() {
         </header>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          {PROTOCOLOS.map((p) => {
-            const Icon = p.icon;
+          {PROTOCOL_CATALOG.map((p) => {
+            const Icon = ICONS[p.icon];
             const locked = !hasPremium;
             return (
               <div

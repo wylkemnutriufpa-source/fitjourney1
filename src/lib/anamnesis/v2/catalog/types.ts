@@ -58,7 +58,8 @@ export type ClinicalDomain =
   | "medications"
   | "labs"
   | "sleep"
-  | "physical_activity";
+  | "physical_activity"
+  | "screening";
 
 export interface CatalogBlock {
   id: string;
