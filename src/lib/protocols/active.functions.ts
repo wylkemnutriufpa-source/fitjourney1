@@ -30,6 +30,29 @@ export type ActiveProtocolRow = {
     durationWeeks: number;
     description: string;
     dailyKcalTarget?: number;
+    macros?: { protein: number; carb: number; fat: number };
+    meals?: Array<{
+      id: string;
+      name: string;
+      time: string;
+      totalKcal: number;
+      items: Array<{
+        foodKey: string;
+        name: string;
+        quantityG: number;
+        householdMeasure: string;
+        kcal: number;
+        imageSlug?: string;
+        substitutions?: Array<{
+          foodKey: string;
+          name: string;
+          quantityG: number;
+          householdMeasure: string;
+          kcal: number;
+        }>;
+      }>;
+    }>;
+    teaSchedule?: Array<{ time?: string; name: string; benefits?: string }>;
     recommendations: {
       waterMl: number;
       sleepHours: number;

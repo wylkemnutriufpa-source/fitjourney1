@@ -30,12 +30,22 @@ export interface PhaseTea {
   readonly benefits?: string;
 }
 
+export interface PhaseMealItemSubstitution {
+  readonly foodKey: string;
+  readonly name: string;
+  readonly quantityG: number;
+  readonly householdMeasure: string;
+  readonly kcal: number;
+}
+
 export interface PhaseMealItem {
   readonly foodKey: string;
   readonly name: string;
   readonly quantityG: number;
   readonly householdMeasure: string;
   readonly kcal: number;
+  readonly imageSlug?: string;
+  readonly substitutions?: ReadonlyArray<PhaseMealItemSubstitution>;
 }
 
 export interface PhaseMeal {
