@@ -355,7 +355,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
         </div>
 
         <nav className="space-y-1 flex-1">
-          {nav.map((item) => {
+          {nav.map((item: (typeof nav)[number]) => {
             const active = path === item.to || path.startsWith(item.to + "/");
             const Icon = item.icon;
             const badgeKey = "badgeKey" in item ? item.badgeKey : null;
