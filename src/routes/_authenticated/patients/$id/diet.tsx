@@ -503,6 +503,8 @@ function PlanEditor({
     } catch (e) {
       toast.error(`Não foi possível regenerar: ${(e as Error).message ?? "erro"}`);
     }
+  }
+
 
   return (
     <section className="space-y-4 pb-28">
