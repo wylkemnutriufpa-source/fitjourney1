@@ -21,30 +21,23 @@
 //
 // O profissional pode sobrepor o critério por bloco (parâmetro `criterion`).
 
+import { inferGramsPerUnit, unitFromGrams } from "@/lib/foods/unit-bridge";
+
 export type MatchCriterion = "protein" | "carb" | "fat" | "energy";
 
 export type EquivalentCandidate = {
-  /** Identidade estável do alimento no catálogo (foods.food_key ou foods.id). */
   foodKey: string;
-  /** Nome exibido. */
   name: string;
-  /** Grupo de escala — usado para filtrar candidatos compatíveis. */
   scaleGroup: string;
-  /**
-   * Subgrupo clínico-contextual (refinamento do scaleGroup). Quando presente,
-   * o engine só substitui dentro do MESMO subGroup, evitando misturas absurdas:
-   * - `protein-meal`  (carnes/peixes/lombo p/ almoço-jantar)
-   * - `protein-snack` (ovo, queijo, frango desfiado, carne moída — lanche/café)
-   * - `carb-meal`     (arroz, macarrão, batata, macaxeira, inhame)
-   * - `carb-breakfast`(pão, tapioca, cuscuz)
-   * - `fat-spread`    (pasta de amendoim, castanha, abacate — combina com fruta/pão)
-   * - `fat-cooking`   (azeite, manteiga — só finalização/cocção)
-   */
   subGroup?: string;
-  /** Unidade padrão (geralmente "g" ou "ml"; pode ser "unid"). */
   unit: string;
-  /** Quantidade padrão sugerida no catálogo (referência, não usada no cálculo). */
   defaultQty: number;
+  /**
+   * Gramas por 1 unidade (ex.: ovo=50, banana=90, maçã=130). Quando presente,
+   * o engine pode prescrever este candidato em "unid" — fundamental p/ ovos e
+   * frutas inteiras que são contadas em unidades.
+   */
+  gramsPerUnit?: number;
   kcalPer100g: number;
   proteinPer100g: number;
   carbPer100g: number;
@@ -52,9 +45,7 @@ export type EquivalentCandidate = {
 };
 
 export type EquivalentBase = EquivalentCandidate & {
-  /** Quantidade efetiva no plano (na `unit` do alimento). */
   qty: number;
-  /** Unidade efetiva no plano antes da normalização para cálculo. */
   originalUnit?: string;
 };
 
