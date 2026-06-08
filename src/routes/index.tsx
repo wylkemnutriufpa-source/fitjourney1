@@ -91,6 +91,16 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
+  // SSR hydrate: busca o conteúdo real no servidor antes de renderizar.
+  // Sem isso, o HTML inicial sai com DEFAULT_LANDING_CONTENT e o cliente
+  // troca para a copy atual (flash visível).
+  loader: async ({ context }) => {
+    await context.queryClient.prefetchQuery({
+      queryKey: ["landing-content"],
+      queryFn: getLandingContent,
+      staleTime: 60_000,
+    });
+  },
   component: Landing,
 });
 
