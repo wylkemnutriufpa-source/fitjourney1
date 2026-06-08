@@ -10,6 +10,7 @@ import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
+import { WaterCalculatorCard } from "@/components/patient/WaterCalculatorCard";
 import {
   Clock,
   AlertTriangle,
