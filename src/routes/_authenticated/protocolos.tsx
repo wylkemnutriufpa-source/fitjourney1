@@ -59,8 +59,6 @@ const ICONS: Record<ProtocolDescriptor["icon"], typeof Timer> = {
 function ProtocolosPage() {
   const { roles } = useAuth();
   const isAdmin = roles.includes("admin");
-  // Premium gating real virá do billing; por enquanto, só admin destranca.
-  const hasPremium = isAdmin;
 
   return (
     <AppShell>
