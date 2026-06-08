@@ -29,9 +29,9 @@ import { LogoMark } from "@/components/LogoMark";
 import { BrandLockup } from "@/components/BrandLockup";
 import {
   DEFAULT_LANDING_CONTENT,
-  fetchLandingContent,
   type LandingContent,
 } from "@/lib/landing/landing-content";
+import { getLandingContent } from "@/lib/landing/landing-content.functions";
 import reel1 from "@/assets/reels/reel-1.mp4.asset.json";
 import reel2 from "@/assets/reels/reel-2.mp4.asset.json";
 import reel3 from "@/assets/reels/reel-3.mp4.asset.json";
@@ -90,6 +90,16 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
+  // SSR hydrate: busca o conteúdo real no servidor antes de renderizar.
+  // Sem isso, o HTML inicial sai com DEFAULT_LANDING_CONTENT e o cliente
+  // troca para a copy atual (flash visível).
+  loader: async ({ context }) => {
+    await context.queryClient.prefetchQuery({
+      queryKey: ["landing-content"],
+      queryFn: getLandingContent,
+      staleTime: 60_000,
+    });
+  },
   component: Landing,
 });
 
@@ -201,10 +211,8 @@ function Landing() {
 
   const { data } = useQuery<LandingContent>({
     queryKey: ["landing-content"],
-    queryFn: fetchLandingContent,
-    placeholderData: DEFAULT_LANDING_CONTENT,
-    staleTime: 0,
-    refetchOnMount: "always",
+    queryFn: getLandingContent,
+    staleTime: 60_000,
   });
   const c = data ?? DEFAULT_LANDING_CONTENT;
 
