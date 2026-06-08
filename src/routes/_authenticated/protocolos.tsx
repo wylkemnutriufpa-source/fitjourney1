@@ -17,6 +17,11 @@ import {
   Flame,
   Wind,
   Gem,
+  Leaf,
+  Baby,
+  TrendingDown,
+  Droplet,
+  CircleDot,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/auth-context";
@@ -46,6 +51,11 @@ const PROTOCOLOS: ReadonlyArray<ProtocoloCard> = [
   { id: "anti-inflamatorio", name: "Protocolo Anti-inflamatório", tagline: "Ômega-3, polifenóis e exclusão de pró-inflamatórios.", icon: Flame },
   { id: "antiinchaco", name: "Protocolo Antiinchaço", tagline: "Sódio controlado, potássio e diuréticos naturais.", icon: Wind },
   { id: "beleza", name: "Protocolo da Beleza", tagline: "Unhas, cabelo e pele — colágeno, silício e antioxidantes.", icon: Gem },
+  { id: "anticonstipacao", name: "Protocolo Anticonstipação", tagline: "Fibras, hidratação e probióticos — trânsito intestinal regular.", icon: Leaf },
+  { id: "pre-natal", name: "Protocolo Pré-Natal", tagline: "Ácido fólico, ferro, ômega-3 — nutrição materno-fetal.", icon: Baby },
+  { id: "resistencia-insulina", name: "Protocolo Resistência à Insulina", tagline: "Baixo índice glicêmico, cromo e fracionamento estratégico.", icon: TrendingDown },
+  { id: "anemia", name: "Protocolo Anemia", tagline: "Ferro heme, vitamina C e B12 — recuperação hematológica.", icon: Droplet },
+  { id: "sop", name: "Protocolo SOP", tagline: "Inositol, baixo carbo e anti-inflamatórios — equilíbrio hormonal.", icon: CircleDot },
   { id: "ifj", name: "Protocolo IFJ — Inteligência FitJourney", tagline: "Cardápio focado em emagrecimento com análogos GLP-1.", icon: Sparkles, exclusive: true },
 ];
 
