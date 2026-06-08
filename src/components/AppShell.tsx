@@ -264,6 +264,10 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
       ((effectiveRole === "patient" && !isPatientArea) ||
         (effectiveRole !== "patient" && isPatientArea)),
   );
+  const isPro = isAdmin; // TEMP: admin = Pro até existir tier real
+  const nutritionistNav = nutritionistNavBase.filter(
+    (i) => !("proOnly" in i && i.proOnly) || isPro,
+  );
   const baseNav = isPatient ? patientNav : nutritionistNav;
   const nav = !isPatient && isAdmin
     ? ([...baseNav, { to: "/admin/profissionais", label: "Admin", icon: ShieldCheck }] as const)
