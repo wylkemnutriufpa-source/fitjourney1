@@ -611,7 +611,16 @@ function PlanEditor({
           <div className="text-xs text-muted-foreground">
             {dirty ? "Alterações não salvas" : "Tudo salvo"}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            <Button
+              variant="outline"
+              onClick={regenerateSubstitutions}
+              disabled={saving}
+              title="Reaplica o motor atual de substituições em todas as refeições deste plano"
+            >
+              <Sparkles className="size-3.5" />
+              Regenerar substituições
+            </Button>
             <Button
               variant="outline"
               onClick={() => setSaveAsTpl({ name: draft.name || "Modelo do plano", saving: false })}
