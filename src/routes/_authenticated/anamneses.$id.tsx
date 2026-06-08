@@ -72,7 +72,7 @@ function AnamnesisDetailPage() {
       if (decision === "approved" && data?.patient?.id) {
         // Regra Canônica #1: sistema sugere, nutri decide o próximo passo.
         // Não auto-navega: abre escolha entre editar plano agora ou voltar à fila.
-        setPostApprove({ patientId: data.patient.id });
+        setPostApprove({ patientId: data.patient.id, patientName: data.patient.fullName });
       } else {
         navigate({ to: "/anamneses" });
       }
