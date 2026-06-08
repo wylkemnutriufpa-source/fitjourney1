@@ -18,12 +18,43 @@ export interface ProtocolTriggers {
   readonly anyGoal?: ReadonlyArray<GoalKind>;
 }
 
+export interface PhaseMacros {
+  readonly protein: number; // % do total
+  readonly carb: number;
+  readonly fat: number;
+}
+
+export interface PhaseTea {
+  readonly time?: string;
+  readonly name: string;
+  readonly benefits?: string;
+}
+
+export interface PhaseMealItem {
+  readonly foodKey: string;
+  readonly name: string;
+  readonly quantityG: number;
+  readonly householdMeasure: string;
+  readonly kcal: number;
+}
+
+export interface PhaseMeal {
+  readonly id: string;
+  readonly name: string;
+  readonly time: string;
+  readonly totalKcal: number;
+  readonly items: ReadonlyArray<PhaseMealItem>;
+}
+
 export interface ProtocolPhase {
   readonly id: number;
   readonly name: string;
   readonly durationWeeks: number;
   readonly description: string;
   readonly dailyKcalTarget?: number;
+  readonly macros?: PhaseMacros;
+  readonly meals?: ReadonlyArray<PhaseMeal>;
+  readonly teaSchedule?: ReadonlyArray<PhaseTea>;
   readonly recommendations: {
     readonly waterMl: number;
     readonly sleepHours: number;
