@@ -59,8 +59,6 @@ const ICONS: Record<ProtocolDescriptor["icon"], typeof Timer> = {
 function ProtocolosPage() {
   const { roles } = useAuth();
   const isAdmin = roles.includes("admin");
-  // Premium gating real virá do billing; por enquanto, só admin destranca.
-  const hasPremium = isAdmin;
 
   return (
     <AppShell>
@@ -83,7 +81,8 @@ function ProtocolosPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           {PROTOCOL_CATALOG.map((p) => {
             const Icon = ICONS[p.icon];
-            const locked = !hasPremium;
+            // Apenas IFJ (exclusive) é trancado para não-admin. Demais sempre abertos.
+            const locked = !!p.exclusive && !isAdmin;
             return (
               <div
                 key={p.id}
