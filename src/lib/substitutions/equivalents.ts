@@ -21,30 +21,23 @@
 //
 // O profissional pode sobrepor o critério por bloco (parâmetro `criterion`).
 
+import { inferGramsPerUnit, unitFromGrams } from "@/lib/foods/unit-bridge";
+
 export type MatchCriterion = "protein" | "carb" | "fat" | "energy";
 
 export type EquivalentCandidate = {
-  /** Identidade estável do alimento no catálogo (foods.food_key ou foods.id). */
   foodKey: string;
-  /** Nome exibido. */
   name: string;
-  /** Grupo de escala — usado para filtrar candidatos compatíveis. */
   scaleGroup: string;
-  /**
-   * Subgrupo clínico-contextual (refinamento do scaleGroup). Quando presente,
-   * o engine só substitui dentro do MESMO subGroup, evitando misturas absurdas:
-   * - `protein-meal`  (carnes/peixes/lombo p/ almoço-jantar)
-   * - `protein-snack` (ovo, queijo, frango desfiado, carne moída — lanche/café)
-   * - `carb-meal`     (arroz, macarrão, batata, macaxeira, inhame)
-   * - `carb-breakfast`(pão, tapioca, cuscuz)
-   * - `fat-spread`    (pasta de amendoim, castanha, abacate — combina com fruta/pão)
-   * - `fat-cooking`   (azeite, manteiga — só finalização/cocção)
-   */
   subGroup?: string;
-  /** Unidade padrão (geralmente "g" ou "ml"; pode ser "unid"). */
   unit: string;
-  /** Quantidade padrão sugerida no catálogo (referência, não usada no cálculo). */
   defaultQty: number;
+  /**
+   * Gramas por 1 unidade (ex.: ovo=50, banana=90, maçã=130). Quando presente,
+   * o engine pode prescrever este candidato em "unid" — fundamental p/ ovos e
+   * frutas inteiras que são contadas em unidades.
+   */
+  gramsPerUnit?: number;
   kcalPer100g: number;
   proteinPer100g: number;
   carbPer100g: number;
@@ -52,9 +45,7 @@ export type EquivalentCandidate = {
 };
 
 export type EquivalentBase = EquivalentCandidate & {
-  /** Quantidade efetiva no plano (na `unit` do alimento). */
   qty: number;
-  /** Unidade efetiva no plano antes da normalização para cálculo. */
   originalUnit?: string;
 };
 
@@ -99,9 +90,7 @@ export function calculateEquivalentQty(
   criterion: MatchCriterion = defaultCriterionFor(base.scaleGroup),
   opts: { step?: number; minQty?: number } = {},
 ): EquivalentOption | null {
-  const isMassOrVol = base.unit === "g" || base.unit === "ml";
-  // Para unidades discretas ("unid"), arredondar para 1; para g/ml, para `step` (5g por padrão).
-  const step = opts.step ?? (isMassOrVol ? 5 : 1);
+  const step = opts.step ?? 5;
   const minQty = opts.minQty ?? step;
 
   const baseNutrientPer100 = nutrientPer100g(base, criterion);
@@ -110,32 +99,57 @@ export function calculateEquivalentQty(
   if (!Number.isFinite(baseNutrientPer100) || baseNutrientPer100 <= 0) return null;
   if (!Number.isFinite(candNutrientPer100) || candNutrientPer100 <= 0) return null;
 
-  // Quantidade absoluta do nutriente no base (em g do nutriente, ou em kcal).
-  const baseAbsolute = (base.qty * baseNutrientPer100) / 100;
-  // Quantidade do candidato (na unidade do candidato) que fornece o mesmo absoluto.
-  const rawQty = (baseAbsolute * 100) / candNutrientPer100;
-  const candStep = candidate.unit === "g" || candidate.unit === "ml" ? step : 1;
-  // Arredondamento por grupo (regra clínica):
-  // - proteína: para CIMA (não subdosar a fonte proteica)
-  // - carboidrato/fruta: para BAIXO (evita excesso calórico)
-  // - demais (fat, energy): nearest (round)
-  const roundFn =
-    candidate.unit === "g" || candidate.unit === "ml"
-      ? candidate.scaleGroup === "protein"
+  // Normaliza base para gramas/ml — itens prescritos em "unid" usam gramsPerUnit
+  // (do DB ou inferido) para entrar na fórmula linear.
+  const baseGpu = base.gramsPerUnit ?? inferGramsPerUnit(base);
+  const baseGrams =
+    base.unit === "g" || base.unit === "ml"
+      ? base.qty
+      : baseGpu && baseGpu > 0
+        ? base.qty * baseGpu
+        : null;
+  if (!baseGrams || baseGrams <= 0) return null;
+
+  // Quantidade absoluta do nutriente alvo no base (em g do nutriente ou kcal).
+  const baseAbsolute = (baseGrams * baseNutrientPer100) / 100;
+  // Gramas do candidato que fornecem o mesmo absoluto.
+  const candGrams = (baseAbsolute * 100) / candNutrientPer100;
+
+  // Decide se o output sai em "unid" (somente quando o nutri prescreveu o base
+  // em unidade E o candidato tem gpu conhecido — mantém naturalidade clínica).
+  const candGpu = candidate.gramsPerUnit ?? inferGramsPerUnit(candidate);
+  const outputInUnits =
+    (base.originalUnit === "unid" || base.unit === "unid") &&
+    candGpu !== null &&
+    candGpu > 0;
+
+  let outQty: number;
+  let outUnit: string;
+  let outGrams: number;
+  if (outputInUnits && candGpu) {
+    outQty = unitFromGrams(candGrams, candGpu, candidate.scaleGroup);
+    outUnit = "unid";
+    outGrams = outQty * candGpu;
+  } else {
+    // Output em massa/volume com arredondamento clínico por grupo.
+    const roundFn =
+      candidate.scaleGroup === "protein"
         ? Math.ceil
         : candidate.scaleGroup === "carb" || candidate.scaleGroup === "fruit"
           ? Math.floor
-          : Math.round
-      : Math.round;
-  const rounded = Math.max(minQty, roundFn(rawQty / candStep) * candStep);
+          : Math.round;
+    outQty = Math.max(minQty, roundFn(candGrams / step) * step);
+    outUnit = candidate.unit === "ml" ? "ml" : "g";
+    outGrams = outQty;
+  }
 
-  const factor = rounded / 100;
+  const factor = outGrams / 100;
   return {
     foodKey: candidate.foodKey,
     name: candidate.name,
     scaleGroup: candidate.scaleGroup,
-    qty: rounded,
-    unit: candidate.unit,
+    qty: outQty,
+    unit: outUnit,
     kcal: Math.round(candidate.kcalPer100g * factor),
     proteinG: Math.round(candidate.proteinPer100g * factor * 10) / 10,
     carbG: Math.round(candidate.carbPer100g * factor * 10) / 10,

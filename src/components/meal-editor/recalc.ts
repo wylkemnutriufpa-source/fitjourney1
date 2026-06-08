@@ -30,10 +30,17 @@ function resolveCriterion(
   return block;
 }
 
+import { inferGramsPerUnit } from "@/lib/foods/unit-bridge";
+
 function equivalentQtyFromPlannerQty(base: PlannerFoodItem, anchor: EquivalentCandidate): number {
   const qty = Number(base.qty);
   if (!Number.isFinite(qty) || qty <= 0) return anchor.defaultQty;
   if ((base.unit === "g" || base.unit === "ml") && base.unit === anchor.unit) return qty;
+  // base em "unid" — converter para gramas usando gpu (do anchor ou inferido).
+  if (base.unit === "unid") {
+    const gpu = anchor.gramsPerUnit ?? inferGramsPerUnit({ foodKey: base.foodKey, name: base.name, scaleGroup: base.scaleGroup });
+    if (gpu && gpu > 0) return qty * gpu;
+  }
   return qty * anchor.defaultQty;
 }
 

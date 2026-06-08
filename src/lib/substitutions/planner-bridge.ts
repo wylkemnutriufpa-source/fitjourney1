@@ -56,6 +56,7 @@ export function buildTacoEquivalents(
     count,
     criterion ?? defaultCriterionFor(base.scaleGroup),
   );
+  if (options.length === 0) return null;
   return options.map((opt) => equivalentToPlannerOption(opt, candidates));
 }
 

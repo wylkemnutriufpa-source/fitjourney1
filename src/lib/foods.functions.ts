@@ -26,6 +26,8 @@ export type FoodDTO = {
   fatPer100g: number;
   fiberPer100g: number;
   scaleGroup: string;
+  /** Gramas por 1 unidade quando o alimento é prescrito em "unid"/"fatia". */
+  gramsPerUnit: number | null;
   protocols: {
     glutenFree: boolean;
     lactoseFree: boolean;
@@ -77,11 +79,23 @@ export const listFoods = createServerFn({ method: "GET" })
     return (foods ?? []).map((f) => {
       const kcalPer100g = Number(f.kcal_per_100g);
       const defaultQty = Number(f.default_qty);
-      // kcal exibido = proporcional à quantidade padrão, quando a unidade é "g" ou "ml"
-      const kcal =
-        f.default_unit === "g" || f.default_unit === "ml"
-          ? Math.round((kcalPer100g * defaultQty) / 100)
-          : Math.round(kcalPer100g);
+      const measures = measuresByFood.get(f.id) ?? [];
+      // Para "unid"/"fatia", usa a medida caseira default para descobrir
+      // quantos gramas equivalem a 1 unidade — assim kcal/macros viram reais.
+      const defaultMeasureGrams =
+        measures.find((m) => m.isDefault)?.gramsEquivalent ??
+        measures[0]?.gramsEquivalent ??
+        null;
+      const isMassOrVol = f.default_unit === "g" || f.default_unit === "ml";
+      const gramsPerOne = isMassOrVol
+        ? null
+        : defaultMeasureGrams && defaultQty > 0
+          ? defaultMeasureGrams / defaultQty
+          : null;
+      const portionGrams = isMassOrVol
+        ? defaultQty
+        : defaultMeasureGrams ?? defaultQty;
+      const kcal = Math.round((kcalPer100g * portionGrams) / 100);
       return {
         id: f.id,
         foodKey: f.food_key ?? "frango-grelhado",
@@ -96,6 +110,7 @@ export const listFoods = createServerFn({ method: "GET" })
         fatPer100g: Number(f.fat_g),
         fiberPer100g: Number(f.fiber_g),
         scaleGroup: f.scale_group,
+        gramsPerUnit: gramsPerOne,
         protocols: {
           glutenFree: f.is_gluten_free,
           lactoseFree: f.is_lactose_free,
@@ -104,7 +119,7 @@ export const listFoods = createServerFn({ method: "GET" })
           vegetarian: f.is_vegetarian,
           vegan: f.is_vegan,
         },
-        householdMeasures: measuresByFood.get(f.id) ?? [],
+        householdMeasures: measures,
       };
     });
   });
