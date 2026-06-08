@@ -6,10 +6,11 @@ import {
   listProfessionals,
   upsertProfessionalSubscription,
   adminUpdateNutritionist,
+  setNutritionistPlanTier,
   type AdminNutritionistRow,
   type NutriPlanTier,
 } from "@/lib/admin/admin.functions";
-import { Pencil } from "lucide-react";
+import { Pencil, Crown, ArrowDownCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
