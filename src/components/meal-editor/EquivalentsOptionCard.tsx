@@ -112,12 +112,33 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
             <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
               Unidade
             </Label>
-            <Input
-              value={value.unit}
-              onChange={(e) => patch({ unit: e.target.value })}
-              disabled={disabled}
-              className="h-8 text-sm"
-            />
+            <div role="radiogroup" aria-label="Unidade" className="flex flex-wrap gap-1">
+              {(() => {
+                const base = ["g", "ml", "unid"];
+                const opts = base.includes(value.unit) ? base : [...base, value.unit];
+                return opts.map((u) => {
+                  const selected = u === value.unit;
+                  return (
+                    <button
+                      key={u}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      disabled={disabled}
+                      onClick={() => patch({ unit: u })}
+                      className={
+                        "px-2 h-8 rounded-md border text-xs font-mono transition-colors " +
+                        (selected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-background text-foreground border-input hover:bg-accent")
+                      }
+                    >
+                      {u}
+                    </button>
+                  );
+                });
+              })()}
+            </div>
           </div>
           <div>
             <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
