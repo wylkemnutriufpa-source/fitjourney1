@@ -161,10 +161,17 @@ function PatientPlanPage() {
 
   const patientName = detail?.fullName ?? "Paciente";
 
-  function publishNew() {
+  function publishFromTemplate() {
     navigate({
       to: "/templates",
       search: { patientId: id, patientName },
+    });
+  }
+
+  function publishWithAI() {
+    navigate({
+      to: "/templates",
+      search: { blank: 1, patientId: id, patientName },
     });
   }
 
