@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyIdentityState, type IdentityStateDTO } from "@/lib/phase2/identity.functions";
-import { BrandLockup } from "@/components/BrandLockup";
+import authBg from "@/assets/auth-bg.mp4.asset.json";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -16,9 +16,6 @@ export const Route = createFileRoute("/app")({
   component: Login,
 });
 
-// Resolve a rota de destino correta a partir da identidade (server-side).
-// Evita flash de UI de nutri para usuário paciente (e vice-versa) entre
-// signIn e o redirect do guard `_authenticated`.
 function pickLandingRoute(identity: IdentityStateDTO): string {
   if (identity.appRoles.includes("admin")) return "/dashboard";
   if (identity.state === "S1") return "/auth/check-email";
@@ -45,7 +42,7 @@ function resolveIdentityWithTimeout(): Promise<IdentityStateDTO> {
 function Login() {
   const navigate = useNavigate();
   const { signIn, session, loading } = useAuth();
-  const [email, setEmail] = useState("wylkem.nutri.ufpa@gmail.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -60,11 +57,6 @@ function Login() {
     resolvingRef.current = false;
   }, [session?.user?.id]);
 
-  // Sessão pré-existente: resolve identidade no servidor antes de navegar.
-  // A resolução é determinística (query por auth_user_id em patients/nutritionists).
-  // Se falhar, é problema de infra/rede — NÃO de identidade. Mostramos erro e
-  // mantemos a sessão; usuário pode recarregar. Nunca deslogamos por isso, nunca
-  // damos fallback para outra área (paciente jamais vai parar em /dashboard).
   useEffect(() => {
     if (!session || resolvedTarget || resolvingRef.current) return;
     resolvingRef.current = true;
@@ -76,9 +68,7 @@ function Login() {
       } catch (err) {
         console.error("[Login] identity resolve failed:", err);
         if (!cancelled) {
-          setError(
-            "Não foi possível validar seu perfil agora (problema de conexão). Recarregue a página.",
-          );
+          setError("Não foi possível validar seu perfil agora (problema de conexão). Recarregue a página.");
         }
       } finally {
         resolvingRef.current = false;
@@ -89,10 +79,7 @@ function Login() {
     };
   }, [session, resolvedTarget]);
 
-
-  if (loading) {
-    return <AuthGateState message="Restaurando sua sessão..." />;
-  }
+  if (loading) return <AuthGateState message="Restaurando sua sessão..." />;
   if (session) {
     if (!resolvedTarget) {
       return (
@@ -127,170 +114,129 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-background text-foreground">
-      <div className="hidden lg:flex flex-col justify-between p-12 bg-sidebar border-r border-border relative overflow-hidden">
-        <div className="relative z-10">
-          <BrandLockup
-            slot="auth-form"
-            wordmarkAs={<Link to="/" className="fj-wordmark leading-none">FitJourney</Link>}
-            onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-          />
-        </div>
+    <div className="relative min-h-screen w-full overflow-hidden bg-black text-foreground">
+      {/* Fullscreen background video */}
+      <video
+        className="absolute inset-0 h-full w-full object-cover"
+        src={authBg.url}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+      />
+      {/* Overlay para legibilidade — escurece sobretudo a parte inferior */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/85" />
 
+      {/* Conteúdo */}
+      <div className="relative z-10 flex min-h-screen flex-col">
+        {/* Header */}
+        <header className="flex items-center justify-between px-5 pt-6 sm:px-8 sm:pt-8">
+          <Link to="/" className="fj-wordmark text-lg leading-none text-white">
+            FitJourney
+          </Link>
+          <Link
+            to="/signup/nutritionist"
+            className="text-[11px] font-mono uppercase tracking-widest text-white/80 hover:text-white"
+          >
+            Criar conta
+          </Link>
+        </header>
 
-        <div className="space-y-6 relative z-10">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-primary">
-            Performance / Nutrition / Lab
-          </p>
-          <h1 className="text-5xl font-bold tracking-tighter leading-[0.95]">
-            Anamnese clínica.
-            <br />
-            <span className="italic text-muted-foreground">Plano cirúrgico.</span>
-          </h1>
-          <p className="text-sm text-muted-foreground max-w-md">
-            Métricas metabólicas calculadas em segundos, templates editáveis e
-            substituições equivalentes que se atualizam em tempo real.
-          </p>
-        </div>
+        {/* Spacer empurra o form para a área dos "quadrados" do vídeo */}
+        <div className="flex-1" />
 
-        <div className="relative z-10 space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { k: "TMB", v: "Mifflin-St Jeor", hint: "kcal basais" },
-              { k: "GET", v: "Fator atividade", hint: "kcal × PAL" },
-              { k: "TDEE", v: "Objetivo final", hint: "déficit / superávit" },
-            ].map((m) => (
-              <div
-                key={m.k}
-                className="group relative border border-border/80 rounded-lg p-3 bg-gradient-to-br from-surface/80 to-surface/30 backdrop-blur-sm hover:border-primary/50 transition-colors overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <p className="relative text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
-                  {m.v}
-                </p>
-                <p className="relative text-lg font-bold font-mono mt-1 bg-gradient-to-br from-foreground to-primary bg-clip-text text-transparent">
-                  {m.k}
-                </p>
-                <p className="relative text-[9px] font-mono text-muted-foreground/70 mt-0.5">
-                  {m.hint}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center justify-between border-t border-border/60 pt-4">
-            <div className="flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                Sistema soberano · v3
+        {/* Card do login sobreposto */}
+        <div className="px-4 pb-8 sm:px-6 sm:pb-12">
+          <form
+            onSubmit={submit}
+            className="mx-auto w-full max-w-sm space-y-4 rounded-2xl border border-white/15 bg-black/55 p-5 backdrop-blur-xl shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)] sm:p-6"
+          >
+            <div className="space-y-1">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-white/60">
+                Acesso
               </p>
+              <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+                Entrar no painel
+              </h2>
             </div>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
-              Snapshot imutável
-            </p>
-          </div>
-        </div>
 
-        <div className="absolute -bottom-32 -right-32 size-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -top-24 -left-24 size-72 rounded-full bg-[var(--gold)]/5 blur-3xl" />
-      </div>
-
-      <div className="flex items-start sm:items-center justify-center px-5 sm:px-6 py-8 sm:py-12">
-        <form onSubmit={submit} className="w-full max-w-sm space-y-6 sm:space-y-7">
-          <div className="lg:hidden -mt-2 mb-4 flex justify-center">
-            <BrandLockup
-              slot="auth-hero"
-              wordmarkAs={<Link to="/" className="fj-wordmark leading-none">FitJourney</Link>}
-              onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
-            />
-          </div>
-
-          <div>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Acesso
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mt-2">Entrar no painel</h2>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-              Email
-            </label>
-            <input
-              required
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-surface border border-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-primary"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-              Senha
-            </label>
-            <div className="relative">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-mono uppercase tracking-widest text-white/60">
+                Email
+              </label>
               <input
                 required
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-surface border border-border rounded-md px-3 py-2.5 pr-10 text-sm focus:outline-none focus:border-primary"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@email.com"
+                className="w-full rounded-md border border-white/15 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-primary focus:outline-none"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                tabIndex={-1}
-                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-              </button>
             </div>
-          </div>
 
-          <div className="flex items-center justify-between -mt-3">
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="size-4 rounded border-border bg-surface text-primary focus:ring-primary accent-primary"
-              />
-              <span className="text-xs text-muted-foreground">Manter conectado</span>
-            </label>
-            <Link
-              to="/forgot-password"
-              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-mono uppercase tracking-widest text-white/60">
+                Senha
+              </label>
+              <div className="relative">
+                <input
+                  required
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-md border border-white/15 bg-white/5 px-3 py-2.5 pr-10 text-sm text-white placeholder:text-white/40 focus:border-primary focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  tabIndex={-1}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-white/60 hover:text-white"
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex cursor-pointer select-none items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="size-4 rounded border-white/30 bg-white/10 accent-primary"
+                />
+                <span className="text-xs text-white/70">Manter conectado</span>
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-xs text-white/70 hover:text-white"
+              >
+                Esqueci senha
+              </Link>
+            </div>
+
+            {error && (
+              <p className="rounded border border-destructive/40 bg-destructive/15 px-3 py-2 text-xs font-mono text-destructive-foreground">
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
-              Esqueci minha senha
-            </Link>
-          </div>
-
-          {error && (
-            <p className="text-xs font-mono text-destructive bg-destructive/10 border border-destructive/30 rounded px-3 py-2">
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-primary text-primary-foreground rounded-md py-3 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-60"
-          >
-            {submitting ? <Loader2 className="size-4 animate-spin" /> : <Activity className="size-4" />}
-            Entrar
-          </button>
-
-          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60 text-center">
-            Novo aqui?{" "}
-            <Link to="/signup/nutritionist" className="text-primary hover:underline">
-              Criar conta de nutricionista
-            </Link>
-          </p>
-        </form>
+              {submitting ? <Loader2 className="size-4 animate-spin" /> : <Activity className="size-4" />}
+              Entrar
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
