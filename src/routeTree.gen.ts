@@ -26,6 +26,7 @@ import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
 import { Route as AuthenticatedTemplatesV2EditorRouteImport } from './routes/_authenticated/templates-v2-editor'
 import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedProtocolosRouteImport } from './routes/_authenticated/protocolos'
 import { Route as AuthenticatedMyPlanV2PreviewRouteImport } from './routes/_authenticated/my-plan-v2-preview'
 import { Route as AuthenticatedMyPlanRouteImport } from './routes/_authenticated/my-plan'
 import { Route as AuthenticatedMyDashboardRouteImport } from './routes/_authenticated/my-dashboard'
@@ -139,6 +140,11 @@ const AuthenticatedTemplatesRoute = AuthenticatedTemplatesRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProtocolosRoute = AuthenticatedProtocolosRouteImport.update({
+  id: '/protocolos',
+  path: '/protocolos',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedMyPlanV2PreviewRoute =
@@ -324,6 +330,7 @@ export interface FileRoutesByFullPath {
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
+  '/protocolos': typeof AuthenticatedProtocolosRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
@@ -371,6 +378,7 @@ export interface FileRoutesByTo {
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
+  '/protocolos': typeof AuthenticatedProtocolosRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
@@ -420,6 +428,7 @@ export interface FileRoutesById {
   '/_authenticated/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/_authenticated/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/_authenticated/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
+  '/_authenticated/protocolos': typeof AuthenticatedProtocolosRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/_authenticated/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
@@ -469,6 +478,7 @@ export interface FileRouteTypes {
     | '/my-dashboard'
     | '/my-plan'
     | '/my-plan-v2-preview'
+    | '/protocolos'
     | '/settings'
     | '/templates'
     | '/templates-v2-editor'
@@ -516,6 +526,7 @@ export interface FileRouteTypes {
     | '/my-dashboard'
     | '/my-plan'
     | '/my-plan-v2-preview'
+    | '/protocolos'
     | '/settings'
     | '/templates'
     | '/templates-v2-editor'
@@ -564,6 +575,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-dashboard'
     | '/_authenticated/my-plan'
     | '/_authenticated/my-plan-v2-preview'
+    | '/_authenticated/protocolos'
     | '/_authenticated/settings'
     | '/_authenticated/templates'
     | '/_authenticated/templates-v2-editor'
@@ -731,6 +743,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/protocolos': {
+      id: '/_authenticated/protocolos'
+      path: '/protocolos'
+      fullPath: '/protocolos'
+      preLoaderRoute: typeof AuthenticatedProtocolosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/my-plan-v2-preview': {
@@ -990,6 +1009,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMyDashboardRoute: typeof AuthenticatedMyDashboardRoute
   AuthenticatedMyPlanRoute: typeof AuthenticatedMyPlanRouteWithChildren
   AuthenticatedMyPlanV2PreviewRoute: typeof AuthenticatedMyPlanV2PreviewRoute
+  AuthenticatedProtocolosRoute: typeof AuthenticatedProtocolosRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
   AuthenticatedTemplatesV2EditorRoute: typeof AuthenticatedTemplatesV2EditorRoute
@@ -1013,6 +1033,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMyDashboardRoute: AuthenticatedMyDashboardRoute,
   AuthenticatedMyPlanRoute: AuthenticatedMyPlanRouteWithChildren,
   AuthenticatedMyPlanV2PreviewRoute: AuthenticatedMyPlanV2PreviewRoute,
+  AuthenticatedProtocolosRoute: AuthenticatedProtocolosRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
   AuthenticatedTemplatesV2EditorRoute: AuthenticatedTemplatesV2EditorRoute,
