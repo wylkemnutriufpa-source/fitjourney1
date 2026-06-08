@@ -124,6 +124,19 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
           "Foco inicial em estimular a produção natural de GLP-1 e criar hábitos de alta saciedade.",
         dailyKcalTarget: 1550,
         macros: { protein: 40, carb: 35, fat: 25 },
+        specialFeature: {
+          name: "Tempero da Saciedade Fit GLP",
+          description:
+            "Mistura especial anti-inflamatória e estimulante natural de GLP-1, exclusiva do protocolo Fit GLP.",
+          recipe:
+            "1 colher de chá de cúrcuma + ½ colher de chá de gengibre em pó + ½ colher de chá de canela Ceylon + pitada de pimenta preta (opcional: raspa de limão).",
+          usage:
+            "Adicionar 1 colher de chá da mistura em pelo menos 2 refeições principais do dia (almoço e jantar).",
+          benefits:
+            "Aumenta saciedade, reduz inflamação e potencializa o efeito natural do GLP-1. A pimenta preta aumenta a absorção da cúrcuma.",
+          notes:
+            "Preparar a mistura para 1 semana e guardar em pote de vidro fechado, longe da luz.",
+        },
         teaSchedule: [
           { time: "07:30", name: "Chá de gengibre + limão + cúrcuma", benefits: "Anti-inflamatório e estimulante de GLP-1" },
           { time: "15:00", name: "Chá verde", benefits: "Melhora sensibilidade à insulina" },
