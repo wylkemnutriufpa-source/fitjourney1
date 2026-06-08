@@ -18,6 +18,7 @@ import {
   Flame,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { emojiForFood } from "@/lib/food-emojis";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import {
   listMyActiveProtocols,
