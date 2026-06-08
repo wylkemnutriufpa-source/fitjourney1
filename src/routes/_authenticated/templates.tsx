@@ -2214,11 +2214,7 @@ function FoodItemRow({
                 </label>
                 <label className="block text-xs text-muted-foreground">
                   Unidade
-                  <Input
-                    value={item.unit}
-                    onChange={(e) => updatePortion({ unit: e.target.value })}
-                    className="mt-1 h-10 text-sm"
-                  />
+                  <div className="mt-1">{unitSelect}</div>
                 </label>
               </div>
               <label className="block text-xs text-muted-foreground">
