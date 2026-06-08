@@ -18,6 +18,7 @@ import {
   Flame,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { emojiForFood } from "@/lib/food-emojis";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import {
   listMyActiveProtocols,
@@ -221,6 +222,9 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
         aria-expanded={open}
         disabled={!hasSubs}
       >
+        <span className="inline-flex size-9 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] text-lg shrink-0" aria-hidden>
+          {emojiForFood(item.name)}
+        </span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
           <p className="text-[11px] text-muted-foreground">
@@ -250,7 +254,8 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
                 key={`${s.foodKey}-${i}`}
                 className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/60 px-2 py-1.5 text-xs"
               >
-                <div className="min-w-0">
+                <div className="min-w-0 flex items-baseline gap-1.5">
+                  <span aria-hidden>{emojiForFood(s.name)}</span>
                   <span className="font-medium text-foreground">{s.name}</span>
                   <span className="text-muted-foreground"> · {s.householdMeasure}</span>
                 </div>
