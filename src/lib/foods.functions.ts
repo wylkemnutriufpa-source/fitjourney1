@@ -26,6 +26,8 @@ export type FoodDTO = {
   fatPer100g: number;
   fiberPer100g: number;
   scaleGroup: string;
+  /** Gramas por 1 unidade quando o alimento é prescrito em "unid"/"fatia". */
+  gramsPerUnit: number | null;
   protocols: {
     glutenFree: boolean;
     lactoseFree: boolean;
