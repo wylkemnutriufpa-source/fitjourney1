@@ -19,8 +19,6 @@ import {
   Info,
   ImageOff,
   Repeat2,
-  ChefHat,
-  Scale,
   ChevronDown,
   ChevronsUpDown,
   ChevronsDownUp,
@@ -30,7 +28,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useId,
   useMemo,
   useState,
 } from "react";
@@ -43,29 +40,8 @@ import {
   getSubstitutionsFor,
   type MealKind,
 } from "@/lib/plans/substitution-rules";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   getPeriod,
   periodLabel,
