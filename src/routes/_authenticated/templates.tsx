@@ -2014,7 +2014,7 @@ function FoodItemRow({
     const clearsMeasure = "qty" in patch || "unit" in patch;
     onChange(withCatalogKcal({
       ...item,
-      ...(clearsMeasure ? { householdMeasure: undefined, gramsEquivalent: undefined } : null),
+      ...(clearsMeasure ? { householdMeasure: undefined, gramsEquivalent: undefined } : {}),
       ...patch,
     }, catalogMatch, item));
   }
@@ -2033,7 +2033,7 @@ function FoodItemRow({
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium truncate">{item.name}</p>
           <p className="text-[10px] text-muted-foreground font-mono">
-            {item.qty} {item.unit} · {item.kcal} kcal
+            {formatFoodPortion(item)} · {item.kcal} kcal
           </p>
         </div>
         <Popover open={infoOpen} onOpenChange={setFoodInfoOpen}>
@@ -2119,7 +2119,7 @@ function FoodItemRow({
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium truncate">{item.name}</p>
             <p className="text-[10px] text-muted-foreground font-mono">
-              {item.qty} {item.unit} · {item.kcal} kcal
+              {formatFoodPortion(item)} · {item.kcal} kcal
             </p>
           </div>
           <button
@@ -2150,7 +2150,7 @@ function FoodItemRow({
             <SheetHeader className="sticky top-0 z-10 bg-background border-b border-border p-4 text-left">
               <SheetTitle className="truncate pr-8">{item.name || "Editar alimento"}</SheetTitle>
               <SheetDescription>
-                {item.qty} {item.unit} · {item.kcal} kcal
+                {formatFoodPortion(item)} · {item.kcal} kcal
               </SheetDescription>
             </SheetHeader>
             <div className="p-4 space-y-3">
