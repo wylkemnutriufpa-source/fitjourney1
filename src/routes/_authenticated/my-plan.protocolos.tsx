@@ -11,8 +11,6 @@ import {
   Clock,
   Droplets,
   Moon,
-  Leaf,
-  CheckCircle2,
   Info,
   ChevronDown,
   Replace,
@@ -20,6 +18,7 @@ import {
   Flame,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import {
   listMyActiveProtocols,
   type ActiveProtocolRow,
@@ -152,37 +151,7 @@ function ActiveProtocolCard({ row }: { row: ActiveProtocolRow }) {
         </section>
       )}
 
-      {phase.recommendations.strategies.length > 0 && (
-        <section className="space-y-1.5">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Estratégias da fase
-          </p>
-          <ul className="space-y-1">
-            {phase.recommendations.strategies.map((s, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm">
-                <CheckCircle2 className="size-3.5 text-[var(--gold)] shrink-0 mt-0.5" />
-                <span>{s}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {phase.recommendations.teaRoutine.length > 0 && (
-        <section className="space-y-1.5">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Rotina de chás
-          </p>
-          <ul className="space-y-1">
-            {phase.recommendations.teaRoutine.map((t, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm">
-                <Leaf className="size-3.5 text-[var(--gold)] shrink-0 mt-0.5" />
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <ProtocolPhaseSections phase={phase} />
     </article>
   );
 }

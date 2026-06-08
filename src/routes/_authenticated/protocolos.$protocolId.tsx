@@ -45,6 +45,7 @@ import {
   type ProtocolPhase,
 } from "@/lib/protocols/catalog";
 import { applyProtocolPhase } from "@/lib/protocols/active.functions";
+import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 
 type PageSearch = { readonly module?: string };
 
@@ -589,43 +590,9 @@ function PhaseDetailsDialog({
             </Section>
           )}
 
-          {/* Estratégias */}
-          {phase.recommendations.strategies.length > 0 && (
-            <Section title="Estratégias-chave">
-              <ul className="space-y-1.5 text-sm">
-                {phase.recommendations.strategies.map((s, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="text-[var(--gold)]">•</span>
-                    <span>{s}</span>
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          )}
+          {/* Estratégias-chave + Rotina de Chás (colapsáveis) */}
+          <ProtocolPhaseSections phase={phase} />
 
-          {/* Chás programados */}
-          {phase.teaSchedule && phase.teaSchedule.length > 0 && (
-            <Section title="Rotina de Chás">
-              <div className="space-y-2">
-                {phase.teaSchedule.map((t, i) => (
-                  <div
-                    key={i}
-                    className="rounded border border-[var(--gold)]/20 bg-background px-3 py-2 text-xs flex flex-col gap-0.5"
-                  >
-                    <div className="flex items-center gap-2">
-                      {t.time && (
-                        <span className="font-mono text-[10px] text-[var(--gold)]">{t.time}</span>
-                      )}
-                      <span className="font-medium">{t.name}</span>
-                    </div>
-                    {t.benefits && (
-                      <span className="text-[11px] text-muted-foreground">{t.benefits}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Section>
-          )}
 
           {/* Cardápio */}
           {phase.meals && phase.meals.length > 0 && (
