@@ -447,6 +447,75 @@ export type Database = {
         }
         Relationships: []
       }
+      patient_active_protocols: {
+        Row: {
+          created_at: string
+          ends_at: string | null
+          id: string
+          last_banner_shown_date: string | null
+          module_id: string
+          module_name: string
+          nutritionist_id: string
+          patient_id: string
+          phase_id: number
+          phase_snapshot: Json
+          protocol_id: string
+          protocol_name: string
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          last_banner_shown_date?: string | null
+          module_id: string
+          module_name: string
+          nutritionist_id: string
+          patient_id: string
+          phase_id: number
+          phase_snapshot: Json
+          protocol_id: string
+          protocol_name: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          last_banner_shown_date?: string | null
+          module_id?: string
+          module_name?: string
+          nutritionist_id?: string
+          patient_id?: string
+          phase_id?: number
+          phase_snapshot?: Json
+          protocol_id?: string
+          protocol_name?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_active_protocols_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_active_protocols_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_consents: {
         Row: {
           accepted_at: string

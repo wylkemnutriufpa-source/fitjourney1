@@ -1,10 +1,11 @@
-// Protocolo IFJ — abertura premium.
-// Guarda-chuva → Módulos → Fases. Aplicar fase abre seletor de paciente.
-// Cardápio detalhado virá em etapa posterior; aqui entregamos a navegação
-// premium e o gancho de aplicação.
+// Abertura premium GENÉRICA — vale para TODOS os protocolos.
+// Guarda-chuva → Módulos → Fases. "Aplicar Fase" abre seletor de paciente
+// e grava em patient_active_protocols (snapshot imutável da fase).
 
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useMutation } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Sparkles,
@@ -32,45 +33,60 @@ import { RealPatientPicker } from "@/components/RealPatientPicker";
 import type { PatientLite } from "@/lib/plans/plans.functions";
 import { toast } from "sonner";
 import {
-  IFJ_PROTOCOL,
-  findIFJModule,
-  type IFJPhase,
-  type IFJModule,
-} from "@/lib/protocols/ifj-catalog";
+  findProtocolById,
+  getProtocolModules,
+  type ProtocolDescriptor,
+  type ProtocolModule,
+  type ProtocolPhase,
+} from "@/lib/protocols/catalog";
+import { applyProtocolPhase } from "@/lib/protocols/active.functions";
 
-type PageSearch = {
-  readonly module?: string;
-};
+type PageSearch = { readonly module?: string };
 
-export const Route = createFileRoute("/_authenticated/protocolos/ifj")({
+export const Route = createFileRoute("/_authenticated/protocolos/$protocolId")({
   validateSearch: (s: Record<string, unknown>): PageSearch => ({
     module: typeof s.module === "string" ? s.module : undefined,
   }),
-  component: IFJProtocolPage,
+  loader: ({ params }) => {
+    const protocol = findProtocolById(params.protocolId);
+    if (!protocol) throw notFound();
+    return { protocol };
+  },
+  component: ProtocolDetailPage,
 });
 
-function IFJProtocolPage() {
+function ProtocolDetailPage() {
+  const { protocol } = Route.useLoaderData();
   const { roles } = useAuth();
   const isAdmin = roles.includes("admin");
-  const hasPremium = isAdmin; // billing real virá depois — admin sempre destranca
 
+  // IFJ é o único exclusivo/premium — demais protocolos abertos para qualquer profissional autenticado.
+  const requiresPremium = !!protocol.exclusive;
+  const hasAccess = !requiresPremium || isAdmin;
+
+  const modules = useMemo(() => getProtocolModules(protocol), [protocol]);
   const { module: moduleId } = Route.useSearch();
   const activeModule = useMemo(
-    () => (moduleId ? findIFJModule(moduleId) : null),
-    [moduleId],
+    () => (moduleId ? modules.find((m) => m.id === moduleId) ?? null : null),
+    [modules, moduleId],
   );
 
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-5xl p-6 space-y-6">
-        <PremiumHeader hasPremium={hasPremium} activeModule={activeModule} />
+        <PremiumHeader
+          protocol={protocol}
+          hasAccess={hasAccess}
+          requiresPremium={requiresPremium}
+          activeModule={activeModule}
+        />
 
-        {!hasPremium ? (
+        {!hasAccess ? (
           <LockedNotice />
         ) : !activeModule ? (
-          <ModulesGrid />
+          <ModulesGrid protocol={protocol} modules={modules} />
         ) : (
-          <PhasesGrid module={activeModule} />
+          <PhasesGrid protocol={protocol} module={activeModule} />
         )}
       </div>
     </AppShell>
@@ -78,45 +94,46 @@ function IFJProtocolPage() {
 }
 
 function PremiumHeader({
-  hasPremium,
+  protocol,
+  hasAccess,
+  requiresPremium,
   activeModule,
 }: {
-  hasPremium: boolean;
-  activeModule: IFJModule | null;
+  protocol: ProtocolDescriptor;
+  hasAccess: boolean;
+  requiresPremium: boolean;
+  activeModule: ProtocolModule | null;
 }) {
   return (
     <header className="space-y-3">
       <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-        <Link
-          to="/protocolos"
-          className="inline-flex items-center gap-1 hover:text-[var(--gold)] transition-colors"
-        >
-          <ArrowLeft className="size-3" />
-          Protocolos
+        <Link to="/protocolos" className="inline-flex items-center gap-1 hover:text-[var(--gold)] transition-colors">
+          <ArrowLeft className="size-3" /> Protocolos
         </Link>
         <span>/</span>
         {activeModule ? (
           <>
             <Link
-              to="/protocolos/ifj"
+              to="/protocolos/$protocolId"
+              params={{ protocolId: protocol.id }}
               className="hover:text-[var(--gold)] transition-colors"
             >
-              IFJ
+              {protocol.name}
             </Link>
             <span>/</span>
             <span className="text-[var(--gold)]">{activeModule.name}</span>
           </>
         ) : (
-          <span className="text-[var(--gold)]">IFJ</span>
+          <span className="text-[var(--gold)]">{protocol.name}</span>
         )}
       </div>
 
       <div className="flex items-center gap-2">
         <Sparkles className="size-4 text-[var(--gold)] animate-pulse" />
         <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] border border-[var(--gold)]/50 rounded px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--gold)_8%,transparent)]">
-          Premium · Exclusivo
+          {requiresPremium ? "Premium · Exclusivo" : "Protocolo"}
         </span>
-        {!hasPremium && (
+        {requiresPremium && !hasAccess && (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-muted-foreground border border-border rounded px-1.5 py-0.5">
             <Lock className="size-3" /> trancado
           </span>
@@ -125,15 +142,12 @@ function PremiumHeader({
 
       <h1
         className="text-3xl font-bold tracking-tight uppercase text-[var(--gold)]"
-        style={{
-          textShadow:
-            "0 0 18px color-mix(in oklab, var(--gold) 35%, transparent)",
-        }}
+        style={{ textShadow: "0 0 18px color-mix(in oklab, var(--gold) 35%, transparent)" }}
       >
-        {activeModule ? activeModule.name : IFJ_PROTOCOL.name}
+        {activeModule ? activeModule.name : protocol.name}
       </h1>
       <p className="text-sm text-muted-foreground max-w-2xl">
-        {activeModule ? activeModule.tagline : IFJ_PROTOCOL.tagline}
+        {activeModule ? activeModule.tagline : protocol.tagline}
       </p>
     </header>
   );
@@ -143,28 +157,30 @@ function LockedNotice() {
   return (
     <div className="rounded-lg border border-[var(--gold)]/30 bg-surface p-8 text-center space-y-3 animate-fade-in">
       <Lock className="size-8 text-[var(--gold)] mx-auto" />
-      <h2 className="text-lg font-semibold text-[var(--gold)] uppercase tracking-wide">
-        Conteúdo Premium
-      </h2>
+      <h2 className="text-lg font-semibold text-[var(--gold)] uppercase tracking-wide">Conteúdo Premium</h2>
       <p className="text-sm text-muted-foreground max-w-md mx-auto">
-        O Protocolo IFJ é exclusivo para assinantes Premium. Em breve você
-        poderá liberar acesso direto por aqui.
+        Este protocolo é exclusivo para assinantes Premium. Em breve você poderá liberar acesso direto por aqui.
       </p>
     </div>
   );
 }
 
-function ModulesGrid() {
+function ModulesGrid({
+  protocol,
+  modules,
+}: {
+  protocol: ProtocolDescriptor;
+  modules: ReadonlyArray<ProtocolModule>;
+}) {
   return (
     <section className="space-y-4 animate-fade-in">
-      <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-        Módulos do IFJ
-      </h2>
+      <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Fases / Módulos</h2>
       <div className="grid gap-3 sm:grid-cols-2">
-        {IFJ_PROTOCOL.modules.map((m) => (
+        {modules.map((m) => (
           <Link
             key={m.id}
-            to="/protocolos/ifj"
+            to="/protocolos/$protocolId"
+            params={{ protocolId: protocol.id }}
             search={{ module: m.id }}
             className="group relative overflow-hidden rounded-lg border border-[var(--gold)]/30 bg-surface p-5 flex flex-col gap-3 hover:border-[var(--gold)]/70 transition-colors shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)]"
           >
@@ -179,10 +195,7 @@ function ModulesGrid() {
             <div className="relative">
               <p
                 className="text-base font-bold uppercase tracking-wide text-[var(--gold)]"
-                style={{
-                  textShadow:
-                    "0 0 12px color-mix(in oklab, var(--gold) 35%, transparent)",
-                }}
+                style={{ textShadow: "0 0 12px color-mix(in oklab, var(--gold) 35%, transparent)" }}
               >
                 {m.name}
               </p>
@@ -190,7 +203,7 @@ function ModulesGrid() {
             </div>
             <div className="relative mt-auto pt-3 border-t border-[var(--gold)]/15 flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase text-muted-foreground">
-                {m.phases.length} fases
+                {m.phases.length} {m.phases.length === 1 ? "fase" : "fases"}
               </span>
               <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-[var(--gold)] group-hover:translate-x-0.5 transition-transform">
                 abrir <ChevronRight className="size-3" />
@@ -203,14 +216,17 @@ function ModulesGrid() {
   );
 }
 
-function PhasesGrid({ module: m }: { module: IFJModule }) {
-  const [applyPhase, setApplyPhase] = useState<IFJPhase | null>(null);
-
+function PhasesGrid({
+  protocol,
+  module: m,
+}: {
+  protocol: ProtocolDescriptor;
+  module: ProtocolModule;
+}) {
+  const [applyPhase, setApplyPhase] = useState<ProtocolPhase | null>(null);
   return (
     <section className="space-y-4 animate-fade-in">
-      <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-        Fases do módulo
-      </h2>
+      <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Fases</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {m.phases.map((p) => (
           <PhaseCard key={p.id} phase={p} onApply={() => setApplyPhase(p)} />
@@ -218,21 +234,16 @@ function PhasesGrid({ module: m }: { module: IFJModule }) {
       </div>
 
       <ApplyPhaseDialog
+        protocol={protocol}
+        module={m}
         phase={applyPhase}
-        moduleName={m.name}
         onClose={() => setApplyPhase(null)}
       />
     </section>
   );
 }
 
-function PhaseCard({
-  phase,
-  onApply,
-}: {
-  phase: IFJPhase;
-  onApply: () => void;
-}) {
+function PhaseCard({ phase, onApply }: { phase: ProtocolPhase; onApply: () => void }) {
   return (
     <div className="group relative overflow-hidden rounded-lg border border-[var(--gold)]/25 bg-surface p-4 flex flex-col gap-3 hover:border-[var(--gold)]/60 transition-colors">
       <Sparkles
@@ -242,10 +253,7 @@ function PhaseCard({
       <div className="relative space-y-1.5">
         <p
           className="text-sm font-bold uppercase tracking-wide text-[var(--gold)] leading-tight"
-          style={{
-            textShadow:
-              "0 0 10px color-mix(in oklab, var(--gold) 30%, transparent)",
-          }}
+          style={{ textShadow: "0 0 10px color-mix(in oklab, var(--gold) 30%, transparent)" }}
         >
           {phase.name}
         </p>
@@ -254,13 +262,9 @@ function PhaseCard({
             <Clock className="size-3" />
             {phase.durationWeeks} sem.
           </span>
-          {phase.dailyKcalTarget && (
-            <span>{phase.dailyKcalTarget} kcal/dia</span>
-          )}
+          {phase.dailyKcalTarget && <span>{phase.dailyKcalTarget} kcal/dia</span>}
         </div>
-        <p className="text-xs text-muted-foreground pt-1">
-          {phase.description}
-        </p>
+        <p className="text-xs text-muted-foreground pt-1">{phase.description}</p>
       </div>
 
       <div className="relative grid grid-cols-3 gap-2 text-[10px] font-mono text-muted-foreground border-t border-[var(--gold)]/15 pt-3">
@@ -290,31 +294,46 @@ function PhaseCard({
 }
 
 function ApplyPhaseDialog({
+  protocol,
+  module: m,
   phase,
-  moduleName,
   onClose,
 }: {
-  phase: IFJPhase | null;
-  moduleName: string;
+  protocol: ProtocolDescriptor;
+  module: ProtocolModule;
+  phase: ProtocolPhase | null;
   onClose: () => void;
 }) {
   const [patient, setPatient] = useState<PatientLite | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  const apply = useServerFn(applyProtocolPhase);
   const open = !!phase;
 
-  const handleApply = () => {
-    if (!patient || !phase) return;
-    // Persistência do cardápio virá na próxima etapa (snapshot V3 completo).
-    // Por enquanto: registramos a intenção e damos feedback claro.
-    toast.success(
-      `${phase.name} marcada para ${patient.fullName}. Cardápio será detalhado na próxima etapa.`,
-    );
-    setDone(patient.fullName);
-  };
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (!patient || !phase) throw new Error("Selecione um paciente");
+      return apply({
+        data: {
+          patientId: patient.id,
+          protocolId: protocol.id,
+          moduleId: m.id,
+          phaseId: phase.id,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success(`${phase!.name} atribuída a ${patient!.fullName}.`);
+      setDone(patient!.fullName);
+    },
+    onError: (err) => {
+      toast.error(`Falha ao aplicar fase: ${(err as Error).message}`);
+    },
+  });
 
   const reset = () => {
     setPatient(null);
     setDone(null);
+    mutation.reset();
     onClose();
   };
 
@@ -323,11 +342,10 @@ function ApplyPhaseDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-[var(--gold)] uppercase tracking-wide">
-            <Sparkles className="size-4" />
-            Aplicar Fase
+            <Sparkles className="size-4" /> Aplicar Fase
           </DialogTitle>
           <DialogDescription>
-            {moduleName} · {phase?.name}
+            {protocol.name} · {m.name} · {phase?.name}
           </DialogDescription>
         </DialogHeader>
 
@@ -335,15 +353,14 @@ function ApplyPhaseDialog({
           <div className="py-4 flex items-center gap-3 text-sm">
             <CheckCircle2 className="size-5 text-emerald-400" />
             <span>
-              Fase atribuída a <strong>{done}</strong>.
+              Fase atribuída a <strong>{done}</strong>. Ele(a) verá no app em "Protocolos Ativos".
             </span>
           </div>
         ) : (
           <div className="py-2 space-y-3">
             <RealPatientPicker value={patient} onChange={setPatient} />
             <p className="text-[11px] text-muted-foreground">
-              O cardápio completo desta fase ainda será definido — esta etapa
-              registra apenas a intenção clínica.
+              O paciente passa a ver esta fase em "Protocolos Ativos" e recebe um banner diário com as recomendações.
             </p>
           </div>
         )}
@@ -353,11 +370,12 @@ function ApplyPhaseDialog({
             <Button onClick={reset}>Fechar</Button>
           ) : (
             <>
-              <Button variant="outline" onClick={reset}>
+              <Button variant="outline" onClick={reset} disabled={mutation.isPending}>
                 Cancelar
               </Button>
-              <Button disabled={!patient} onClick={handleApply}>
-                <Send className="size-4" /> Aplicar
+              <Button disabled={!patient || mutation.isPending} onClick={() => mutation.mutate()}>
+                <Send className="size-4" />
+                {mutation.isPending ? "Aplicando…" : "Aplicar"}
               </Button>
             </>
           )}
