@@ -326,7 +326,7 @@ function Landing() {
             </button>
             <Link
               to="/app"
-              className="px-3 py-1.5 text-xs font-semibold rounded-full border border-border/60 bg-card/40 text-foreground"
+              className="hidden min-[420px]:inline-flex px-3 py-1.5 text-xs font-semibold rounded-full border border-border/60 bg-card/40 text-foreground"
             >
               Entrar
             </Link>
