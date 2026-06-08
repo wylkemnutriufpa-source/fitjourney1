@@ -58,7 +58,7 @@ function AnamnesisDetailPage() {
 
   const [notes, setNotes] = useState<string>("");
   const [actionError, setActionError] = useState<string | null>(null);
-  const [postApprove, setPostApprove] = useState<{ patientId: string } | null>(null);
+  const [postApprove, setPostApprove] = useState<{ patientId: string; patientName: string } | null>(null);
 
   const mut = useMutation({
     mutationFn: (decision: "approved" | "needs_changes") =>
