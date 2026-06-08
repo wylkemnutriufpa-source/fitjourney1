@@ -4,8 +4,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { ClipboardList, ChevronRight, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ClipboardList, ChevronRight, AlertCircle, CheckCircle2, Loader2, CheckSquare, Square } from "lucide-react";
 import { toast } from "sonner";
 import { listAnamnesesForNutritionist, reviewAnamnesis } from "@/lib/anamnesis/review.functions";
 import { AppShell } from "@/components/AppShell";
@@ -44,6 +44,9 @@ function fmtDate(iso: string | null) {
 
 function AnamnesesQueuePage() {
   const [status, setStatus] = useState<StatusFilter>("submitted");
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const [bulkRunning, setBulkRunning] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number } | null>(null);
   const fetchList = useServerFn(listAnamnesesForNutritionist);
   const reviewFn = useServerFn(reviewAnamnesis);
   const queryClient = useQueryClient();
@@ -54,6 +57,19 @@ function AnamnesesQueuePage() {
     staleTime: 15_000,
   });
 
+  const approvableItems = useMemo(
+    () =>
+      (data?.items ?? []).filter(
+        (it) => it.reviewStatus === "submitted" || it.reviewStatus === "needs_changes",
+      ),
+    [data],
+  );
+
+  // Limpa seleção quando muda de aba ou lista muda
+  useEffect(() => {
+    setSelected(new Set());
+  }, [status, data?.items.length]);
+
   const approveMut = useMutation({
     mutationFn: (anamnesisId: string) =>
       reviewFn({ data: { anamnesisId, decision: "approved" } }),
@@ -63,6 +79,53 @@ function AnamnesesQueuePage() {
     },
     onError: (e: Error) => toast.error(e.message ?? "Falha ao aprovar"),
   });
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selected.size === approvableItems.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(approvableItems.map((it) => it.id)));
+    }
+  }
+
+  async function bulkApprove(ids: string[]) {
+    if (ids.length === 0 || bulkRunning) return;
+    const confirmMsg =
+      ids.length === approvableItems.length && ids.length > selected.size
+        ? `Aprovar TODAS as ${ids.length} anamneses desta lista?\n\nA aprovação é imutável e dispara os alertas clínicos no app do paciente.`
+        : `Aprovar ${ids.length} anamnese${ids.length > 1 ? "s" : ""} selecionada${ids.length > 1 ? "s" : ""}?\n\nA aprovação é imutável e dispara os alertas clínicos no app do paciente.`;
+    if (!window.confirm(confirmMsg)) return;
+
+    setBulkRunning(true);
+    setBulkProgress({ done: 0, total: ids.length });
+    let ok = 0;
+    let fail = 0;
+    for (const id of ids) {
+      try {
+        await reviewFn({ data: { anamnesisId: id, decision: "approved" } });
+        ok += 1;
+      } catch (e) {
+        fail += 1;
+        console.error("[bulk approve]", id, e);
+      }
+      setBulkProgress({ done: ok + fail, total: ids.length });
+    }
+    setBulkRunning(false);
+    setBulkProgress(null);
+    setSelected(new Set());
+    await queryClient.invalidateQueries({ queryKey: ["nutri", "anamneses"] });
+    if (fail === 0) toast.success(`${ok} anamnese${ok > 1 ? "s" : ""} aprovada${ok > 1 ? "s" : ""}.`);
+    else toast.error(`${ok} aprovada(s), ${fail} falharam.`);
+  }
 
   return (
     <AppShell>
@@ -123,13 +186,82 @@ function AnamnesesQueuePage() {
           </div>
         )}
 
+        {approvableItems.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 rounded-lg border border-border bg-surface p-3">
+            <button
+              type="button"
+              onClick={toggleSelectAll}
+              disabled={bulkRunning}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground hover:text-primary disabled:opacity-60"
+            >
+              {selected.size === approvableItems.length ? (
+                <CheckSquare className="size-4 text-primary" />
+              ) : (
+                <Square className="size-4" />
+              )}
+              {selected.size === approvableItems.length ? "Desmarcar todas" : "Selecionar todas"}
+            </button>
+            <span className="text-xs text-muted-foreground">
+              {selected.size} de {approvableItems.length} selecionada{approvableItems.length === 1 ? "" : "s"}
+            </span>
+            <div className="ml-auto flex items-center gap-2">
+              {bulkProgress && (
+                <span className="text-[11px] font-mono text-muted-foreground">
+                  {bulkProgress.done}/{bulkProgress.total}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => bulkApprove(Array.from(selected))}
+                disabled={bulkRunning || selected.size === 0}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold border border-emerald-600/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {bulkRunning ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCircle2 className="size-3.5" />}
+                Aprovar selecionadas
+              </button>
+              <button
+                type="button"
+                onClick={() => bulkApprove(approvableItems.map((it) => it.id))}
+                disabled={bulkRunning}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+              >
+                {bulkRunning ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCircle2 className="size-3.5" />}
+                Aprovar todas ({approvableItems.length})
+              </button>
+            </div>
+          </div>
+        )}
+
         <ul className="space-y-2">
-          {(data?.items ?? []).map((item) => (
-                      <li key={item.id} className="relative">
+          {(data?.items ?? []).map((item) => {
+            const isApprovable =
+              item.reviewStatus === "submitted" || item.reviewStatus === "needs_changes";
+            const isSelected = selected.has(item.id);
+            return (
+              <li key={item.id} className="relative">
+                {isApprovable && (
+                  <button
+                    type="button"
+                    onClick={() => toggleSelect(item.id)}
+                    disabled={bulkRunning}
+                    aria-label={isSelected ? "Desmarcar" : "Selecionar"}
+                    className="absolute left-3 top-4 z-10 inline-flex items-center justify-center size-5 rounded border border-border bg-background hover:border-primary disabled:opacity-50"
+                  >
+                    {isSelected ? (
+                      <CheckSquare className="size-4 text-primary" />
+                    ) : (
+                      <Square className="size-4 text-muted-foreground" />
+                    )}
+                  </button>
+                )}
               <Link
                 to="/anamneses/$id"
                 params={{ id: item.id }}
-                className="block rounded-lg border border-border hover:border-primary/50 transition-colors p-4 pr-4 sm:pr-44"
+                className={
+                  "block rounded-lg border transition-colors p-4 pr-4 sm:pr-44 " +
+                  (isSelected ? "border-primary/60 bg-primary/5" : "border-border hover:border-primary/50") +
+                  (isApprovable ? " pl-10" : "")
+                }
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
@@ -220,8 +352,9 @@ function AnamnesesQueuePage() {
                   Aprovar
                 </button>
               )}
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </AppShell>
