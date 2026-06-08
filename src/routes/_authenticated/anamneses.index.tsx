@@ -348,8 +348,9 @@ function AnamnesesQueuePage() {
                   Aprovar
                 </button>
               )}
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </AppShell>
