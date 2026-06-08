@@ -174,10 +174,39 @@ function ProfessionalsPage() {
                     )}
                   </td>
                   <td className="px-4 py-2 text-right">
-                    <Button size="sm" variant="outline" onClick={() => setEditing(n)}>
-                      <Pencil className="h-3.5 w-3.5 mr-1" />
-                      Editar
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      {sub?.plan_tier === "pro" ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={tierMut.isPending}
+                          onClick={() =>
+                            tierMut.mutate({ nutritionist_id: n.id, plan_tier: "basic" })
+                          }
+                          title="Voltar para BASIC"
+                        >
+                          <ArrowDownCircle className="h-3.5 w-3.5 mr-1" />
+                          Basic
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          disabled={tierMut.isPending}
+                          onClick={() =>
+                            tierMut.mutate({ nutritionist_id: n.id, plan_tier: "pro" })
+                          }
+                          className="bg-amber-500/90 hover:bg-amber-500 text-background"
+                          title="Upgrade manual para PRO"
+                        >
+                          <Crown className="h-3.5 w-3.5 mr-1" />
+                          Upgrade PRO
+                        </Button>
+                      )}
+                      <Button size="sm" variant="outline" onClick={() => setEditing(n)}>
+                        <Pencil className="h-3.5 w-3.5 mr-1" />
+                        Editar
+                      </Button>
+                    </div>
                   </td>
 
                 </tr>
