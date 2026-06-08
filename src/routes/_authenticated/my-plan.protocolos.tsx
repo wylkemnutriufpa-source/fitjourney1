@@ -237,9 +237,9 @@ function MealCard({ meal }: { meal: PhaseMeal }) {
 }
 
 function FoodRow({ item }: { item: PhaseMealItem }) {
-  const [open, setOpen] = useState(false);
   const subs = item.substitutions ?? [];
   const hasSubs = subs.length > 0;
+  const [open, setOpen] = useState(hasSubs);
   return (
     <div className="rounded-lg border border-border/60 bg-surface/40 first:mt-2">
       <button
@@ -262,7 +262,7 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
         {hasSubs && (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-[var(--gold)]/80 shrink-0">
             <Replace className="size-3" />
-            {subs.length} sub
+            {subs.length} substituições
             <ChevronDown
               className={cn("size-3 transition-transform", open && "rotate-180")}
             />
