@@ -24,7 +24,14 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
   const [imgError, setImgError] = useState(false);
   const imgSrc = imgFor(value.imageSlug ?? value.foodKey, value.name);
 
-  const patch = (p: Partial<MaterializedEquivalentOption>) => onChange({ ...value, ...p });
+  const patch = (p: Partial<MaterializedEquivalentOption>) => {
+    const clearsMeasure = "qty" in p || "unit" in p;
+    onChange({
+      ...value,
+      ...(clearsMeasure ? { householdMeasure: undefined, gramsEquivalent: undefined } : {}),
+      ...p,
+    });
+  };
 
   return (
     <div className="group/card flex gap-3 rounded-lg border border-border bg-card p-3 shadow-sm transition-all hover:border-primary/40 hover:shadow-md">
@@ -64,6 +71,12 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
             className="h-8 min-w-0 flex-1 basis-full text-sm font-medium sm:basis-auto"
             aria-label="Nome do equivalente"
           />
+          {value.householdMeasure ? (
+            <p className="basis-full text-[11px] text-muted-foreground">
+              Medida caseira: <span className="text-foreground">{value.householdMeasure}</span>
+              <span className="font-mono"> · {value.qty} {value.unit}</span>
+            </p>
+          ) : null}
           {onSwap ? (
             <Button
               type="button"
