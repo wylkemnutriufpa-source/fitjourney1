@@ -340,12 +340,9 @@ function PlanMeals({
     return ids;
   }, [meals]);
 
-  const [openMeals, setOpenMeals] = useState<Set<string>>(() => {
-    const saved = loadSet(`${storageKey}:meals`);
-    if (saved.size > 0) return saved;
-    // padrão: primeira refeição aberta
-    return new Set(allMealIds.slice(0, 1));
-  });
+  const [openMeals, setOpenMeals] = useState<Set<string>>(() =>
+    loadSet(`${storageKey}:meals`),
+  );
   const [openItems, setOpenItems] = useState<Set<string>>(() =>
     loadSet(`${storageKey}:items`),
   );
