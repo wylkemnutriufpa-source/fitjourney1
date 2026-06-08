@@ -67,16 +67,36 @@ function inferScaleGroup(item: PhaseMealItem): ScaleGroup {
 let _uid = 0;
 const nid = (p: string) => `${p}-${Date.now().toString(36)}-${++_uid}`;
 
+const TACO_CATALOG_VERSION = "taco-4ed-2025-06";
+
 function toFoodItem(it: PhaseMealItem): PlannerFoodItem {
-  return {
+  const scaleGroup = inferScaleGroup(it);
+  const item: PlannerFoodItem = {
     id: nid("food"),
     foodKey: it.foodKey,
     name: it.name,
     qty: it.quantityG,
     unit: "g",
     kcal: it.kcal,
-    scaleGroup: inferScaleGroup(it),
+    scaleGroup,
   };
+  if (it.substitutions && it.substitutions.length > 0) {
+    item.materializedEquivalents = {
+      criterion: "auto",
+      generatedAt: new Date(0).toISOString(),
+      catalogVersion: TACO_CATALOG_VERSION,
+      options: it.substitutions.map((s) => ({
+        foodKey: s.foodKey,
+        name: s.name,
+        scaleGroup,
+        qty: s.quantityG,
+        unit: "g",
+        kcal: s.kcal,
+        imageSlug: s.foodKey,
+      })),
+    };
+  }
+  return item;
 }
 
 export function protocolPhaseToPlannerTemplate(
