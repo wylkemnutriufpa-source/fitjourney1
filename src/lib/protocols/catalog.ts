@@ -98,19 +98,80 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
     phases: [
       {
         id: 1,
-        name: "Fase 1 — Aceleração de Saciedade",
+        name: "Fase 1 — Ativação de Saciedade",
         durationWeeks: 3,
         description:
-          "Estimula GLP-1 naturalmente, reduz apetite e prepara o eixo intestino-cérebro.",
+          "Foco inicial em estimular a produção natural de GLP-1 e criar hábitos de alta saciedade.",
         dailyKcalTarget: 1550,
+        macros: { protein: 40, carb: 35, fat: 25 },
+        teaSchedule: [
+          { time: "07:30", name: "Chá de gengibre + limão + cúrcuma", benefits: "Anti-inflamatório e estimulante de GLP-1" },
+          { time: "15:00", name: "Chá verde", benefits: "Melhora sensibilidade à insulina" },
+        ],
+        meals: [
+          {
+            id: "cafe_manha",
+            name: "Café da Manhã",
+            time: "07:00",
+            totalKcal: 380,
+            items: [
+              { foodKey: "aveia", name: "Aveia", quantityG: 40, householdMeasure: "4 colheres de sopa cheias", kcal: 150 },
+              { foodKey: "whey", name: "Whey Protein Isolado", quantityG: 25, householdMeasure: "1 scoop", kcal: 100 },
+              { foodKey: "maca", name: "Maçã com casca", quantityG: 150, householdMeasure: "1 unidade média", kcal: 80 },
+            ],
+          },
+          {
+            id: "lanche_manha",
+            name: "Lanche da Manhã",
+            time: "10:00",
+            totalKcal: 220,
+            items: [
+              { foodKey: "iogurte-grego", name: "Iogurte Grego Natural", quantityG: 170, householdMeasure: "1 pote", kcal: 105 },
+              { foodKey: "castanha", name: "Castanha de Caju", quantityG: 15, householdMeasure: "8 unidades", kcal: 90 },
+            ],
+          },
+          {
+            id: "almoco",
+            name: "Almoço",
+            time: "13:00",
+            totalKcal: 520,
+            items: [
+              { foodKey: "frango-grelhado", name: "Frango grelhado", quantityG: 150, householdMeasure: "1 filé médio", kcal: 248 },
+              { foodKey: "feijao", name: "Feijão", quantityG: 100, householdMeasure: "1 concha", kcal: 80 },
+              { foodKey: "salada-verde", name: "Salada verde + azeite", quantityG: 200, householdMeasure: "2 xícaras", kcal: 120 },
+            ],
+          },
+          {
+            id: "lanche_tarde",
+            name: "Lanche da Tarde",
+            time: "16:00",
+            totalKcal: 230,
+            items: [
+              { foodKey: "maca", name: "Maçã", quantityG: 150, householdMeasure: "1 unidade", kcal: 80 },
+              { foodKey: "queijo-minas", name: "Queijo Minas Frescal", quantityG: 50, householdMeasure: "2 fatias", kcal: 120 },
+            ],
+          },
+          {
+            id: "jantar",
+            name: "Jantar",
+            time: "19:30",
+            totalKcal: 400,
+            items: [
+              { foodKey: "peixe-grelhado", name: "Filé de Tilápia grelhado", quantityG: 150, householdMeasure: "1 filé médio", kcal: 180 },
+              { foodKey: "legumes", name: "Legumes refogados", quantityG: 250, householdMeasure: "2 xícaras", kcal: 90 },
+              { foodKey: "abacate", name: "Abacate", quantityG: 60, householdMeasure: "¼ unidade", kcal: 100 },
+            ],
+          },
+        ],
         recommendations: {
           waterMl: 3500,
           sleepHours: 8,
-          teaRoutine: ["Chá verde pela manhã", "Hibisco à tarde"],
+          teaRoutine: ["Chá de gengibre + limão + cúrcuma (07:30)", "Chá verde (15:00)"],
           strategies: [
-            "Proteína primeiro nas refeições",
-            "Vinagre de maçã antes das principais refeições",
-            "Fibras solúveis no café da manhã",
+            "Proteína no início de todas as refeições",
+            "15ml de vinagre de maçã diluído 10 min antes do almoço e jantar",
+            "Alta ingestão de fibras solúveis",
+            "Ordem das refeições: Proteína → Fibra → Gordura → Carboidrato",
           ],
         },
       },
