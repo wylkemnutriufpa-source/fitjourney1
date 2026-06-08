@@ -262,6 +262,8 @@ function PlanEditor({
   const [picker, setPicker] = useState<{ mealId: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<"edit" | "preview">("edit");
+  const [saveAsTpl, setSaveAsTpl] = useState<{ name: string; saving: boolean } | null>(null);
+  const saveTemplateFn = useServerFn(saveMyTemplate);
   // Itens recém-adicionados nesta sessão: disparam auto-geração de substituições.
   const [newItemIds, setNewItemIds] = useState<Set<string>>(() => new Set());
   // Modal pós-adição: aparece toda vez que um alimento é inserido.
