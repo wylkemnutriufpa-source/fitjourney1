@@ -254,7 +254,8 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
                 key={`${s.foodKey}-${i}`}
                 className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/60 px-2 py-1.5 text-xs"
               >
-                <div className="min-w-0">
+                <div className="min-w-0 flex items-baseline gap-1.5">
+                  <span aria-hidden>{emojiForFood(s.name)}</span>
                   <span className="font-medium text-foreground">{s.name}</span>
                   <span className="text-muted-foreground"> · {s.householdMeasure}</span>
                 </div>
