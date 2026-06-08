@@ -21,6 +21,7 @@ import {
   ArrowLeft,
   ArrowDown,
   ArrowUp,
+  BookmarkPlus,
   ChevronRight,
   Clock,
   Copy,
@@ -76,6 +77,7 @@ import {
   type PatientPlanFull,
 } from "@/lib/plans/patient-plan.functions";
 import { saveEditedPlan } from "@/lib/plans/plans.functions";
+import { saveMyTemplate } from "@/lib/templates/templates.functions";
 import { getPatientForNutritionist } from "@/lib/patients/patient-detail.functions";
 import { EquivalentsBlock, toPlannerFoodItem } from "@/components/meal-editor";
 import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
@@ -260,6 +262,8 @@ function PlanEditor({
   const [picker, setPicker] = useState<{ mealId: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<"edit" | "preview">("edit");
+  const [saveAsTpl, setSaveAsTpl] = useState<{ name: string; saving: boolean } | null>(null);
+  const saveTemplateFn = useServerFn(saveMyTemplate);
   // Itens recém-adicionados nesta sessão: disparam auto-geração de substituições.
   const [newItemIds, setNewItemIds] = useState<Set<string>>(() => new Set());
   // Modal pós-adição: aparece toda vez que um alimento é inserido.
@@ -542,14 +546,25 @@ function PlanEditor({
           <div className="text-xs text-muted-foreground">
             {dirty ? "Alterações não salvas" : "Tudo salvo"}
           </div>
-          <Button onClick={handleSave} disabled={!dirty || saving}>
-            {saving ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Save className="size-3.5" />
-            )}
-            Salvar alterações
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setSaveAsTpl({ name: draft.name || "Modelo do plano", saving: false })}
+              disabled={saving}
+              title="Salvar este plano como um modelo reutilizável"
+            >
+              <BookmarkPlus className="size-3.5" />
+              Salvar como modelo
+            </Button>
+            <Button onClick={handleSave} disabled={!dirty || saving}>
+              {saving ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Save className="size-3.5" />
+              )}
+              Salvar alterações
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -583,6 +598,66 @@ function PlanEditor({
           }}
         />
       )}
+
+      <Dialog open={!!saveAsTpl} onOpenChange={(o) => !o && setSaveAsTpl(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Salvar como modelo</DialogTitle>
+            <DialogDescription>
+              Cria um modelo reutilizável a partir deste plano. O plano do paciente
+              não é alterado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="tpl-name">Nome do modelo</Label>
+            <Input
+              id="tpl-name"
+              value={saveAsTpl?.name ?? ""}
+              onChange={(e) =>
+                setSaveAsTpl((s) => (s ? { ...s, name: e.target.value } : s))
+              }
+              placeholder="Ex.: Cutting 1800kcal — 5 refeições"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSaveAsTpl(null)} disabled={saveAsTpl?.saving}>
+              Cancelar
+            </Button>
+            <Button
+              disabled={!saveAsTpl?.name.trim() || saveAsTpl?.saving}
+              onClick={async () => {
+                if (!saveAsTpl) return;
+                const name = saveAsTpl.name.trim();
+                if (!name) return;
+                setSaveAsTpl({ ...saveAsTpl, saving: true });
+                try {
+                  await saveTemplateFn({
+                    data: {
+                      name,
+                      basedOn: `patient-plan:${plan.id}`,
+                      template: { ...draft, name, kcal: Math.round(totalKcal) },
+                    },
+                  });
+                  toast.success("Modelo salvo na sua biblioteca.");
+                  setSaveAsTpl(null);
+                } catch (e) {
+                  toast.error(
+                    `Não consegui salvar o modelo: ${(e as Error).message ?? "erro"}`,
+                  );
+                  setSaveAsTpl((s) => (s ? { ...s, saving: false } : s));
+                }
+              }}
+            >
+              {saveAsTpl?.saving ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <BookmarkPlus className="size-3.5" />
+              )}
+              Salvar modelo
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
