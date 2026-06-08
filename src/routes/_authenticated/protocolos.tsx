@@ -59,6 +59,30 @@ const ICONS: Record<ProtocolDescriptor["icon"], typeof Timer> = {
 function ProtocolosPage() {
   const { roles } = useAuth();
   const isAdmin = roles.includes("admin");
+  // TEMP: admin = Pro até existir tier real (ver src/lib/finance/plan-tier.ts)
+  const isPro = isAdmin;
+
+  if (!isPro) {
+    return (
+      <AppShell>
+        <div className="mx-auto w-full max-w-xl p-6">
+          <div className="rounded-lg border border-[var(--gold)]/30 bg-surface p-8 text-center space-y-3">
+            <Sparkles className="size-6 text-[var(--gold)] mx-auto" />
+            <h1 className="text-xl font-bold uppercase tracking-wide text-[var(--gold)]">
+              Protocolos é exclusivo do plano Pro
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Assinantes do plano Basic não têm acesso aos Protocolos premium.
+              Faça upgrade para Pro para desbloquear esta área.
+            </p>
+            <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] border border-[var(--gold)]/40 rounded px-2 py-1">
+              <Lock className="size-3" /> requer Pro
+            </span>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
