@@ -44,6 +44,9 @@ function fmtDate(iso: string | null) {
 
 function AnamnesesQueuePage() {
   const [status, setStatus] = useState<StatusFilter>("submitted");
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const [bulkRunning, setBulkRunning] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number } | null>(null);
   const fetchList = useServerFn(listAnamnesesForNutritionist);
   const reviewFn = useServerFn(reviewAnamnesis);
   const queryClient = useQueryClient();
@@ -54,6 +57,19 @@ function AnamnesesQueuePage() {
     staleTime: 15_000,
   });
 
+  const approvableItems = useMemo(
+    () =>
+      (data?.items ?? []).filter(
+        (it) => it.reviewStatus === "submitted" || it.reviewStatus === "needs_changes",
+      ),
+    [data],
+  );
+
+  // Limpa seleção quando muda de aba ou lista muda
+  useEffect(() => {
+    setSelected(new Set());
+  }, [status, data?.items.length]);
+
   const approveMut = useMutation({
     mutationFn: (anamnesisId: string) =>
       reviewFn({ data: { anamnesisId, decision: "approved" } }),
@@ -63,6 +79,53 @@ function AnamnesesQueuePage() {
     },
     onError: (e: Error) => toast.error(e.message ?? "Falha ao aprovar"),
   });
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selected.size === approvableItems.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(approvableItems.map((it) => it.id)));
+    }
+  }
+
+  async function bulkApprove(ids: string[]) {
+    if (ids.length === 0 || bulkRunning) return;
+    const confirmMsg =
+      ids.length === approvableItems.length && ids.length > selected.size
+        ? `Aprovar TODAS as ${ids.length} anamneses desta lista?\n\nA aprovação é imutável e dispara os alertas clínicos no app do paciente.`
+        : `Aprovar ${ids.length} anamnese${ids.length > 1 ? "s" : ""} selecionada${ids.length > 1 ? "s" : ""}?\n\nA aprovação é imutável e dispara os alertas clínicos no app do paciente.`;
+    if (!window.confirm(confirmMsg)) return;
+
+    setBulkRunning(true);
+    setBulkProgress({ done: 0, total: ids.length });
+    let ok = 0;
+    let fail = 0;
+    for (const id of ids) {
+      try {
+        await reviewFn({ data: { anamnesisId: id, decision: "approved" } });
+        ok += 1;
+      } catch (e) {
+        fail += 1;
+        console.error("[bulk approve]", id, e);
+      }
+      setBulkProgress({ done: ok + fail, total: ids.length });
+    }
+    setBulkRunning(false);
+    setBulkProgress(null);
+    setSelected(new Set());
+    await queryClient.invalidateQueries({ queryKey: ["nutri", "anamneses"] });
+    if (fail === 0) toast.success(`${ok} anamnese${ok > 1 ? "s" : ""} aprovada${ok > 1 ? "s" : ""}.`);
+    else toast.error(`${ok} aprovada(s), ${fail} falharam.`);
+  }
 
   return (
     <AppShell>
