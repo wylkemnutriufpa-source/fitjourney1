@@ -588,3 +588,97 @@ function ApplyPhaseDialog({
     </Dialog>
   );
 }
+
+function PreviewMealCard({ meal }: { meal: PhaseMeal }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-[var(--gold)]/20 bg-background/60 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-3 p-3 text-left hover:bg-[color-mix(in_oklab,var(--gold)_5%,transparent)] transition-colors"
+        aria-expanded={open}
+      >
+        <span className="inline-flex size-9 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] text-[var(--gold)] font-mono text-[10px] shrink-0">
+          {meal.time}
+        </span>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold uppercase tracking-wide text-foreground truncate">
+            {meal.name}
+          </p>
+          <p className="text-[10px] font-mono text-muted-foreground">
+            {meal.items.length} {meal.items.length === 1 ? "alimento" : "alimentos"} · {meal.totalKcal} kcal
+          </p>
+        </div>
+        <ChevronDown
+          className={cn(
+            "size-4 text-[var(--gold)] transition-transform shrink-0",
+            open && "rotate-180",
+          )}
+        />
+      </button>
+      {open && (
+        <div className="px-3 pb-3 space-y-2 border-t border-[var(--gold)]/15 animate-fade-in pt-2">
+          {meal.items.map((it, i) => (
+            <PreviewFoodRow key={`${meal.id}-${i}`} item={it} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PreviewFoodRow({ item }: { item: PhaseMealItem }) {
+  const subs = item.substitutions ?? [];
+  const hasSubs = subs.length > 0;
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-lg border border-border/60 bg-surface/40">
+      <button
+        type="button"
+        onClick={() => hasSubs && setOpen((v) => !v)}
+        className={cn(
+          "w-full flex items-center gap-3 p-2.5 text-left",
+          hasSubs && "hover:bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] transition-colors",
+        )}
+        aria-expanded={open}
+        disabled={!hasSubs}
+      >
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+          <p className="text-[11px] text-muted-foreground">
+            {item.householdMeasure}
+            <span className="text-muted-foreground/60"> · {item.quantityG}g · {item.kcal} kcal</span>
+          </p>
+        </div>
+        {hasSubs && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-[var(--gold)]/80 shrink-0">
+            <Replace className="size-3" />
+            {subs.length} substituições
+            <ChevronDown className={cn("size-3 transition-transform", open && "rotate-180")} />
+          </span>
+        )}
+      </button>
+      {hasSubs && open && (
+        <div className="px-2.5 pb-2.5 space-y-1.5 border-t border-border/40 pt-2 animate-fade-in">
+          <ul className="space-y-1">
+            {subs.map((s, i) => (
+              <li
+                key={`${s.foodKey}-${i}`}
+                className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/70 px-2 py-1.5 text-xs"
+              >
+                <div className="min-w-0">
+                  <span className="font-medium text-foreground">{s.name}</span>
+                  <span className="text-muted-foreground"> · {s.householdMeasure}</span>
+                </div>
+                <span className="font-mono text-[10px] text-muted-foreground shrink-0">
+                  {s.quantityG}g · {s.kcal} kcal
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
