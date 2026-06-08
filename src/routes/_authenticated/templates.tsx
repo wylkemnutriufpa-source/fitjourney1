@@ -747,7 +747,12 @@ function TemplatesPage() {
               ? { id: search.patientId, name: search.patientName ?? "este paciente" }
               : null
           }
-          onClose={() => setEditing(null)}
+          onClose={() => {
+            setEditing(null);
+            if (search.fromProtocol) {
+              navigate({ to: "/protocolos/$protocolId", params: { protocolId: search.fromProtocol } });
+            }
+          }}
           onSave={async (input) => {
             try {
               await saveMine(input);
