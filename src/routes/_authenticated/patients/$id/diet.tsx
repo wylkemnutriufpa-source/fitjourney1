@@ -784,12 +784,18 @@ function MealCard({
                 type="number"
                 inputMode="decimal"
                 value={it.qty}
-                onChange={(e) =>
-                  onUpdateItem(it.id, (x) => ({
-                    ...x,
-                    qty: Number(e.target.value) || 0,
-                  }))
-                }
+                onChange={(e) => {
+                  const nextQty = Number(e.target.value) || 0;
+                  onUpdateItem(it.id, (x) => {
+                    const prevQty = Number(x.qty) || 0;
+                    const prevKcal = Number(x.kcal) || 0;
+                    // Escala kcal proporcionalmente. Vale p/ g, ml, unid, fatia:
+                    // mantém a densidade kcal/qty que o item já tinha.
+                    const nextKcal =
+                      prevQty > 0 ? Math.round((prevKcal * nextQty) / prevQty) : prevKcal;
+                    return { ...x, qty: nextQty, kcal: nextKcal };
+                  });
+                }}
                 aria-label="Quantidade"
                 className="flex-1 md:flex-none text-xs font-mono h-11 md:h-9"
               />
