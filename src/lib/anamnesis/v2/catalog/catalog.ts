@@ -363,5 +363,93 @@ export const CATALOG: CatalogManifest = {
         },
       ],
     },
+
+    // ===== BLOCO 8 — Triagem de Protocolos (sugestão de Protocolos FitJourney) =====
+    {
+      id: "screening",
+      domain: "screening",
+      title: "Triagem clínica",
+      description:
+        "Sinaliza condições que ativam sugestão automática de Protocolos FitJourney após aprovação.",
+      questions: [
+        {
+          id: "screening.anxiety",
+          domain: "screening",
+          type: "boolean",
+          title: "Sofre com ansiedade frequente?",
+          clinicalTags: ["anxiety"],
+        },
+        {
+          id: "screening.migraine",
+          domain: "screening",
+          type: "boolean",
+          title: "Tem enxaqueca recorrente?",
+          clinicalTags: ["migraine"],
+        },
+        {
+          id: "screening.parasitosis",
+          domain: "screening",
+          type: "boolean",
+          title: "Suspeita ou histórico de parasitose intestinal?",
+          clinicalTags: ["parasitosis_suspected"],
+        },
+        {
+          id: "screening.cellulite",
+          domain: "screening",
+          type: "boolean",
+          title: "Tem queixa de celulite?",
+          clinicalTags: ["cellulite_concern"],
+        },
+        {
+          id: "screening.hairLoss",
+          domain: "screening",
+          type: "boolean",
+          title: "Queda de cabelo acima do normal?",
+          clinicalTags: ["hair_loss"],
+        },
+        {
+          id: "screening.chronicInflammation",
+          domain: "screening",
+          type: "boolean",
+          title: "Dores articulares/inflamação crônica?",
+          clinicalTags: ["chronic_inflammation"],
+        },
+        {
+          id: "screening.bloating",
+          domain: "screening",
+          type: "boolean",
+          title: "Sente inchaço corporal frequente?",
+          clinicalTags: ["bloating"],
+        },
+        {
+          id: "screening.beautyConcern",
+          domain: "screening",
+          type: "boolean",
+          title: "Quer foco em pele, cabelo e unhas?",
+          clinicalTags: ["beauty_concern"],
+        },
+        {
+          id: "screening.lowHydration",
+          domain: "screening",
+          type: "boolean",
+          title: "Costuma beber pouca água (menos de 1,5L/dia)?",
+          clinicalTags: ["low_hydration"],
+        },
+        {
+          id: "screening.anemia",
+          domain: "screening",
+          type: "boolean",
+          title: "Tem anemia diagnosticada ou suspeita?",
+          clinicalTags: ["anemia"],
+        },
+        {
+          id: "screening.cravings",
+          domain: "screening",
+          type: "boolean",
+          title: "Tem compulsão ou fome excessiva ao longo do dia?",
+          clinicalTags: ["high_appetite"],
+        },
+      ],
+    },
   ],
 };
