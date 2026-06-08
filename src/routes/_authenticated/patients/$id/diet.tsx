@@ -1026,71 +1026,113 @@ function ReplicateMenu({
 // Visualização (somente leitura) — espelha o que o paciente vê
 // ============================================================
 function PreviewMealCard({ meal }: { readonly meal: EditMeal }) {
+  const [open, setOpen] = useState(false);
   const kcal = meal.main.items.reduce((s, it) => s + kcalOf(it), 0);
+  const count = meal.main.items.length;
   return (
-    <div className="bg-surface border border-border rounded-lg p-4 space-y-3">
-      <div className="flex items-center justify-between gap-3 border-b border-border pb-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <Clock className="size-3.5 text-muted-foreground shrink-0" />
-          <span className="text-xs font-mono text-muted-foreground">
-            {meal.time}
-          </span>
-          <span className="text-sm font-semibold truncate">{meal.label}</span>
-        </div>
-        <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-mono font-semibold text-primary">
-          {Math.round(kcal)} kcal
+    <div className="bg-surface border border-border rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full flex items-center gap-3 p-3 text-left hover:bg-primary/5 transition-colors"
+      >
+        <span className="inline-flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary font-mono text-[10px] shrink-0">
+          {meal.time}
         </span>
-      </div>
-      {meal.main.title && (
-        <p className="text-sm font-medium">{meal.main.title}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold truncate">{meal.label}</p>
+          <p className="text-[11px] text-muted-foreground font-mono">
+            {count} {count === 1 ? "alimento" : "alimentos"} · {Math.round(kcal)} kcal
+          </p>
+        </div>
+        <ChevronDown
+          className={`size-4 text-muted-foreground transition-transform shrink-0 ${open ? "rotate-180" : ""}`}
+          aria-hidden
+        />
+      </button>
+
+      {open && (
+        <div className="px-3 pb-3 space-y-2 border-t border-border animate-fade-in">
+          {meal.main.title && (
+            <p className="text-sm font-medium pt-2">{meal.main.title}</p>
+          )}
+          {count === 0 ? (
+            <p className="text-xs text-muted-foreground italic pt-2">
+              Sem alimentos.
+            </p>
+          ) : (
+            meal.main.items.map((it) => (
+              <PreviewFoodRow key={it.id} item={it} />
+            ))
+          )}
+        </div>
       )}
-      <ul className="space-y-1.5">
-        {meal.main.items.map((it) => {
-          const eq = (it as any).materializedEquivalents as
-            | { options?: Array<{ name: string; qty: number; unit: string }> }
-            | undefined;
-          const hasOpts = (eq?.options?.length ?? 0) > 0;
-          return (
-            <li
-              key={it.id}
-              className="rounded-md border border-border/60 bg-background/60 px-3 py-2"
-            >
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-sm">{cleanFoodDisplayName(it.name)}</span>
-                <span className="text-xs font-mono text-muted-foreground">
-                  {it.qty} {it.unit}
-                </span>
-              </div>
-              {hasOpts && (
-                <div className="mt-1.5 space-y-0.5 border-t border-dashed border-border/60 pt-1.5">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                    Substituições
-                  </span>
-                  {eq!.options!.map((o, i) => (
-                    <div
-                      key={i}
-                      className="flex items-baseline justify-between gap-2 text-xs"
-                    >
-                      <span className="truncate">{cleanFoodDisplayName(o.name)}</span>
-                      <span className="font-mono text-muted-foreground">
-                        {o.qty} {o.unit}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </li>
-          );
-        })}
-        {meal.main.items.length === 0 && (
-          <li className="text-xs text-muted-foreground italic">
-            Sem alimentos.
-          </li>
-        )}
-      </ul>
     </div>
   );
 }
+
+function PreviewFoodRow({ item }: { readonly item: EditMeal["main"]["items"][number] }) {
+  const eq = (item as any).materializedEquivalents as
+    | { options?: Array<{ name: string; qty: number; unit: string; kcal?: number; householdMeasure?: string }> }
+    | undefined;
+  const opts = eq?.options ?? [];
+  const hasOpts = opts.length > 0;
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-md border border-border/60 bg-background/60">
+      <button
+        type="button"
+        onClick={() => hasOpts && setOpen((v) => !v)}
+        aria-expanded={hasOpts ? open : undefined}
+        disabled={!hasOpts}
+        className={`w-full flex items-baseline justify-between gap-2 px-3 py-2 text-left ${hasOpts ? "hover:bg-primary/5 transition-colors" : ""}`}
+      >
+        <span className="text-sm truncate">{cleanFoodDisplayName(item.name)}</span>
+        <span className="flex items-center gap-1.5 shrink-0">
+          <span className="text-xs font-mono text-muted-foreground">
+            {item.qty} {item.unit}
+          </span>
+          {hasOpts && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-primary/80">
+              <Repeat2 className="size-3" />
+              {opts.length}
+              <ChevronDown
+                className={`size-3 transition-transform ${open ? "rotate-180" : ""}`}
+                aria-hidden
+              />
+            </span>
+          )}
+        </span>
+      </button>
+      {hasOpts && open && (
+        <div className="px-3 pb-2 space-y-1 border-t border-dashed border-border/60 pt-1.5 animate-fade-in">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Substituições
+          </p>
+          {opts.map((o, i) => (
+            <div
+              key={i}
+              className="flex items-baseline justify-between gap-2 text-xs rounded border border-border/60 bg-background px-2 py-1"
+            >
+              <span className="truncate">
+                <span className="font-medium">{cleanFoodDisplayName(o.name)}</span>
+                {o.householdMeasure && (
+                  <span className="text-muted-foreground"> · {o.householdMeasure}</span>
+                )}
+              </span>
+              <span className="font-mono text-[10px] text-muted-foreground shrink-0 tabular-nums">
+                {o.qty} {o.unit}
+                {o.kcal ? ` · ${o.kcal} kcal` : ""}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 // ============================================================
 // Modal pós-adição — escolher Replicar e/ou Gerar equivalentes
