@@ -362,6 +362,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 : 0;
             const showDot =
               badgeKey === "feedback-pending" && !!fbStatus?.isPending && !!fbStatus.hasNutritionist;
+            const isProtocolos = item.to === "/protocolos";
             return (
               <Link
                 key={item.to}
@@ -374,13 +375,54 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 }}
                 className={
                   "relative flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors " +
-                  (active
-                    ? "bg-primary/10 text-primary border-l-2 border-[var(--gold)] shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--gold)_18%,transparent)]"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50 border-l-2 border-transparent")
+                  (isProtocolos
+                    ? (active
+                        ? "bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] border-l-2 border-[var(--gold)] shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--gold)_30%,transparent)]"
+                        : "border-l-2 border-transparent hover:bg-[color-mix(in_oklab,var(--gold)_6%,transparent)]")
+                    : active
+                      ? "bg-primary/10 text-primary border-l-2 border-[var(--gold)] shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--gold)_18%,transparent)]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50 border-l-2 border-transparent")
                 }
               >
-                <Icon className={"size-4 " + (active ? "text-[var(--gold)]" : "")} />
-                <span className="flex-1">{item.label}</span>
+                <Icon
+                  className={
+                    "size-4 " +
+                    (isProtocolos
+                      ? "text-[var(--gold)] animate-pulse"
+                      : active
+                        ? "text-[var(--gold)]"
+                        : "")
+                  }
+                />
+                <span
+                  className={
+                    "flex-1 " +
+                    (isProtocolos
+                      ? "font-bold uppercase tracking-wide text-[var(--gold)]"
+                      : "")
+                  }
+                  style={
+                    isProtocolos
+                      ? {
+                          textShadow:
+                            "0 0 10px color-mix(in oklab, var(--gold) 40%, transparent)",
+                        }
+                      : undefined
+                  }
+                >
+                  {item.label}
+                </span>
+                {isProtocolos && (
+                  <>
+                    <Sparkles
+                      className="size-3 text-[var(--gold)]/80 animate-pulse"
+                      aria-hidden
+                    />
+                    <span className="text-[8px] font-mono uppercase tracking-widest text-[var(--gold)] border border-[var(--gold)]/50 rounded px-1 py-0.5 bg-[color-mix(in_oklab,var(--gold)_8%,transparent)]">
+                      Premium
+                    </span>
+                  </>
+                )}
                 {badgeCount > 0 && (
                   <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--gold)] text-[var(--gold-foreground)] text-[10px] font-mono shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_45%,transparent)]">
                     {badgeCount}
