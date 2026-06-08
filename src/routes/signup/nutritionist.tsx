@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
-import { Activity, Loader2, Eye, EyeOff } from "lucide-react";
+import { Activity, Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { signupNutritionist } from "@/lib/phase2/signup.functions";
 
 export const Route = createFileRoute("/signup/nutritionist")({
@@ -49,6 +49,13 @@ function SignupNutritionistPage() {
   return (
     <div className="min-h-screen flex items-start sm:items-center justify-center bg-background text-foreground px-5 sm:px-6 py-8 sm:py-12">
       <form onSubmit={onSubmit} className="w-full max-w-sm space-y-6 sm:space-y-7">
+        <Link
+          to="/app"
+          className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="size-3.5" />
+          Voltar para o login
+        </Link>
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Cadastro
