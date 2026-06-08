@@ -223,7 +223,7 @@ function PatientPlanPage() {
                 }}
               />
             ) : (
-              <EmptyPlanState onPublish={publishNew} />
+              <EmptyPlanState onTemplate={publishFromTemplate} onAI={publishWithAI} />
             )}
           </>
         )}
