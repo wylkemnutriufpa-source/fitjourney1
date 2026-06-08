@@ -546,14 +546,25 @@ function PlanEditor({
           <div className="text-xs text-muted-foreground">
             {dirty ? "Alterações não salvas" : "Tudo salvo"}
           </div>
-          <Button onClick={handleSave} disabled={!dirty || saving}>
-            {saving ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Save className="size-3.5" />
-            )}
-            Salvar alterações
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setSaveAsTpl({ name: draft.name || "Modelo do plano", saving: false })}
+              disabled={saving}
+              title="Salvar este plano como um modelo reutilizável"
+            >
+              <BookmarkPlus className="size-3.5" />
+              Salvar como modelo
+            </Button>
+            <Button onClick={handleSave} disabled={!dirty || saving}>
+              {saving ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Save className="size-3.5" />
+              )}
+              Salvar alterações
+            </Button>
+          </div>
         </div>
       </div>
 
