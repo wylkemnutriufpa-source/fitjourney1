@@ -6,10 +6,11 @@ import {
   listProfessionals,
   upsertProfessionalSubscription,
   adminUpdateNutritionist,
+  setNutritionistPlanTier,
   type AdminNutritionistRow,
   type NutriPlanTier,
 } from "@/lib/admin/admin.functions";
-import { Pencil } from "lucide-react";
+import { Pencil, Crown, ArrowDownCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,11 +68,21 @@ function planBadgeClass(t: NutriPlanTier | undefined): string {
 
 function ProfessionalsPage() {
   const fetchAll = useServerFn(listProfessionals);
+  const setTierFn = useServerFn(setNutritionistPlanTier);
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin", "professionals"],
     queryFn: () => fetchAll(),
   });
   const [editing, setEditing] = useState<AdminNutritionistRow | null>(null);
+  const tierMut = useMutation({
+    mutationFn: (vars: { nutritionist_id: string; plan_tier: NutriPlanTier }) =>
+      setTierFn({ data: vars }),
+    onSuccess: (_r, vars) => {
+      toast.success(vars.plan_tier === "pro" ? "Upgrade para PRO aplicado" : "Plano alterado para BASIC");
+      refetch();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <div className="space-y-4">
@@ -163,10 +174,39 @@ function ProfessionalsPage() {
                     )}
                   </td>
                   <td className="px-4 py-2 text-right">
-                    <Button size="sm" variant="outline" onClick={() => setEditing(n)}>
-                      <Pencil className="h-3.5 w-3.5 mr-1" />
-                      Editar
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      {sub?.plan_tier === "pro" ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={tierMut.isPending}
+                          onClick={() =>
+                            tierMut.mutate({ nutritionist_id: n.id, plan_tier: "basic" })
+                          }
+                          title="Voltar para BASIC"
+                        >
+                          <ArrowDownCircle className="h-3.5 w-3.5 mr-1" />
+                          Basic
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          disabled={tierMut.isPending}
+                          onClick={() =>
+                            tierMut.mutate({ nutritionist_id: n.id, plan_tier: "pro" })
+                          }
+                          className="bg-amber-500/90 hover:bg-amber-500 text-background"
+                          title="Upgrade manual para PRO"
+                        >
+                          <Crown className="h-3.5 w-3.5 mr-1" />
+                          Upgrade PRO
+                        </Button>
+                      )}
+                      <Button size="sm" variant="outline" onClick={() => setEditing(n)}>
+                        <Pencil className="h-3.5 w-3.5 mr-1" />
+                        Editar
+                      </Button>
+                    </div>
                   </td>
 
                 </tr>
