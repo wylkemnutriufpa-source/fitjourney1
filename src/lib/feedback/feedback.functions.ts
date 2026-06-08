@@ -189,7 +189,11 @@ export const getMyFeedbackStatus = createServerFn({ method: "GET" })
       };
     }
 
-    const { data: nutri } = await supabase
+    // Paciente não tem RLS de SELECT em `nutritionists` (só nutri/admin leem).
+    // Usamos o client admin apenas para este campo público de configuração
+    // do nutri vinculado — sem expor PII.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: nutri } = await supabaseAdmin
       .from("nutritionists")
       .select("feedback_frequency_days")
       .eq("id", patient.nutritionist_id)
