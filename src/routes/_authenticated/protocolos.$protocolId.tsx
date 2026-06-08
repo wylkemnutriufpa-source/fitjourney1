@@ -45,6 +45,7 @@ import {
   type ProtocolPhase,
 } from "@/lib/protocols/catalog";
 import { applyProtocolPhase } from "@/lib/protocols/active.functions";
+import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 
 type PageSearch = { readonly module?: string };
 
