@@ -222,6 +222,9 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
         aria-expanded={open}
         disabled={!hasSubs}
       >
+        <span className="inline-flex size-9 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] text-lg shrink-0" aria-hidden>
+          {emojiForFood(item.name)}
+        </span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
           <p className="text-[11px] text-muted-foreground">
