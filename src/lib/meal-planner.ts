@@ -418,7 +418,7 @@ const recipeBook: Record<string, Blueprint> = {
     baseQty: 250,
     items: [
       { name: "Folhas", qty: 80, unit: "g", kcal: 15, scaleGroup: "vegetable" },
-      { name: "Legumes crus/cozidos", qty: 120, unit: "g", kcal: 48, scaleGroup: "vegetable" },
+      { name: "Legumes variados", qty: 120, unit: "g", kcal: 48, scaleGroup: "vegetable" },
       { name: "Proteína magra", qty: 50, unit: "g", kcal: 83, scaleGroup: "protein" },
       { name: "Azeite", qty: 5, unit: "ml", kcal: 45, scaleGroup: "fat" },
     ],

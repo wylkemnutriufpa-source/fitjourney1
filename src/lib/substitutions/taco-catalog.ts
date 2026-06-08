@@ -413,7 +413,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   // ------ Frutas (equivalência por energia; porções em g para cálculo linear) ------
   {
     foodKey: "banana",
-    name: "Banana prata crua",
+    name: "Banana prata",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 100,
@@ -424,7 +424,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "maca",
-    name: "Maçã crua",
+    name: "Maçã",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 130,
@@ -435,7 +435,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "pera",
-    name: "Pera crua",
+    name: "Pera",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 130,
@@ -446,7 +446,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "laranja",
-    name: "Laranja pera crua",
+    name: "Laranja pera",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 130,
@@ -468,7 +468,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "manga",
-    name: "Manga crua",
+    name: "Manga",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 100,
@@ -490,7 +490,7 @@ export const tacoCatalog: readonly EquivalentCandidate[] = [
   },
   {
     foodKey: "uva",
-    name: "Uva crua",
+    name: "Uva",
     scaleGroup: "fruit",
     unit: "g",
     defaultQty: 100,
