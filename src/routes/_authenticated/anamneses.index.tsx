@@ -233,8 +233,27 @@ function AnamnesesQueuePage() {
         )}
 
         <ul className="space-y-2">
-          {(data?.items ?? []).map((item) => (
-                      <li key={item.id} className="relative">
+          {(data?.items ?? []).map((item) => {
+            const isApprovable =
+              item.reviewStatus === "submitted" || item.reviewStatus === "needs_changes";
+            const isSelected = selected.has(item.id);
+            return (
+              <li key={item.id} className="relative">
+                {isApprovable && (
+                  <button
+                    type="button"
+                    onClick={() => toggleSelect(item.id)}
+                    disabled={bulkRunning}
+                    aria-label={isSelected ? "Desmarcar" : "Selecionar"}
+                    className="absolute left-3 top-4 z-10 inline-flex items-center justify-center size-5 rounded border border-border bg-background hover:border-primary disabled:opacity-50"
+                  >
+                    {isSelected ? (
+                      <CheckSquare className="size-4 text-primary" />
+                    ) : (
+                      <Square className="size-4 text-muted-foreground" />
+                    )}
+                  </button>
+                )}
               <Link
                 to="/anamneses/$id"
                 params={{ id: item.id }}
