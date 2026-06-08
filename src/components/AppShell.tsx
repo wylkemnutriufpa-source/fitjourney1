@@ -73,12 +73,12 @@ function ThemeToggle() {
 
 
 const nutritionistNav = [
+  { to: "/protocolos", label: "Protocolos", icon: Sparkles },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/patients", label: "Pacientes", icon: Users },
   { to: "/anamneses", label: "Anamneses", icon: ClipboardList, badgeKey: "pending-anamneses" as const },
   { to: "/feedbacks", label: "Feedbacks", icon: MessageSquareHeart, badgeKey: "pending-feedbacks" as const },
   { to: "/templates", label: "Templates", icon: FileStack },
-  { to: "/protocolos", label: "Protocolos", icon: Sparkles },
   { to: "/financeiro", label: "Financeiro", icon: DollarSign },
   { to: "/settings", label: "Configurações", icon: Settings },
 ] as const;
