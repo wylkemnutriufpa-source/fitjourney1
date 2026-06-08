@@ -85,6 +85,7 @@ import { EquivalentsBlock, toPlannerFoodItem } from "@/components/meal-editor";
 import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
 import { cleanFoodDisplayName, cleanFoodNamesDeep } from "@/lib/foods/display-name";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { toPlannerTemplate } from "@/lib/meal-planner";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Plano do paciente — FitJourney" }] }),
