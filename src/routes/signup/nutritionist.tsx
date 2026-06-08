@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { Activity, Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { signupNutritionist } from "@/lib/phase2/signup.functions";
+import authBg from "@/assets/auth-bg.mp4.asset.json";
 
 export const Route = createFileRoute("/signup/nutritionist")({
   head: () => ({
@@ -47,15 +48,34 @@ function SignupNutritionistPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-start sm:items-center justify-center bg-background text-foreground px-5 sm:px-6 py-8 sm:py-12">
-      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-6 sm:space-y-7">
+    <div className="relative min-h-screen w-full overflow-hidden bg-black text-foreground">
+      <video
+        className="absolute inset-0 h-full w-full object-cover"
+        src={authBg.url}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/85" />
+
+      <div className="relative z-10 flex min-h-screen flex-col px-5 sm:px-6 py-6 sm:py-8">
         <Link
           to="/app"
-          className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-white/80 hover:text-white transition-colors"
         >
           <ArrowLeft className="size-3.5" />
           Voltar para o login
         </Link>
+
+        <div className="flex-1" />
+
+        <form
+          onSubmit={onSubmit}
+          className="mx-auto w-full max-w-sm space-y-5 rounded-2xl border border-white/15 bg-black/55 p-5 backdrop-blur-xl shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)] sm:p-6"
+        >
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Cadastro
@@ -145,7 +165,8 @@ function SignupNutritionistPage() {
             Entrar na minha conta
           </Link>
         </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
