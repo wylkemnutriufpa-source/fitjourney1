@@ -825,58 +825,73 @@ function MealCard({
                 const currentMeasure = (it as any).householdMeasure as
                   | { label: string; grams: number; measureId?: string }
                   | undefined;
-                const value = currentMeasure ? `m:${currentMeasure.label}` : `u:${it.unit}`;
-                const hasMeasures = (measures?.length ?? 0) > 0;
+                const currentValue = currentMeasure ? `m:${currentMeasure.label}` : `u:${it.unit}`;
+
+                type Opt = { value: string; label: string; kind: "u" | "m"; payload?: any };
+                const opts: Opt[] = [
+                  { value: "u:g", label: "g", kind: "u" },
+                  { value: "u:unid", label: "unid", kind: "u" },
+                ];
+                if (it.unit === "ml" || (!measures?.length && false)) {
+                  opts.splice(1, 0, { value: "u:ml", label: "ml", kind: "u" });
+                }
+                if (it.unit && !["g", "ml", "unid", "medida"].includes(it.unit) && !measures?.find((m) => m.measureName === it.unit)) {
+                  opts.push({ value: `u:${it.unit}`, label: it.unit, kind: "u" });
+                }
+                (measures ?? []).forEach((m) => {
+                  opts.push({ value: `m:${m.measureName}`, label: m.measureName, kind: "m", payload: m });
+                });
+
+                const pick = (opt: Opt) => {
+                  onUpdateItem(it.id, (x) => {
+                    const next: any = { ...x };
+                    if (opt.kind === "u") {
+                      delete next.householdMeasure;
+                      next.unit = opt.value.slice(2);
+                      return next;
+                    }
+                    const m = opt.payload as { id?: string; measureName: string; gramsEquivalent: number };
+                    next.householdMeasure = {
+                      label: m.measureName,
+                      grams: m.gramsEquivalent,
+                      measureId: m.id,
+                    };
+                    next.unit = "medida";
+                    const qtyMult = Number(next.qty) || 1;
+                    if (kcalPer100g) {
+                      next.kcal = Math.round((kcalPer100g * m.gramsEquivalent * qtyMult) / 100);
+                    }
+                    return next;
+                  });
+                };
+
                 return (
-                  <select
-                    value={value}
-                    onChange={(e) => {
-                      const [kind, ...rest] = e.target.value.split(":");
-                      const val = rest.join(":");
-                      onUpdateItem(it.id, (x) => {
-                        const next: any = { ...x };
-                        if (kind === "u") {
-                          // Voltou para g/ml/unid livre — limpa medida caseira
-                          delete next.householdMeasure;
-                          next.unit = val;
-                          return next;
-                        }
-                        const m = measures?.find((mm) => mm.measureName === val);
-                        if (!m) return x;
-                        next.householdMeasure = {
-                          label: m.measureName,
-                          grams: m.gramsEquivalent,
-                          measureId: m.id,
-                        };
-                        next.unit = "medida";
-                        const qtyMult = Number(next.qty) || 1;
-                        if (kcalPer100g) {
-                          next.kcal = Math.round(
-                            (kcalPer100g * m.gramsEquivalent * qtyMult) / 100,
-                          );
-                        }
-                        return next;
-                      });
-                    }}
+                  <div
+                    role="radiogroup"
                     aria-label="Unidade ou medida caseira"
-                    className="w-28 md:w-auto text-xs font-mono h-11 md:h-9 rounded-md border border-input bg-background px-2"
+                    className="flex flex-wrap gap-1 items-center"
                   >
-                    <option value="u:g">g</option>
-                    <option value="u:ml">ml</option>
-                    <option value="u:unid">unid</option>
-                    {!hasMeasures && it.unit && !["g", "ml", "unid"].includes(it.unit) && (
-                      <option value={`u:${it.unit}`}>{it.unit}</option>
-                    )}
-                    {hasMeasures && (
-                      <optgroup label="Medidas caseiras">
-                        {measures!.map((m) => (
-                          <option key={m.measureName} value={`m:${m.measureName}`}>
-                            {m.measureName}
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
-                  </select>
+                    {opts.map((opt) => {
+                      const selected = opt.value === currentValue;
+                      return (
+                        <button
+                          type="button"
+                          key={opt.value}
+                          role="radio"
+                          aria-checked={selected}
+                          onClick={() => pick(opt)}
+                          className={
+                            "px-2 h-9 md:h-8 rounded-md border text-xs font-mono transition-colors " +
+                            (selected
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-background text-foreground border-input hover:bg-accent")
+                          }
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 );
               })()}
             </div>
