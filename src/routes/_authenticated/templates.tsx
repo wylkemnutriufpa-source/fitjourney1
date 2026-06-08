@@ -1834,8 +1834,16 @@ function findCatalogFood(foods: FoodDTO[] | undefined, item: PlannerFoodItem) {
 
 function gramsForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
   if (item.unit === "g" || item.unit === "ml") return item.qty;
+  if (typeof item.gramsEquivalent === "number" && Number.isFinite(item.gramsEquivalent)) {
+    return item.gramsEquivalent;
+  }
   const defaultMeasure = food.householdMeasures.find((measure) => measure.isDefault) ?? food.householdMeasures[0];
   return item.qty * (defaultMeasure?.gramsEquivalent ?? food.qty);
+}
+
+function formatFoodPortion(item: PlannerFoodItem): string {
+  const amount = `${item.qty} ${item.unit}`;
+  return item.householdMeasure ? `${item.householdMeasure} · ${amount}` : amount;
 }
 
 function nutritionForCurrentPortion(item: PlannerFoodItem, food: FoodDTO) {
@@ -1996,12 +2004,19 @@ function FoodItemRow({
       ...item,
       qty: grams,
       unit: "g",
+      householdMeasure: measureName,
+      gramsEquivalent: grams,
     }, catalogMatch, item));
     setInfoOpen(false);
   }
 
   function updatePortion(patch: Partial<PlannerFoodItem>) {
-    onChange(withCatalogKcal({ ...item, ...patch }, catalogMatch, item));
+    const clearsMeasure = "qty" in patch || "unit" in patch;
+    onChange(withCatalogKcal({
+      ...item,
+      ...(clearsMeasure ? { householdMeasure: undefined, gramsEquivalent: undefined } : null),
+      ...patch,
+    }, catalogMatch, item));
   }
 
   const baseClass =
