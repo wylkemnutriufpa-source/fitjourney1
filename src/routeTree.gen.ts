@@ -35,6 +35,7 @@ import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authentic
 import { Route as AuthenticatedFeedbacksRouteImport } from './routes/_authenticated/feedbacks'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedProtocolosIndexRouteImport } from './routes/_authenticated/protocolos.index'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients/index'
 import { Route as AuthenticatedAnamnesesIndexRouteImport } from './routes/_authenticated/anamneses.index'
 import { Route as CSlugCodeRouteImport } from './routes/c.$slug.$code'
@@ -191,6 +192,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedProtocolosIndexRoute =
+  AuthenticatedProtocolosIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProtocolosRoute,
+  } as any)
 const AuthenticatedPatientsIndexRoute =
   AuthenticatedPatientsIndexRouteImport.update({
     id: '/patients/',
@@ -373,6 +380,7 @@ export interface FileRoutesByFullPath {
   '/c/$slug/$code': typeof CSlugCodeRoute
   '/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/protocolos/': typeof AuthenticatedProtocolosIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
   '/patients/$id/feedbacks': typeof AuthenticatedPatientsIdFeedbacksRoute
   '/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
@@ -394,7 +402,6 @@ export interface FileRoutesByTo {
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
   '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
-  '/protocolos': typeof AuthenticatedProtocolosRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/templates-v2-editor': typeof AuthenticatedTemplatesV2EditorRoute
@@ -423,6 +430,7 @@ export interface FileRoutesByTo {
   '/c/$slug/$code': typeof CSlugCodeRoute
   '/anamneses': typeof AuthenticatedAnamnesesIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
+  '/protocolos': typeof AuthenticatedProtocolosIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
   '/patients/$id/feedbacks': typeof AuthenticatedPatientsIdFeedbacksRoute
   '/patients/$id': typeof AuthenticatedPatientsIdIndexRoute
@@ -475,6 +483,7 @@ export interface FileRoutesById {
   '/c/$slug/$code': typeof CSlugCodeRoute
   '/_authenticated/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/_authenticated/protocolos/': typeof AuthenticatedProtocolosIndexRoute
   '/_authenticated/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
   '/_authenticated/patients/$id/feedbacks': typeof AuthenticatedPatientsIdFeedbacksRoute
   '/_authenticated/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
@@ -527,6 +536,7 @@ export interface FileRouteTypes {
     | '/c/$slug/$code'
     | '/anamneses/'
     | '/patients/'
+    | '/protocolos/'
     | '/patients/$id/diet'
     | '/patients/$id/feedbacks'
     | '/patients/$id/'
@@ -548,7 +558,6 @@ export interface FileRouteTypes {
     | '/my-dashboard'
     | '/my-plan'
     | '/my-plan-v2-preview'
-    | '/protocolos'
     | '/settings'
     | '/templates'
     | '/templates-v2-editor'
@@ -577,6 +586,7 @@ export interface FileRouteTypes {
     | '/c/$slug/$code'
     | '/anamneses'
     | '/patients'
+    | '/protocolos'
     | '/patients/$id/diet'
     | '/patients/$id/feedbacks'
     | '/patients/$id'
@@ -628,6 +638,7 @@ export interface FileRouteTypes {
     | '/c/$slug/$code'
     | '/_authenticated/anamneses/'
     | '/_authenticated/patients/'
+    | '/_authenticated/protocolos/'
     | '/_authenticated/patients/$id/diet'
     | '/_authenticated/patients/$id/feedbacks'
     | '/_authenticated/patients/$id/'
@@ -833,6 +844,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/protocolos/': {
+      id: '/_authenticated/protocolos/'
+      path: '/'
+      fullPath: '/protocolos/'
+      preLoaderRoute: typeof AuthenticatedProtocolosIndexRouteImport
+      parentRoute: typeof AuthenticatedProtocolosRoute
     }
     '/_authenticated/patients/': {
       id: '/_authenticated/patients/'
@@ -1044,12 +1062,14 @@ const AuthenticatedMyPlanRouteWithChildren =
 
 interface AuthenticatedProtocolosRouteChildren {
   AuthenticatedProtocolosProtocolIdRoute: typeof AuthenticatedProtocolosProtocolIdRoute
+  AuthenticatedProtocolosIndexRoute: typeof AuthenticatedProtocolosIndexRoute
 }
 
 const AuthenticatedProtocolosRouteChildren: AuthenticatedProtocolosRouteChildren =
   {
     AuthenticatedProtocolosProtocolIdRoute:
       AuthenticatedProtocolosProtocolIdRoute,
+    AuthenticatedProtocolosIndexRoute: AuthenticatedProtocolosIndexRoute,
   }
 
 const AuthenticatedProtocolosRouteWithChildren =
