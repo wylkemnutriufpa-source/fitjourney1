@@ -18,6 +18,7 @@ import {
   Send,
   CheckCircle2,
   Pencil,
+  Replace,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/auth-context";
@@ -425,19 +426,45 @@ function PhaseDetailsDialog({
                         {meal.totalKcal} kcal
                       </span>
                     </div>
-                    <ul className="space-y-1 text-xs">
+                    <ul className="space-y-2 text-xs">
                       {meal.items.map((it, i) => (
                         <li
                           key={i}
-                          className="flex items-baseline justify-between gap-2 border-t border-border/40 pt-1 first:border-t-0 first:pt-0"
+                          className="rounded-md border border-border/50 bg-surface/40 p-2"
                         >
-                          <div className="min-w-0">
-                            <span className="font-medium">{it.name}</span>
-                            <span className="text-muted-foreground"> · {it.householdMeasure}</span>
+                          <div className="flex items-baseline justify-between gap-2">
+                            <div className="min-w-0">
+                              <span className="font-medium">{it.name}</span>
+                              <span className="text-muted-foreground"> · {it.householdMeasure}</span>
+                            </div>
+                            <span className="font-mono text-[10px] text-muted-foreground shrink-0">
+                              {it.quantityG}g · {it.kcal} kcal
+                            </span>
                           </div>
-                          <span className="font-mono text-[10px] text-muted-foreground shrink-0">
-                            {it.quantityG}g · {it.kcal} kcal
-                          </span>
+                          {it.substitutions && it.substitutions.length > 0 && (
+                            <div className="mt-2 space-y-1 border-t border-border/40 pt-2">
+                              <p className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-[var(--gold)]/80">
+                                <Replace className="size-3" />
+                                Substituições já prontas
+                              </p>
+                              <ul className="space-y-1">
+                                {it.substitutions.map((s, subIndex) => (
+                                  <li
+                                    key={`${s.foodKey}-${subIndex}`}
+                                    className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/70 px-2 py-1"
+                                  >
+                                    <span className="min-w-0">
+                                      <span className="font-medium">{s.name}</span>
+                                      <span className="text-muted-foreground"> · {s.householdMeasure}</span>
+                                    </span>
+                                    <span className="font-mono text-[10px] text-muted-foreground shrink-0">
+                                      {s.quantityG}g · {s.kcal} kcal
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </li>
                       ))}
                     </ul>
