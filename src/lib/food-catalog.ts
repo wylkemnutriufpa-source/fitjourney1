@@ -15,6 +15,13 @@ export type FoodCategory =
   | "Bebidas"
   | "Gerais";
 
+export type CatalogHouseholdMeasure = {
+  id?: string;
+  measureName: string;
+  gramsEquivalent: number;
+  isDefault?: boolean;
+};
+
 export type CatalogFood = {
   foodKey: string;        // chave da imagem (pode não existir; ignorado em FoodItemRow)
   name: string;
@@ -22,6 +29,10 @@ export type CatalogFood = {
   unit: string;
   kcal: number;
   scaleGroup: ScaleGroup;
+  /** Densidade calórica para escalar kcal quando o usuário troca a medida. */
+  kcalPer100g?: number;
+  /** Medidas caseiras disponíveis no DB (ex: "1 colher de sopa (25g)"). */
+  householdMeasures?: CatalogHouseholdMeasure[];
 };
 
 export const foodCatalog: Record<FoodCategory, CatalogFood[]> = {
