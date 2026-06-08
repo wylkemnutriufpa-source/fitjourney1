@@ -81,7 +81,8 @@ function ProtocolosPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           {PROTOCOL_CATALOG.map((p) => {
             const Icon = ICONS[p.icon];
-            const locked = !hasPremium;
+            // Apenas IFJ (exclusive) é trancado para não-admin. Demais sempre abertos.
+            const locked = !!p.exclusive && !isAdmin;
             return (
               <div
                 key={p.id}
