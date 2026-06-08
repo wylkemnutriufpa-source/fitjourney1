@@ -269,7 +269,7 @@ function Landing() {
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
-            className="flex items-center gap-3 min-w-0 flex-shrink overflow-hidden"
+            className="flex shrink-0 items-center gap-3"
           >
             <BrandLockup
               slot="landing-header"
@@ -326,7 +326,7 @@ function Landing() {
             </button>
             <Link
               to="/app"
-              className="px-3 py-1.5 text-xs font-semibold rounded-full border border-border/60 bg-card/40 text-foreground"
+              className="hidden min-[420px]:inline-flex px-3 py-1.5 text-xs font-semibold rounded-full border border-border/60 bg-card/40 text-foreground"
             >
               Entrar
             </Link>
