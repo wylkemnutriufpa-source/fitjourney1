@@ -307,9 +307,24 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
         aria-expanded={open}
         disabled={!hasDetail}
       >
-        <span className="inline-flex size-9 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] text-lg shrink-0" aria-hidden>
-          {emojiForFood(item.name)}
-        </span>
+        {(() => {
+          const thumb = imgFor("", item.name);
+          return thumb ? (
+            <span className="relative inline-block size-12 rounded-md overflow-hidden bg-muted shrink-0">
+              <img
+                src={thumb}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+              />
+            </span>
+          ) : (
+            <span className="inline-flex size-12 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] text-xl shrink-0" aria-hidden>
+              {emojiForFood(item.name)}
+            </span>
+          );
+        })()}
+
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground break-words leading-tight">{item.name}</p>
           <p className="text-[11px] text-muted-foreground mt-0.5">
