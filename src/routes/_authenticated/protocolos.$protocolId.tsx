@@ -250,7 +250,7 @@ function ModulesGrid({
           navigate({
             to: "/protocolos/$protocolId",
             params: { protocolId: protocol.id },
-            search: { module: m.id },
+            search: { module: m.id, patientId, patientName },
           });
         }}
       />
@@ -264,7 +264,7 @@ function ModulesGrid({
           navigate({
             to: "/protocolos/$protocolId",
             params: { protocolId: protocol.id },
-            search: { module: m.id },
+            search: { module: m.id, patientId, patientName },
           });
         }}
       />
