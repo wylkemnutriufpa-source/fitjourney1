@@ -66,6 +66,9 @@ function ProtocolosIndexPage() {
   const { roles } = useAuth();
   const isAdmin = roles.includes("admin");
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const parentSearch = useSearch({ from: "/_authenticated/protocolos" });
+  const patientId = parentSearch.patientId;
+  const patientName = parentSearch.patientName;
 
   return (
     <AppShell>
