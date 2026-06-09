@@ -46,12 +46,19 @@ import {
 } from "@/lib/protocols/catalog";
 import { applyProtocolPhase } from "@/lib/protocols/active.functions";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
+import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
 
-type PageSearch = { readonly module?: string };
+type PageSearch = {
+  readonly module?: string;
+  readonly patientId?: string;
+  readonly patientName?: string;
+};
 
 export const Route = createFileRoute("/_authenticated/protocolos/$protocolId")({
   validateSearch: (s: Record<string, unknown>): PageSearch => ({
     module: typeof s.module === "string" ? s.module : undefined,
+    patientId: typeof s.patientId === "string" ? s.patientId : undefined,
+    patientName: typeof s.patientName === "string" ? s.patientName : undefined,
   }),
   loader: ({ params }) => {
     const protocol = findProtocolById(params.protocolId);
@@ -71,7 +78,7 @@ function ProtocolDetailPage() {
   const hasAccess = !requiresPremium || isAdmin;
 
   const modules = useMemo(() => getProtocolModules(protocol), [protocol]);
-  const { module: moduleId } = Route.useSearch();
+  const { module: moduleId, patientId, patientName } = Route.useSearch();
   const activeModule = useMemo(
     () => (moduleId ? modules.find((m) => m.id === moduleId) ?? null : null),
     [modules, moduleId],
@@ -87,12 +94,16 @@ function ProtocolDetailPage() {
           activeModule={activeModule}
         />
 
+        {hasAccess && patientId && (
+          <ProtocolDiagnosticCard patientId={patientId} />
+        )}
+
         {!hasAccess ? (
           <LockedNotice />
         ) : !activeModule ? (
-          <ModulesGrid protocol={protocol} modules={modules} />
+          <ModulesGrid protocol={protocol} modules={modules} patientId={patientId} patientName={patientName} />
         ) : (
-          <PhasesGrid protocol={protocol} module={activeModule} />
+          <PhasesGrid protocol={protocol} module={activeModule} patientId={patientId} patientName={patientName} />
         )}
       </div>
     </AppShell>
@@ -174,9 +185,13 @@ function LockedNotice() {
 function ModulesGrid({
   protocol,
   modules,
+  patientId,
+  patientName,
 }: {
   protocol: ProtocolDescriptor;
   modules: ReadonlyArray<ProtocolModule>;
+  patientId?: string;
+  patientName?: string;
 }) {
   const [intro, setIntro] = useState<ProtocolModule | null>(null);
   const [detailsOpen, setDetailsOpen] = useState<ProtocolModule | null>(null);
@@ -235,7 +250,7 @@ function ModulesGrid({
           navigate({
             to: "/protocolos/$protocolId",
             params: { protocolId: protocol.id },
-            search: { module: m.id },
+            search: { module: m.id, patientId, patientName },
           });
         }}
       />
@@ -249,7 +264,7 @@ function ModulesGrid({
           navigate({
             to: "/protocolos/$protocolId",
             params: { protocolId: protocol.id },
-            search: { module: m.id },
+            search: { module: m.id, patientId, patientName },
           });
         }}
       />
@@ -443,9 +458,13 @@ function ModuleDetailsDialog({
 function PhasesGrid({
   protocol,
   module: m,
+  patientId,
+  patientName,
 }: {
   protocol: ProtocolDescriptor;
   module: ProtocolModule;
+  patientId?: string;
+  patientName?: string;
 }) {
   const [detailsPhase, setDetailsPhase] = useState<ProtocolPhase | null>(null);
   const [applyPhase, setApplyPhase] = useState<ProtocolPhase | null>(null);
@@ -474,6 +493,8 @@ function PhasesGrid({
         module={m}
         phase={applyPhase}
         onClose={() => setApplyPhase(null)}
+        initialPatientId={patientId}
+        initialPatientName={patientName}
       />
     </section>
   );
@@ -687,12 +708,17 @@ function ApplyPhaseDialog({
   module: m,
   phase,
   onClose,
+  initialPatientId,
+  initialPatientName,
 }: {
   protocol: ProtocolDescriptor;
   module: ProtocolModule;
   phase: ProtocolPhase | null;
   onClose: () => void;
+  initialPatientId?: string;
+  initialPatientName?: string;
 }) {
+  void initialPatientName;
   const [patient, setPatient] = useState<PatientLite | null>(null);
   const [done, setDone] = useState<string | null>(null);
   const apply = useServerFn(applyProtocolPhase);
@@ -747,7 +773,7 @@ function ApplyPhaseDialog({
           </div>
         ) : (
           <div className="py-2 space-y-3">
-            <RealPatientPicker value={patient} onChange={setPatient} />
+            <RealPatientPicker value={patient} onChange={setPatient} initialPatientId={initialPatientId} />
             <p className="text-[11px] text-muted-foreground">
               O paciente passa a ver esta fase em "Protocolos Ativos" e recebe um banner diário com as recomendações.
             </p>

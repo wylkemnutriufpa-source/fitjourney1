@@ -2,7 +2,7 @@
 // A rota pai /protocolos é layout; esta leaf renderiza a lista.
 
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import {
   Activity,
   Baby,
@@ -66,6 +66,9 @@ function ProtocolosIndexPage() {
   const { roles } = useAuth();
   const isAdmin = roles.includes("admin");
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const parentSearch = useSearch({ from: "/_authenticated/protocolos" });
+  const patientId = parentSearch.patientId;
+  const patientName = parentSearch.patientName;
 
   return (
     <AppShell>
@@ -146,7 +149,13 @@ function ProtocolosIndexPage() {
             }
 
             return (
-              <Link key={p.id} to="/protocolos/$protocolId" params={{ protocolId: p.id }} className={cardClasses}>
+              <Link
+                key={p.id}
+                to="/protocolos/$protocolId"
+                params={{ protocolId: p.id }}
+                search={{ patientId, patientName }}
+                className={cardClasses}
+              >
                 {inner}
               </Link>
             );
