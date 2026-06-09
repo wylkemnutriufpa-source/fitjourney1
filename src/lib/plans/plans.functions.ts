@@ -29,6 +29,7 @@ import { runNutritionEngines } from "@/lib/clinical/run-nutrition-engines";
 import { validatePlan, type DailyTotals, type FoodOccurrence } from "@/lib/engine/clinical-gate";
 import { ENGINE_VERSION, GATE_VERSION } from "@/lib/engine/version";
 import { generateDraftPlanFromApproval } from "@/lib/plans/draft-auto-plan";
+import { findProtocolPhase } from "@/lib/protocols/catalog";
 
 export type AnamnesisStatusLite =
   | "approved"
@@ -330,6 +331,11 @@ const PublishInput = z.object({
    * Permite rastrear adesão/abandono por template do sistema.
    */
   sourceTemplateKey: z.string().min(1).max(120).optional(),
+  protocolMeta: z.object({
+    protocolId: z.string().min(1).max(64),
+    moduleId: z.string().min(1).max(64),
+    phaseId: z.number().int().min(1).max(50),
+  }).optional(),
   /**
    * Quando true, permite publicar mesmo sem ClinicalContext calculável
    * (paciente sem anamnese aprovada). Motor + gate clínico são pulados;
