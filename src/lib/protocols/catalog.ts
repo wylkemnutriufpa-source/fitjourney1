@@ -652,7 +652,7 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
           ],
           strategies: [
             "Aumentar volume de vegetais nas refeições principais",
-            "Manter proteína alta no início de cada refeição",
+            "Manter ingestão de proteína em todas as refeições",
             "Incluir psyllium em uma refeição por dia",
             "Suco verde diário no meio da manhã",
           ],
