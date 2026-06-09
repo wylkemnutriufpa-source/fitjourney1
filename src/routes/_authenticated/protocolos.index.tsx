@@ -106,12 +106,20 @@ function ProtocolosIndexPage() {
                       <Icon className="size-4 text-[var(--gold)]" />
                     </div>
                     <div className="min-w-0">
-                      <p
-                        className="text-sm font-bold uppercase tracking-wide leading-tight truncate text-[var(--gold)]"
-                        style={{ textShadow: "0 0 12px color-mix(in oklab, var(--gold) 35%, transparent)" }}
-                      >
-                        {p.name}
-                      </p>
+                      {(() => {
+                        const parts = p.name.split(/\s+[—-]\s+/);
+                        const top = parts.length > 1 ? parts[0] : p.name;
+                        const bottom = parts.length > 1 ? parts.slice(1).join(" — ") : null;
+                        return (
+                          <p
+                            className="text-sm font-bold uppercase tracking-wide leading-tight text-[var(--gold)] break-words"
+                            style={{ textShadow: "0 0 12px color-mix(in oklab, var(--gold) 35%, transparent)" }}
+                          >
+                            <span className="block">{top}</span>
+                            {bottom && <span className="block text-[11px] font-semibold tracking-normal normal-case text-foreground/90">{bottom}</span>}
+                          </p>
+                        );
+                      })()}
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-widest text-[var(--gold)] border border-[var(--gold)]/50 rounded px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--gold)_8%,transparent)]">
                           <Sparkles className="size-2.5" />
