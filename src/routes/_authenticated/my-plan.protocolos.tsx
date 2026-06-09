@@ -27,6 +27,24 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
+import { getMyClinicalContext } from "@/lib/clinical/context.functions";
+import type { ActivityLevel } from "@/lib/engine/types";
+
+const WATER_ML_PER_KG: Record<ActivityLevel, number> = {
+  sedentary: 35,
+  light: 38,
+  moderate: 40,
+  high: 45,
+  extreme: 50,
+};
+
+function personalizedWaterMl(
+  weightKg: number | null | undefined,
+  activity: ActivityLevel | null | undefined,
+): number | null {
+  if (!weightKg || !activity) return null;
+  return Math.round(weightKg * WATER_ML_PER_KG[activity]);
+}
 
 export const Route = createFileRoute("/_authenticated/my-plan/protocolos")({
   head: () => ({ meta: [{ title: "Protocolos Ativos — FitJourney" }] }),
@@ -47,11 +65,21 @@ export const Route = createFileRoute("/_authenticated/my-plan/protocolos")({
 
 function PatientActiveProtocolsPage() {
   const fetchActive = useServerFn(listMyActiveProtocols);
+  const fetchCtx = useServerFn(getMyClinicalContext);
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient", "active-protocols"],
     queryFn: () => fetchActive(),
     staleTime: 60_000,
   });
+  const { data: ctx } = useQuery({
+    queryKey: ["my-clinical-context"],
+    queryFn: () => fetchCtx(),
+    staleTime: 60_000,
+  });
+  const personalWaterMl = personalizedWaterMl(
+    ctx?.currentWeight?.weightKg ?? null,
+    ctx?.demographics.activity ?? null,
+  );
 
   return (
     <AppShell>
@@ -92,7 +120,7 @@ function PatientActiveProtocolsPage() {
         ) : (
           <div className="space-y-4">
             {data.protocols.map((p) => (
-              <ActiveProtocolCard key={p.id} row={p} />
+              <ActiveProtocolCard key={p.id} row={p} personalWaterMl={personalWaterMl} />
             ))}
           </div>
         )}
@@ -108,9 +136,17 @@ export function computeCurrentWeek(row: ActiveProtocolRow): number {
   return Math.max(1, Math.min(week, row.phase_snapshot.durationWeeks));
 }
 
-function ActiveProtocolCard({ row }: { row: ActiveProtocolRow }) {
+function ActiveProtocolCard({
+  row,
+  personalWaterMl,
+}: {
+  row: ActiveProtocolRow;
+  personalWaterMl: number | null;
+}) {
   const phase = row.phase_snapshot;
   const week = computeCurrentWeek(row);
+  const waterMl = personalWaterMl ?? phase.recommendations.waterMl;
+  const waterLabel = `${(waterMl / 1000).toFixed(1)}L água${personalWaterMl ? " (você)" : ""}`;
   return (
     <article className="relative overflow-hidden rounded-2xl border border-[var(--gold)]/30 bg-gradient-to-br from-surface to-background p-5 space-y-5 shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)]">
       <Sparkles
@@ -132,7 +168,7 @@ function ActiveProtocolCard({ row }: { row: ActiveProtocolRow }) {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] font-mono">
         <MetricChip icon={<Clock className="size-3" />} label={`Sem ${week}/${phase.durationWeeks}`} />
-        <MetricChip icon={<Droplets className="size-3" />} label={`${(phase.recommendations.waterMl / 1000).toFixed(1)}L água`} />
+        <MetricChip icon={<Droplets className="size-3" />} label={waterLabel} />
         <MetricChip icon={<Moon className="size-3" />} label={`${phase.recommendations.sleepHours}h sono`} />
         {phase.dailyKcalTarget && (
           <MetricChip icon={<Flame className="size-3" />} label={`${phase.dailyKcalTarget} kcal/dia`} />
