@@ -193,12 +193,24 @@ function MyPlanPage() {
   if (!data) {
     return (
       <AppShell>
-        <div className="space-y-3 max-w-xl">
+        <div className="space-y-6 max-w-3xl">
+          <DailyProtocolBanner />
           <h1 className="text-2xl font-bold tracking-tight">Meu Plano</h1>
-          <p className="text-sm text-muted-foreground">
-            Você ainda não tem um plano publicado. Assim que seu nutricionista
-            publicar, ele aparecerá aqui.
-          </p>
+          {protocols.length > 0 ? (
+            <section className="space-y-4">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+                Protocolos ativos
+              </p>
+              {protocols.map((p) => (
+                <ActiveProtocolCard key={p.id} row={p} personalWaterMl={personalWaterMl} />
+              ))}
+            </section>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Você ainda não tem um plano publicado. Assim que seu nutricionista
+              publicar, ele aparecerá aqui.
+            </p>
+          )}
         </div>
       </AppShell>
     );
