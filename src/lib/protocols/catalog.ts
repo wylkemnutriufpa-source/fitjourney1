@@ -2022,6 +2022,10 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
   },
 ];
 
+// Gastrite é exposto como protocolo top-level próprio (não faz parte do IFJ "Inteligência").
+const GASTRITE_MODULE = IFJ_MODULES.find((m) => m.id === "gastrite")!;
+const IFJ_INTELLIGENCE_MODULES = IFJ_MODULES.filter((m) => m.id !== "gastrite");
+
 // ---------------------------------------------------------------------------
 // Catálogo
 // ---------------------------------------------------------------------------
