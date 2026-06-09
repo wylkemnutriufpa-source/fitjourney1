@@ -103,10 +103,95 @@ function ProtocolDetailPage() {
         ) : !activeModule ? (
           <ModulesGrid protocol={protocol} modules={modules} patientId={patientId} patientName={patientName} />
         ) : (
-          <PhasesGrid protocol={protocol} module={activeModule} patientId={patientId} patientName={patientName} />
+          <>
+            {activeModule.methodology && <ModuleMethodologyCard methodology={activeModule.methodology} />}
+            <PhasesGrid protocol={protocol} module={activeModule} patientId={patientId} patientName={patientName} />
+          </>
         )}
       </div>
     </AppShell>
+  );
+}
+
+function ModuleMethodologyCard({ methodology }: { methodology: NonNullable<ProtocolModule["methodology"]> }) {
+  const [open, setOpen] = useState(true);
+  return (
+    <section className="rounded-xl border border-[var(--gold)]/25 bg-background/60 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full flex items-center gap-2.5 px-3.5 py-3 text-left hover:bg-[color-mix(in_oklab,var(--gold)_5%,transparent)] transition-colors"
+      >
+        <Sparkles className="size-4 text-[var(--gold)]" />
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+            Metodologia
+          </p>
+          <p className="text-sm font-semibold text-foreground">{methodology.title}</p>
+        </div>
+        <ChevronDown className={cn("size-4 text-[var(--gold)] transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div className="px-3.5 pb-3.5 pt-1 border-t border-[var(--gold)]/15 space-y-3 animate-fade-in">
+          {methodology.subtitle && (
+            <p className="text-xs text-muted-foreground leading-relaxed">{methodology.subtitle}</p>
+          )}
+
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] mb-2">
+              Pilares
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {methodology.pillars.map((p) => (
+                <div key={p.title} className="rounded-lg border border-border/60 bg-surface/40 p-2.5 space-y-1">
+                  <p className="text-sm font-medium text-foreground">{p.title}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{p.summary}</p>
+                  {p.examples && p.examples.length > 0 && (
+                    <ul className="flex flex-wrap gap-1 pt-0.5">
+                      {p.examples.map((ex) => (
+                        <li
+                          key={ex}
+                          className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-[var(--gold)]/20 text-foreground/80"
+                        >
+                          {ex}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] mb-2">
+              Regras comportamentais
+            </p>
+            <ul className="space-y-1.5">
+              {methodology.behavioralRules.map((r) => (
+                <li
+                  key={r.name}
+                  className="flex items-start gap-2 text-xs rounded-md border border-border/40 bg-background/60 px-2.5 py-2"
+                >
+                  <span className="text-[var(--gold)] mt-0.5">•</span>
+                  <span>
+                    <strong className="text-foreground">{r.name}:</strong>{" "}
+                    <span className="text-muted-foreground">{r.description}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {methodology.disclaimer && (
+            <p className="text-[10px] font-mono text-muted-foreground/80 italic border-t border-border/40 pt-2">
+              {methodology.disclaimer}
+            </p>
+          )}
+        </div>
+      )}
+    </section>
   );
 }
 
