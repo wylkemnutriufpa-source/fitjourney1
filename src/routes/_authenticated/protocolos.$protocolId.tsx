@@ -50,6 +50,7 @@ import { applyProtocolPhase, listProtocolEnrollments, type ProtocolEnrollmentRow
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
 import { getGoldenTipsFor, type GoldenTip } from "@/lib/protocols/golden-tips";
+import { getMethodologyFor } from "@/lib/protocols/methodologies";
 
 type PageSearch = {
   readonly module?: string;
@@ -106,10 +107,18 @@ function ProtocolDetailPage() {
         {!hasAccess ? (
           <LockedNotice />
         ) : !activeModule ? (
-          <ModulesGrid protocol={protocol} modules={modules} patientId={patientId} patientName={patientName} />
+          <>
+            {getMethodologyFor(protocol.id) && (
+              <ModuleMethodologyCard methodology={getMethodologyFor(protocol.id)!} />
+            )}
+            <GoldenTips protocolId={protocol.id} />
+            <ModulesGrid protocol={protocol} modules={modules} patientId={patientId} patientName={patientName} />
+          </>
         ) : (
           <>
-            {activeModule.methodology && <ModuleMethodologyCard methodology={activeModule.methodology} />}
+            {(activeModule.methodology ?? getMethodologyFor(protocol.id)) && (
+              <ModuleMethodologyCard methodology={(activeModule.methodology ?? getMethodologyFor(protocol.id))!} />
+            )}
             <GoldenTips protocolId={protocol.id} />
             <PhasesGrid protocol={protocol} module={activeModule} patientId={patientId} patientName={patientName} />
           </>
