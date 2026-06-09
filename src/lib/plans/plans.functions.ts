@@ -141,8 +141,26 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
       }
     }
 
+    // Protocolo ativo também conta como "tem plano" — aplicar protocolo entrega
+    // um plano clínico ao paciente (mesmo objetivo: alimentação prescrita).
+    const { data: activeProtocols } = await supabase
+      .from("patient_active_protocols")
+      .select("patient_id, started_at")
+      .in("patient_id", patientIds)
+      .eq("status", "active")
+      .order("started_at", { ascending: false });
+    const activeProtoByPatient = new Map<string, string>();
+    for (const ap of activeProtocols ?? []) {
+      if (!activeProtoByPatient.has(ap.patient_id)) {
+        activeProtoByPatient.set(ap.patient_id, ap.started_at as string);
+      }
+    }
+
     return patients.map((p: any) => {
       const info = byPatient.get(p.id);
+      const publishedAt = publishedByPatient.get(p.id) ?? null;
+      const protoAt = activeProtoByPatient.get(p.id) ?? null;
+      const hasPlan = Boolean(publishedAt || protoAt);
       return {
         id: p.id,
         fullName: p.full_name,
@@ -152,12 +170,13 @@ export const listMyPatientsForPlan = createServerFn({ method: "GET" })
         isActive: p.is_active ?? true,
         anamnesisStatus: info?.status ?? "none",
         anamnesisUpdatedAt: info?.updatedAt ?? null,
-        planStatus: publishedByPatient.has(p.id) ? "delivered" : "pending",
-        latestPublishedPlanAt: publishedByPatient.get(p.id) ?? null,
+        planStatus: hasPlan ? "delivered" : "pending",
+        latestPublishedPlanAt: publishedAt ?? protoAt,
         autoDraft: autoByPatient.get(p.id) ?? null,
       };
     });
   });
+
 
 const EnsureDraftInput = z.object({
   patientId: z.string().uuid(),
