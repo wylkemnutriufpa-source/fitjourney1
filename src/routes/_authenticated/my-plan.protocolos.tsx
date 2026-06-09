@@ -264,9 +264,9 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
           {emojiForFood(item.name)}
         </span>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
-          <p className="text-[11px] text-muted-foreground">
-            {item.householdMeasure}
+          <p className="text-sm font-medium text-foreground break-words leading-tight">{item.name}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            <span>{abbreviateMeasure(item.householdMeasure)}</span>
             <span className="text-muted-foreground/60"> · {item.quantityG}g · {item.kcal} kcal</span>
           </p>
         </div>
