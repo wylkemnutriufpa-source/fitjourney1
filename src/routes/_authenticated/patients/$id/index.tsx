@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { PhysicalAssessmentCard } from "@/components/patient/PhysicalAssessmentCard";
+import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
 import { getPatientForNutritionist, setPatientActiveStatus } from "@/lib/patients/patient-detail.functions";
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
 import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
@@ -359,6 +360,9 @@ function PatientProfile() {
 
         {/* Avaliação Física — entidade única com histórico */}
         <PhysicalAssessmentCard patientId={p.id} />
+
+        {/* Diagnóstico clínico × protocolo aplicado — informativo, não bloqueante */}
+        <ProtocolDiagnosticCard patientId={p.id} />
 
         {/* Feedbacks do paciente — atalho + últimos 3 */}
         <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
