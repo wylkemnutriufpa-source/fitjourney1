@@ -773,7 +773,7 @@ function ApplyPhaseDialog({
           </div>
         ) : (
           <div className="py-2 space-y-3">
-            <RealPatientPicker value={patient} onChange={setPatient} />
+            <RealPatientPicker value={patient} onChange={setPatient} initialPatientId={initialPatientId} />
             <p className="text-[11px] text-muted-foreground">
               O paciente passa a ver esta fase em "Protocolos Ativos" e recebe um banner diário com as recomendações.
             </p>
