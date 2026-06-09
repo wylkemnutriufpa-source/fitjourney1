@@ -2,7 +2,7 @@
 // A rota pai /protocolos é layout; esta leaf renderiza a lista.
 
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import {
   Activity,
   Baby,
