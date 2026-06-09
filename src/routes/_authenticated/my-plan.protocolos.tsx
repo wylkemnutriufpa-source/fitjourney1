@@ -153,7 +153,7 @@ export function computeCurrentWeek(row: ActiveProtocolRow): number {
   return Math.max(1, Math.min(week, row.phase_snapshot.durationWeeks));
 }
 
-function ActiveProtocolCard({
+export function ActiveProtocolCard({
   row,
   personalWaterMl,
 }: {
