@@ -46,7 +46,7 @@ import {
   type ProtocolModule,
   type ProtocolPhase,
 } from "@/lib/protocols/catalog";
-import { applyProtocolPhase } from "@/lib/protocols/active.functions";
+import { applyProtocolPhase, listProtocolEnrollments, type ProtocolEnrollmentRow } from "@/lib/protocols/active.functions";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
 
