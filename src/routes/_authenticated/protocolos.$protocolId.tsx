@@ -94,6 +94,8 @@ function ProtocolDetailPage() {
           activeModule={activeModule}
         />
 
+        {hasAccess && <EnrollmentsButton protocol={protocol} />}
+
         {hasAccess && patientId && (
           <ProtocolDiagnosticCard patientId={patientId} />
         )}
