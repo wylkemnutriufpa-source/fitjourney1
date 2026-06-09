@@ -127,7 +127,7 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
       {
         id: 1,
         name: "Fase 1 — Ativação de Saciedade",
-        durationWeeks: 3,
+        durationWeeks: 2,
         description:
           "Foco inicial em estimular a produção natural de GLP-1 e criar hábitos de alta saciedade.",
         dailyKcalTarget: 1550,
@@ -401,7 +401,7 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
       {
         id: 2,
         name: "Fase 2 — Consolidação + Suco Verde",
-        durationWeeks: 3,
+        durationWeeks: 2,
         description:
           "Consolidação da saciedade com introdução de suco verde diário e maior volume de vegetais.",
         dailyKcalTarget: 1600,
@@ -676,7 +676,7 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
       {
         id: 3,
         name: "Fase 3 — Adaptação Metabólica + Caldos",
-        durationWeeks: 1,
+        durationWeeks: 2,
         description:
           "Introdução de caldos nutritivos no jantar, ajuste metabólico e refeed estratégico de carboidratos.",
         dailyKcalTarget: 1700,
@@ -864,7 +864,7 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
       {
         id: 4,
         name: "Fase 4 — Manutenção e Autonomia",
-        durationWeeks: 1,
+        durationWeeks: 2,
         description:
           "Transição para manutenção sustentável com flexibilidade alimentar e jejum leve opcional.",
         dailyKcalTarget: 1750,
@@ -1284,7 +1284,7 @@ function defaultModules(p: ProtocolDescriptor): ReadonlyArray<ProtocolModule> {
         {
           id: 2,
           name: "Fase 2 — Manutenção",
-          durationWeeks: 4,
+          durationWeeks: 2,
           description: `Consolidação do ${p.name} e calibragem fina das recomendações.`,
           recommendations: {
             waterMl: 2500,
