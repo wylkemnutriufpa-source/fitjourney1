@@ -207,6 +207,20 @@ function TeaRowCard({ tea, index }: { tea: TeaRow; index: number }) {
       {hasDetail && open && (
         <dl className="px-2.5 pb-2.5 pt-1.5 border-t border-border/40 space-y-1.5 animate-fade-in text-xs">
           {tea.quantity && <DetailRow label="Quantidade" value={tea.quantity} />}
+          {tea.ingredients && tea.ingredients.length > 0 && (
+            <div className="flex gap-2">
+              <dt className="font-mono uppercase tracking-wider text-[10px] text-muted-foreground shrink-0 min-w-[5.5rem]">
+                Ingredientes
+              </dt>
+              <dd className="text-foreground/90 flex-1">
+                <ul className="list-disc pl-4 space-y-0.5">
+                  {tea.ingredients.map((ing, i) => (
+                    <li key={i}>{ing}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          )}
           {tea.preparation && <DetailRow label="Modo de preparo" value={tea.preparation} />}
           {tea.timesPerDay && <DetailRow label="Frequência" value={tea.timesPerDay} />}
           {tea.benefits && <DetailRow label="Benefícios" value={tea.benefits} />}
