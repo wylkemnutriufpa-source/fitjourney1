@@ -12,7 +12,7 @@ import { submitPatientAnamnesisUpdate } from "@/lib/anamnesis/review.functions";
 import { AppShell } from "@/components/AppShell";
 import type { Answers } from "@/lib/anamnesis/v2/catalog/types";
 
-export const Route = createFileRoute("/_authenticated/my-plan/update-health-profile")({
+export const Route = createFileRoute("/_authenticated/meu-plano/update-health-profile")({
   head: () => ({ meta: [{ title: "Atualizar Perfil de Saúde — FitJourney" }] }),
   component: UpdateHealthProfilePage,
   errorComponent: ({ error, reset }) => (

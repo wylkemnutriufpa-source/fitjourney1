@@ -9,7 +9,7 @@ import { ArrowLeft, Activity, History } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { listMyPhysicalAssessments } from "@/lib/physical-assessments/physical-assessments.functions";
 
-export const Route = createFileRoute("/_authenticated/my-plan/physical-assessment")({
+export const Route = createFileRoute("/_authenticated/meu-plano/physical-assessment")({
   head: () => ({ meta: [{ title: "Avaliação Física — FitJourney" }] }),
   component: MyPhysicalAssessmentPage,
   errorComponent: ({ error, reset }) => (

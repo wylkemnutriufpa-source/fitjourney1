@@ -28,8 +28,8 @@ import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProtocolosRouteImport } from './routes/_authenticated/protocolos'
 import { Route as AuthenticatedMyPlanV2PreviewRouteImport } from './routes/_authenticated/my-plan-v2-preview'
-import { Route as AuthenticatedMyPlanRouteImport } from './routes/_authenticated/my-plan'
 import { Route as AuthenticatedMyDashboardRouteImport } from './routes/_authenticated/my-dashboard'
+import { Route as AuthenticatedMeuPlanoRouteImport } from './routes/_authenticated/meu-plano'
 import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedFeedbacksRouteImport } from './routes/_authenticated/feedbacks'
@@ -43,12 +43,12 @@ import { Route as AuthenticatedProtocolosProtocolIdRouteImport } from './routes/
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients/new'
 import { Route as AuthenticatedOnboardingPatientRouteImport } from './routes/_authenticated/onboarding/patient'
 import { Route as AuthenticatedOnboardingNutritionistRouteImport } from './routes/_authenticated/onboarding/nutritionist'
-import { Route as AuthenticatedMyPlanUpdateHealthProfileRouteImport } from './routes/_authenticated/my-plan.update-health-profile'
-import { Route as AuthenticatedMyPlanSettingsRouteImport } from './routes/_authenticated/my-plan.settings'
-import { Route as AuthenticatedMyPlanProtocolosRouteImport } from './routes/_authenticated/my-plan.protocolos'
-import { Route as AuthenticatedMyPlanPhysicalAssessmentRouteImport } from './routes/_authenticated/my-plan.physical-assessment'
-import { Route as AuthenticatedMyPlanFeedbackRouteImport } from './routes/_authenticated/my-plan.feedback'
-import { Route as AuthenticatedMyPlanAnamneseRouteImport } from './routes/_authenticated/my-plan.anamnese'
+import { Route as AuthenticatedMeuPlanoUpdateHealthProfileRouteImport } from './routes/_authenticated/meu-plano.update-health-profile'
+import { Route as AuthenticatedMeuPlanoSettingsRouteImport } from './routes/_authenticated/meu-plano.settings'
+import { Route as AuthenticatedMeuPlanoProtocolosRouteImport } from './routes/_authenticated/meu-plano.protocolos'
+import { Route as AuthenticatedMeuPlanoPhysicalAssessmentRouteImport } from './routes/_authenticated/meu-plano.physical-assessment'
+import { Route as AuthenticatedMeuPlanoFeedbackRouteImport } from './routes/_authenticated/meu-plano.feedback'
+import { Route as AuthenticatedMeuPlanoAnamneseRouteImport } from './routes/_authenticated/meu-plano.anamnese'
 import { Route as AuthenticatedAnamnesesIdRouteImport } from './routes/_authenticated/anamneses.$id'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminProfissionaisRouteImport } from './routes/_authenticated/admin.profissionais'
@@ -156,17 +156,17 @@ const AuthenticatedMyPlanV2PreviewRoute =
     path: '/my-plan-v2-preview',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedMyPlanRoute = AuthenticatedMyPlanRouteImport.update({
-  id: '/my-plan',
-  path: '/my-plan',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedMyDashboardRoute =
   AuthenticatedMyDashboardRouteImport.update({
     id: '/my-dashboard',
     path: '/my-dashboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedMeuPlanoRoute = AuthenticatedMeuPlanoRouteImport.update({
+  id: '/meu-plano',
+  path: '/meu-plano',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
@@ -239,41 +239,41 @@ const AuthenticatedOnboardingNutritionistRoute =
     path: '/onboarding/nutritionist',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedMyPlanUpdateHealthProfileRoute =
-  AuthenticatedMyPlanUpdateHealthProfileRouteImport.update({
+const AuthenticatedMeuPlanoUpdateHealthProfileRoute =
+  AuthenticatedMeuPlanoUpdateHealthProfileRouteImport.update({
     id: '/update-health-profile',
     path: '/update-health-profile',
-    getParentRoute: () => AuthenticatedMyPlanRoute,
+    getParentRoute: () => AuthenticatedMeuPlanoRoute,
   } as any)
-const AuthenticatedMyPlanSettingsRoute =
-  AuthenticatedMyPlanSettingsRouteImport.update({
+const AuthenticatedMeuPlanoSettingsRoute =
+  AuthenticatedMeuPlanoSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
-    getParentRoute: () => AuthenticatedMyPlanRoute,
+    getParentRoute: () => AuthenticatedMeuPlanoRoute,
   } as any)
-const AuthenticatedMyPlanProtocolosRoute =
-  AuthenticatedMyPlanProtocolosRouteImport.update({
+const AuthenticatedMeuPlanoProtocolosRoute =
+  AuthenticatedMeuPlanoProtocolosRouteImport.update({
     id: '/protocolos',
     path: '/protocolos',
-    getParentRoute: () => AuthenticatedMyPlanRoute,
+    getParentRoute: () => AuthenticatedMeuPlanoRoute,
   } as any)
-const AuthenticatedMyPlanPhysicalAssessmentRoute =
-  AuthenticatedMyPlanPhysicalAssessmentRouteImport.update({
+const AuthenticatedMeuPlanoPhysicalAssessmentRoute =
+  AuthenticatedMeuPlanoPhysicalAssessmentRouteImport.update({
     id: '/physical-assessment',
     path: '/physical-assessment',
-    getParentRoute: () => AuthenticatedMyPlanRoute,
+    getParentRoute: () => AuthenticatedMeuPlanoRoute,
   } as any)
-const AuthenticatedMyPlanFeedbackRoute =
-  AuthenticatedMyPlanFeedbackRouteImport.update({
+const AuthenticatedMeuPlanoFeedbackRoute =
+  AuthenticatedMeuPlanoFeedbackRouteImport.update({
     id: '/feedback',
     path: '/feedback',
-    getParentRoute: () => AuthenticatedMyPlanRoute,
+    getParentRoute: () => AuthenticatedMeuPlanoRoute,
   } as any)
-const AuthenticatedMyPlanAnamneseRoute =
-  AuthenticatedMyPlanAnamneseRouteImport.update({
+const AuthenticatedMeuPlanoAnamneseRoute =
+  AuthenticatedMeuPlanoAnamneseRouteImport.update({
     id: '/anamnese',
     path: '/anamnese',
-    getParentRoute: () => AuthenticatedMyPlanRoute,
+    getParentRoute: () => AuthenticatedMeuPlanoRoute,
   } as any)
 const AuthenticatedAnamnesesIdRoute =
   AuthenticatedAnamnesesIdRouteImport.update({
@@ -348,8 +348,8 @@ export interface FileRoutesByFullPath {
   '/feedbacks': typeof AuthenticatedFeedbacksRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/insights': typeof AuthenticatedInsightsRoute
+  '/meu-plano': typeof AuthenticatedMeuPlanoRouteWithChildren
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
-  '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
   '/protocolos': typeof AuthenticatedProtocolosRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
@@ -367,12 +367,12 @@ export interface FileRoutesByFullPath {
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
-  '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
-  '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
-  '/my-plan/physical-assessment': typeof AuthenticatedMyPlanPhysicalAssessmentRoute
-  '/my-plan/protocolos': typeof AuthenticatedMyPlanProtocolosRoute
-  '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
-  '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
+  '/meu-plano/anamnese': typeof AuthenticatedMeuPlanoAnamneseRoute
+  '/meu-plano/feedback': typeof AuthenticatedMeuPlanoFeedbackRoute
+  '/meu-plano/physical-assessment': typeof AuthenticatedMeuPlanoPhysicalAssessmentRoute
+  '/meu-plano/protocolos': typeof AuthenticatedMeuPlanoProtocolosRoute
+  '/meu-plano/settings': typeof AuthenticatedMeuPlanoSettingsRoute
+  '/meu-plano/update-health-profile': typeof AuthenticatedMeuPlanoUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -399,8 +399,8 @@ export interface FileRoutesByTo {
   '/feedbacks': typeof AuthenticatedFeedbacksRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/insights': typeof AuthenticatedInsightsRoute
+  '/meu-plano': typeof AuthenticatedMeuPlanoRouteWithChildren
   '/my-dashboard': typeof AuthenticatedMyDashboardRoute
-  '/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
@@ -417,12 +417,12 @@ export interface FileRoutesByTo {
   '/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
-  '/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
-  '/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
-  '/my-plan/physical-assessment': typeof AuthenticatedMyPlanPhysicalAssessmentRoute
-  '/my-plan/protocolos': typeof AuthenticatedMyPlanProtocolosRoute
-  '/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
-  '/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
+  '/meu-plano/anamnese': typeof AuthenticatedMeuPlanoAnamneseRoute
+  '/meu-plano/feedback': typeof AuthenticatedMeuPlanoFeedbackRoute
+  '/meu-plano/physical-assessment': typeof AuthenticatedMeuPlanoPhysicalAssessmentRoute
+  '/meu-plano/protocolos': typeof AuthenticatedMeuPlanoProtocolosRoute
+  '/meu-plano/settings': typeof AuthenticatedMeuPlanoSettingsRoute
+  '/meu-plano/update-health-profile': typeof AuthenticatedMeuPlanoUpdateHealthProfileRoute
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -451,8 +451,8 @@ export interface FileRoutesById {
   '/_authenticated/feedbacks': typeof AuthenticatedFeedbacksRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/insights': typeof AuthenticatedInsightsRoute
+  '/_authenticated/meu-plano': typeof AuthenticatedMeuPlanoRouteWithChildren
   '/_authenticated/my-dashboard': typeof AuthenticatedMyDashboardRoute
-  '/_authenticated/my-plan': typeof AuthenticatedMyPlanRouteWithChildren
   '/_authenticated/my-plan-v2-preview': typeof AuthenticatedMyPlanV2PreviewRoute
   '/_authenticated/protocolos': typeof AuthenticatedProtocolosRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -470,12 +470,12 @@ export interface FileRoutesById {
   '/_authenticated/admin/profissionais': typeof AuthenticatedAdminProfissionaisRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/anamneses/$id': typeof AuthenticatedAnamnesesIdRoute
-  '/_authenticated/my-plan/anamnese': typeof AuthenticatedMyPlanAnamneseRoute
-  '/_authenticated/my-plan/feedback': typeof AuthenticatedMyPlanFeedbackRoute
-  '/_authenticated/my-plan/physical-assessment': typeof AuthenticatedMyPlanPhysicalAssessmentRoute
-  '/_authenticated/my-plan/protocolos': typeof AuthenticatedMyPlanProtocolosRoute
-  '/_authenticated/my-plan/settings': typeof AuthenticatedMyPlanSettingsRoute
-  '/_authenticated/my-plan/update-health-profile': typeof AuthenticatedMyPlanUpdateHealthProfileRoute
+  '/_authenticated/meu-plano/anamnese': typeof AuthenticatedMeuPlanoAnamneseRoute
+  '/_authenticated/meu-plano/feedback': typeof AuthenticatedMeuPlanoFeedbackRoute
+  '/_authenticated/meu-plano/physical-assessment': typeof AuthenticatedMeuPlanoPhysicalAssessmentRoute
+  '/_authenticated/meu-plano/protocolos': typeof AuthenticatedMeuPlanoProtocolosRoute
+  '/_authenticated/meu-plano/settings': typeof AuthenticatedMeuPlanoSettingsRoute
+  '/_authenticated/meu-plano/update-health-profile': typeof AuthenticatedMeuPlanoUpdateHealthProfileRoute
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/_authenticated/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -504,8 +504,8 @@ export interface FileRouteTypes {
     | '/feedbacks'
     | '/financeiro'
     | '/insights'
+    | '/meu-plano'
     | '/my-dashboard'
-    | '/my-plan'
     | '/my-plan-v2-preview'
     | '/protocolos'
     | '/settings'
@@ -523,12 +523,12 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/settings'
     | '/anamneses/$id'
-    | '/my-plan/anamnese'
-    | '/my-plan/feedback'
-    | '/my-plan/physical-assessment'
-    | '/my-plan/protocolos'
-    | '/my-plan/settings'
-    | '/my-plan/update-health-profile'
+    | '/meu-plano/anamnese'
+    | '/meu-plano/feedback'
+    | '/meu-plano/physical-assessment'
+    | '/meu-plano/protocolos'
+    | '/meu-plano/settings'
+    | '/meu-plano/update-health-profile'
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
@@ -555,8 +555,8 @@ export interface FileRouteTypes {
     | '/feedbacks'
     | '/financeiro'
     | '/insights'
+    | '/meu-plano'
     | '/my-dashboard'
-    | '/my-plan'
     | '/my-plan-v2-preview'
     | '/settings'
     | '/templates'
@@ -573,12 +573,12 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/settings'
     | '/anamneses/$id'
-    | '/my-plan/anamnese'
-    | '/my-plan/feedback'
-    | '/my-plan/physical-assessment'
-    | '/my-plan/protocolos'
-    | '/my-plan/settings'
-    | '/my-plan/update-health-profile'
+    | '/meu-plano/anamnese'
+    | '/meu-plano/feedback'
+    | '/meu-plano/physical-assessment'
+    | '/meu-plano/protocolos'
+    | '/meu-plano/settings'
+    | '/meu-plano/update-health-profile'
     | '/onboarding/nutritionist'
     | '/onboarding/patient'
     | '/patients/new'
@@ -606,8 +606,8 @@ export interface FileRouteTypes {
     | '/_authenticated/feedbacks'
     | '/_authenticated/financeiro'
     | '/_authenticated/insights'
+    | '/_authenticated/meu-plano'
     | '/_authenticated/my-dashboard'
-    | '/_authenticated/my-plan'
     | '/_authenticated/my-plan-v2-preview'
     | '/_authenticated/protocolos'
     | '/_authenticated/settings'
@@ -625,12 +625,12 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/profissionais'
     | '/_authenticated/admin/settings'
     | '/_authenticated/anamneses/$id'
-    | '/_authenticated/my-plan/anamnese'
-    | '/_authenticated/my-plan/feedback'
-    | '/_authenticated/my-plan/physical-assessment'
-    | '/_authenticated/my-plan/protocolos'
-    | '/_authenticated/my-plan/settings'
-    | '/_authenticated/my-plan/update-health-profile'
+    | '/_authenticated/meu-plano/anamnese'
+    | '/_authenticated/meu-plano/feedback'
+    | '/_authenticated/meu-plano/physical-assessment'
+    | '/_authenticated/meu-plano/protocolos'
+    | '/_authenticated/meu-plano/settings'
+    | '/_authenticated/meu-plano/update-health-profile'
     | '/_authenticated/onboarding/nutritionist'
     | '/_authenticated/onboarding/patient'
     | '/_authenticated/patients/new'
@@ -796,18 +796,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyPlanV2PreviewRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/my-plan': {
-      id: '/_authenticated/my-plan'
-      path: '/my-plan'
-      fullPath: '/my-plan'
-      preLoaderRoute: typeof AuthenticatedMyPlanRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/my-dashboard': {
       id: '/_authenticated/my-dashboard'
       path: '/my-dashboard'
       fullPath: '/my-dashboard'
       preLoaderRoute: typeof AuthenticatedMyDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/meu-plano': {
+      id: '/_authenticated/meu-plano'
+      path: '/meu-plano'
+      fullPath: '/meu-plano'
+      preLoaderRoute: typeof AuthenticatedMeuPlanoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/insights': {
@@ -901,47 +901,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingNutritionistRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/my-plan/update-health-profile': {
-      id: '/_authenticated/my-plan/update-health-profile'
+    '/_authenticated/meu-plano/update-health-profile': {
+      id: '/_authenticated/meu-plano/update-health-profile'
       path: '/update-health-profile'
-      fullPath: '/my-plan/update-health-profile'
-      preLoaderRoute: typeof AuthenticatedMyPlanUpdateHealthProfileRouteImport
-      parentRoute: typeof AuthenticatedMyPlanRoute
+      fullPath: '/meu-plano/update-health-profile'
+      preLoaderRoute: typeof AuthenticatedMeuPlanoUpdateHealthProfileRouteImport
+      parentRoute: typeof AuthenticatedMeuPlanoRoute
     }
-    '/_authenticated/my-plan/settings': {
-      id: '/_authenticated/my-plan/settings'
+    '/_authenticated/meu-plano/settings': {
+      id: '/_authenticated/meu-plano/settings'
       path: '/settings'
-      fullPath: '/my-plan/settings'
-      preLoaderRoute: typeof AuthenticatedMyPlanSettingsRouteImport
-      parentRoute: typeof AuthenticatedMyPlanRoute
+      fullPath: '/meu-plano/settings'
+      preLoaderRoute: typeof AuthenticatedMeuPlanoSettingsRouteImport
+      parentRoute: typeof AuthenticatedMeuPlanoRoute
     }
-    '/_authenticated/my-plan/protocolos': {
-      id: '/_authenticated/my-plan/protocolos'
+    '/_authenticated/meu-plano/protocolos': {
+      id: '/_authenticated/meu-plano/protocolos'
       path: '/protocolos'
-      fullPath: '/my-plan/protocolos'
-      preLoaderRoute: typeof AuthenticatedMyPlanProtocolosRouteImport
-      parentRoute: typeof AuthenticatedMyPlanRoute
+      fullPath: '/meu-plano/protocolos'
+      preLoaderRoute: typeof AuthenticatedMeuPlanoProtocolosRouteImport
+      parentRoute: typeof AuthenticatedMeuPlanoRoute
     }
-    '/_authenticated/my-plan/physical-assessment': {
-      id: '/_authenticated/my-plan/physical-assessment'
+    '/_authenticated/meu-plano/physical-assessment': {
+      id: '/_authenticated/meu-plano/physical-assessment'
       path: '/physical-assessment'
-      fullPath: '/my-plan/physical-assessment'
-      preLoaderRoute: typeof AuthenticatedMyPlanPhysicalAssessmentRouteImport
-      parentRoute: typeof AuthenticatedMyPlanRoute
+      fullPath: '/meu-plano/physical-assessment'
+      preLoaderRoute: typeof AuthenticatedMeuPlanoPhysicalAssessmentRouteImport
+      parentRoute: typeof AuthenticatedMeuPlanoRoute
     }
-    '/_authenticated/my-plan/feedback': {
-      id: '/_authenticated/my-plan/feedback'
+    '/_authenticated/meu-plano/feedback': {
+      id: '/_authenticated/meu-plano/feedback'
       path: '/feedback'
-      fullPath: '/my-plan/feedback'
-      preLoaderRoute: typeof AuthenticatedMyPlanFeedbackRouteImport
-      parentRoute: typeof AuthenticatedMyPlanRoute
+      fullPath: '/meu-plano/feedback'
+      preLoaderRoute: typeof AuthenticatedMeuPlanoFeedbackRouteImport
+      parentRoute: typeof AuthenticatedMeuPlanoRoute
     }
-    '/_authenticated/my-plan/anamnese': {
-      id: '/_authenticated/my-plan/anamnese'
+    '/_authenticated/meu-plano/anamnese': {
+      id: '/_authenticated/meu-plano/anamnese'
       path: '/anamnese'
-      fullPath: '/my-plan/anamnese'
-      preLoaderRoute: typeof AuthenticatedMyPlanAnamneseRouteImport
-      parentRoute: typeof AuthenticatedMyPlanRoute
+      fullPath: '/meu-plano/anamnese'
+      preLoaderRoute: typeof AuthenticatedMeuPlanoAnamneseRouteImport
+      parentRoute: typeof AuthenticatedMeuPlanoRoute
     }
     '/_authenticated/anamneses/$id': {
       id: '/_authenticated/anamneses/$id'
@@ -1037,28 +1037,30 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
-interface AuthenticatedMyPlanRouteChildren {
-  AuthenticatedMyPlanAnamneseRoute: typeof AuthenticatedMyPlanAnamneseRoute
-  AuthenticatedMyPlanFeedbackRoute: typeof AuthenticatedMyPlanFeedbackRoute
-  AuthenticatedMyPlanPhysicalAssessmentRoute: typeof AuthenticatedMyPlanPhysicalAssessmentRoute
-  AuthenticatedMyPlanProtocolosRoute: typeof AuthenticatedMyPlanProtocolosRoute
-  AuthenticatedMyPlanSettingsRoute: typeof AuthenticatedMyPlanSettingsRoute
-  AuthenticatedMyPlanUpdateHealthProfileRoute: typeof AuthenticatedMyPlanUpdateHealthProfileRoute
+interface AuthenticatedMeuPlanoRouteChildren {
+  AuthenticatedMeuPlanoAnamneseRoute: typeof AuthenticatedMeuPlanoAnamneseRoute
+  AuthenticatedMeuPlanoFeedbackRoute: typeof AuthenticatedMeuPlanoFeedbackRoute
+  AuthenticatedMeuPlanoPhysicalAssessmentRoute: typeof AuthenticatedMeuPlanoPhysicalAssessmentRoute
+  AuthenticatedMeuPlanoProtocolosRoute: typeof AuthenticatedMeuPlanoProtocolosRoute
+  AuthenticatedMeuPlanoSettingsRoute: typeof AuthenticatedMeuPlanoSettingsRoute
+  AuthenticatedMeuPlanoUpdateHealthProfileRoute: typeof AuthenticatedMeuPlanoUpdateHealthProfileRoute
 }
 
-const AuthenticatedMyPlanRouteChildren: AuthenticatedMyPlanRouteChildren = {
-  AuthenticatedMyPlanAnamneseRoute: AuthenticatedMyPlanAnamneseRoute,
-  AuthenticatedMyPlanFeedbackRoute: AuthenticatedMyPlanFeedbackRoute,
-  AuthenticatedMyPlanPhysicalAssessmentRoute:
-    AuthenticatedMyPlanPhysicalAssessmentRoute,
-  AuthenticatedMyPlanProtocolosRoute: AuthenticatedMyPlanProtocolosRoute,
-  AuthenticatedMyPlanSettingsRoute: AuthenticatedMyPlanSettingsRoute,
-  AuthenticatedMyPlanUpdateHealthProfileRoute:
-    AuthenticatedMyPlanUpdateHealthProfileRoute,
+const AuthenticatedMeuPlanoRouteChildren: AuthenticatedMeuPlanoRouteChildren = {
+  AuthenticatedMeuPlanoAnamneseRoute: AuthenticatedMeuPlanoAnamneseRoute,
+  AuthenticatedMeuPlanoFeedbackRoute: AuthenticatedMeuPlanoFeedbackRoute,
+  AuthenticatedMeuPlanoPhysicalAssessmentRoute:
+    AuthenticatedMeuPlanoPhysicalAssessmentRoute,
+  AuthenticatedMeuPlanoProtocolosRoute: AuthenticatedMeuPlanoProtocolosRoute,
+  AuthenticatedMeuPlanoSettingsRoute: AuthenticatedMeuPlanoSettingsRoute,
+  AuthenticatedMeuPlanoUpdateHealthProfileRoute:
+    AuthenticatedMeuPlanoUpdateHealthProfileRoute,
 }
 
-const AuthenticatedMyPlanRouteWithChildren =
-  AuthenticatedMyPlanRoute._addFileChildren(AuthenticatedMyPlanRouteChildren)
+const AuthenticatedMeuPlanoRouteWithChildren =
+  AuthenticatedMeuPlanoRoute._addFileChildren(
+    AuthenticatedMeuPlanoRouteChildren,
+  )
 
 interface AuthenticatedProtocolosRouteChildren {
   AuthenticatedProtocolosProtocolIdRoute: typeof AuthenticatedProtocolosProtocolIdRoute
@@ -1083,8 +1085,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedFeedbacksRoute: typeof AuthenticatedFeedbacksRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
+  AuthenticatedMeuPlanoRoute: typeof AuthenticatedMeuPlanoRouteWithChildren
   AuthenticatedMyDashboardRoute: typeof AuthenticatedMyDashboardRoute
-  AuthenticatedMyPlanRoute: typeof AuthenticatedMyPlanRouteWithChildren
   AuthenticatedMyPlanV2PreviewRoute: typeof AuthenticatedMyPlanV2PreviewRoute
   AuthenticatedProtocolosRoute: typeof AuthenticatedProtocolosRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -1107,8 +1109,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFeedbacksRoute: AuthenticatedFeedbacksRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
+  AuthenticatedMeuPlanoRoute: AuthenticatedMeuPlanoRouteWithChildren,
   AuthenticatedMyDashboardRoute: AuthenticatedMyDashboardRoute,
-  AuthenticatedMyPlanRoute: AuthenticatedMyPlanRouteWithChildren,
   AuthenticatedMyPlanV2PreviewRoute: AuthenticatedMyPlanV2PreviewRoute,
   AuthenticatedProtocolosRoute: AuthenticatedProtocolosRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,

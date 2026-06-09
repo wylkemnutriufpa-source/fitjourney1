@@ -20,7 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AvatarCropDialog } from "@/components/AvatarCropDialog";
 import { maskPhoneBR } from "@/lib/phone-mask";
 
-export const Route = createFileRoute("/_authenticated/my-plan/settings")({
+export const Route = createFileRoute("/_authenticated/meu-plano/settings")({
   head: () => ({ meta: [{ title: "Minha conta — FitJourney" }] }),
   component: PatientSettings,
   errorComponent: ({ error, reset }) => (

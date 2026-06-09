@@ -44,7 +44,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/my-plan/feedback")({
+export const Route = createFileRoute("/_authenticated/meu-plano/feedback")({
   head: () => ({ meta: [{ title: "Feedback — FitJourney" }] }),
   component: FeedbackPage,
   errorComponent: ({ error, reset }) => (
