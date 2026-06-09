@@ -267,6 +267,14 @@ function PatientProfile() {
               <FileText className="size-4" />
               {hasPublishedPlan ? "Novo plano com IA" : "Plano com IA FitJourney"}
             </Link>
+            <Link
+              to="/protocolos"
+              search={{ patientId: p.id, patientName: p.fullName }}
+              className="col-span-2 sm:col-span-1 flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-[var(--gold)]/70 bg-[color-mix(in_oklab,var(--gold)_10%,transparent)] px-4 py-2.5 text-xs font-bold tracking-wide text-[var(--gold)] shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_25%,transparent),0_6px_24px_-8px_color-mix(in_oklab,var(--gold)_45%,transparent)] hover:bg-[color-mix(in_oklab,var(--gold)_18%,transparent)] hover:border-[var(--gold)] transition-all"
+            >
+              <Sparkles className="size-4" />
+              Aplicar Protocolo
+            </Link>
           </div>
         </div>
 
