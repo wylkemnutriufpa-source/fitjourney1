@@ -143,8 +143,37 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
             "Preparar a mistura para 1 semana e guardar em pote de vidro fechado, longe da luz.",
         },
         teaSchedule: [
-          { time: "07:30", name: "Chá de gengibre + limão + cúrcuma", benefits: "Anti-inflamatório e estimulante de GLP-1" },
-          { time: "15:00", name: "Chá verde", benefits: "Melhora sensibilidade à insulina" },
+          {
+            time: "07:30",
+            name: "Chá de gengibre + limão + cúrcuma",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 fatia fina de gengibre fresco (~3 g)",
+              "½ colher de chá de cúrcuma em pó",
+              "Suco de ½ limão",
+              "Pitada de pimenta-do-reino preta",
+            ],
+            preparation:
+              "Ferver a água com o gengibre e a cúrcuma por 5 minutos. Desligar, abafar por 3 minutos, coar, acrescentar o limão e a pimenta. Tomar morno e sem açúcar.",
+            timesPerDay: "1x ao dia (em jejum)",
+            benefits: "Anti-inflamatório e estimulante de GLP-1",
+            notes: "Evitar se houver gastrite ativa.",
+          },
+          {
+            time: "15:00",
+            name: "Chá verde",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 colher de chá de chá verde a granel (ou 1 sachê)",
+            ],
+            preparation:
+              "Aquecer a água até ~80°C (antes de ferver). Adicionar o chá, abafar por 3 minutos e coar. Tomar puro.",
+            timesPerDay: "1x ao dia (meio da tarde)",
+            benefits: "Melhora sensibilidade à insulina e termogênese leve",
+            notes: "Não consumir após 17h para preservar o sono.",
+          },
         ],
         meals: [
           {
