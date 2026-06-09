@@ -1,5 +1,7 @@
 // Modal de checkout / renovação de assinatura.
-// Tabs: Cartão (Stripe - em breve) e Pix (chave + WhatsApp para comprovante).
+// Mostra a lista de planos cadastrados pelo admin (Mensal/Trimestral/etc) como
+// botões colapsáveis. Cada plano expande exibindo o QR code, o código Pix
+// copia-e-cola, e botão para enviar o comprovante pelo WhatsApp.
 
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -9,6 +11,9 @@ import {
   Check,
   MessageCircle,
   Loader2,
+  ChevronDown,
+  ChevronUp,
+  QrCode,
 } from "lucide-react";
 
 import {
@@ -18,7 +23,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getAppSettings } from "@/lib/settings/app-settings.functions";
+import {
+  getAppSettings,
+  type AppSettings,
+  type CheckoutPlan,
+} from "@/lib/settings/app-settings.functions";
 
 type Audience = "nutritionist" | "patient";
 
@@ -26,44 +35,32 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   audience: Audience;
-  /** Nome para usar na mensagem do WhatsApp (paciente ou nutricionista). */
   displayName?: string;
-  /** Valor sugerido em centavos. Se ausente, usuário escolhe livremente. */
   suggestedAmountCents?: number;
-  /** Rótulo do plano (mensal, trimestral, etc) para mensagem. */
   planLabel?: string;
 };
-
-function formatBRL(cents: number) {
-  return (cents / 100).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-}
 
 export function CheckoutModal({
   open,
   onOpenChange,
   audience,
   displayName,
-  suggestedAmountCents,
   planLabel,
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Renovar assinatura</DialogTitle>
           <DialogDescription>
-            Pague via Pix. Após o pagamento, envie o comprovante pelo WhatsApp
+            Escolha um plano, pague via Pix e envie o comprovante pelo WhatsApp
             para liberar seu acesso.
           </DialogDescription>
         </DialogHeader>
 
-        <PixTab
+        <CheckoutBody
           audience={audience}
           displayName={displayName}
-          suggestedAmountCents={suggestedAmountCents}
           planLabel={planLabel}
         />
       </DialogContent>
@@ -71,29 +68,21 @@ export function CheckoutModal({
   );
 }
 
-
-function PixTab({
+function CheckoutBody({
   audience,
   displayName,
-  suggestedAmountCents,
   planLabel,
 }: {
   audience: Audience;
   displayName?: string;
-  suggestedAmountCents?: number;
   planLabel?: string;
 }) {
   const fetchSettings = useServerFn(getAppSettings);
   const { data, isLoading } = useQuery({
-    queryKey: ["app-settings", "pix"],
+    queryKey: ["app-settings", "checkout"],
     queryFn: () => fetchSettings(),
     staleTime: 5 * 60_000,
   });
-
-  const [copied, setCopied] = useState(false);
-  const [amount, setAmount] = useState<string>(
-    suggestedAmountCents ? (suggestedAmountCents / 100).toFixed(2) : "",
-  );
 
   if (isLoading || !data) {
     return (
@@ -103,10 +92,92 @@ function PixTab({
     );
   }
 
-  async function copyPix() {
-    if (!data) return;
+  return (
+    <PlansList
+      settings={data}
+      audience={audience}
+      displayName={displayName}
+      preferredLabel={planLabel}
+    />
+  );
+}
+
+function PlansList({
+  settings,
+  audience,
+  displayName,
+  preferredLabel,
+}: {
+  settings: AppSettings;
+  audience: Audience;
+  displayName?: string;
+  preferredLabel?: string;
+}) {
+  const plans = settings.checkoutPlans ?? [];
+  const initialOpen = (() => {
+    if (plans.length === 0) return null;
+    const match = preferredLabel
+      ? plans.find((p) => p.label.toLowerCase() === preferredLabel.toLowerCase())
+      : null;
+    return match?.id ?? plans[0].id;
+  })();
+  const [openId, setOpenId] = useState<string | null>(initialOpen);
+
+  if (plans.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+        Nenhum plano disponível no momento. Entre em contato pelo WhatsApp{" "}
+        <a
+          href={`https://wa.me/${settings.whatsappNumber}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary underline"
+        >
+          {settings.whatsappNumber}
+        </a>
+        .
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2 py-2">
+      {plans.map((p) => (
+        <PlanRow
+          key={p.id}
+          plan={p}
+          open={openId === p.id}
+          onToggle={() => setOpenId(openId === p.id ? null : p.id)}
+          whatsappNumber={settings.whatsappNumber}
+          audience={audience}
+          displayName={displayName}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PlanRow({
+  plan,
+  open,
+  onToggle,
+  whatsappNumber,
+  audience,
+  displayName,
+}: {
+  plan: CheckoutPlan;
+  open: boolean;
+  onToggle: () => void;
+  whatsappNumber: string;
+  audience: Audience;
+  displayName?: string;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  async function copyCode() {
+    if (!plan.pixCode) return;
     try {
-      await navigator.clipboard.writeText(data.pixKey);
+      await navigator.clipboard.writeText(plan.pixCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -115,80 +186,99 @@ function PixTab({
   }
 
   const audienceLabel = audience === "nutritionist" ? "Profissional" : "Paciente";
-  const amountNum = parseFloat(amount.replace(",", "."));
-  const amountText = isFinite(amountNum) && amountNum > 0
-    ? formatBRL(Math.round(amountNum * 100))
-    : null;
-
   const message = [
     `Olá! Estou enviando comprovante de pagamento via Pix.`,
     `${audienceLabel}: ${displayName ?? "(meu nome)"}`,
-    planLabel ? `Plano: ${planLabel}` : null,
-    amountText ? `Valor: ${amountText}` : null,
-    `Chave usada: ${data.pixKey}`,
+    `Plano: ${plan.label}`,
+    plan.amount ? `Valor: ${plan.amount}` : null,
   ]
     .filter(Boolean)
     .join("\n");
-
-  const waUrl = `https://wa.me/${data.whatsappNumber}?text=${encodeURIComponent(message)}`;
+  const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
   return (
-    <div className="space-y-4 py-2">
-      <div className="rounded-lg border border-border bg-surface/40 p-4 space-y-3">
-        <div>
-          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-            Chave Pix ({data.pixKeyType})
-          </p>
-          <div className="flex items-center gap-2 mt-1">
-            <code className="flex-1 text-lg font-mono bg-background rounded px-3 py-2 border border-border break-all">
-              {data.pixKey}
-            </code>
-            <button
-              type="button"
-              onClick={copyPix}
-              className="grid size-10 place-items-center rounded-md border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground"
-              title="Copiar chave"
-            >
-              {copied ? <Check className="size-4 text-primary" /> : <Copy className="size-4" />}
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-            Valor pago (R$)
-          </label>
-          <input
-            type="number"
-            inputMode="decimal"
-            step="0.01"
-            min="0"
-            placeholder="0,00"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="mt-1 w-full bg-background border border-border rounded px-3 py-2 text-sm"
-          />
-          <p className="text-[11px] text-muted-foreground mt-1">
-            Informe o valor que pagou para constar no comprovante.
-          </p>
-        </div>
-      </div>
-
-      <ol className="text-xs text-muted-foreground space-y-1.5 list-decimal list-inside">
-        <li>Faça o Pix para a chave acima no app do seu banco.</li>
-        <li>Toque no botão abaixo e envie o comprovante pelo WhatsApp.</li>
-        <li>Seu acesso é liberado assim que o pagamento for confirmado.</li>
-      </ol>
-
-      <a
-        href={waUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#1ebe57] text-white font-medium px-4 py-3 rounded-md transition-colors"
+    <div className="rounded-lg border border-border bg-surface/40 overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/40 transition-colors"
       >
-        <MessageCircle className="size-4" />
-        Enviar comprovante pelo WhatsApp
-      </a>
+        <QrCode className="size-4 text-primary shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-semibold">{plan.label}</div>
+          {plan.amount && (
+            <div className="text-[11px] text-muted-foreground">{plan.amount}</div>
+          )}
+        </div>
+        {open ? (
+          <ChevronUp className="size-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="size-4 text-muted-foreground" />
+        )}
+      </button>
+
+      {open && (
+        <div className="border-t border-border p-4 space-y-3">
+          {plan.qrCodeDataUrl ? (
+            <div className="grid place-items-center">
+              <img
+                src={plan.qrCodeDataUrl}
+                alt={`QR Code ${plan.label}`}
+                className="size-56 object-contain rounded-md bg-white p-2 border border-border"
+              />
+            </div>
+          ) : (
+            <div className="rounded-md border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
+              QR Code ainda não disponível para este plano.
+            </div>
+          )}
+
+          {plan.pixCode ? (
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">
+                Código Pix copia-e-cola
+              </p>
+              <div className="flex items-start gap-2">
+                <code className="flex-1 text-[11px] font-mono bg-background rounded px-3 py-2 border border-border break-all max-h-24 overflow-y-auto">
+                  {plan.pixCode}
+                </code>
+                <button
+                  type="button"
+                  onClick={copyCode}
+                  className="grid size-10 place-items-center rounded-md border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground shrink-0"
+                  title="Copiar código"
+                >
+                  {copied ? (
+                    <Check className="size-4 text-primary" />
+                  ) : (
+                    <Copy className="size-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-md border border-dashed border-border p-3 text-center text-xs text-muted-foreground">
+              Código copia-e-cola ainda não cadastrado.
+            </div>
+          )}
+
+          <ol className="text-[11px] text-muted-foreground space-y-1 list-decimal list-inside pt-1">
+            <li>Pague via Pix usando o QR code ou o código copia-e-cola.</li>
+            <li>Envie o comprovante pelo WhatsApp no botão abaixo.</li>
+            <li>Seu acesso é liberado assim que o pagamento for confirmado.</li>
+          </ol>
+
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#1ebe57] text-white font-medium px-4 py-2.5 rounded-md transition-colors text-sm"
+          >
+            <MessageCircle className="size-4" />
+            Enviar comprovante pelo WhatsApp
+          </a>
+        </div>
+      )}
     </div>
   );
 }
