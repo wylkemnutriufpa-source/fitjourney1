@@ -138,6 +138,12 @@ function PatientProfile() {
     queryFn: () => fetchFeedbacks({ data: { patientId: id } }),
     staleTime: 10_000,
   });
+  const { data: activeProtocolsData } = useQuery({
+    queryKey: ["patient-active-protocols", id],
+    queryFn: () => fetchActiveProtocols({ data: { patientId: id } }),
+    staleTime: 10_000,
+  });
+  const activeProtocols = activeProtocolsData?.protocols ?? [];
 
   if (isLoading) {
     return (
