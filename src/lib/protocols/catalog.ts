@@ -28,6 +28,11 @@ export interface PhaseTea {
   readonly time?: string;
   readonly name: string;
   readonly benefits?: string;
+  readonly quantity?: string;
+  readonly ingredients?: ReadonlyArray<string>;
+  readonly preparation?: string;
+  readonly timesPerDay?: string;
+  readonly notes?: string;
 }
 
 export interface PhaseMealItemSubstitution {
