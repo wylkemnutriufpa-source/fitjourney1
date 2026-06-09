@@ -136,9 +136,17 @@ export function computeCurrentWeek(row: ActiveProtocolRow): number {
   return Math.max(1, Math.min(week, row.phase_snapshot.durationWeeks));
 }
 
-function ActiveProtocolCard({ row }: { row: ActiveProtocolRow }) {
+function ActiveProtocolCard({
+  row,
+  personalWaterMl,
+}: {
+  row: ActiveProtocolRow;
+  personalWaterMl: number | null;
+}) {
   const phase = row.phase_snapshot;
   const week = computeCurrentWeek(row);
+  const waterMl = personalWaterMl ?? phase.recommendations.waterMl;
+  const waterLabel = `${(waterMl / 1000).toFixed(1)}L água${personalWaterMl ? " (você)" : ""}`;
   return (
     <article className="relative overflow-hidden rounded-2xl border border-[var(--gold)]/30 bg-gradient-to-br from-surface to-background p-5 space-y-5 shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)]">
       <Sparkles
@@ -160,7 +168,7 @@ function ActiveProtocolCard({ row }: { row: ActiveProtocolRow }) {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] font-mono">
         <MetricChip icon={<Clock className="size-3" />} label={`Sem ${week}/${phase.durationWeeks}`} />
-        <MetricChip icon={<Droplets className="size-3" />} label={`${(phase.recommendations.waterMl / 1000).toFixed(1)}L água`} />
+        <MetricChip icon={<Droplets className="size-3" />} label={waterLabel} />
         <MetricChip icon={<Moon className="size-3" />} label={`${phase.recommendations.sleepHours}h sono`} />
         {phase.dailyKcalTarget && (
           <MetricChip icon={<Flame className="size-3" />} label={`${phase.dailyKcalTarget} kcal/dia`} />
