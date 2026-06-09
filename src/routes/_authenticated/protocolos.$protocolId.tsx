@@ -5,7 +5,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Sparkles,
@@ -20,6 +20,8 @@ import {
   CheckCircle2,
   Pencil,
   Replace,
+  Users,
+  Timer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
@@ -44,7 +46,7 @@ import {
   type ProtocolModule,
   type ProtocolPhase,
 } from "@/lib/protocols/catalog";
-import { applyProtocolPhase } from "@/lib/protocols/active.functions";
+import { applyProtocolPhase, listProtocolEnrollments, type ProtocolEnrollmentRow } from "@/lib/protocols/active.functions";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
 
@@ -93,6 +95,8 @@ function ProtocolDetailPage() {
           requiresPremium={requiresPremium}
           activeModule={activeModule}
         />
+
+        {hasAccess && <EnrollmentsButton protocol={protocol} />}
 
         {hasAccess && patientId && (
           <ProtocolDiagnosticCard patientId={patientId} />
@@ -1109,5 +1113,108 @@ function PreviewFoodRow({ item }: { item: PhaseMealItem }) {
         </div>
       )}
     </div>
+  );
+}
+
+function EnrollmentsButton({ protocol }: { protocol: ProtocolDescriptor }) {
+  const [open, setOpen] = useState(false);
+  const fetchEnrollments = useServerFn(listProtocolEnrollments);
+  const { data, isLoading } = useQuery({
+    queryKey: ["protocol-enrollments", protocol.id],
+    queryFn: () => fetchEnrollments({ data: { protocolId: protocol.id } }),
+    enabled: open,
+    staleTime: 30_000,
+  });
+  const count = data?.enrollments.length ?? 0;
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--gold)]/40 bg-[color-mix(in_oklab,var(--gold)_6%,transparent)] px-3.5 py-2 text-sm font-medium text-[var(--gold)] hover:bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] transition-colors"
+      >
+        <Users className="size-4" />
+        Pacientes neste protocolo
+        {count > 0 && (
+          <span className="ml-1 inline-flex items-center justify-center rounded-full bg-[var(--gold)] text-background text-[10px] font-mono px-1.5 py-0.5 min-w-5">
+            {count}
+          </span>
+        )}
+      </button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogDescription className="text-[10px] font-mono uppercase tracking-widest">
+              {protocol.name}
+            </DialogDescription>
+            <DialogTitle
+              className="text-[var(--gold)] uppercase tracking-wide flex items-center gap-2"
+              style={{ textShadow: "0 0 12px color-mix(in oklab, var(--gold) 30%, transparent)" }}
+            >
+              <Users className="size-4" />
+              Pacientes ativos
+            </DialogTitle>
+          </DialogHeader>
+
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground py-4">Carregando…</p>
+          ) : !data?.enrollments.length ? (
+            <div className="rounded-lg border border-border bg-surface p-6 text-center space-y-1">
+              <p className="text-sm text-muted-foreground">
+                Nenhum paciente está nesta jornada ainda.
+              </p>
+              <p className="text-[11px] text-muted-foreground/80">
+                Aplique uma fase a um paciente para vê-lo aqui.
+              </p>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {data.enrollments.map((e) => (
+                <EnrollmentRow key={e.id} row={e} />
+              ))}
+            </ul>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function EnrollmentRow({ row }: { row: ProtocolEnrollmentRow }) {
+  const daysLeft = (() => {
+    if (!row.ends_at) return null;
+    const ms = new Date(row.ends_at).getTime() - Date.now();
+    return Math.max(0, Math.ceil(ms / (24 * 60 * 60 * 1000)));
+  })();
+  return (
+    <li className="rounded-lg border border-[var(--gold)]/20 bg-background/60 p-3 flex items-center gap-3">
+      <span className="inline-flex size-10 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] text-sm font-semibold text-[var(--gold)] shrink-0 overflow-hidden">
+        {row.patient_avatar_url ? (
+          <img src={row.patient_avatar_url} alt="" className="w-full h-full object-cover" />
+        ) : (
+          row.patient_name.charAt(0).toUpperCase()
+        )}
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-foreground truncate">{row.patient_name}</p>
+        <p className="text-[11px] text-muted-foreground truncate">
+          {row.module_name} · {row.phase_name}
+        </p>
+      </div>
+      <span
+        className={cn(
+          "inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-mono shrink-0",
+          daysLeft !== null && daysLeft <= 3
+            ? "border-amber-500/40 text-amber-500 bg-amber-500/5"
+            : "border-[var(--gold)]/30 text-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_6%,transparent)]",
+        )}
+        title={row.ends_at ? `Fim previsto: ${new Date(row.ends_at).toLocaleDateString("pt-BR")}` : undefined}
+      >
+        <Timer className="size-3" />
+        {daysLeft === null ? "—" : `${daysLeft} d`}
+      </span>
+    </li>
   );
 }
