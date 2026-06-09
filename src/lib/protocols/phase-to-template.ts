@@ -138,6 +138,14 @@ export function protocolPhaseToPlannerTemplate(
     description: phase.description,
     tags: ["protocolo", protocol.id, mod.id],
     kcal: phase.dailyKcalTarget ?? 0,
+    protocolMeta: {
+      protocolId: protocol.id,
+      protocolName: protocol.name,
+      moduleId: mod.id,
+      moduleName: mod.name,
+      phaseId: phase.id,
+      phaseName: phase.name,
+    },
     meals,
-  };
+  } as PlannerTemplate;
 }
