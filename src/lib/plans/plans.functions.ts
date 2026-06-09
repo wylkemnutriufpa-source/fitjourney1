@@ -1008,6 +1008,11 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
         .select("id, published_at")
         .single();
       if (uErr) throw new Error(uErr.message);
+      await syncActiveProtocolFromPlan(supabase, {
+        patientId: draft.patient_id,
+        nutritionistId: nutri.id,
+        sourceTemplateKey: draftSourceTemplateKey,
+      });
       return { id: updated.id, publishedAt: updated.published_at };
     }
 
