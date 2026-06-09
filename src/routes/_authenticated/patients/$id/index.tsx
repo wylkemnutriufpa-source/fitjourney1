@@ -370,6 +370,9 @@ function PatientProfile() {
         {/* Avaliação Física — entidade única com histórico */}
         <PhysicalAssessmentCard patientId={p.id} />
 
+        {/* Hidratação personalizada — calculadora baseada no contexto clínico do paciente */}
+        <WaterCalculatorCard patientId={p.id} />
+
         {/* Diagnóstico clínico × protocolo aplicado — informativo, não bloqueante */}
         <ProtocolDiagnosticCard patientId={p.id} />
 
