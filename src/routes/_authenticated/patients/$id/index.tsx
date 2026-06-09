@@ -308,6 +308,91 @@ function PatientProfile() {
           </div>
         </section>
 
+        {/* Status clínico — Plano alimentar + Protocolo ativo (visão rápida) */}
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* Plano alimentar */}
+          <div className={"rounded-lg border p-5 space-y-2 " + (hasPublishedPlan ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-surface")}>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Plano alimentar
+            </p>
+            <h3 className="text-base font-semibold flex items-center gap-2">
+              <FileText className={"size-4 " + (hasPublishedPlan ? "text-emerald-400" : "text-muted-foreground")} />
+              {hasPublishedPlan ? "Plano ativo publicado" : "Sem plano publicado"}
+            </h3>
+            {hasPublishedPlan && publishedPlans && (
+              <p className="text-[11px] text-muted-foreground">
+                Atualizado em {formatDate(publishedPlans[0].publishedAt)} · paciente já visualiza no app.
+              </p>
+            )}
+            {!hasPublishedPlan && (
+              <p className="text-[11px] text-muted-foreground">
+                Elabore um plano via template ou IA FitJourney.
+              </p>
+            )}
+            {hasPublishedPlan && (
+              <Link
+                to="/patients/$id/diet"
+                params={{ id: p.id }}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:underline pt-1"
+              >
+                <Pencil className="size-3" /> Abrir e editar
+              </Link>
+            )}
+          </div>
+
+          {/* Protocolo ativo */}
+          <div className={"rounded-lg border p-5 space-y-2 " + (activeProtocols.length > 0 ? "border-[var(--gold)]/50 bg-[color-mix(in_oklab,var(--gold)_6%,transparent)]" : "border-border bg-surface")}>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Protocolo clínico
+            </p>
+            {activeProtocols.length === 0 ? (
+              <>
+                <h3 className="text-base font-semibold flex items-center gap-2">
+                  <Activity className="size-4 text-muted-foreground" />
+                  Nenhum protocolo ativo
+                </h3>
+                <p className="text-[11px] text-muted-foreground">
+                  Aplique um protocolo clínico para guiar a evolução do paciente.
+                </p>
+                <Link
+                  to="/protocolos"
+                  search={{ patientId: p.id, patientName: p.fullName }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--gold)] hover:underline pt-1"
+                >
+                  <Sparkles className="size-3" /> Aplicar protocolo
+                </Link>
+              </>
+            ) : (
+              <>
+                <h3 className="text-base font-semibold flex items-center gap-2">
+                  <Activity className="size-4 text-[var(--gold)]" />
+                  {activeProtocols.length} protocolo{activeProtocols.length > 1 ? "s" : ""} ativo{activeProtocols.length > 1 ? "s" : ""}
+                </h3>
+                <ul className="space-y-1.5 pt-1">
+                  {activeProtocols.map((ap) => (
+                    <li key={ap.id} className="text-xs">
+                      <p className="font-semibold">{ap.protocol_name}</p>
+                      <p className="text-muted-foreground flex items-center gap-1.5">
+                        <CalendarDays className="size-3" />
+                        {ap.module_name} · Fase: {ap.phase_snapshot?.name} · {ap.phase_snapshot?.durationWeeks}sem · iniciado {formatDate(ap.started_at)}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/protocolos"
+                  search={{ patientId: p.id, patientName: p.fullName }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--gold)] hover:underline pt-1"
+                >
+                  <Sparkles className="size-3" /> Gerenciar protocolos
+                </Link>
+              </>
+            )}
+          </div>
+        </section>
+
+
+
         {/* Anamnese clínica — visível no perfil + atalho para revisão/edição */}
         <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
           <div className="flex items-start justify-between gap-3 flex-wrap">
