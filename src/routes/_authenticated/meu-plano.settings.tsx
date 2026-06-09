@@ -214,7 +214,7 @@ function PatientSettings() {
       <div className="space-y-8 max-w-2xl">
         <div className="space-y-1 border-b border-border pb-4">
           <Link
-            to="/my-plan"
+            to="/meu-plano"
             className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground mb-2"
           >
             <ArrowLeft className="size-3" /> Voltar ao plano

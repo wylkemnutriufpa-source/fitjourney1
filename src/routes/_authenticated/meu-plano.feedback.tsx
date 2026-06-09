@@ -333,7 +333,7 @@ function FeedbackPage() {
               {!profile?.heightCm && (
                 <p className="text-[11px] text-muted-foreground">
                   Cadastre sua altura em{" "}
-                  <Link to="/my-plan/settings" className="text-primary underline">
+                  <Link to="/meu-plano/settings" className="text-primary underline">
                     Configurações
                   </Link>{" "}
                   para visualizar a curva de IMC.

@@ -4,7 +4,7 @@
 // editável do nutri (override + botão +) chega num passo seguinte.
 //
 // Reusada por:
-//   - /my-plan/protocolos (paciente)
+//   - /meu-plano/protocolos (paciente)
 //   - /protocolos/$protocolId (cat\u00e1logo)
 //
 // Determinístico, sem IO.

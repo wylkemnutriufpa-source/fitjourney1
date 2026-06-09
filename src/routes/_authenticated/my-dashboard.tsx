@@ -150,7 +150,7 @@ function MyDashboardPage() {
 
         {/* Cronômetro do próximo feedback — só aparece se o paciente tem nutricionista vinculado */}
         {fbStatus?.hasNutritionist && (
-          <Link to="/my-plan/feedback" className="block group">
+          <Link to="/meu-plano/feedback" className="block group">
             <FeedbackCountdown
               frequencyDays={fbStatus.frequencyDays}
               lastFeedbackAt={fbStatus.lastFeedbackAt}
@@ -267,25 +267,25 @@ function MyDashboardPage() {
           className="grid grid-cols-1 sm:grid-cols-3 gap-3"
         >
           <NavTile
-            to="/my-plan"
+            to="/meu-plano"
             icon={Utensils}
             title="Meu plano"
             description="Refeições, equivalências e detalhes do plano publicado."
           />
           <NavTile
-            to="/my-plan/feedback"
+            to="/meu-plano/feedback"
             icon={MessageSquare}
             title="Enviar feedback"
             description="Compartilhe peso, fotos e como foi a semana."
           />
           <NavTile
-            to="/my-plan/anamnese"
+            to="/meu-plano/anamnese"
             icon={ClipboardList}
             title="Minha anamnese"
             description="Veja as respostas da sua última anamnese aprovada."
           />
           <NavTile
-            to="/my-plan/physical-assessment"
+            to="/meu-plano/physical-assessment"
             icon={Activity}
             title="Avaliação física"
             description="Sua avaliação atual e histórico de evolução."
@@ -485,7 +485,7 @@ function LegacyWelcomeBanner({ firstName }: { firstName: string }) {
           </p>
         </div>
         <Link
-          to="/my-plan/update-health-profile"
+          to="/meu-plano/update-health-profile"
           className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-[0_0_28px_-6px_oklch(0.62_0.16_155/0.7)]"
         >
           <ClipboardList className="size-4" />
