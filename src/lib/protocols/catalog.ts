@@ -28,6 +28,11 @@ export interface PhaseTea {
   readonly time?: string;
   readonly name: string;
   readonly benefits?: string;
+  readonly quantity?: string;
+  readonly ingredients?: ReadonlyArray<string>;
+  readonly preparation?: string;
+  readonly timesPerDay?: string;
+  readonly notes?: string;
 }
 
 export interface PhaseMealItemSubstitution {
@@ -138,8 +143,37 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
             "Preparar a mistura para 1 semana e guardar em pote de vidro fechado, longe da luz.",
         },
         teaSchedule: [
-          { time: "07:30", name: "Chá de gengibre + limão + cúrcuma", benefits: "Anti-inflamatório e estimulante de GLP-1" },
-          { time: "15:00", name: "Chá verde", benefits: "Melhora sensibilidade à insulina" },
+          {
+            time: "07:30",
+            name: "Chá de gengibre + limão + cúrcuma",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 fatia fina de gengibre fresco (~3 g)",
+              "½ colher de chá de cúrcuma em pó",
+              "Suco de ½ limão",
+              "Pitada de pimenta-do-reino preta",
+            ],
+            preparation:
+              "Ferver a água com o gengibre e a cúrcuma por 5 minutos. Desligar, abafar por 3 minutos, coar, acrescentar o limão e a pimenta. Tomar morno e sem açúcar.",
+            timesPerDay: "1x ao dia (em jejum)",
+            benefits: "Anti-inflamatório e estimulante de GLP-1",
+            notes: "Evitar se houver gastrite ativa.",
+          },
+          {
+            time: "15:00",
+            name: "Chá verde",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 colher de chá de chá verde a granel (ou 1 sachê)",
+            ],
+            preparation:
+              "Aquecer a água até ~80°C (antes de ferver). Adicionar o chá, abafar por 3 minutos e coar. Tomar puro.",
+            timesPerDay: "1x ao dia (meio da tarde)",
+            benefits: "Melhora sensibilidade à insulina e termogênese leve",
+            notes: "Não consumir após 17h para preservar o sono.",
+          },
         ],
         meals: [
           {
@@ -355,10 +389,9 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
           sleepHours: 8,
           teaRoutine: ["Chá de gengibre + limão + cúrcuma (07:30)", "Chá verde (15:00)"],
           strategies: [
-            "Proteína no início de todas as refeições",
+            "Ingerir proteína em todas as refeições",
             "15ml de vinagre de maçã diluído 10 min antes do almoço e jantar",
             "Alta ingestão de fibras solúveis",
-            "Ordem das refeições: Proteína → Fibra → Gordura → Carboidrato",
           ],
         },
       },
@@ -382,8 +415,35 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
             "Suporte hepático, hidratação, antioxidantes e potencialização do efeito GLP-1.",
         },
         teaSchedule: [
-          { time: "07:30", name: "Chá de gengibre + cúrcuma + limão", benefits: "Anti-inflamatório e estimulante de GLP-1" },
-          { time: "20:00", name: "Chá de camomila + melissa", benefits: "Melhora qualidade do sono e reduz ansiedade" },
+          {
+            time: "07:30",
+            name: "Chá de gengibre + cúrcuma + limão",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 fatia fina de gengibre fresco (~3 g)",
+              "½ colher de chá de cúrcuma em pó",
+              "Suco de ½ limão",
+            ],
+            preparation:
+              "Ferver a água com o gengibre e a cúrcuma por 5 minutos. Abafar 3 min, coar, acrescentar o limão. Tomar morno.",
+            timesPerDay: "1x ao dia (em jejum)",
+            benefits: "Anti-inflamatório e estimulante de GLP-1",
+          },
+          {
+            time: "20:00",
+            name: "Chá de camomila + melissa",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 colher de chá de camomila seca (ou 1 sachê)",
+              "1 colher de chá de melissa seca (ou 1 sachê)",
+            ],
+            preparation:
+              "Aquecer a água sem ferver, desligar, adicionar as ervas, abafar por 5 minutos e coar. Tomar 30–60 min antes de dormir.",
+            timesPerDay: "1x ao dia (à noite)",
+            benefits: "Melhora qualidade do sono e reduz ansiedade",
+          },
         ],
         meals: [
           {
@@ -592,7 +652,7 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
           ],
           strategies: [
             "Aumentar volume de vegetais nas refeições principais",
-            "Manter proteína alta no início de cada refeição",
+            "Manter ingestão de proteína em todas as refeições",
             "Incluir psyllium em uma refeição por dia",
             "Suco verde diário no meio da manhã",
           ],
@@ -806,7 +866,21 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
             "Sensibilidade à insulina, autofagia leve e hábito anti-inflamatório consolidado.",
         },
         teaSchedule: [
-          { time: "07:30", name: "Chá de gengibre + cúrcuma + limão", benefits: "Hábito matinal de manutenção" },
+          {
+            time: "07:30",
+            name: "Chá de gengibre + cúrcuma + limão",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 fatia fina de gengibre fresco (~3 g)",
+              "½ colher de chá de cúrcuma em pó",
+              "Suco de ½ limão",
+            ],
+            preparation:
+              "Ferver a água com o gengibre e a cúrcuma por 5 minutos. Abafar 3 min, coar e acrescentar o limão. Tomar morno.",
+            timesPerDay: "1x ao dia (em jejum)",
+            benefits: "Hábito matinal de manutenção, anti-inflamatório leve",
+          },
         ],
         meals: [
           {
