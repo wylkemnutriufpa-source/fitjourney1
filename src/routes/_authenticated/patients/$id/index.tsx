@@ -251,16 +251,6 @@ function PatientProfile() {
                 Ver anamnese
               </Link>
             )}
-            {hasPublishedPlan && (
-              <Link
-                to="/patients/$id/diet"
-                params={{ id: p.id }}
-                className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
-              >
-                <Eye className="size-3.5" />
-                Ver plano vigente
-              </Link>
-            )}
             <Link
               to="/templates"
               search={{ patientId: p.id, patientName: p.fullName }}
