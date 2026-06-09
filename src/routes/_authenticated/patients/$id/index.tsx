@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { SubscriptionEditor } from "@/components/finance/SubscriptionEditor";
 import { PhysicalAssessmentCard } from "@/components/patient/PhysicalAssessmentCard";
 import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
+import { WaterCalculatorCard } from "@/components/patient/WaterCalculatorCard";
 import { getPatientForNutritionist, setPatientActiveStatus } from "@/lib/patients/patient-detail.functions";
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
 import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
