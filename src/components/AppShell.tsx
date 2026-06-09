@@ -27,6 +27,7 @@ import { useAuth } from "@/lib/auth-context";
 import { getMyPendingAnamnesesCount } from "@/lib/anamnesis/review.functions";
 import { getMyIdentityState } from "@/lib/phase2/identity.functions";
 import { getMyFeedbackStatus, getMyPendingFeedbacksCount } from "@/lib/feedback/feedback.functions";
+import { listMyActiveProtocols } from "@/lib/protocols/active.functions";
 import { applyTheme, getStoredTheme, setTheme, type ThemeMode } from "@/lib/patient/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
@@ -84,9 +85,9 @@ const nutritionistNavBase = [
 ] as const;
 
 const patientNav = [
+  { to: "/my-plan/protocolos", label: "Protocolos Ativos", icon: Sparkles },
   { to: "/my-dashboard", label: "Início", icon: LayoutDashboard },
   { to: "/my-plan", label: "Meu Plano", icon: LayoutDashboard },
-  { to: "/my-plan/protocolos", label: "Protocolos Ativos", icon: Sparkles },
   { to: "/my-plan/feedback", label: "Feedback", icon: MessageSquareHeart, badgeKey: "feedback-pending" as const },
   { to: "/my-plan/settings", label: "Configurações", icon: Settings },
 ] as const;
@@ -298,6 +299,14 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     enabled: mounted && !!user?.id && isPatient,
   });
 
+  const fetchPatientProtocols = useServerFn(listMyActiveProtocols);
+  const { data: patientProtocols } = useQuery({
+    queryKey: ["patient", "active-protocols", "nav", user?.id ?? "anonymous"],
+    queryFn: () => fetchPatientProtocols(),
+    staleTime: 60_000,
+    enabled: mounted && !!user?.id && isPatient,
+  });
+
   async function handleSignOut() {
     await signOut();
     navigate({ to: "/app" });
@@ -366,28 +375,24 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 : 0;
             const showDot =
               badgeKey === "feedback-pending" && !!fbStatus?.isPending && !!fbStatus.hasNutritionist;
-            const isProtocolos = item.to === "/protocolos";
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => {
-                  if (typeof window !== "undefined" && window.innerWidth < 768) {
-                    setSidebarOpen(false);
-                    __sidebarOpenCache = false;
-                  }
-                }}
-                className={
-                  "relative flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors " +
-                  (isProtocolos
-                    ? (active
-                        ? "bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] border-l-2 border-[var(--gold)] shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--gold)_30%,transparent)]"
-                        : "border-l-2 border-transparent hover:bg-[color-mix(in_oklab,var(--gold)_6%,transparent)]")
-                    : active
-                      ? "bg-primary/10 text-primary border-l-2 border-[var(--gold)] shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--gold)_18%,transparent)]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50 border-l-2 border-transparent")
-                }
-              >
+            const isProtocolos = item.to === "/protocolos" || item.to === "/my-plan/protocolos";
+            const protocolosUnavailable =
+              item.to === "/my-plan/protocolos" &&
+              !!patientProtocols &&
+              patientProtocols.protocols.length === 0;
+            const linkClassName =
+              "relative flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors " +
+              (protocolosUnavailable
+                ? "border-l-2 border-[var(--gold)]/20 bg-[color-mix(in_oklab,var(--gold)_5%,transparent)] opacity-55 cursor-not-allowed"
+                : isProtocolos
+                  ? active
+                    ? "bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] border-l-2 border-[var(--gold)] shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--gold)_30%,transparent)]"
+                    : "border-l-2 border-transparent hover:bg-[color-mix(in_oklab,var(--gold)_6%,transparent)]"
+                  : active
+                    ? "bg-primary/10 text-primary border-l-2 border-[var(--gold)] shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--gold)_18%,transparent)]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50 border-l-2 border-transparent");
+            const content = (
+              <>
                 <Icon
                   className={
                     "size-4 " +
@@ -438,6 +443,35 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                     className="size-2 rounded-full bg-[var(--gold)] animate-pulse shadow-[0_0_8px_color-mix(in_oklab,var(--gold)_70%,transparent)]"
                   />
                 )}
+              </>
+            );
+            if (protocolosUnavailable) {
+              return (
+                <button
+                  key={item.to}
+                  type="button"
+                  disabled
+                  title="Aguardando próximo protocolo"
+                  aria-disabled="true"
+                  className={linkClassName}
+                >
+                  {content}
+                </button>
+              );
+            }
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => {
+                  if (typeof window !== "undefined" && window.innerWidth < 768) {
+                    setSidebarOpen(false);
+                    __sidebarOpenCache = false;
+                  }
+                }}
+                className={linkClassName}
+              >
+                {content}
               </Link>
             );
           })}
