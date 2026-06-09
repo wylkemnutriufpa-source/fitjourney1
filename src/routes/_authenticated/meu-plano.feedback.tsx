@@ -44,7 +44,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/my-plan/feedback")({
+export const Route = createFileRoute("/_authenticated/meu-plano/feedback")({
   head: () => ({ meta: [{ title: "Feedback — FitJourney" }] }),
   component: FeedbackPage,
   errorComponent: ({ error, reset }) => (
@@ -333,7 +333,7 @@ function FeedbackPage() {
               {!profile?.heightCm && (
                 <p className="text-[11px] text-muted-foreground">
                   Cadastre sua altura em{" "}
-                  <Link to="/my-plan/settings" className="text-primary underline">
+                  <Link to="/meu-plano/settings" className="text-primary underline">
                     Configurações
                   </Link>{" "}
                   para visualizar a curva de IMC.

@@ -1,7 +1,7 @@
 // Cadastro de paciente via link de convite.
 // Fluxo: ?code=XXX → valida → form (nome, email, senha) → cria conta
 // auto-confirmada → login automático → /onboarding/patient (criado na Fase 2).
-// Por enquanto, após login redireciona para /my-plan.
+// Por enquanto, após login redireciona para /meu-plano.
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";

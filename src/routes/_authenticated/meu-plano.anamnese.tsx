@@ -10,7 +10,7 @@ import { AppShell } from "@/components/AppShell";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
 import { getMyApprovedAnamnesisFull } from "@/lib/anamnesis/review.functions";
 
-export const Route = createFileRoute("/_authenticated/my-plan/anamnese")({
+export const Route = createFileRoute("/_authenticated/meu-plano/anamnese")({
   head: () => ({ meta: [{ title: "Minha Anamnese — FitJourney" }] }),
   component: MyAnamnesePage,
   errorComponent: ({ error }) => (
@@ -107,7 +107,7 @@ function MyAnamnesePage() {
                 </p>
               </div>
               <Link
-                to="/my-plan/update-health-profile"
+                to="/meu-plano/update-health-profile"
                 className="text-xs font-semibold py-2 px-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2"
               >
                 <Pencil className="size-3.5" /> Atualizar minha anamnese

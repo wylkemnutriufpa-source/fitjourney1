@@ -49,8 +49,8 @@ export const Route = createFileRoute("/_authenticated")({
     const isPatientRoute =
       path === "/my-dashboard" ||
       path.startsWith("/my-dashboard/") ||
-      path === "/my-plan" ||
-      path.startsWith("/my-plan/") ||
+      path === "/meu-plano" ||
+      path.startsWith("/meu-plano/") ||
       onPatientOnboarding;
 
     const isAdmin = identity.appRoles.includes("admin");
@@ -81,7 +81,7 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/dashboard", replace: true });
     }
 
-    // Patient gate: pacientes acessam /my-dashboard, /my-plan/* e
+    // Patient gate: pacientes acessam /my-dashboard, /meu-plano/* e
     // /onboarding/patient.
     // - Enquanto onboarding_completed_at IS NULL → força /onboarding/patient.
     // - Após onboarding concluído: /onboarding/patient bloqueado (semântica de

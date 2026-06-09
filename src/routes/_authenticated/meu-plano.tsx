@@ -10,7 +10,7 @@ import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { listFoods, type FoodDTO } from "@/lib/foods.functions";
 import { listMyActiveProtocols } from "@/lib/protocols/active.functions";
 import { getMyClinicalContext } from "@/lib/clinical/context.functions";
-import { ActiveProtocolCard, personalizedWaterMl } from "./my-plan.protocolos";
+import { ActiveProtocolCard, personalizedWaterMl } from "./meu-plano.protocolos";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
 import { DailyProtocolBanner } from "@/components/patient/DailyProtocolBanner";
@@ -91,7 +91,7 @@ function saveSet(key: string, set: Set<string>) {
   }
 }
 
-export const Route = createFileRoute("/_authenticated/my-plan")({
+export const Route = createFileRoute("/_authenticated/meu-plano")({
   head: () => ({ meta: [{ title: "Meu Plano — FitJourney" }] }),
   component: MyPlanPage,
   errorComponent: ({ error }) => (
@@ -132,7 +132,7 @@ function MyPlanPage() {
     staleTime: 5 * 60_000,
   });
   const { data: activeProtocols } = useQuery({
-    queryKey: ["patient", "active-protocols", "my-plan"],
+    queryKey: ["patient", "active-protocols", "meu-plano"],
     queryFn: () => fetchActiveProtocols(),
     staleTime: 60_000,
   });
@@ -168,7 +168,7 @@ function MyPlanPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.id]);
 
-  if (path !== "/my-plan") {
+  if (path !== "/meu-plano") {
     return <Outlet />;
   }
 

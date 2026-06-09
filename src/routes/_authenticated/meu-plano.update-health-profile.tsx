@@ -12,7 +12,7 @@ import { submitPatientAnamnesisUpdate } from "@/lib/anamnesis/review.functions";
 import { AppShell } from "@/components/AppShell";
 import type { Answers } from "@/lib/anamnesis/v2/catalog/types";
 
-export const Route = createFileRoute("/_authenticated/my-plan/update-health-profile")({
+export const Route = createFileRoute("/_authenticated/meu-plano/update-health-profile")({
   head: () => ({ meta: [{ title: "Atualizar Perfil de Saúde — FitJourney" }] }),
   component: UpdateHealthProfilePage,
   errorComponent: ({ error, reset }) => (
@@ -32,7 +32,7 @@ function UpdateHealthProfilePage() {
     setError(null);
     try {
       await submit({ data: { answers } });
-      navigate({ to: "/my-plan", replace: true });
+      navigate({ to: "/meu-plano", replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha ao enviar atualização.");
       setSubmitting(false);
@@ -43,7 +43,7 @@ function UpdateHealthProfilePage() {
     <AppShell>
       <div className="max-w-2xl space-y-6">
         <Link
-          to="/my-plan"
+          to="/meu-plano"
           className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-3.5" /> Voltar ao plano

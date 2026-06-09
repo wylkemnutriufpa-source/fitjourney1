@@ -85,11 +85,11 @@ const nutritionistNavBase = [
 ] as const;
 
 const patientNav = [
-  { to: "/my-plan/protocolos", label: "Protocolos Ativos", icon: Sparkles },
+  { to: "/meu-plano/protocolos", label: "Protocolos Ativos", icon: Sparkles },
   { to: "/my-dashboard", label: "Início", icon: LayoutDashboard },
-  { to: "/my-plan", label: "Meu Plano", icon: LayoutDashboard },
-  { to: "/my-plan/feedback", label: "Feedback", icon: MessageSquareHeart, badgeKey: "feedback-pending" as const },
-  { to: "/my-plan/settings", label: "Configurações", icon: Settings },
+  { to: "/meu-plano", label: "Meu Plano", icon: LayoutDashboard },
+  { to: "/meu-plano/feedback", label: "Feedback", icon: MessageSquareHeart, badgeKey: "feedback-pending" as const },
+  { to: "/meu-plano/settings", label: "Configurações", icon: Settings },
 ] as const;
 
 function Crumbs() {
@@ -127,7 +127,7 @@ function BackButton() {
     path === "/" ||
     path === "/dashboard" ||
     path === "/my-dashboard" ||
-    path === "/my-plan"
+    path === "/meu-plano"
   ) {
     return null;
   }
@@ -171,8 +171,8 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
   const isPatientArea =
     path === "/my-dashboard" ||
     path.startsWith("/my-dashboard/") ||
-    path === "/my-plan" ||
-    path.startsWith("/my-plan/") ||
+    path === "/meu-plano" ||
+    path.startsWith("/meu-plano/") ||
     path.startsWith("/onboarding/patient");
 
   const avatarQuery = useQuery({
@@ -191,7 +191,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
     },
   });
   const avatarUrl = avatarQuery.data ?? null;
-  const settingsHref = isPatientArea ? "/my-plan/settings" : "/settings";
+  const settingsHref = isPatientArea ? "/meu-plano/settings" : "/settings";
 
   // Sidebar: cache module-level evita que cada remount do AppShell (cada rota
   // envolve <AppShell>) reabra o menu em mobile causando flash "expande/retrai"
@@ -375,9 +375,9 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 : 0;
             const showDot =
               badgeKey === "feedback-pending" && !!fbStatus?.isPending && !!fbStatus.hasNutritionist;
-            const isProtocolos = item.to === "/protocolos" || item.to === "/my-plan/protocolos";
+            const isProtocolos = item.to === "/protocolos" || item.to === "/meu-plano/protocolos";
             const protocolosUnavailable =
-              item.to === "/my-plan/protocolos" &&
+              item.to === "/meu-plano/protocolos" &&
               !!patientProtocols &&
               patientProtocols.protocols.length === 0;
             const linkClassName =

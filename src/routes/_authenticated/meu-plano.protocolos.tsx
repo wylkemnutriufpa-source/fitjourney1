@@ -63,7 +63,7 @@ function abbreviateMeasure(value: string | null | undefined): string {
     .replace(/\bpor[çc][õo]es?\b/gi, "porção");
 }
 
-export const Route = createFileRoute("/_authenticated/my-plan/protocolos")({
+export const Route = createFileRoute("/_authenticated/meu-plano/protocolos")({
   head: () => ({ meta: [{ title: "Protocolos Ativos — FitJourney" }] }),
   component: PatientActiveProtocolsPage,
   errorComponent: ({ error }) => (

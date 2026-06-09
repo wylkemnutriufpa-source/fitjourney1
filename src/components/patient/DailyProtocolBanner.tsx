@@ -129,7 +129,7 @@ export function DailyProtocolBanner() {
 
         <DialogFooter className="gap-2 sm:gap-2">
           <Button variant="outline" asChild>
-            <Link to="/my-plan/protocolos" onClick={handleClose}>
+            <Link to="/meu-plano/protocolos" onClick={handleClose}>
               Ver detalhes <ArrowRight className="size-3.5" />
             </Link>
           </Button>
