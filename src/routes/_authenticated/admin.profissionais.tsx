@@ -7,10 +7,21 @@ import {
   upsertProfessionalSubscription,
   adminUpdateNutritionist,
   setNutritionistPlanTier,
+  adminDeleteNutritionist,
   type AdminNutritionistRow,
   type NutriPlanTier,
 } from "@/lib/admin/admin.functions";
-import { Pencil, Crown, ArrowDownCircle } from "lucide-react";
+import { Pencil, Crown, ArrowDownCircle, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,16 +80,29 @@ function planBadgeClass(t: NutriPlanTier | undefined): string {
 function ProfessionalsPage() {
   const fetchAll = useServerFn(listProfessionals);
   const setTierFn = useServerFn(setNutritionistPlanTier);
+  const deleteFn = useServerFn(adminDeleteNutritionist);
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin", "professionals"],
     queryFn: () => fetchAll(),
   });
   const [editing, setEditing] = useState<AdminNutritionistRow | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<AdminNutritionistRow | null>(null);
+  const [deleteInput, setDeleteInput] = useState("");
   const tierMut = useMutation({
     mutationFn: (vars: { nutritionist_id: string; plan_tier: NutriPlanTier }) =>
       setTierFn({ data: vars }),
     onSuccess: (_r, vars) => {
       toast.success(vars.plan_tier === "pro" ? "Upgrade para PRO aplicado" : "Plano alterado para BASIC");
+      refetch();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const deleteMut = useMutation({
+    mutationFn: (nutritionist_id: string) => deleteFn({ data: { nutritionist_id } }),
+    onSuccess: () => {
+      toast.success("Profissional excluído permanentemente.");
+      setConfirmDelete(null);
+      setDeleteInput("");
       refetch();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -206,6 +230,15 @@ function ProfessionalsPage() {
                         <Pencil className="h-3.5 w-3.5 mr-1" />
                         Editar
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => { setConfirmDelete(n); setDeleteInput(""); }}
+                        className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        title="Excluir profissional permanentemente"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
                   </td>
 
@@ -233,6 +266,46 @@ function ProfessionalsPage() {
           }}
         />
       )}
+
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => { if (!o) { setConfirmDelete(null); setDeleteInput(""); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir profissional permanentemente</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>
+                  Esta ação <strong>não pode ser desfeita</strong>. Templates, códigos de convite,
+                  assinatura e acesso de login serão removidos.
+                </p>
+                <p className="text-sm">
+                  <strong>Pré-requisito:</strong> o profissional não pode ter pacientes vinculados.
+                  Se houver, a operação será recusada — exclua/transfira os pacientes antes.
+                </p>
+                <p className="text-sm">
+                  Para confirmar, digite o email <code className="px-1 py-0.5 rounded bg-muted text-foreground">{confirmDelete?.email}</code> abaixo:
+                </p>
+                <input
+                  type="email"
+                  value={deleteInput}
+                  onChange={(e) => setDeleteInput(e.target.value)}
+                  placeholder={confirmDelete?.email}
+                  className="w-full bg-surface border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-destructive"
+                />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMut.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={!confirmDelete || deleteInput.trim().toLowerCase() !== confirmDelete.email.toLowerCase() || deleteMut.isPending}
+              onClick={(e) => { e.preventDefault(); if (confirmDelete) deleteMut.mutate(confirmDelete.id); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteMut.isPending ? "Excluindo…" : `Excluir ${confirmDelete?.full_name ?? ""}`.trim()}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

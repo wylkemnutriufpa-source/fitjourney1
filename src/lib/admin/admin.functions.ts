@@ -291,3 +291,37 @@ export const adminUpdateNutritionist = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// =========================================================================
+// Exclusões permanentes
+// =========================================================================
+
+const DeleteNutriInput = z.object({ nutritionist_id: z.string().uuid() });
+
+export const adminDeleteNutritionist = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => DeleteNutriInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertAdmin(supabase, userId);
+    const { error } = await supabase.rpc("admin_delete_nutritionist", {
+      _nutritionist_id: data.nutritionist_id,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+const DeletePatientInput = z.object({ patient_id: z.string().uuid() });
+
+export const deletePatientAsNutritionist = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => DeletePatientInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase.rpc("admin_delete_patient", {
+      _patient_id: data.patient_id,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+
