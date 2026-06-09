@@ -65,11 +65,21 @@ export const Route = createFileRoute("/_authenticated/my-plan/protocolos")({
 
 function PatientActiveProtocolsPage() {
   const fetchActive = useServerFn(listMyActiveProtocols);
+  const fetchCtx = useServerFn(getMyClinicalContext);
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient", "active-protocols"],
     queryFn: () => fetchActive(),
     staleTime: 60_000,
   });
+  const { data: ctx } = useQuery({
+    queryKey: ["my-clinical-context"],
+    queryFn: () => fetchCtx(),
+    staleTime: 60_000,
+  });
+  const personalWaterMl = personalizedWaterMl(
+    ctx?.currentWeight?.weightKg ?? null,
+    ctx?.demographics.activity ?? null,
+  );
 
   return (
     <AppShell>
