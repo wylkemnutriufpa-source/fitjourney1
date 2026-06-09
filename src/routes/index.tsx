@@ -371,7 +371,7 @@ function Landing() {
               <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.08] mb-6 tracking-tight" style={{ color: '#8B6B2E', textShadow: '0 1px 0 rgba(0,0,0,0.04)' }}>
                 {c.hero.title_line1}{" "}
                 <span className="relative inline-block">
-                  <span className="text-[var(--gold)]" style={{ textShadow: '0 0 28px rgba(201,162,76,0.35)' }}>{c.hero.title_line2}</span>
+                  <span className="text-gradient-animated italic font-display">{c.hero.title_line2}</span>
                   <span aria-hidden className="absolute left-0 right-0 -bottom-1 h-[3px] rounded-full bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-60" />
                 </span>
               </motion.h1>
