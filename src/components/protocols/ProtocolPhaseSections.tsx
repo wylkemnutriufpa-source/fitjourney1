@@ -104,6 +104,7 @@ export function ProtocolPhaseSections({
           title="Rotina de Chás"
           icon={<Leaf className="size-3.5" />}
           countLabel={`${teas.length} ${teas.length === 1 ? "chá" : "chás"}`}
+          defaultOpen
         >
           <div className="space-y-1.5">
             {teas.map((t, i) => (
