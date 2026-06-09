@@ -11,10 +11,12 @@ export function RealPatientPicker({
   value,
   onChange,
   placeholder = "Buscar paciente por nome ou e-mail...",
+  initialPatientId,
 }: {
   readonly value: PatientLite | null;
   readonly onChange: (p: PatientLite | null) => void;
   readonly placeholder?: string;
+  readonly initialPatientId?: string;
 }) {
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const { data, isLoading, error } = useQuery({
@@ -22,6 +24,13 @@ export function RealPatientPicker({
     queryFn: () => fetchPatients(),
     staleTime: 30_000,
   });
+
+  // Pré-seleção quando vem com paciente em escopo (vindo do perfil).
+  useEffect(() => {
+    if (!initialPatientId || value) return;
+    const found = data?.find((p) => p.id === initialPatientId);
+    if (found) onChange(found);
+  }, [initialPatientId, data, value, onChange]);
 
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
