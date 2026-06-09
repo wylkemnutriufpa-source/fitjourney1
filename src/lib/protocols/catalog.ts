@@ -1178,7 +1178,7 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
   // -------------------------------------------------------------------------
   {
     id: "gastrite",
-    name: "Gastrite",
+    name: "Módulo Gastrite",
     tagline: "Alívio, Proteção e Cicatrização da Mucosa Gástrica",
     methodology: {
       title: "Metodologia Gastrite — Proteção e Cicatrização",
