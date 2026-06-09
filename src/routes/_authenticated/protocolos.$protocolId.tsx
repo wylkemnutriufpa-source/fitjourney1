@@ -458,9 +458,13 @@ function ModuleDetailsDialog({
 function PhasesGrid({
   protocol,
   module: m,
+  patientId,
+  patientName,
 }: {
   protocol: ProtocolDescriptor;
   module: ProtocolModule;
+  patientId?: string;
+  patientName?: string;
 }) {
   const [detailsPhase, setDetailsPhase] = useState<ProtocolPhase | null>(null);
   const [applyPhase, setApplyPhase] = useState<ProtocolPhase | null>(null);
@@ -489,6 +493,8 @@ function PhasesGrid({
         module={m}
         phase={applyPhase}
         onClose={() => setApplyPhase(null)}
+        initialPatientId={patientId}
+        initialPatientName={patientName}
       />
     </section>
   );
