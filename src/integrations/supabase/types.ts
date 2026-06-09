@@ -124,6 +124,7 @@ export type Database = {
       }
       app_settings: {
         Row: {
+          checkout_plans: Json
           created_at: string
           id: string
           pix_key: string
@@ -134,6 +135,7 @@ export type Database = {
           whatsapp_number: string
         }
         Insert: {
+          checkout_plans?: Json
           created_at?: string
           id?: string
           pix_key?: string
@@ -144,6 +146,7 @@ export type Database = {
           whatsapp_number?: string
         }
         Update: {
+          checkout_plans?: Json
           created_at?: string
           id?: string
           pix_key?: string
