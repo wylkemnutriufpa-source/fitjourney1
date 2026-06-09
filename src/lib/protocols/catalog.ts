@@ -389,10 +389,9 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
           sleepHours: 8,
           teaRoutine: ["Chá de gengibre + limão + cúrcuma (07:30)", "Chá verde (15:00)"],
           strategies: [
-            "Proteína no início de todas as refeições",
+            "Ingerir proteína em todas as refeições",
             "15ml de vinagre de maçã diluído 10 min antes do almoço e jantar",
             "Alta ingestão de fibras solúveis",
-            "Ordem das refeições: Proteína → Fibra → Gordura → Carboidrato",
           ],
         },
       },
