@@ -81,7 +81,9 @@ function CheckoutBody({
   const { data, isLoading } = useQuery({
     queryKey: ["app-settings", "checkout"],
     queryFn: () => fetchSettings(),
-    staleTime: 5 * 60_000,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
 
   if (isLoading || !data) {
