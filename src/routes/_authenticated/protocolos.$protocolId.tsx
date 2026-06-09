@@ -708,12 +708,17 @@ function ApplyPhaseDialog({
   module: m,
   phase,
   onClose,
+  initialPatientId,
+  initialPatientName,
 }: {
   protocol: ProtocolDescriptor;
   module: ProtocolModule;
   phase: ProtocolPhase | null;
   onClose: () => void;
+  initialPatientId?: string;
+  initialPatientName?: string;
 }) {
+  void initialPatientName;
   const [patient, setPatient] = useState<PatientLite | null>(null);
   const [done, setDone] = useState<string | null>(null);
   const apply = useServerFn(applyProtocolPhase);
