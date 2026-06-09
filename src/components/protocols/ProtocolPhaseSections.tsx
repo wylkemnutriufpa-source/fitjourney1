@@ -168,7 +168,7 @@ function TeaRowCard({ tea, index }: { tea: TeaRow; index: number }) {
     !!tea.note ||
     !!tea.time ||
     (tea.ingredients?.length ?? 0) > 0;
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(hasDetail);
 
   return (
     <div className="rounded-lg border border-border/60 bg-surface/40">
