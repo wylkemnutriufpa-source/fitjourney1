@@ -368,15 +368,15 @@ function Landing() {
                 <span className="w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse shadow-[0_0_8px_color-mix(in_oklab,var(--gold)_70%,transparent)]" />
               </motion.div>
 
-              <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] mb-6 tracking-tight">
+              <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.08] mb-6 tracking-tight" style={{ color: 'var(--ivory)' }}>
                 {c.hero.title_line1}{" "}
                 <span className="relative inline-block">
-                  <span className="text-gradient-animated">{c.hero.title_line2}</span>
-                  <span aria-hidden className="absolute left-0 right-0 -bottom-1 h-[3px] rounded-full bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-80" />
+                  <span className="text-[var(--gold)]" style={{ textShadow: '0 0 28px rgba(201,162,76,0.35)' }}>{c.hero.title_line2}</span>
+                  <span aria-hidden className="absolute left-0 right-0 -bottom-1 h-[3px] rounded-full bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-60" />
                 </span>
               </motion.h1>
 
-              <motion.p variants={fadeUp} className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
+              <motion.p variants={fadeUp} className="text-lg max-w-xl mx-auto lg:mx-0 mb-9 leading-[1.7] font-light" style={{ color: 'var(--sage)' }}>
                 {c.hero.description}
               </motion.p>
 
