@@ -18,6 +18,7 @@ export type TeaRow = {
   name: string;
   time?: string;
   quantity?: string;
+  ingredients?: ReadonlyArray<string>;
   preparation?: string;
   timesPerDay?: string;
   benefits?: string;
@@ -29,7 +30,12 @@ export function buildTeaRows(phase: ProtocolPhase): TeaRow[] {
   const fromSchedule: TeaRow[] = (phase.teaSchedule ?? []).map((t: PhaseTea) => ({
     name: t.name,
     time: t.time,
+    quantity: t.quantity,
+    ingredients: t.ingredients,
+    preparation: t.preparation,
+    timesPerDay: t.timesPerDay,
     benefits: t.benefits,
+    note: t.notes,
   }));
   if (fromSchedule.length > 0) return fromSchedule;
   // Fallback: derivar de teaRoutine (strings livres). Nome = string toda.
