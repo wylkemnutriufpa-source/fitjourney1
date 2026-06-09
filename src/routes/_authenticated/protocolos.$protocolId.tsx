@@ -47,11 +47,17 @@ import {
 import { applyProtocolPhase } from "@/lib/protocols/active.functions";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 
-type PageSearch = { readonly module?: string };
+type PageSearch = {
+  readonly module?: string;
+  readonly patientId?: string;
+  readonly patientName?: string;
+};
 
 export const Route = createFileRoute("/_authenticated/protocolos/$protocolId")({
   validateSearch: (s: Record<string, unknown>): PageSearch => ({
     module: typeof s.module === "string" ? s.module : undefined,
+    patientId: typeof s.patientId === "string" ? s.patientId : undefined,
+    patientName: typeof s.patientName === "string" ? s.patientName : undefined,
   }),
   loader: ({ params }) => {
     const protocol = findProtocolById(params.protocolId);
