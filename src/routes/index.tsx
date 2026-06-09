@@ -370,10 +370,7 @@ function Landing() {
 
               <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.08] mb-6 tracking-tight" style={{ color: '#8B6B2E', textShadow: '0 1px 0 rgba(0,0,0,0.04)' }}>
                 {c.hero.title_line1}{" "}
-                <span className="relative inline-block">
-                  <span className="text-gradient-animated italic font-display">{c.hero.title_line2}</span>
-                  <span aria-hidden className="absolute left-0 right-0 -bottom-1 h-[3px] rounded-full bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-60" />
-                </span>
+                <span className="font-display">{c.hero.title_line2}</span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-lg max-w-xl mx-auto lg:mx-0 mb-9 leading-[1.7] font-light" style={{ color: 'var(--sage)' }}>
@@ -1168,8 +1165,8 @@ function FjLandingTheme() {
           --forest-deep: #14271C;
           --forest: #1F3A2A;
           --forest-mid: #234334;
-          --sage: #8FB59A;
-          --sage-soft: #B8D1BF;
+          --sage: #4A7560;
+          --sage-soft: #6B937A;
           --gold: #C9A24C;
           --gold-soft: #E6C77A;
 
