@@ -358,9 +358,18 @@ function PatientProfile() {
           )}
 
           {p.anamnesis && anamnesisFull && !anamnesisLoading && (
-            <div className="pt-2">
-              <AnamnesisAnswersView rawJson={anamnesisFull.rawAnswersJson} />
-            </div>
+            <details className="pt-2 group">
+              <summary className="cursor-pointer list-none flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2 text-xs font-semibold hover:border-primary/40 hover:text-foreground transition-colors">
+                <span className="flex items-center gap-2">
+                  <Eye className="size-3.5" />
+                  Ver respostas da anamnese
+                </span>
+                <ChevronRight className="size-3.5 transition-transform group-open:rotate-90" />
+              </summary>
+              <div className="pt-4">
+                <AnamnesisAnswersView rawJson={anamnesisFull.rawAnswersJson} />
+              </div>
+            </details>
           )}
 
           {p.anamnesis && !anamnesisLoading && !anamnesisFull && (
