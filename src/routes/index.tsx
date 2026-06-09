@@ -1165,8 +1165,8 @@ function FjLandingTheme() {
           --forest-deep: #14271C;
           --forest: #1F3A2A;
           --forest-mid: #234334;
-          --sage: #8FB59A;
-          --sage-soft: #B8D1BF;
+          --sage: #4A7560;
+          --sage-soft: #6B937A;
           --gold: #C9A24C;
           --gold-soft: #E6C77A;
 
