@@ -1,14 +1,18 @@
-// Calculadora de água do paciente.
-// Lê ClinicalContext (peso + nível de atividade da anamnese aprovada).
-// Modo recomendado = derivação do contexto clínico.
-// Modo simular = paciente altera peso/atividade só para simulação local.
-// Degrada elegantemente quando ctx.calculable=false ou ctx=null.
+// Calculadora de água — dois modos:
+//  - sem prop: usa getMyClinicalContext (uso no app do paciente).
+//  - com patientId: usa getClinicalContext(patientId) (uso no perfil pelo nutri).
+// Modo recomendado = derivação do contexto clínico (peso atual + atividade).
+// Modo simular = altera peso/atividade localmente sem mutar nada.
+// Degrada elegantemente quando ctx não está pronto.
 
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Droplet, Sparkles, Info } from "lucide-react";
-import { getMyClinicalContext } from "@/lib/clinical/context.functions";
+import {
+  getMyClinicalContext,
+  getClinicalContext,
+} from "@/lib/clinical/context.functions";
 import type { ActivityLevel } from "@/lib/engine/types";
 
 const ML_PER_KG: Record<ActivityLevel, number> = {
