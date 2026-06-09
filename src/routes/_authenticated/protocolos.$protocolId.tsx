@@ -46,6 +46,7 @@ import {
 } from "@/lib/protocols/catalog";
 import { applyProtocolPhase } from "@/lib/protocols/active.functions";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
+import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
 
 type PageSearch = {
   readonly module?: string;
