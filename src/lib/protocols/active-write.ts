@@ -114,13 +114,15 @@ async function ensurePublishedPlanFromPhase(
     .eq("status", "published");
 
   const template = protocolPhaseToPlannerTemplate(found.protocol, found.module, found.phase);
+  const templateAny = template as unknown as Record<string, unknown>;
   const publishedAt = new Date().toISOString();
   const snapshot = {
-    ...template,
+    ...templateAny,
     publishedAt,
     publishedFromProtocol: true,
-    protocolMeta: template.protocolMeta,
+    protocolMeta: templateAny.protocolMeta,
   };
+
 
   const { error } = await supabase.from("plans").insert({
     patient_id: input.patientId,
