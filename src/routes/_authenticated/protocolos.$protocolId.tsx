@@ -20,6 +20,8 @@ import {
   CheckCircle2,
   Pencil,
   Replace,
+  Users,
+  Timer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
