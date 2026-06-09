@@ -345,6 +345,41 @@ const PublishInput = z.object({
   overrideMissingClinical: z.boolean().optional(),
 });
 
+type ProtocolApplyMeta = z.infer<typeof PublishInput>["protocolMeta"];
+
+function protocolMetaFromSourceKey(sourceTemplateKey?: string): ProtocolApplyMeta {
+  if (!sourceTemplateKey?.startsWith("protocol-")) return undefined;
+  for (const protocol of PROTOCOL_CATALOG) {
+    const prefix = `protocol-${protocol.id}-`;
+    if (!sourceTemplateKey.startsWith(prefix)) continue;
+    const rest = sourceTemplateKey.slice(prefix.length);
+    for (const mod of protocol.modules) {
+      const modulePrefix = `${mod.id}-`;
+      if (!rest.startsWith(modulePrefix)) continue;
+      const phaseId = Number(rest.slice(modulePrefix.length));
+      if (Number.isInteger(phaseId) && mod.phases.some((p) => p.id === phaseId)) {
+        return { protocolId: protocol.id, moduleId: mod.id, phaseId };
+      }
+    }
+  }
+  return undefined;
+}
+
+async function syncActiveProtocolFromPlan(
+  supabase: any,
+  input: { patientId: string; nutritionistId: string; protocolMeta?: ProtocolApplyMeta; sourceTemplateKey?: string },
+) {
+  const protocolMeta = input.protocolMeta ?? protocolMetaFromSourceKey(input.sourceTemplateKey);
+  if (!protocolMeta) return;
+  await applyActiveProtocolPhase(supabase, {
+    patientId: input.patientId,
+    nutritionistId: input.nutritionistId,
+    protocolId: protocolMeta.protocolId,
+    moduleId: protocolMeta.moduleId,
+    phaseId: protocolMeta.phaseId,
+  });
+}
+
 export type PublishPlanResult = {
   id: string;
   publishedAt: string;
