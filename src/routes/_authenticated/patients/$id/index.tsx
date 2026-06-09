@@ -8,7 +8,7 @@ import { PhysicalAssessmentCard } from "@/components/patient/PhysicalAssessmentC
 import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
 import { WaterCalculatorCard } from "@/components/patient/WaterCalculatorCard";
 import { getPatientForNutritionist, setPatientActiveStatus } from "@/lib/patients/patient-detail.functions";
-import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
+import { listPublishedPlansForPatient, getLatestPlanForPatient } from "@/lib/plans/plans.functions";
 import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
 import { listPatientFeedbacks } from "@/lib/feedback/feedback.functions";
 import { listPatientActiveProtocols } from "@/lib/protocols/active.functions";
