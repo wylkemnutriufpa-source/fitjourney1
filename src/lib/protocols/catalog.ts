@@ -143,6 +143,82 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
     id: "fit-glp",
     name: "Fit GLP",
     tagline: "Saciedade Natural e Controle de Apetite",
+    methodology: {
+      title: "Metodologia GLP-1 Natural",
+      subtitle:
+        "Cinco pilares e quatro regras comportamentais que maximizam saciedade, reduzem impulsos alimentares, melhoram a resposta glicêmica e aumentam a adesão.",
+      pillars: [
+        {
+          title: "1. Pré-carga de saciedade",
+          summary:
+            "Antes das refeições principais, criar distensão gástrica e reduzir a ingestão espontânea.",
+          examples: [
+            "300–500 ml de água 10 min antes",
+            "5–10 g de psyllium diluído",
+            "Salada crua de entrada",
+            "Caldo de legumes morno",
+          ],
+        },
+        {
+          title: "2. Proteína primeiro",
+          summary:
+            "Regra simples: a primeira garfada é proteína. Estabiliza glicemia e antecipa a saciedade.",
+          examples: ["Ovos", "Frango", "Peixe", "Iogurte grego", "Carne magra"],
+        },
+        {
+          title: "3. Fibra estratégica",
+          summary:
+            "Não apenas comer mais fibra — criar momentos específicos no dia para cada tipo.",
+          examples: [
+            "Manhã: chia",
+            "Almoço: feijão",
+            "Lanche: fruta inteira",
+            "Jantar: vegetais volumosos",
+          ],
+        },
+        {
+          title: "4. Velocidade glicêmica",
+          summary:
+            "Sequência alimentar dentro do prato: vegetais → proteína → carboidrato. Menos pico de glicose, menos fome pós-refeição.",
+        },
+        {
+          title: "5. Ambiente anti-fome",
+          summary:
+            "Itens permanentes à mão para sustentar adesão entre as refeições.",
+          examples: [
+            "Água gelada",
+            "Café sem açúcar",
+            "Chás",
+            "Gelatina sem açúcar",
+            "Vegetais crocantes",
+          ],
+        },
+      ],
+      behavioralRules: [
+        {
+          name: "Regra dos 20 minutos",
+          description:
+            "Esperar 20 minutos antes de repetir uma refeição — tempo para os sinais de saciedade chegarem.",
+        },
+        {
+          name: "Regra da proteína âncora",
+          description:
+            "Toda refeição deve ter uma fonte proteica dominante.",
+        },
+        {
+          name: "Regra dos 50%",
+          description:
+            "Metade do prato precisa ser legumes, verduras ou vegetais.",
+        },
+        {
+          name: "Regra da fome real",
+          description:
+            "Escala de 0–10: comer entre 3 e 7. Evitar comer em 0 (fome extrema) ou 10 (estufamento).",
+        },
+      ],
+      disclaimer:
+        "Indicador clínico-comportamental de potencial de saciedade da dieta. Não é substituto de medicamento GLP-1.",
+    },
     phases: [
       {
         id: 1,
