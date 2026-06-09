@@ -16,9 +16,12 @@ import {
   Replace,
   UtensilsCrossed,
   Flame,
+  ImageOff,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { emojiForFood } from "@/lib/food-emojis";
+import { imgFor } from "@/lib/food-images";
+
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import {
   listMyActiveProtocols,
