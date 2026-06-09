@@ -101,6 +101,7 @@ function PatientProfile() {
   const fetchPlans = useServerFn(listPublishedPlansForPatient);
   const fetchAnamnesis = useServerFn(getAnamnesisForReview);
   const fetchFeedbacks = useServerFn(listPatientFeedbacks);
+  const fetchActiveProtocols = useServerFn(listPatientActiveProtocols);
   const setActiveStatus = useServerFn(setPatientActiveStatus);
 
   const { data, isLoading, error } = useQuery({
