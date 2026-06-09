@@ -775,6 +775,52 @@ export const listPublishedPlansForPatient = createServerFn({ method: "GET" })
   });
 
 // ─────────────────────────────────────────────────────────────────
+// Último plano do paciente (qualquer status) — atalho rápido p/ editor.
+// Usado no card "Plano alimentar" do perfil do paciente.
+// ─────────────────────────────────────────────────────────────────
+export type LatestPlanSummary = {
+  id: string;
+  status: "draft" | "published" | "archived";
+  publishedAt: string | null;
+  updatedAt: string;
+  title: string | null;
+} | null;
+
+export const getLatestPlanForPatient = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ patientId: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }): Promise<LatestPlanSummary> => {
+    const { supabase, userId } = context as { supabase: any; userId: string };
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!nutri) return null;
+
+    const { data: row, error } = await supabase
+      .from("plans")
+      .select("id, status, published_at, updated_at, snapshot")
+      .eq("patient_id", data.patientId)
+      .eq("nutritionist_id", nutri.id)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) return null;
+    const title = (row.snapshot && typeof row.snapshot === "object"
+      ? (row.snapshot.title ?? row.snapshot.name ?? null)
+      : null) as string | null;
+    return {
+      id: row.id,
+      status: row.status,
+      publishedAt: row.published_at,
+      updatedAt: row.updated_at,
+      title,
+    };
+  });
+
+// ─────────────────────────────────────────────────────────────────
 // Sprint 3 — Draft editável end-to-end.
 // getDraftPlanForEdit → carrega snapshot do draft para abrir no editor.
 // updateDraftPlan     → salva edições no snapshot (UPDATE, status='draft').
