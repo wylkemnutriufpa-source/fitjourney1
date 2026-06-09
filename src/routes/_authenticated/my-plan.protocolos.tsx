@@ -40,7 +40,7 @@ const WATER_ML_PER_KG: Record<ActivityLevel, number> = {
   extreme: 50,
 };
 
-function personalizedWaterMl(
+export function personalizedWaterMl(
   weightKg: number | null | undefined,
   activity: ActivityLevel | null | undefined,
 ): number | null {
