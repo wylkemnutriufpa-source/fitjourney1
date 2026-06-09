@@ -78,7 +78,7 @@ function ProtocolDetailPage() {
   const hasAccess = !requiresPremium || isAdmin;
 
   const modules = useMemo(() => getProtocolModules(protocol), [protocol]);
-  const { module: moduleId } = Route.useSearch();
+  const { module: moduleId, patientId, patientName } = Route.useSearch();
   const activeModule = useMemo(
     () => (moduleId ? modules.find((m) => m.id === moduleId) ?? null : null),
     [modules, moduleId],
@@ -94,12 +94,16 @@ function ProtocolDetailPage() {
           activeModule={activeModule}
         />
 
+        {hasAccess && patientId && (
+          <ProtocolDiagnosticCard patientId={patientId} />
+        )}
+
         {!hasAccess ? (
           <LockedNotice />
         ) : !activeModule ? (
-          <ModulesGrid protocol={protocol} modules={modules} />
+          <ModulesGrid protocol={protocol} modules={modules} patientId={patientId} patientName={patientName} />
         ) : (
-          <PhasesGrid protocol={protocol} module={activeModule} />
+          <PhasesGrid protocol={protocol} module={activeModule} patientId={patientId} patientName={patientName} />
         )}
       </div>
     </AppShell>
