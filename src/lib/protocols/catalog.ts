@@ -459,9 +459,9 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
                 householdMeasure: "2 unidades",
                 kcal: 156,
                 substitutions: [
-                  { foodKey: "tapioca-recheada", name: "Tapioca com queijo branco", quantityG: 80, householdMeasure: "1 unidade", kcal: 180 },
                   { foodKey: "queijo-cottage", name: "Queijo Cottage", quantityG: 150, householdMeasure: "5 colheres de sopa", kcal: 140 },
-                  { foodKey: "iogurte-natural", name: "Iogurte natural + chia", quantityG: 200, householdMeasure: "1 copo", kcal: 150 },
+                  { foodKey: "iogurte-grego", name: "Iogurte Grego Natural", quantityG: 170, householdMeasure: "1 pote", kcal: 105 },
+                  { foodKey: "whey", name: "Whey Protein Isolado", quantityG: 25, householdMeasure: "1 scoop", kcal: 100 },
                 ],
               },
               {
@@ -472,8 +472,8 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
                 kcal: 150,
                 substitutions: [
                   { foodKey: "granola", name: "Granola sem açúcar", quantityG: 35, householdMeasure: "3 colheres de sopa", kcal: 150 },
-                  { foodKey: "pao-integral", name: "Pão integral", quantityG: 50, householdMeasure: "2 fatias", kcal: 140 },
-                  { foodKey: "batata-doce", name: "Batata doce cozida", quantityG: 170, householdMeasure: "1 unidade média", kcal: 145 },
+                  { foodKey: "tapioca", name: "Tapioca (goma)", quantityG: 60, householdMeasure: "2 discos médios", kcal: 145 },
+                  { foodKey: "cuscuz", name: "Cuscuz de milho", quantityG: 90, householdMeasure: "½ xícara", kcal: 140 },
                 ],
               },
               {
@@ -483,9 +483,9 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
                 householdMeasure: "1 xícara",
                 kcal: 80,
                 substitutions: [
-                  { foodKey: "maca", name: "Maçã com casca", quantityG: 150, householdMeasure: "1 unidade", kcal: 80 },
-                  { foodKey: "kiwi", name: "Kiwi", quantityG: 150, householdMeasure: "2 unidades", kcal: 90 },
                   { foodKey: "morango", name: "Morangos frescos", quantityG: 150, householdMeasure: "1 xícara", kcal: 50 },
+                  { foodKey: "mirtilo", name: "Mirtilo (blueberry)", quantityG: 120, householdMeasure: "1 xícara", kcal: 70 },
+                  { foodKey: "amora", name: "Amoras frescas", quantityG: 120, householdMeasure: "1 xícara", kcal: 55 },
                 ],
               },
             ],
