@@ -40,7 +40,7 @@ const WATER_ML_PER_KG: Record<ActivityLevel, number> = {
   extreme: 50,
 };
 
-function personalizedWaterMl(
+export function personalizedWaterMl(
   weightKg: number | null | undefined,
   activity: ActivityLevel | null | undefined,
 ): number | null {
@@ -153,7 +153,7 @@ export function computeCurrentWeek(row: ActiveProtocolRow): number {
   return Math.max(1, Math.min(week, row.phase_snapshot.durationWeeks));
 }
 
-function ActiveProtocolCard({
+export function ActiveProtocolCard({
   row,
   personalWaterMl,
 }: {

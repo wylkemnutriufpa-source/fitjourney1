@@ -8,6 +8,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { getMyActivePlan } from "@/lib/plans/patient-plan.functions";
 import { getMyPatientProfile } from "@/lib/profile/patient-profile.functions";
 import { listFoods, type FoodDTO } from "@/lib/foods.functions";
+import { listMyActiveProtocols } from "@/lib/protocols/active.functions";
+import { getMyClinicalContext } from "@/lib/clinical/context.functions";
+import { ActiveProtocolCard, personalizedWaterMl } from "./my-plan.protocolos";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
 import { DailyProtocolBanner } from "@/components/patient/DailyProtocolBanner";
@@ -110,6 +113,8 @@ function MyPlanPage() {
   const fetchPlan = useServerFn(getMyActivePlan);
   const fetchProfile = useServerFn(getMyPatientProfile);
   const fetchFoods = useServerFn(listFoods);
+  const fetchActiveProtocols = useServerFn(listMyActiveProtocols);
+  const fetchCtx = useServerFn(getMyClinicalContext);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient", "active-plan"],
@@ -126,6 +131,21 @@ function MyPlanPage() {
     queryFn: () => fetchFoods(),
     staleTime: 5 * 60_000,
   });
+  const { data: activeProtocols } = useQuery({
+    queryKey: ["patient", "active-protocols", "my-plan"],
+    queryFn: () => fetchActiveProtocols(),
+    staleTime: 60_000,
+  });
+  const { data: ctx } = useQuery({
+    queryKey: ["my-clinical-context"],
+    queryFn: () => fetchCtx(),
+    staleTime: 60_000,
+  });
+  const personalWaterMl = personalizedWaterMl(
+    ctx?.currentWeight?.weightKg ?? null,
+    ctx?.demographics.activity ?? null,
+  );
+  const protocols = activeProtocols?.protocols ?? [];
 
   const greeting = useMemo(() => {
     const now = new Date();
@@ -173,12 +193,24 @@ function MyPlanPage() {
   if (!data) {
     return (
       <AppShell>
-        <div className="space-y-3 max-w-xl">
+        <div className="space-y-6 max-w-3xl">
+          <DailyProtocolBanner />
           <h1 className="text-2xl font-bold tracking-tight">Meu Plano</h1>
-          <p className="text-sm text-muted-foreground">
-            Você ainda não tem um plano publicado. Assim que seu nutricionista
-            publicar, ele aparecerá aqui.
-          </p>
+          {protocols.length > 0 ? (
+            <section className="space-y-4">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+                Protocolos ativos
+              </p>
+              {protocols.map((p) => (
+                <ActiveProtocolCard key={p.id} row={p} personalWaterMl={personalWaterMl} />
+              ))}
+            </section>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Você ainda não tem um plano publicado. Assim que seu nutricionista
+              publicar, ele aparecerá aqui.
+            </p>
+          )}
         </div>
       </AppShell>
     );
@@ -228,6 +260,17 @@ function MyPlanPage() {
         )}
 
         <PlanMeals planId={data.id} meals={meals} foods={foods} />
+
+        {protocols.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+              Protocolos ativos
+            </h2>
+            {protocols.map((p) => (
+              <ActiveProtocolCard key={p.id} row={p} personalWaterMl={personalWaterMl} />
+            ))}
+          </section>
+        )}
 
         <ShoppingListCard meals={meals} foods={foods ?? []} />
 
