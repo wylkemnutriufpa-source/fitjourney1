@@ -304,35 +304,41 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
         aria-expanded={open}
         disabled={!hasDetail}
       >
-        <span className="inline-flex size-9 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] text-lg shrink-0" aria-hidden>
-          {emojiForFood(item.name)}
-        </span>
+        {(() => {
+          const thumb = imgFor(item.name, item.name);
+          return thumb ? (
+            <span className="relative inline-block size-10 rounded-md overflow-hidden bg-muted shrink-0">
+              <img
+                src={thumb}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+              />
+            </span>
+          ) : (
+            <span className="inline-flex size-10 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] text-lg shrink-0" aria-hidden>
+              {emojiForFood(item.name)}
+            </span>
+          );
+        })()}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground break-words leading-tight">{item.name}</p>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            <span>{abbreviateMeasure(item.householdMeasure)}</span>
+          <p className="text-sm text-foreground leading-snug">
+            <span className="font-medium">{item.name}</span>
+            <span className="text-muted-foreground/80"> · {abbreviateMeasure(item.householdMeasure)}</span>
             <span className="text-muted-foreground/60"> · {item.quantityG}g · {item.kcal} kcal</span>
           </p>
         </div>
         {hasDetail && (
-          <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-[var(--gold)]/80 shrink-0">
-            {hasSubs ? (
-              <>
-                <Replace className="size-3" />
-                {subs.length} substituições
-              </>
-            ) : (
-              <>
-                <Info className="size-3" />
-                receita
-              </>
+          <ChevronDown
+            aria-label={hasSubs ? "Ver substituições" : "Ver receita"}
+            className={cn(
+              "size-4 text-[var(--gold)]/80 transition-transform shrink-0",
+              open && "rotate-180",
             )}
-            <ChevronDown
-              className={cn("size-3 transition-transform", open && "rotate-180")}
-            />
-          </span>
+          />
         )}
       </button>
+
 
       {hasDetail && open && (
         <div className="px-2.5 pb-2.5 space-y-2 border-t border-border/40 pt-2 animate-fade-in">
