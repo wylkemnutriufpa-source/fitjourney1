@@ -2048,7 +2048,18 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
       ],
       anyGoal: ["cut"],
     },
-    modules: IFJ_MODULES,
+    modules: IFJ_INTELLIGENCE_MODULES,
+  },
+  {
+    id: "gastrite",
+    name: "Protocolo IFJ — Módulo Gastrite",
+    tagline: "Alívio, proteção e cicatrização da mucosa gástrica.",
+    icon: "HeartPulse",
+    exclusive: true,
+    triggers: {
+      anyClinicalTag: ["gastritis", "dyspepsia", "reflux"],
+    },
+    modules: [GASTRITE_MODULE],
   },
   {
     id: "jejum-intermitente",
