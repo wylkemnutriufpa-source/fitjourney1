@@ -27,6 +27,24 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
+import { getMyClinicalContext } from "@/lib/clinical/context.functions";
+import type { ActivityLevel } from "@/lib/engine/types";
+
+const WATER_ML_PER_KG: Record<ActivityLevel, number> = {
+  sedentary: 35,
+  light: 38,
+  moderate: 40,
+  high: 45,
+  extreme: 50,
+};
+
+function personalizedWaterMl(
+  weightKg: number | null | undefined,
+  activity: ActivityLevel | null | undefined,
+): number | null {
+  if (!weightKg || !activity) return null;
+  return Math.round(weightKg * WATER_ML_PER_KG[activity]);
+}
 
 export const Route = createFileRoute("/_authenticated/my-plan/protocolos")({
   head: () => ({ meta: [{ title: "Protocolos Ativos — FitJourney" }] }),
