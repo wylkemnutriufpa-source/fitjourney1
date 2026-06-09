@@ -368,15 +368,15 @@ function Landing() {
                 <span className="w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse shadow-[0_0_8px_color-mix(in_oklab,var(--gold)_70%,transparent)]" />
               </motion.div>
 
-              <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] mb-6 tracking-tight">
+              <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.08] mb-6 tracking-tight" style={{ color: 'var(--ivory)' }}>
                 {c.hero.title_line1}{" "}
                 <span className="relative inline-block">
-                  <span className="text-gradient-animated">{c.hero.title_line2}</span>
-                  <span aria-hidden className="absolute left-0 right-0 -bottom-1 h-[3px] rounded-full bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-80" />
+                  <span className="text-[var(--gold)]" style={{ textShadow: '0 0 28px rgba(201,162,76,0.35)' }}>{c.hero.title_line2}</span>
+                  <span aria-hidden className="absolute left-0 right-0 -bottom-1 h-[3px] rounded-full bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-60" />
                 </span>
               </motion.h1>
 
-              <motion.p variants={fadeUp} className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
+              <motion.p variants={fadeUp} className="text-lg max-w-xl mx-auto lg:mx-0 mb-9 leading-[1.7] font-light" style={{ color: 'var(--sage)' }}>
                 {c.hero.description}
               </motion.p>
 
@@ -994,17 +994,31 @@ function Landing() {
         </div>
       </footer>
 
-      {/* ══════════ BOTÃO FLUTUANTE WHATSAPP ══════════ */}
+      {/* ══════════ BOTÃO FLUTUANTE WHATSAPP (Premium Grafite + Dourado) ══════════ */}
       <a
         href={CONTACT_WHATSAPP}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Converse com Sistema FitJourney no WhatsApp"
-        className="fixed bottom-5 right-5 z-40 group inline-flex items-center gap-2 rounded-full bg-[#25D366] text-white pl-3 pr-4 py-3 shadow-[0_10px_30px_-8px_rgba(37,211,102,0.55)] hover:shadow-[0_14px_36px_-8px_rgba(37,211,102,0.75)] hover:scale-[1.04] active:scale-95 transition-all"
+        className="fixed bottom-5 right-5 z-40 group inline-flex items-center gap-2 rounded-full pl-3 pr-4 py-3 transition-all hover:scale-[1.04] active:scale-95"
+        style={{
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
+          border: '1px solid rgba(201,162,76,0.45)',
+          boxShadow: '0 10px 30px -8px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,162,76,0.15)',
+          color: '#FBF7EE',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = '0 14px 36px -8px rgba(0,0,0,0.65), 0 0 20px -4px rgba(201,162,76,0.25)';
+          e.currentTarget.style.borderColor = 'rgba(201,162,76,0.7)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = '0 10px 30px -8px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,162,76,0.15)';
+          e.currentTarget.style.borderColor = 'rgba(201,162,76,0.45)';
+        }}
       >
         <span className="relative inline-flex items-center justify-center size-8">
-          <span className="absolute inset-0 rounded-full bg-white/30 animate-ping" aria-hidden />
-          <WhatsAppIcon className="relative size-7" />
+          <span className="absolute inset-0 rounded-full bg-[var(--gold)]/20 animate-ping" aria-hidden />
+          <WhatsAppIcon className="relative size-7" style={{ color: 'var(--gold)' }} />
         </span>
         <span className="hidden sm:inline text-sm font-semibold whitespace-nowrap">
           Converse no WhatsApp
@@ -1143,12 +1157,7 @@ function ContactModal({ onClose }: { onClose: () => void }) {
 function FjLandingTheme() {
   return (
     <>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@300;400;500;600;700&display=swap"
-      />
+      {/* Fontes carregadas no <head> de __root.tsx para evitar hydration mismatch */}
       <style>{`
         /* ─── Paleta de verdes escopada ─────────────────────────── */
         .fj-landing {
