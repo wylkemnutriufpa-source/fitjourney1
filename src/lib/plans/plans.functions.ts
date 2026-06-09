@@ -29,7 +29,8 @@ import { runNutritionEngines } from "@/lib/clinical/run-nutrition-engines";
 import { validatePlan, type DailyTotals, type FoodOccurrence } from "@/lib/engine/clinical-gate";
 import { ENGINE_VERSION, GATE_VERSION } from "@/lib/engine/version";
 import { generateDraftPlanFromApproval } from "@/lib/plans/draft-auto-plan";
-import { findProtocolPhase } from "@/lib/protocols/catalog";
+import { applyActiveProtocolPhase } from "@/lib/protocols/active-write";
+import { PROTOCOL_CATALOG } from "@/lib/protocols/catalog";
 
 export type AnamnesisStatusLite =
   | "approved"
