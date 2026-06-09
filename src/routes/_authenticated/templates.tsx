@@ -973,6 +973,7 @@ function TemplateEditor({
   >(null);
   const publishPlan = useServerFn(publishPlanToPatient);
   const publishDraft = useServerFn(publishDraftPlan);
+  const editorQc = useQueryClient();
 
   async function doPublish(
     patientId: string,
