@@ -49,6 +49,7 @@ import {
 import { applyProtocolPhase, listProtocolEnrollments, type ProtocolEnrollmentRow } from "@/lib/protocols/active.functions";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
+import { getGoldenTipsFor, type GoldenTip } from "@/lib/protocols/golden-tips";
 
 type PageSearch = {
   readonly module?: string;
