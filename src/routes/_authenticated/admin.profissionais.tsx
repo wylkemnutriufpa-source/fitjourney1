@@ -230,6 +230,15 @@ function ProfessionalsPage() {
                         <Pencil className="h-3.5 w-3.5 mr-1" />
                         Editar
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => { setConfirmDelete(n); setDeleteInput(""); }}
+                        className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        title="Excluir profissional permanentemente"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
                   </td>
 
