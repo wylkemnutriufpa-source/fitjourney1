@@ -107,10 +107,18 @@ function ProtocolDetailPage() {
         {!hasAccess ? (
           <LockedNotice />
         ) : !activeModule ? (
-          <ModulesGrid protocol={protocol} modules={modules} patientId={patientId} patientName={patientName} />
+          <>
+            {getMethodologyFor(protocol.id) && (
+              <ModuleMethodologyCard methodology={getMethodologyFor(protocol.id)!} />
+            )}
+            <GoldenTips protocolId={protocol.id} />
+            <ModulesGrid protocol={protocol} modules={modules} patientId={patientId} patientName={patientName} />
+          </>
         ) : (
           <>
-            {activeModule.methodology && <ModuleMethodologyCard methodology={activeModule.methodology} />}
+            {(activeModule.methodology ?? getMethodologyFor(protocol.id)) && (
+              <ModuleMethodologyCard methodology={(activeModule.methodology ?? getMethodologyFor(protocol.id))!} />
+            )}
             <GoldenTips protocolId={protocol.id} />
             <PhasesGrid protocol={protocol} module={activeModule} patientId={patientId} patientName={patientName} />
           </>
