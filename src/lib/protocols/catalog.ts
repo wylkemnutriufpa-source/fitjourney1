@@ -364,26 +364,224 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
       },
       {
         id: 2,
-        name: "Fase 2 — Consolidação da Saciedade",
+        name: "Fase 2 — Consolidação + Suco Verde",
         durationWeeks: 3,
         description:
-          "Manutenção da saciedade elevada e introdução de maior volume de vegetais.",
+          "Consolidação da saciedade com introdução de suco verde diário e maior volume de vegetais.",
         dailyKcalTarget: 1600,
         macros: { protein: 38, carb: 37, fat: 25 },
         specialFeature: {
-          name: "Tempero da Saciedade Fit GLP",
+          name: "Tempero da Saciedade Fit GLP + Suco Verde",
           description:
-            "Mistura especial anti-inflamatória e estimulante natural de GLP-1, mantida da Fase 1.",
+            "Mistura especial anti-inflamatória mantida da Fase 1, agora com adição do Suco Verde Fit GLP no período da manhã.",
           recipe:
-            "1 colher de chá de cúrcuma + ½ colher de chá de gengibre em pó + ½ colher de chá de canela Ceylon + pitada de pimenta preta.",
+            "Tempero: 1 colher de chá de cúrcuma + ½ de gengibre + ½ de canela Ceylon + pitada de pimenta preta. Suco Verde: 1 folha de couve + ½ maçã verde + ½ pepino + suco de ½ limão + 200ml de água gelada.",
           usage:
-            "Adicionar 1 colher de chá em pelo menos 2 refeições principais do dia.",
+            "Tempero em 2 refeições principais. Suco Verde 1x ao dia, no meio da manhã.",
           benefits:
-            "Aumenta saciedade, reduz inflamação e potencializa o efeito natural do GLP-1.",
+            "Suporte hepático, hidratação, antioxidantes e potencialização do efeito GLP-1.",
         },
         teaSchedule: [
           { time: "07:30", name: "Chá de gengibre + cúrcuma + limão", benefits: "Anti-inflamatório e estimulante de GLP-1" },
           { time: "20:00", name: "Chá de camomila + melissa", benefits: "Melhora qualidade do sono e reduz ansiedade" },
+        ],
+        meals: [
+          {
+            id: "cafe_manha",
+            name: "Café da Manhã",
+            time: "07:00",
+            totalKcal: 390,
+            items: [
+              {
+                foodKey: "ovo",
+                name: "Ovo mexido",
+                quantityG: 100,
+                householdMeasure: "2 unidades",
+                kcal: 156,
+                substitutions: [
+                  { foodKey: "tapioca-recheada", name: "Tapioca com queijo branco", quantityG: 80, householdMeasure: "1 unidade", kcal: 180 },
+                  { foodKey: "queijo-cottage", name: "Queijo Cottage", quantityG: 150, householdMeasure: "5 colheres de sopa", kcal: 140 },
+                  { foodKey: "iogurte-natural", name: "Iogurte natural + chia", quantityG: 200, householdMeasure: "1 copo", kcal: 150 },
+                ],
+              },
+              {
+                foodKey: "aveia",
+                name: "Aveia em flocos",
+                quantityG: 40,
+                householdMeasure: "4 colheres de sopa",
+                kcal: 150,
+                substitutions: [
+                  { foodKey: "granola", name: "Granola sem açúcar", quantityG: 35, householdMeasure: "3 colheres de sopa", kcal: 150 },
+                  { foodKey: "pao-integral", name: "Pão integral", quantityG: 50, householdMeasure: "2 fatias", kcal: 140 },
+                  { foodKey: "batata-doce", name: "Batata doce cozida", quantityG: 170, householdMeasure: "1 unidade média", kcal: 145 },
+                ],
+              },
+              {
+                foodKey: "frutas-vermelhas",
+                name: "Frutas vermelhas",
+                quantityG: 120,
+                householdMeasure: "1 xícara",
+                kcal: 80,
+                substitutions: [
+                  { foodKey: "maca", name: "Maçã com casca", quantityG: 150, householdMeasure: "1 unidade", kcal: 80 },
+                  { foodKey: "kiwi", name: "Kiwi", quantityG: 150, householdMeasure: "2 unidades", kcal: 90 },
+                  { foodKey: "morango", name: "Morangos frescos", quantityG: 150, householdMeasure: "1 xícara", kcal: 50 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "suco_verde",
+            name: "Suco Verde Fit GLP",
+            time: "09:30",
+            totalKcal: 90,
+            items: [
+              {
+                foodKey: "suco-verde-fit",
+                name: "Suco Verde Fit GLP",
+                quantityG: 300,
+                householdMeasure: "1 copo grande",
+                kcal: 90,
+                substitutions: [
+                  { foodKey: "agua-coco-limao", name: "Água de coco + limão", quantityG: 300, householdMeasure: "1 copo grande", kcal: 60 },
+                  { foodKey: "cha-verde-limao", name: "Chá verde gelado + limão", quantityG: 300, householdMeasure: "1 copo grande", kcal: 5 },
+                  { foodKey: "kefir-natural", name: "Kefir natural", quantityG: 200, householdMeasure: "1 copo", kcal: 120 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "almoco",
+            name: "Almoço",
+            time: "12:30",
+            totalKcal: 540,
+            items: [
+              {
+                foodKey: "patinho-moido",
+                name: "Patinho moído refogado",
+                quantityG: 140,
+                householdMeasure: "1 porção média",
+                kcal: 260,
+                substitutions: [
+                  { foodKey: "frango-grelhado", name: "Frango grelhado", quantityG: 150, householdMeasure: "1 filé médio", kcal: 248 },
+                  { foodKey: "peixe-grelhado", name: "Tilápia grelhada", quantityG: 180, householdMeasure: "1 filé grande", kcal: 215 },
+                  { foodKey: "tofu-grelhado", name: "Tofu grelhado", quantityG: 180, householdMeasure: "1 porção", kcal: 250 },
+                ],
+              },
+              {
+                foodKey: "quinoa",
+                name: "Quinoa cozida",
+                quantityG: 90,
+                householdMeasure: "3 colheres de sopa",
+                kcal: 110,
+                substitutions: [
+                  { foodKey: "arroz-integral", name: "Arroz integral", quantityG: 80, householdMeasure: "4 colheres de sopa", kcal: 110 },
+                  { foodKey: "batata-doce", name: "Batata doce", quantityG: 130, householdMeasure: "1 unidade pequena", kcal: 110 },
+                  { foodKey: "mandioquinha", name: "Mandioquinha cozida", quantityG: 130, householdMeasure: "1 porção", kcal: 115 },
+                ],
+              },
+              {
+                foodKey: "lentilha",
+                name: "Lentilha",
+                quantityG: 100,
+                householdMeasure: "1 concha",
+                kcal: 95,
+                substitutions: [
+                  { foodKey: "feijao", name: "Feijão", quantityG: 100, householdMeasure: "1 concha", kcal: 80 },
+                  { foodKey: "grao-de-bico", name: "Grão de bico", quantityG: 100, householdMeasure: "1 concha", kcal: 120 },
+                  { foodKey: "ervilha", name: "Ervilha cozida", quantityG: 100, householdMeasure: "1 concha", kcal: 85 },
+                ],
+              },
+              {
+                foodKey: "salada-colorida",
+                name: "Salada colorida + azeite",
+                quantityG: 250,
+                householdMeasure: "2 xícaras grandes",
+                kcal: 75,
+                substitutions: [
+                  { foodKey: "legumes", name: "Legumes refogados", quantityG: 250, householdMeasure: "2 xícaras", kcal: 90 },
+                  { foodKey: "brocolis", name: "Brócolis no vapor", quantityG: 250, householdMeasure: "2 xícaras", kcal: 85 },
+                  { foodKey: "abobrinha", name: "Abobrinha grelhada", quantityG: 250, householdMeasure: "2 xícaras", kcal: 75 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "lanche_tarde",
+            name: "Lanche da Tarde",
+            time: "16:00",
+            totalKcal: 220,
+            items: [
+              {
+                foodKey: "iogurte-natural",
+                name: "Iogurte natural + chia",
+                quantityG: 200,
+                householdMeasure: "1 pote",
+                kcal: 150,
+                substitutions: [
+                  { foodKey: "kefir-natural", name: "Kefir natural", quantityG: 200, householdMeasure: "1 copo", kcal: 120 },
+                  { foodKey: "queijo-cottage", name: "Queijo Cottage", quantityG: 150, householdMeasure: "5 colheres de sopa", kcal: 140 },
+                  { foodKey: "ricota", name: "Ricota fresca", quantityG: 100, householdMeasure: "2 fatias", kcal: 140 },
+                ],
+              },
+              {
+                foodKey: "amendoa",
+                name: "Amêndoas",
+                quantityG: 12,
+                householdMeasure: "10 unidades",
+                kcal: 70,
+                substitutions: [
+                  { foodKey: "castanha", name: "Castanha de caju", quantityG: 12, householdMeasure: "6 unidades", kcal: 70 },
+                  { foodKey: "nozes", name: "Nozes", quantityG: 12, householdMeasure: "3 unidades", kcal: 80 },
+                  { foodKey: "pasta-amendoim", name: "Pasta de amendoim", quantityG: 12, householdMeasure: "1 colher de chá", kcal: 70 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "jantar",
+            name: "Jantar",
+            time: "19:30",
+            totalKcal: 420,
+            items: [
+              {
+                foodKey: "salmao",
+                name: "Salmão grelhado",
+                quantityG: 130,
+                householdMeasure: "1 posta média",
+                kcal: 230,
+                substitutions: [
+                  { foodKey: "peixe-grelhado", name: "Tilápia grelhada", quantityG: 160, householdMeasure: "1 filé médio", kcal: 190 },
+                  { foodKey: "frango-grelhado", name: "Frango grelhado", quantityG: 130, householdMeasure: "1 filé pequeno", kcal: 215 },
+                  { foodKey: "ovo", name: "Omelete (3 ovos)", quantityG: 150, householdMeasure: "1 omelete", kcal: 234 },
+                ],
+              },
+              {
+                foodKey: "legumes-assados",
+                name: "Mix de legumes assados",
+                quantityG: 250,
+                householdMeasure: "2 xícaras",
+                kcal: 110,
+                substitutions: [
+                  { foodKey: "salada-verde", name: "Salada verde + azeite", quantityG: 250, householdMeasure: "2 xícaras grandes", kcal: 90 },
+                  { foodKey: "brocolis", name: "Brócolis no vapor", quantityG: 250, householdMeasure: "2 xícaras", kcal: 85 },
+                  { foodKey: "couve-flor", name: "Couve-flor gratinada", quantityG: 250, householdMeasure: "2 xícaras", kcal: 120 },
+                ],
+              },
+              {
+                foodKey: "abacate",
+                name: "Abacate",
+                quantityG: 50,
+                householdMeasure: "¼ unidade",
+                kcal: 80,
+                substitutions: [
+                  { foodKey: "azeite", name: "Azeite extra virgem", quantityG: 9, householdMeasure: "1 colher de sobremesa", kcal: 80 },
+                  { foodKey: "castanha", name: "Castanha de caju", quantityG: 14, householdMeasure: "7 unidades", kcal: 80 },
+                  { foodKey: "amendoa", name: "Amêndoas", quantityG: 14, householdMeasure: "11 unidades", kcal: 80 },
+                ],
+              },
+            ],
+          },
         ],
         recommendations: {
           waterMl: 3800,
@@ -396,32 +594,193 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
             "Aumentar volume de vegetais nas refeições principais",
             "Manter proteína alta no início de cada refeição",
             "Incluir psyllium em uma refeição por dia",
+            "Suco verde diário no meio da manhã",
           ],
         },
       },
       {
         id: 3,
-        name: "Fase 3 — Adaptação Metabólica",
+        name: "Fase 3 — Adaptação Metabólica + Caldos",
         durationWeeks: 1,
         description:
-          "Ajuste metabólico e preparação para a fase de manutenção, com refeed estratégico de carboidratos.",
+          "Introdução de caldos nutritivos no jantar, ajuste metabólico e refeed estratégico de carboidratos.",
         dailyKcalTarget: 1700,
         macros: { protein: 35, carb: 40, fat: 25 },
         specialFeature: {
-          name: "Tempero da Saciedade Fit GLP",
+          name: "Caldo Proteico Fit GLP",
           description:
-            "Mantém o tempero funcional do protocolo, agora opcional conforme preferência.",
+            "Caldo de ossos ou frango com legumes funcionais — rico em colágeno, eletrólitos e aminoácidos que favorecem saciedade noturna.",
           recipe:
-            "1 colher de chá de cúrcuma + ½ colher de chá de gengibre em pó + ½ colher de chá de canela Ceylon + pitada de pimenta preta.",
-          usage: "Adicionar em pelo menos 1 refeição principal do dia.",
-          benefits: "Sustenta o efeito anti-inflamatório acumulado nas fases anteriores.",
+            "1L de caldo de frango caseiro + cenoura, abobrinha, gengibre e cúrcuma. Cozinhar por 40 min em fogo baixo.",
+          usage:
+            "Servir 1 tigela no jantar, acompanhada de proteína magra. Tempero da Saciedade segue opcional em 1 refeição/dia.",
+          benefits:
+            "Hidratação, saciedade noturna prolongada, suporte intestinal e recuperação muscular.",
         },
+        meals: [
+          {
+            id: "cafe_manha",
+            name: "Café da Manhã",
+            time: "07:00",
+            totalKcal: 400,
+            items: [
+              {
+                foodKey: "tapioca-recheada",
+                name: "Tapioca recheada com ovo e queijo",
+                quantityG: 130,
+                householdMeasure: "1 unidade média",
+                kcal: 280,
+                substitutions: [
+                  { foodKey: "pao-integral", name: "Pão integral + ovo + queijo", quantityG: 130, householdMeasure: "2 fatias", kcal: 280 },
+                  { foodKey: "crepioca", name: "Crepioca com queijo", quantityG: 130, householdMeasure: "1 unidade", kcal: 270 },
+                  { foodKey: "omelete-queijo", name: "Omelete com queijo branco", quantityG: 150, householdMeasure: "1 unidade", kcal: 280 },
+                ],
+              },
+              {
+                foodKey: "mamao",
+                name: "Mamão papaia",
+                quantityG: 200,
+                householdMeasure: "1 fatia grande",
+                kcal: 80,
+                substitutions: [
+                  { foodKey: "abacaxi", name: "Abacaxi", quantityG: 150, householdMeasure: "2 fatias", kcal: 75 },
+                  { foodKey: "melao", name: "Melão", quantityG: 200, householdMeasure: "2 fatias", kcal: 70 },
+                  { foodKey: "manga", name: "Manga", quantityG: 150, householdMeasure: "1 fatia", kcal: 90 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "almoco",
+            name: "Almoço (refeed estratégico)",
+            time: "12:30",
+            totalKcal: 600,
+            items: [
+              {
+                foodKey: "frango-grelhado",
+                name: "Frango grelhado",
+                quantityG: 150,
+                householdMeasure: "1 filé médio",
+                kcal: 248,
+                substitutions: [
+                  { foodKey: "patinho", name: "Patinho grelhado", quantityG: 140, householdMeasure: "1 porção", kcal: 250 },
+                  { foodKey: "peixe-grelhado", name: "Tilápia grelhada", quantityG: 180, householdMeasure: "1 filé grande", kcal: 215 },
+                  { foodKey: "ovo", name: "Ovos (3 unidades)", quantityG: 150, householdMeasure: "3 unidades", kcal: 234 },
+                ],
+              },
+              {
+                foodKey: "batata-doce",
+                name: "Batata doce assada",
+                quantityG: 200,
+                householdMeasure: "1 unidade grande",
+                kcal: 170,
+                substitutions: [
+                  { foodKey: "arroz-integral", name: "Arroz integral", quantityG: 120, householdMeasure: "6 colheres de sopa", kcal: 165 },
+                  { foodKey: "mandioca", name: "Mandioca cozida", quantityG: 120, householdMeasure: "1 pedaço médio", kcal: 170 },
+                  { foodKey: "quinoa", name: "Quinoa", quantityG: 130, householdMeasure: "4 colheres de sopa", kcal: 160 },
+                ],
+              },
+              {
+                foodKey: "feijao",
+                name: "Feijão",
+                quantityG: 120,
+                householdMeasure: "1 concha grande",
+                kcal: 100,
+                substitutions: [
+                  { foodKey: "lentilha", name: "Lentilha", quantityG: 120, householdMeasure: "1 concha grande", kcal: 115 },
+                  { foodKey: "grao-de-bico", name: "Grão de bico", quantityG: 100, householdMeasure: "1 concha", kcal: 120 },
+                  { foodKey: "ervilha", name: "Ervilha", quantityG: 120, householdMeasure: "1 concha grande", kcal: 100 },
+                ],
+              },
+              {
+                foodKey: "salada-verde",
+                name: "Salada verde + azeite",
+                quantityG: 200,
+                householdMeasure: "2 xícaras",
+                kcal: 82,
+                substitutions: [
+                  { foodKey: "legumes", name: "Legumes refogados", quantityG: 200, householdMeasure: "2 xícaras", kcal: 80 },
+                  { foodKey: "brocolis", name: "Brócolis no vapor", quantityG: 200, householdMeasure: "2 xícaras", kcal: 70 },
+                  { foodKey: "abobrinha", name: "Abobrinha refogada", quantityG: 200, householdMeasure: "2 xícaras", kcal: 60 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "lanche_tarde",
+            name: "Lanche da Tarde",
+            time: "16:00",
+            totalKcal: 280,
+            items: [
+              {
+                foodKey: "shake-whey-fruta",
+                name: "Shake de whey + banana",
+                quantityG: 300,
+                householdMeasure: "1 copo grande",
+                kcal: 280,
+                substitutions: [
+                  { foodKey: "iogurte-natural", name: "Iogurte natural + aveia + fruta", quantityG: 250, householdMeasure: "1 pote", kcal: 280 },
+                  { foodKey: "vitamina-leite", name: "Vitamina de leite + banana + aveia", quantityG: 300, householdMeasure: "1 copo grande", kcal: 290 },
+                  { foodKey: "kefir-fruta", name: "Kefir + frutas vermelhas + chia", quantityG: 300, householdMeasure: "1 copo grande", kcal: 270 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "jantar",
+            name: "Jantar — Caldo Proteico",
+            time: "19:30",
+            totalKcal: 420,
+            items: [
+              {
+                foodKey: "caldo-proteico",
+                name: "Caldo de frango com legumes",
+                quantityG: 400,
+                householdMeasure: "1 tigela grande",
+                kcal: 200,
+                substitutions: [
+                  { foodKey: "caldo-carne", name: "Caldo de carne com legumes", quantityG: 400, householdMeasure: "1 tigela grande", kcal: 210 },
+                  { foodKey: "sopa-legumes", name: "Sopa de legumes com peito de frango", quantityG: 400, householdMeasure: "1 tigela grande", kcal: 220 },
+                  { foodKey: "caldo-peixe", name: "Caldo de peixe com tubérculos", quantityG: 400, householdMeasure: "1 tigela grande", kcal: 200 },
+                ],
+              },
+              {
+                foodKey: "peixe-grelhado",
+                name: "Filé de Tilápia grelhado",
+                quantityG: 120,
+                householdMeasure: "1 filé pequeno",
+                kcal: 140,
+                substitutions: [
+                  { foodKey: "frango-desfiado", name: "Frango desfiado", quantityG: 100, householdMeasure: "½ xícara", kcal: 165 },
+                  { foodKey: "ovo", name: "Ovos cozidos", quantityG: 100, householdMeasure: "2 unidades", kcal: 156 },
+                  { foodKey: "atum", name: "Atum em água", quantityG: 120, householdMeasure: "1 lata drenada", kcal: 155 },
+                ],
+              },
+              {
+                foodKey: "azeite",
+                name: "Azeite extra virgem",
+                quantityG: 9,
+                householdMeasure: "1 colher de sobremesa",
+                kcal: 80,
+                substitutions: [
+                  { foodKey: "abacate", name: "Abacate", quantityG: 50, householdMeasure: "¼ unidade", kcal: 80 },
+                  { foodKey: "castanha", name: "Castanha de caju", quantityG: 14, householdMeasure: "7 unidades", kcal: 80 },
+                  { foodKey: "amendoa", name: "Amêndoas", quantityG: 14, householdMeasure: "11 unidades", kcal: 80 },
+                ],
+              },
+            ],
+          },
+        ],
         recommendations: {
           waterMl: 4000,
           sleepHours: 8,
-          teaRoutine: [],
+          teaRoutine: [
+            "Chá verde (15:00)",
+            "Chá de hibisco gelado (16:30)",
+          ],
           strategies: [
             "Introduzir refeed estratégico de carboidratos 1–2x/semana",
+            "Caldo proteico no jantar para prolongar saciedade noturna",
             "Manter alta saciedade com proteína e fibras",
             "Observar resposta corporal ao ajuste calórico",
           ],
@@ -432,29 +791,198 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
         name: "Fase 4 — Manutenção e Autonomia",
         durationWeeks: 1,
         description:
-          "Transição para manutenção sustentável com maior flexibilidade alimentar.",
+          "Transição para manutenção sustentável com flexibilidade alimentar e jejum leve opcional.",
         dailyKcalTarget: 1750,
         macros: { protein: 35, carb: 40, fat: 25 },
         specialFeature: {
-          name: "Tempero da Saciedade Fit GLP",
+          name: "Jejum Leve 12h + Tempero da Saciedade",
           description:
-            "Tempero do protocolo agora como hábito permanente — uso livre conforme preferência.",
+            "Janela alimentar de 12h (ex.: 08:00 às 20:00) para sustentar sensibilidade à insulina. Tempero da Saciedade como hábito permanente.",
           recipe:
-            "1 colher de chá de cúrcuma + ½ colher de chá de gengibre em pó + ½ colher de chá de canela Ceylon + pitada de pimenta preta.",
-          usage: "Usar livremente nas refeições do dia a dia.",
-          benefits: "Hábito anti-inflamatório consolidado para a manutenção de longo prazo.",
+            "Tempero: 1 colher de chá de cúrcuma + ½ de gengibre + ½ de canela Ceylon + pitada de pimenta preta.",
+          usage:
+            "Manter janela de 12h sem alimento sólido entre o jantar e o café da manhã. Tempero usado livremente nas refeições.",
+          benefits:
+            "Sensibilidade à insulina, autofagia leve e hábito anti-inflamatório consolidado.",
         },
         teaSchedule: [
           { time: "07:30", name: "Chá de gengibre + cúrcuma + limão", benefits: "Hábito matinal de manutenção" },
+        ],
+        meals: [
+          {
+            id: "cafe_manha",
+            name: "Café da Manhã (quebra de jejum)",
+            time: "08:00",
+            totalKcal: 430,
+            items: [
+              {
+                foodKey: "ovo",
+                name: "Ovos mexidos",
+                quantityG: 150,
+                householdMeasure: "3 unidades",
+                kcal: 234,
+                substitutions: [
+                  { foodKey: "omelete-queijo", name: "Omelete com queijo branco", quantityG: 150, householdMeasure: "1 omelete", kcal: 240 },
+                  { foodKey: "iogurte-granola", name: "Iogurte natural + granola", quantityG: 250, householdMeasure: "1 pote", kcal: 240 },
+                  { foodKey: "queijo-cottage", name: "Queijo Cottage + aveia", quantityG: 200, householdMeasure: "1 porção", kcal: 250 },
+                ],
+              },
+              {
+                foodKey: "pao-integral",
+                name: "Pão integral",
+                quantityG: 50,
+                householdMeasure: "2 fatias",
+                kcal: 140,
+                substitutions: [
+                  { foodKey: "tapioca", name: "Tapioca", quantityG: 80, householdMeasure: "1 unidade", kcal: 140 },
+                  { foodKey: "aveia", name: "Aveia em flocos", quantityG: 40, householdMeasure: "4 colheres de sopa", kcal: 150 },
+                  { foodKey: "batata-doce", name: "Batata doce", quantityG: 160, householdMeasure: "1 unidade média", kcal: 140 },
+                ],
+              },
+              {
+                foodKey: "abacate",
+                name: "Abacate amassado",
+                quantityG: 40,
+                householdMeasure: "2 colheres de sopa",
+                kcal: 60,
+                substitutions: [
+                  { foodKey: "azeite", name: "Azeite no pão", quantityG: 7, householdMeasure: "1 colher de chá", kcal: 60 },
+                  { foodKey: "pasta-amendoim", name: "Pasta de amendoim", quantityG: 10, householdMeasure: "1 colher de chá cheia", kcal: 60 },
+                  { foodKey: "manteiga-ghee", name: "Manteiga ghee", quantityG: 7, householdMeasure: "1 colher de chá", kcal: 60 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "almoco",
+            name: "Almoço",
+            time: "12:30",
+            totalKcal: 580,
+            items: [
+              {
+                foodKey: "carne-vermelha",
+                name: "Carne vermelha magra grelhada",
+                quantityG: 150,
+                householdMeasure: "1 bife médio",
+                kcal: 280,
+                substitutions: [
+                  { foodKey: "frango-grelhado", name: "Frango grelhado", quantityG: 170, householdMeasure: "1 filé grande", kcal: 280 },
+                  { foodKey: "peixe-grelhado", name: "Peixe grelhado", quantityG: 200, householdMeasure: "1 filé grande", kcal: 240 },
+                  { foodKey: "tofu-grelhado", name: "Tofu grelhado", quantityG: 200, householdMeasure: "1 porção grande", kcal: 280 },
+                ],
+              },
+              {
+                foodKey: "arroz-integral",
+                name: "Arroz integral",
+                quantityG: 100,
+                householdMeasure: "5 colheres de sopa",
+                kcal: 140,
+                substitutions: [
+                  { foodKey: "quinoa", name: "Quinoa", quantityG: 110, householdMeasure: "4 colheres de sopa", kcal: 135 },
+                  { foodKey: "batata-doce", name: "Batata doce", quantityG: 160, householdMeasure: "1 unidade média", kcal: 140 },
+                  { foodKey: "macarrao-integral", name: "Macarrão integral", quantityG: 100, householdMeasure: "1 pegador", kcal: 150 },
+                ],
+              },
+              {
+                foodKey: "feijao",
+                name: "Feijão",
+                quantityG: 100,
+                householdMeasure: "1 concha",
+                kcal: 80,
+                substitutions: [
+                  { foodKey: "lentilha", name: "Lentilha", quantityG: 100, householdMeasure: "1 concha", kcal: 95 },
+                  { foodKey: "grao-de-bico", name: "Grão de bico", quantityG: 100, householdMeasure: "1 concha", kcal: 120 },
+                  { foodKey: "ervilha", name: "Ervilha", quantityG: 100, householdMeasure: "1 concha", kcal: 85 },
+                ],
+              },
+              {
+                foodKey: "salada-colorida",
+                name: "Salada colorida + azeite",
+                quantityG: 200,
+                householdMeasure: "2 xícaras",
+                kcal: 80,
+                substitutions: [
+                  { foodKey: "legumes-assados", name: "Legumes assados", quantityG: 200, householdMeasure: "2 xícaras", kcal: 100 },
+                  { foodKey: "brocolis", name: "Brócolis no vapor", quantityG: 200, householdMeasure: "2 xícaras", kcal: 70 },
+                  { foodKey: "abobrinha", name: "Abobrinha grelhada", quantityG: 200, householdMeasure: "2 xícaras", kcal: 60 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "lanche_tarde",
+            name: "Lanche da Tarde",
+            time: "16:30",
+            totalKcal: 260,
+            items: [
+              {
+                foodKey: "iogurte-granola",
+                name: "Iogurte natural + granola + frutas",
+                quantityG: 250,
+                householdMeasure: "1 pote",
+                kcal: 260,
+                substitutions: [
+                  { foodKey: "shake-whey-fruta", name: "Shake de whey + fruta", quantityG: 300, householdMeasure: "1 copo grande", kcal: 260 },
+                  { foodKey: "vitamina-aveia", name: "Vitamina de banana com aveia", quantityG: 300, householdMeasure: "1 copo grande", kcal: 270 },
+                  { foodKey: "pao-pasta", name: "Pão integral + pasta de amendoim", quantityG: 80, householdMeasure: "2 fatias", kcal: 260 },
+                ],
+              },
+            ],
+          },
+          {
+            id: "jantar",
+            name: "Jantar (fechamento da janela)",
+            time: "20:00",
+            totalKcal: 420,
+            items: [
+              {
+                foodKey: "frango-desfiado",
+                name: "Frango desfiado refogado",
+                quantityG: 140,
+                householdMeasure: "1 xícara",
+                kcal: 230,
+                substitutions: [
+                  { foodKey: "peixe-grelhado", name: "Peixe grelhado", quantityG: 170, householdMeasure: "1 filé médio", kcal: 200 },
+                  { foodKey: "carne-vermelha", name: "Carne magra grelhada", quantityG: 120, householdMeasure: "1 bife pequeno", kcal: 220 },
+                  { foodKey: "ovo", name: "Omelete (3 ovos)", quantityG: 150, householdMeasure: "1 omelete", kcal: 234 },
+                ],
+              },
+              {
+                foodKey: "legumes-assados",
+                name: "Mix de legumes assados",
+                quantityG: 250,
+                householdMeasure: "2 xícaras",
+                kcal: 110,
+                substitutions: [
+                  { foodKey: "salada-verde", name: "Salada verde + azeite", quantityG: 250, householdMeasure: "2 xícaras grandes", kcal: 90 },
+                  { foodKey: "brocolis", name: "Brócolis no vapor", quantityG: 250, householdMeasure: "2 xícaras", kcal: 85 },
+                  { foodKey: "couve-flor", name: "Couve-flor gratinada", quantityG: 250, householdMeasure: "2 xícaras", kcal: 120 },
+                ],
+              },
+              {
+                foodKey: "azeite",
+                name: "Azeite extra virgem",
+                quantityG: 9,
+                householdMeasure: "1 colher de sobremesa",
+                kcal: 80,
+                substitutions: [
+                  { foodKey: "abacate", name: "Abacate", quantityG: 50, householdMeasure: "¼ unidade", kcal: 80 },
+                  { foodKey: "castanha", name: "Castanha de caju", quantityG: 14, householdMeasure: "7 unidades", kcal: 80 },
+                  { foodKey: "amendoa", name: "Amêndoas", quantityG: 14, householdMeasure: "11 unidades", kcal: 80 },
+                ],
+              },
+            ],
+          },
         ],
         recommendations: {
           waterMl: 4000,
           sleepHours: 8,
           teaRoutine: ["Chá de gengibre + cúrcuma + limão (07:30)"],
           strategies: [
-            "Manter hábitos de saciedade adquiridos",
-            "Aumentar variedade alimentar com segurança",
-            "Preparação para manutenção de longo prazo",
+            "Manter janela alimentar de 12h (08:00–20:00)",
+            "Variedade alimentar com segurança",
+            "Hábitos de saciedade consolidados",
+            "Tempero da Saciedade como rotina permanente",
           ],
         },
       },
