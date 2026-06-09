@@ -515,6 +515,42 @@ function Patients() {
         Convite Online
       </button>
       <OnlineInviteDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => { if (!o) { setConfirmDelete(null); setDeleteInput(""); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir paciente permanentemente</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>
+                  Esta ação <strong>não pode ser desfeita</strong>. Todos os dados clínicos do paciente
+                  (anamneses, planos publicados, feedbacks, avaliações físicas, protocolos e assinaturas)
+                  serão removidos permanentemente, junto com o acesso de login.
+                </p>
+                <p className="text-sm">
+                  Para confirmar, digite o email <code className="px-1 py-0.5 rounded bg-muted text-foreground">{confirmDelete?.email}</code> abaixo:
+                </p>
+                <input
+                  type="email"
+                  value={deleteInput}
+                  onChange={(e) => setDeleteInput(e.target.value)}
+                  placeholder={confirmDelete?.email}
+                  className="w-full bg-surface border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-destructive"
+                />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={!confirmDelete || deleteInput.trim().toLowerCase() !== confirmDelete.email.toLowerCase() || deleteMutation.isPending}
+              onClick={(e) => { e.preventDefault(); if (confirmDelete) deleteMutation.mutate(confirmDelete.id); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteMutation.isPending ? "Excluindo…" : `Excluir ${confirmDelete?.name ?? ""}`.trim()}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
