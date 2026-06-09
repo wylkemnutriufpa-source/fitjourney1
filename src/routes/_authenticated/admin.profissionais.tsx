@@ -266,6 +266,46 @@ function ProfessionalsPage() {
           }}
         />
       )}
+
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => { if (!o) { setConfirmDelete(null); setDeleteInput(""); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir profissional permanentemente</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>
+                  Esta ação <strong>não pode ser desfeita</strong>. Templates, códigos de convite,
+                  assinatura e acesso de login serão removidos.
+                </p>
+                <p className="text-sm">
+                  <strong>Pré-requisito:</strong> o profissional não pode ter pacientes vinculados.
+                  Se houver, a operação será recusada — exclua/transfira os pacientes antes.
+                </p>
+                <p className="text-sm">
+                  Para confirmar, digite o email <code className="px-1 py-0.5 rounded bg-muted text-foreground">{confirmDelete?.email}</code> abaixo:
+                </p>
+                <input
+                  type="email"
+                  value={deleteInput}
+                  onChange={(e) => setDeleteInput(e.target.value)}
+                  placeholder={confirmDelete?.email}
+                  className="w-full bg-surface border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-destructive"
+                />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMut.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={!confirmDelete || deleteInput.trim().toLowerCase() !== confirmDelete.email.toLowerCase() || deleteMut.isPending}
+              onClick={(e) => { e.preventDefault(); if (confirmDelete) deleteMut.mutate(confirmDelete.id); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteMut.isPending ? "Excluindo…" : `Excluir ${confirmDelete?.full_name ?? ""}`.trim()}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
