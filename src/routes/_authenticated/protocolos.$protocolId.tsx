@@ -185,9 +185,13 @@ function LockedNotice() {
 function ModulesGrid({
   protocol,
   modules,
+  patientId,
+  patientName,
 }: {
   protocol: ProtocolDescriptor;
   modules: ReadonlyArray<ProtocolModule>;
+  patientId?: string;
+  patientName?: string;
 }) {
   const [intro, setIntro] = useState<ProtocolModule | null>(null);
   const [detailsOpen, setDetailsOpen] = useState<ProtocolModule | null>(null);
