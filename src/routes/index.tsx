@@ -368,7 +368,7 @@ function Landing() {
                 <span className="w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse shadow-[0_0_8px_color-mix(in_oklab,var(--gold)_70%,transparent)]" />
               </motion.div>
 
-              <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.08] mb-6 tracking-tight" style={{ color: 'var(--ivory)' }}>
+              <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.08] mb-6 tracking-tight" style={{ color: 'var(--forest-deep)' }}>
                 {c.hero.title_line1}{" "}
                 <span className="relative inline-block">
                   <span className="text-[var(--gold)]" style={{ textShadow: '0 0 28px rgba(201,162,76,0.35)' }}>{c.hero.title_line2}</span>
