@@ -105,6 +105,7 @@ function ProtocolDetailPage() {
         ) : (
           <>
             {activeModule.methodology && <ModuleMethodologyCard methodology={activeModule.methodology} />}
+            <GoldenTipPause20 />
             <PhasesGrid protocol={protocol} module={activeModule} patientId={patientId} patientName={patientName} />
           </>
         )}
@@ -194,6 +195,96 @@ function ModuleMethodologyCard({ methodology }: { methodology: NonNullable<Proto
     </section>
   );
 }
+
+function GoldenTipPause20() {
+  const [open, setOpen] = useState(false);
+  return (
+    <section
+      className="rounded-xl border border-[var(--gold)]/40 bg-gradient-to-br from-[color-mix(in_oklab,var(--gold)_8%,transparent)] to-background overflow-hidden shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_15%,transparent)]"
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full flex items-center gap-2.5 px-3.5 py-3 text-left hover:bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] transition-colors"
+      >
+        <span className="inline-flex size-8 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_18%,transparent)] text-lg shrink-0" aria-hidden>
+          💡
+        </span>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+            Dica de Ouro FitJourney
+          </p>
+          <p className="text-sm font-semibold text-foreground">
+            Pausa Metabólica de 20 Minutos
+          </p>
+        </div>
+        <ChevronDown
+          className={cn("size-4 text-[var(--gold)] transition-transform shrink-0", open && "rotate-180")}
+        />
+      </button>
+
+      {open && (
+        <div className="px-3.5 pb-4 pt-1 border-t border-[var(--gold)]/20 space-y-3 animate-fade-in text-sm leading-relaxed">
+          <p className="text-muted-foreground">
+            Os sinais de saciedade não chegam instantaneamente ao cérebro. Quando você começa a
+            comer, o estômago se distende, o intestino libera hormônios (GLP-1, PYY, CCK) e os
+            nutrientes começam a ser absorvidos — mas o cérebro só recebe esses sinais aos poucos.
+            Por isso é comum repetir o prato e só depois perceber que já estava satisfeito.
+          </p>
+
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] mb-1.5">
+              Como aplicar
+            </p>
+            <ol className="space-y-1 text-foreground/90 list-decimal list-inside marker:text-[var(--gold)]">
+              <li>Termine a refeição e pare de comer.</li>
+              <li>Aguarde cerca de 20 minutos.</li>
+              <li>Beba água, se desejar.</li>
+              <li>Só então decida se ainda está com fome de verdade.</li>
+            </ol>
+          </div>
+
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] mb-1.5">
+              Checklist rápido
+            </p>
+            <ul className="space-y-1 text-foreground/90">
+              <li>✅ Terminou a refeição</li>
+              <li>✅ Aguardou 20 minutos</li>
+              <li>✅ Sente fome física? Repita uma porção planejada.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] mb-1.5">
+              Sequência completa GLP-1 Natural
+            </p>
+            <ol className="space-y-1 text-foreground/90 list-decimal list-inside marker:text-[var(--gold)]">
+              <li>Pré-carga hídrica (água antes da refeição).</li>
+              <li>Vegetais primeiro.</li>
+              <li>Proteína em seguida.</li>
+              <li>Carboidrato por último.</li>
+              <li>Mastigação lenta.</li>
+              <li>Pausa Metabólica de 20 minutos.</li>
+            </ol>
+          </div>
+
+          <p className="text-xs text-muted-foreground border-l-2 border-[var(--gold)]/40 pl-3">
+            <strong className="text-foreground">Não é</strong> passar fome nem ignorar sinais reais
+            do corpo. É só dar tempo para os mecanismos naturais de saciedade agirem antes de
+            decidir repetir.
+          </p>
+
+          <p className="text-[10px] font-mono text-muted-foreground/80 italic border-t border-border/40 pt-2">
+            Estratégia comportamental — apoia, mas não substitui medicamento GLP-1.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
 
 function PremiumHeader({
   protocol,
