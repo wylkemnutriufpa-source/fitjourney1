@@ -11,6 +11,7 @@ import { getPatientForNutritionist, setPatientActiveStatus } from "@/lib/patient
 import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
 import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
 import { listPatientFeedbacks } from "@/lib/feedback/feedback.functions";
+import { listPatientActiveProtocols } from "@/lib/protocols/active.functions";
 import { adherenceLabel, resultLabel } from "@/lib/feedback/copy";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
 import { VideoLoader } from "@/components/VideoLoader";
