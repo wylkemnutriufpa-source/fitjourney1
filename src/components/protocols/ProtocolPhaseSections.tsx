@@ -165,7 +165,8 @@ function TeaRowCard({ tea, index }: { tea: TeaRow; index: number }) {
     !!tea.timesPerDay ||
     !!tea.benefits ||
     !!tea.note ||
-    !!tea.time;
+    !!tea.time ||
+    (tea.ingredients?.length ?? 0) > 0;
   const [open, setOpen] = useState(false);
 
   return (
