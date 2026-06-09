@@ -949,7 +949,7 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
     // Confere draft + ownership.
     const { data: draft, error: dErr } = await supabase
       .from("plans")
-      .select("id, patient_id, status")
+      .select("id, patient_id, status, source_template_key")
       .eq("id", data.planId)
       .eq("nutritionist_id", nutri.id)
       .maybeSingle();
@@ -958,6 +958,7 @@ export const publishDraftPlan = createServerFn({ method: "POST" })
     if (draft.status !== "draft") {
       throw new Error("Este plano já foi publicado.");
     }
+    const draftSourceTemplateKey: string | undefined = draft.source_template_key ?? undefined;
 
     // ---- Pipeline clínico (mesma lógica de publishPlanToPatient) ----
     const ctx = await loadClinicalContext(supabase, draft.patient_id);
