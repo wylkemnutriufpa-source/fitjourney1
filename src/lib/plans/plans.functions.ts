@@ -353,7 +353,7 @@ function protocolMetaFromSourceKey(sourceTemplateKey?: string): ProtocolApplyMet
     const prefix = `protocol-${protocol.id}-`;
     if (!sourceTemplateKey.startsWith(prefix)) continue;
     const rest = sourceTemplateKey.slice(prefix.length);
-    for (const mod of protocol.modules) {
+    for (const mod of protocol.modules ?? []) {
       const modulePrefix = `${mod.id}-`;
       if (!rest.startsWith(modulePrefix)) continue;
       const phaseId = Number(rest.slice(modulePrefix.length));
@@ -469,6 +469,12 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
         .select("id, published_at")
         .single();
       if (errOv) throw new Error(errOv.message);
+      await syncActiveProtocolFromPlan(supabase, {
+        patientId: data.patientId,
+        nutritionistId: nutri.id,
+        protocolMeta: data.protocolMeta,
+        sourceTemplateKey: data.sourceTemplateKey,
+      });
       return { id: planOv.id, publishedAt: planOv.published_at };
     }
 
@@ -566,6 +572,12 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
       .select("id, published_at")
       .single();
     if (error) throw new Error(error.message);
+    await syncActiveProtocolFromPlan(supabase, {
+      patientId: data.patientId,
+      nutritionistId: nutri.id,
+      protocolMeta: data.protocolMeta,
+      sourceTemplateKey: data.sourceTemplateKey,
+    });
 
     return { id: plan.id, publishedAt: plan.published_at };
   });
