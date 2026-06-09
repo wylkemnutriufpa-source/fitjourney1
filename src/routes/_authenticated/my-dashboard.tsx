@@ -226,69 +226,38 @@ function MyDashboardPage() {
           )}
         </section>
 
-        {/* Plano ativo + Plano contratado (mesclados) */}
+        {/* Plano contratado (financeiro / vencimento) */}
         <section
-          aria-labelledby="active-plan"
-          className="bg-surface border border-border rounded-lg p-5 space-y-4"
+          aria-labelledby="contracted-plan"
+          className="bg-surface border border-border rounded-lg p-5 space-y-3"
         >
           <div className="flex items-center justify-between">
             <h2
-              id="active-plan"
+              id="contracted-plan"
               className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground"
             >
-              Plano ativo
+              Plano contratado
             </h2>
             <Wallet className="size-3 text-muted-foreground" />
           </div>
 
-          {planLoading ? (
+          {subLoading ? (
             <p className="text-sm text-muted-foreground">Carregando…</p>
-          ) : !hasPlan ? (
+          ) : !subscription ? (
             <p className="text-sm text-muted-foreground">
-              Nenhum plano publicado por enquanto. Assim que seu nutricionista
-              publicar, ele aparece aqui.
+              Nenhum plano financeiro registrado pelo seu nutricionista.
             </p>
           ) : (
-            <Link
-              to="/my-plan"
-              className="flex items-center justify-between gap-3 rounded-md border border-border bg-background px-4 py-3 hover:border-primary/40 hover:bg-primary/5 transition"
-            >
-              <div>
-                <p className="text-base font-semibold tracking-tight">
-                  Acesse seu plano
-                </p>
-                {plan?.publishedAt && (
-                  <p className="text-[11px] font-mono text-muted-foreground">
-                    publicado em {formatShortDate(plan.publishedAt)}
-                  </p>
-                )}
-              </div>
-              <ArrowRight className="size-4 text-primary" />
-            </Link>
+            <SubscriptionInfo
+              planKind={subscription.planKind}
+              status={subscription.status}
+              priceCents={subscription.priceCents}
+              startsAt={subscription.startsAt}
+              endsAt={subscription.endsAt}
+            />
           )}
-
-          {/* Plano contratado (financeiro) */}
-          <div className="pt-3 border-t border-border space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Plano contratado
-            </p>
-            {subLoading ? (
-              <p className="text-sm text-muted-foreground">Carregando…</p>
-            ) : !subscription ? (
-              <p className="text-sm text-muted-foreground">
-                Nenhum plano financeiro registrado pelo seu nutricionista.
-              </p>
-            ) : (
-              <SubscriptionInfo
-                planKind={subscription.planKind}
-                status={subscription.status}
-                priceCents={subscription.priceCents}
-                startsAt={subscription.startsAt}
-                endsAt={subscription.endsAt}
-              />
-            )}
-          </div>
         </section>
+
 
         {/* Tiles de navegação */}
         <section
