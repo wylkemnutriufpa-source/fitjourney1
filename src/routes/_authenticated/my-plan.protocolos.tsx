@@ -120,7 +120,7 @@ function PatientActiveProtocolsPage() {
         ) : (
           <div className="space-y-4">
             {data.protocols.map((p) => (
-              <ActiveProtocolCard key={p.id} row={p} />
+              <ActiveProtocolCard key={p.id} row={p} personalWaterMl={personalWaterMl} />
             ))}
           </div>
         )}
