@@ -13,7 +13,6 @@ import {
   Moon,
   Info,
   ChevronDown,
-  
   UtensilsCrossed,
   Flame,
   ImageOff,
@@ -222,7 +221,7 @@ function MetricChip({ icon, label }: { icon: React.ReactNode; label: string }) {
 
 function resolveMealHero(meal: PhaseMeal): string | undefined {
   for (const it of meal.items) {
-    const u = imgFor("", it.name);
+    const u = imgFor(it.name, it.name);
     if (u) return u;
   }
   return undefined;
@@ -306,7 +305,7 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
         disabled={!hasDetail}
       >
         {(() => {
-          const thumb = imgFor("", item.name);
+          const thumb = imgFor(item.name, item.name);
           return thumb ? (
             <span className="relative inline-block size-10 rounded-md overflow-hidden bg-muted shrink-0">
               <img
