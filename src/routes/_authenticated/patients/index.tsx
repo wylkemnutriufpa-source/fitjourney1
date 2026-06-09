@@ -474,6 +474,14 @@ function Patients() {
                       >
                         <Power className="size-4" />
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => { setConfirmDelete({ id: p.id, name: p.fullName, email: p.email }); setDeleteInput(""); }}
+                        className="size-8 grid place-items-center rounded text-destructive/80 hover:text-destructive hover:bg-destructive/10"
+                        title="Excluir paciente permanentemente"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
                       <Link
                         to="/patients/$id"
                         params={{ id: p.id }}
