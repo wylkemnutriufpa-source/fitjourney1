@@ -116,6 +116,13 @@ function PatientProfile() {
     staleTime: 0,
     refetchOnMount: "always",
   });
+  const fetchLatestPlan = useServerFn(getLatestPlanForPatient);
+  const { data: latestPlan } = useQuery({
+    queryKey: ["patient-latest-plan", id],
+    queryFn: () => fetchLatestPlan({ data: { patientId: id } }),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
   const anamnesisId = data?.anamnesis?.id ?? null;
   const activeMutation = useMutation({
     mutationFn: (isActive: boolean) => setActiveStatus({ data: { patientId: id, isActive } }),
