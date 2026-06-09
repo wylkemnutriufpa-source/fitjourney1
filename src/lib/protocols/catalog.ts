@@ -866,7 +866,21 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
             "Sensibilidade à insulina, autofagia leve e hábito anti-inflamatório consolidado.",
         },
         teaSchedule: [
-          { time: "07:30", name: "Chá de gengibre + cúrcuma + limão", benefits: "Hábito matinal de manutenção" },
+          {
+            time: "07:30",
+            name: "Chá de gengibre + cúrcuma + limão",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 fatia fina de gengibre fresco (~3 g)",
+              "½ colher de chá de cúrcuma em pó",
+              "Suco de ½ limão",
+            ],
+            preparation:
+              "Ferver a água com o gengibre e a cúrcuma por 5 minutos. Abafar 3 min, coar e acrescentar o limão. Tomar morno.",
+            timesPerDay: "1x ao dia (em jejum)",
+            benefits: "Hábito matinal de manutenção, anti-inflamatório leve",
+          },
         ],
         meals: [
           {
