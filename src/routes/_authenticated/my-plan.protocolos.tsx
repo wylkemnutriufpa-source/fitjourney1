@@ -220,44 +220,73 @@ function MetricChip({ icon, label }: { icon: React.ReactNode; label: string }) {
   );
 }
 
+function resolveMealHero(meal: PhaseMeal): string | undefined {
+  for (const it of meal.items) {
+    const u = imgFor("", it.name);
+    if (u) return u;
+  }
+  return undefined;
+}
+
 function MealCard({ meal }: { meal: PhaseMeal }) {
   const [open, setOpen] = useState(false);
+  const heroUrl = resolveMealHero(meal);
   return (
-    <div className="rounded-xl border border-[var(--gold)]/20 bg-background/60 overflow-hidden">
+    <article className="rounded-xl border border-[var(--gold)]/20 bg-background/60 overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-3 p-3 text-left hover:bg-[color-mix(in_oklab,var(--gold)_5%,transparent)] transition-colors"
+        className="w-full grid grid-cols-[72px_1fr_auto] sm:grid-cols-[88px_1fr_auto] gap-3 items-center text-left hover:bg-[color-mix(in_oklab,var(--gold)_5%,transparent)] transition-colors"
         aria-expanded={open}
       >
-        <span className="inline-flex size-9 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] text-[var(--gold)] font-mono text-[10px] shrink-0">
-          {meal.time}
-        </span>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold uppercase tracking-wide text-foreground truncate">
+        <div className="relative aspect-square bg-muted">
+          {heroUrl ? (
+            <img
+              src={heroUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center text-muted-foreground">
+              <ImageOff className="size-5" aria-hidden />
+            </div>
+          )}
+        </div>
+        <div className="py-3 min-w-0 space-y-0.5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[var(--gold)]/80">
+              <Clock className="size-3" aria-hidden />
+              {meal.time}
+            </span>
+          </div>
+          <h3 className="text-sm sm:text-base font-semibold uppercase tracking-wide text-foreground break-words leading-tight">
             {meal.name}
-          </p>
-          <p className="text-[10px] font-mono text-muted-foreground">
-            {meal.items.length} {meal.items.length === 1 ? "alimento" : "alimentos"} · {meal.totalKcal} kcal
+          </h3>
+          <p className="text-[11px] text-muted-foreground">
+            {meal.items.length} {meal.items.length === 1 ? "alimento" : "alimentos"}
+            <span className="tabular-nums"> · {meal.totalKcal} kcal</span>
           </p>
         </div>
         <ChevronDown
+          aria-hidden
           className={cn(
-            "size-4 text-[var(--gold)] transition-transform shrink-0",
+            "size-4 mr-3 text-[var(--gold)] transition-transform shrink-0",
             open && "rotate-180",
           )}
         />
       </button>
 
       {open && (
-        <div className="px-3 pb-3 space-y-2 border-t border-[var(--gold)]/15 animate-fade-in">
+        <div className="p-3 space-y-2 border-t border-[var(--gold)]/15 animate-fade-in">
           {meal.items.map((it, i) => (
             <FoodRow key={`${meal.id}-${i}`} item={it} />
           ))}
         </div>
       )}
-    </div>
+    </article>
   );
+
 }
 
 function FoodRow({ item }: { item: PhaseMealItem }) {
