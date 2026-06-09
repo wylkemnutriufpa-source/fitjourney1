@@ -150,6 +150,61 @@ export const listPatientActiveProtocols = createServerFn({ method: "POST" })
     return { protocols: (rows ?? []) as ActiveProtocolRow[] };
   });
 
+const ProtocolIdInput = z.object({ protocolId: z.string().min(1).max(64) });
+
+export type ProtocolEnrollmentRow = {
+  id: string;
+  patient_id: string;
+  patient_name: string;
+  patient_avatar_url: string | null;
+  module_id: string;
+  module_name: string;
+  phase_id: number;
+  phase_name: string;
+  phase_duration_weeks: number;
+  started_at: string;
+  ends_at: string | null;
+};
+
+export const listProtocolEnrollments = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ProtocolIdInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: nutri } = await supabase
+      .from("nutritionists")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+    if (!nutri) return { enrollments: [] as ProtocolEnrollmentRow[] };
+
+    const { data: rows, error } = await supabase
+      .from("patient_active_protocols")
+      .select(
+        "id, patient_id, module_id, module_name, phase_id, phase_snapshot, started_at, ends_at, patients!inner(full_name, avatar_url)",
+      )
+      .eq("nutritionist_id", nutri.id)
+      .eq("protocol_id", data.protocolId)
+      .eq("status", "active")
+      .order("started_at", { ascending: false });
+    if (error) throw new Error(error.message);
+
+    const enrollments: ProtocolEnrollmentRow[] = (rows ?? []).map((r: any) => ({
+      id: r.id,
+      patient_id: r.patient_id,
+      patient_name: r.patients?.full_name ?? "Paciente",
+      patient_avatar_url: r.patients?.avatar_url ?? null,
+      module_id: r.module_id,
+      module_name: r.module_name,
+      phase_id: r.phase_id,
+      phase_name: r.phase_snapshot?.name ?? `Fase ${r.phase_id}`,
+      phase_duration_weeks: r.phase_snapshot?.durationWeeks ?? 0,
+      started_at: r.started_at,
+      ends_at: r.ends_at,
+    }));
+    return { enrollments };
+  });
+
 const BannerInput = z.object({ activeProtocolId: z.string().uuid() });
 
 export const markBannerShownToday = createServerFn({ method: "POST" })
