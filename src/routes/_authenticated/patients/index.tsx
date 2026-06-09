@@ -397,17 +397,18 @@ function Patients() {
                         {p.planStatus === "delivered" ? "Com plano" : "Sem plano"}
                       </span>
                       {p.anamnesisStatus === "approved" && (
-                        <a
-                          href={p.autoDraft ? `/templates?draftPlanId=${encodeURIComponent(p.autoDraft.planId)}` : "#"}
+                        <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!p.autoDraft) {
-                              e.preventDefault();
+                            if (p.autoDraft) {
+                              openExistingDraft(p.autoDraft.planId);
+                            } else {
                               void openPrePlan(p.id);
                             }
                           }}
-                          aria-disabled={openingDraftFor === p.id}
-                          className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase text-primary hover:text-primary/80 transition-colors"
+                          disabled={openingDraftFor === p.id}
+                          className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
                           title={p.autoDraft?.reason ?? "Gerar ou abrir pré-plano sugerido"}
                         >
                           <span className="size-1.5 rounded-full bg-primary" />
@@ -417,7 +418,7 @@ function Patients() {
                               · {p.autoDraft.templateName}
                             </span>
                           )}
-                        </a>
+                        </button>
                       )}
                     </div>
                   </td>
