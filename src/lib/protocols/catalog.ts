@@ -415,8 +415,35 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
             "Suporte hepático, hidratação, antioxidantes e potencialização do efeito GLP-1.",
         },
         teaSchedule: [
-          { time: "07:30", name: "Chá de gengibre + cúrcuma + limão", benefits: "Anti-inflamatório e estimulante de GLP-1" },
-          { time: "20:00", name: "Chá de camomila + melissa", benefits: "Melhora qualidade do sono e reduz ansiedade" },
+          {
+            time: "07:30",
+            name: "Chá de gengibre + cúrcuma + limão",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 fatia fina de gengibre fresco (~3 g)",
+              "½ colher de chá de cúrcuma em pó",
+              "Suco de ½ limão",
+            ],
+            preparation:
+              "Ferver a água com o gengibre e a cúrcuma por 5 minutos. Abafar 3 min, coar, acrescentar o limão. Tomar morno.",
+            timesPerDay: "1x ao dia (em jejum)",
+            benefits: "Anti-inflamatório e estimulante de GLP-1",
+          },
+          {
+            time: "20:00",
+            name: "Chá de camomila + melissa",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 colher de chá de camomila seca (ou 1 sachê)",
+              "1 colher de chá de melissa seca (ou 1 sachê)",
+            ],
+            preparation:
+              "Aquecer a água sem ferver, desligar, adicionar as ervas, abafar por 5 minutos e coar. Tomar 30–60 min antes de dormir.",
+            timesPerDay: "1x ao dia (à noite)",
+            benefits: "Melhora qualidade do sono e reduz ansiedade",
+          },
         ],
         meals: [
           {
