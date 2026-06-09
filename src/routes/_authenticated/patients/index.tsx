@@ -5,12 +5,24 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { ensureDraftPlanForPatient, listMyPatientsForPlan } from "@/lib/plans/plans.functions";
 import { setPatientActiveStatus } from "@/lib/patients/patient-detail.functions";
-import { Plus, Search, FileText, Share2, Power, Phone } from "lucide-react";
+import { deletePatientAsNutritionist } from "@/lib/admin/admin.functions";
+import { Plus, Search, FileText, Share2, Power, Phone, Trash2 } from "lucide-react";
 import { OnlineInviteDialog } from "@/components/patients/OnlineInviteDialog";
 import { VideoLoader } from "@/components/VideoLoader";
 import { maskPhoneBR } from "@/lib/phone-mask";
 import { toast } from "sonner";
 import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 
 export const Route = createFileRoute("/_authenticated/patients/")({
   head: () => ({ meta: [{ title: "Pacientes — FitJourney" }] }),
