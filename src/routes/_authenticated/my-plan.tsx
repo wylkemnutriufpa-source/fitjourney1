@@ -113,6 +113,8 @@ function MyPlanPage() {
   const fetchPlan = useServerFn(getMyActivePlan);
   const fetchProfile = useServerFn(getMyPatientProfile);
   const fetchFoods = useServerFn(listFoods);
+  const fetchActiveProtocols = useServerFn(listMyActiveProtocols);
+  const fetchCtx = useServerFn(getMyClinicalContext);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient", "active-plan"],
@@ -129,6 +131,21 @@ function MyPlanPage() {
     queryFn: () => fetchFoods(),
     staleTime: 5 * 60_000,
   });
+  const { data: activeProtocols } = useQuery({
+    queryKey: ["patient", "active-protocols", "my-plan"],
+    queryFn: () => fetchActiveProtocols(),
+    staleTime: 60_000,
+  });
+  const { data: ctx } = useQuery({
+    queryKey: ["my-clinical-context"],
+    queryFn: () => fetchCtx(),
+    staleTime: 60_000,
+  });
+  const personalWaterMl = personalizedWaterMl(
+    ctx?.currentWeight?.weightKg ?? null,
+    ctx?.demographics.activity ?? null,
+  );
+  const protocols = activeProtocols?.protocols ?? [];
 
   const greeting = useMemo(() => {
     const now = new Date();
