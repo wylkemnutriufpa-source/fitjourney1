@@ -93,6 +93,7 @@ function Patients() {
   const fetchPatients = useServerFn(listMyPatientsForPlan);
   const ensureDraft = useServerFn(ensureDraftPlanForPatient);
   const setActiveStatus = useServerFn(setPatientActiveStatus);
+  const deletePatientFn = useServerFn(deletePatientAsNutritionist);
   const { data: patients = [], isLoading, error } = useQuery({
     queryKey: ["patients-index"],
     queryFn: () => fetchPatients(),
@@ -103,6 +104,8 @@ function Patients() {
   const [filter, setFilter] = useState<PatientFilter>(search.filter ?? "all");
   const [inviteOpen, setInviteOpen] = useState(false);
   const [openingDraftFor, setOpeningDraftFor] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [deleteInput, setDeleteInput] = useState("");
   const activeMutation = useMutation({
     mutationFn: ({ patientId, isActive }: { patientId: string; isActive: boolean }) =>
       setActiveStatus({ data: { patientId, isActive } }),
@@ -113,6 +116,17 @@ function Patients() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao atualizar status."),
   });
+  const deleteMutation = useMutation({
+    mutationFn: (patientId: string) => deletePatientFn({ data: { patient_id: patientId } }),
+    onSuccess: async () => {
+      toast.success("Paciente excluído permanentemente.");
+      setConfirmDelete(null);
+      setDeleteInput("");
+      await qc.invalidateQueries({ queryKey: ["patients-index"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Falha ao excluir paciente."),
+  });
+
 
   const openPrePlan = async (patientId: string) => {
     if (openingDraftFor) return;
