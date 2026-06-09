@@ -50,6 +50,9 @@ export interface PhaseMealItem {
   readonly householdMeasure: string;
   readonly kcal: number;
   readonly imageSlug?: string;
+  readonly ingredients?: ReadonlyArray<string>;
+  readonly preparation?: string;
+  readonly usage?: string;
   readonly substitutions?: ReadonlyArray<PhaseMealItemSubstitution>;
 }
 
@@ -500,8 +503,20 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
                 foodKey: "suco-verde-fit",
                 name: "Suco Verde Fit GLP",
                 quantityG: 300,
-                householdMeasure: "1 copo grande",
+                householdMeasure: "1 copo grande (300 ml)",
                 kcal: 90,
+                ingredients: [
+                  "1 folha grande de couve manteiga (sem o talo)",
+                  "½ maçã verde com casca",
+                  "½ pepino japonês com casca",
+                  "Suco de ½ limão",
+                  "200 ml de água gelada (ou água de coco)",
+                  "Gelo a gosto",
+                  "Opcional: 1 cm de gengibre fresco / 5 folhas de hortelã",
+                ],
+                preparation:
+                  "Lave bem a couve, a maçã e o pepino. Bata todos os ingredientes no liquidificador por 30–40 segundos até ficar homogêneo. Não coar (manter as fibras). Beber imediatamente, sem adoçar.",
+                usage: "1x ao dia, no meio da manhã (cerca de 2h após o café). Consumir em até 15 min após o preparo.",
                 substitutions: [
                   { foodKey: "agua-coco-limao", name: "Água de coco + limão", quantityG: 300, householdMeasure: "1 copo grande", kcal: 60 },
                   { foodKey: "cha-verde-limao", name: "Chá verde gelado + limão", quantityG: 300, householdMeasure: "1 copo grande", kcal: 5 },

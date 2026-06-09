@@ -816,18 +816,20 @@ function PreviewMealCard({ meal }: { meal: PhaseMeal }) {
 function PreviewFoodRow({ item }: { item: PhaseMealItem }) {
   const subs = item.substitutions ?? [];
   const hasSubs = subs.length > 0;
+  const hasRecipe = (item.ingredients?.length ?? 0) > 0 || !!item.preparation;
+  const hasDetail = hasSubs || hasRecipe;
   const [open, setOpen] = useState(false);
   return (
     <div className="rounded-lg border border-border/60 bg-surface/40">
       <button
         type="button"
-        onClick={() => hasSubs && setOpen((v) => !v)}
+        onClick={() => hasDetail && setOpen((v) => !v)}
         className={cn(
           "w-full flex items-center gap-3 p-2.5 text-left",
-          hasSubs && "hover:bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] transition-colors",
+          hasDetail && "hover:bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] transition-colors",
         )}
         aria-expanded={open}
-        disabled={!hasSubs}
+        disabled={!hasDetail}
       >
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
@@ -836,32 +838,72 @@ function PreviewFoodRow({ item }: { item: PhaseMealItem }) {
             <span className="text-muted-foreground/60"> · {item.quantityG}g · {item.kcal} kcal</span>
           </p>
         </div>
-        {hasSubs && (
+        {hasDetail && (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-[var(--gold)]/80 shrink-0">
-            <Replace className="size-3" />
-            {subs.length} substituições
+            {hasSubs ? (
+              <>
+                <Replace className="size-3" />
+                {subs.length} substituições
+              </>
+            ) : (
+              <>receita</>
+            )}
             <ChevronDown className={cn("size-3 transition-transform", open && "rotate-180")} />
           </span>
         )}
       </button>
-      {hasSubs && open && (
-        <div className="px-2.5 pb-2.5 space-y-1.5 border-t border-border/40 pt-2 animate-fade-in">
-          <ul className="space-y-1">
-            {subs.map((s, i) => (
-              <li
-                key={`${s.foodKey}-${i}`}
-                className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/70 px-2 py-1.5 text-xs"
-              >
-                <div className="min-w-0">
-                  <span className="font-medium text-foreground">{s.name}</span>
-                  <span className="text-muted-foreground"> · {s.householdMeasure}</span>
+      {hasDetail && open && (
+        <div className="px-2.5 pb-2.5 space-y-2 border-t border-border/40 pt-2 animate-fade-in">
+          {hasRecipe && (
+            <div className="space-y-1.5">
+              {item.ingredients && item.ingredients.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Ingredientes
+                  </p>
+                  <ul className="mt-1 list-disc list-inside space-y-0.5 text-xs text-foreground/90">
+                    {item.ingredients.map((ing, i) => (
+                      <li key={i}>{ing}</li>
+                    ))}
+                  </ul>
                 </div>
-                <span className="font-mono text-[10px] text-muted-foreground shrink-0">
-                  {s.quantityG}g · {s.kcal} kcal
-                </span>
-              </li>
-            ))}
-          </ul>
+              )}
+              {item.preparation && (
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Modo de preparo
+                  </p>
+                  <p className="text-xs text-foreground/90 mt-1">{item.preparation}</p>
+                </div>
+              )}
+              {item.usage && (
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Como usar
+                  </p>
+                  <p className="text-xs text-foreground/90 mt-1">{item.usage}</p>
+                </div>
+              )}
+            </div>
+          )}
+          {hasSubs && (
+            <ul className="space-y-1">
+              {subs.map((s, i) => (
+                <li
+                  key={`${s.foodKey}-${i}`}
+                  className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/70 px-2 py-1.5 text-xs"
+                >
+                  <div className="min-w-0">
+                    <span className="font-medium text-foreground">{s.name}</span>
+                    <span className="text-muted-foreground"> · {s.householdMeasure}</span>
+                  </div>
+                  <span className="font-mono text-[10px] text-muted-foreground shrink-0">
+                    {s.quantityG}g · {s.kcal} kcal
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </div>

@@ -209,18 +209,20 @@ function MealCard({ meal }: { meal: PhaseMeal }) {
 function FoodRow({ item }: { item: PhaseMealItem }) {
   const subs = item.substitutions ?? [];
   const hasSubs = subs.length > 0;
+  const hasRecipe = (item.ingredients?.length ?? 0) > 0 || !!item.preparation;
+  const hasDetail = hasSubs || hasRecipe;
   const [open, setOpen] = useState(false);
   return (
     <div className="rounded-lg border border-border/60 bg-surface/40 first:mt-2">
       <button
         type="button"
-        onClick={() => hasSubs && setOpen((v) => !v)}
+        onClick={() => hasDetail && setOpen((v) => !v)}
         className={cn(
           "w-full flex items-center gap-3 p-2.5 text-left",
-          hasSubs && "hover:bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] transition-colors",
+          hasDetail && "hover:bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] transition-colors",
         )}
         aria-expanded={open}
-        disabled={!hasSubs}
+        disabled={!hasDetail}
       >
         <span className="inline-flex size-9 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] text-lg shrink-0" aria-hidden>
           {emojiForFood(item.name)}
@@ -232,10 +234,19 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
             <span className="text-muted-foreground/60"> · {item.quantityG}g · {item.kcal} kcal</span>
           </p>
         </div>
-        {hasSubs && (
+        {hasDetail && (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-[var(--gold)]/80 shrink-0">
-            <Replace className="size-3" />
-            {subs.length} substituições
+            {hasSubs ? (
+              <>
+                <Replace className="size-3" />
+                {subs.length} substituições
+              </>
+            ) : (
+              <>
+                <Info className="size-3" />
+                receita
+              </>
+            )}
             <ChevronDown
               className={cn("size-3 transition-transform", open && "rotate-180")}
             />
@@ -243,28 +254,64 @@ function FoodRow({ item }: { item: PhaseMealItem }) {
         )}
       </button>
 
-      {hasSubs && open && (
-        <div className="px-2.5 pb-2.5 space-y-1.5 border-t border-border/40 pt-2 animate-fade-in">
-          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-            Substituições equivalentes
-          </p>
-          <ul className="space-y-1">
-            {subs.map((s, i) => (
-              <li
-                key={`${s.foodKey}-${i}`}
-                className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/60 px-2 py-1.5 text-xs"
-              >
-                <div className="min-w-0 flex items-baseline gap-1.5">
-                  <span aria-hidden>{emojiForFood(s.name)}</span>
-                  <span className="font-medium text-foreground">{s.name}</span>
-                  <span className="text-muted-foreground"> · {s.householdMeasure}</span>
+      {hasDetail && open && (
+        <div className="px-2.5 pb-2.5 space-y-2 border-t border-border/40 pt-2 animate-fade-in">
+          {hasRecipe && (
+            <div className="space-y-1.5">
+              {item.ingredients && item.ingredients.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Ingredientes
+                  </p>
+                  <ul className="mt-1 list-disc list-inside space-y-0.5 text-xs text-foreground/90">
+                    {item.ingredients.map((ing, i) => (
+                      <li key={i}>{ing}</li>
+                    ))}
+                  </ul>
                 </div>
-                <span className="font-mono text-[10px] text-muted-foreground shrink-0">
-                  {s.quantityG}g · {s.kcal} kcal
-                </span>
-              </li>
-            ))}
-          </ul>
+              )}
+              {item.preparation && (
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Modo de preparo
+                  </p>
+                  <p className="text-xs text-foreground/90 mt-1">{item.preparation}</p>
+                </div>
+              )}
+              {item.usage && (
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Como usar
+                  </p>
+                  <p className="text-xs text-foreground/90 mt-1">{item.usage}</p>
+                </div>
+              )}
+            </div>
+          )}
+          {hasSubs && (
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                Substituições equivalentes
+              </p>
+              <ul className="space-y-1">
+                {subs.map((s, i) => (
+                  <li
+                    key={`${s.foodKey}-${i}`}
+                    className="flex items-baseline justify-between gap-2 rounded border border-[var(--gold)]/15 bg-background/60 px-2 py-1.5 text-xs"
+                  >
+                    <div className="min-w-0 flex items-baseline gap-1.5">
+                      <span aria-hidden>{emojiForFood(s.name)}</span>
+                      <span className="font-medium text-foreground">{s.name}</span>
+                      <span className="text-muted-foreground"> · {s.householdMeasure}</span>
+                    </div>
+                    <span className="font-mono text-[10px] text-muted-foreground shrink-0">
+                      {s.quantityG}g · {s.kcal} kcal
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>
