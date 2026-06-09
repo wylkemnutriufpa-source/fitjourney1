@@ -311,7 +311,7 @@ function Patients() {
                     {p.planStatus === "delivered" ? "Com plano" : "Sem plano"}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     disabled={activeMutation.isPending}
@@ -326,6 +326,15 @@ function Patients() {
                     <Power className="size-4" />
                     {p.isActive ? "Inativar" : "Reativar"}
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => { setConfirmDelete({ id: p.id, name: p.fullName, email: p.email }); setDeleteInput(""); }}
+                    className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-destructive/40 text-destructive text-xs font-semibold hover:bg-destructive/10"
+                    title="Excluir paciente permanentemente"
+                  >
+                    <Trash2 className="size-4" />
+                    Excluir
+                  </button>
                   <Link
                     to="/patients/$id"
                     params={{ id: p.id }}
@@ -335,6 +344,7 @@ function Patients() {
                     Perfil
                   </Link>
                 </div>
+
               </div>
             );
           })}
