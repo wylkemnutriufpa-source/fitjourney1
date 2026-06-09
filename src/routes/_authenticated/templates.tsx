@@ -1009,6 +1009,12 @@ function TemplateEditor({
       }
       setApplyDone(patientName);
       setMissingAnamneseFor(null);
+      await Promise.all([
+        editorQc.invalidateQueries({ queryKey: ["patients-index"] }),
+        editorQc.invalidateQueries({ queryKey: ["patient-detail", patientId] }),
+        editorQc.invalidateQueries({ queryKey: ["my-patients-for-plan"] }),
+        editorQc.invalidateQueries({ queryKey: ["patient-plan", patientId] }),
+      ]);
     } catch (e: any) {
       const msg = e?.message ?? "Falha ao publicar plano.";
       if (msg.includes("CLINICAL_CONTEXT_INCOMPLETE") && !opts?.overrideMissingClinical) {
