@@ -1173,6 +1173,227 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
       },
     ],
   },
+  // -------------------------------------------------------------------------
+  // Módulo Gastrite — Alívio, Proteção e Cicatrização da Mucosa Gástrica
+  // -------------------------------------------------------------------------
+  {
+    id: "gastrite",
+    name: "Gastrite",
+    tagline: "Alívio, Proteção e Cicatrização da Mucosa Gástrica",
+    methodology: {
+      title: "Metodologia Gastrite — Proteção e Cicatrização",
+      subtitle:
+        "Reduzir inflamação, aliviar sintomas e promover cicatrização natural da mucosa gástrica através de refeições leves, frequentes e estratégicas.",
+      pillars: [
+        {
+          title: "1. Fracionamento protetor",
+          summary:
+            "Refeições pequenas a cada 3 horas evitam jejum prolongado e excesso de produção ácida.",
+          examples: [
+            "5 a 6 refeições/dia",
+            "Volume reduzido por refeição",
+            "Mastigação lenta e completa",
+          ],
+        },
+        {
+          title: "2. Exclusão de irritantes",
+          summary:
+            "Remover os principais agressores da mucosa durante a fase aguda.",
+          examples: [
+            "Café, refrigerante, álcool",
+            "Frituras e gorduras saturadas",
+            "Pimenta, vinagre, frutas ácidas",
+            "Embutidos, enlatados, ultraprocessados",
+          ],
+        },
+        {
+          title: "3. Alimentos cicatrizantes",
+          summary:
+            "Priorizar alimentos com efeito mucilaginoso e anti-inflamatório.",
+          examples: [
+            "Aveia, banana madura, maçã cozida",
+            "Batata, mandioca, inhame",
+            "Frango/peixe cozidos, ovos pochê",
+            "Camomila, alcaçuz, hortelã",
+          ],
+        },
+        {
+          title: "4. Chá Protetor Gástrico",
+          summary:
+            "Mistura calmante e cicatrizante usada antes das principais refeições.",
+        },
+        {
+          title: "5. Ambiente anti-recidiva",
+          summary:
+            "Hábitos e ambiente que mantêm a mucosa cicatrizada após a alta sintomática.",
+          examples: [
+            "Não deitar nas 2h pós-refeição",
+            "Reduzir estresse e sono curto",
+            "Hidratação fora das refeições",
+          ],
+        },
+      ],
+      behavioralRules: [
+        { name: "Regra das 3 horas", description: "Nunca passar mais de 3 horas em jejum durante o dia." },
+        { name: "Regra do prato morno", description: "Preferir preparações mornas — evitar extremos de temperatura." },
+        { name: "Regra do líquido fora", description: "Beber líquidos 30 min antes ou 1h depois das refeições, não junto." },
+        { name: "Regra da mastigação", description: "Mastigar cada garfada pelo menos 20 vezes antes de engolir." },
+      ],
+      disclaimer:
+        "Protocolo nutricional de suporte. Não substitui IBP, antibioticoterapia para H. pylori ou avaliação endoscópica indicadas pelo médico.",
+    },
+    phases: [
+      {
+        id: 1,
+        name: "Fase 1 — Alívio Agudo",
+        durationWeeks: 2,
+        description: "Foco em reduzir inflamação e irritação da mucosa. Refeições leves, mornas e frequentes.",
+        dailyKcalTarget: 1600,
+        macros: { protein: 30, carb: 50, fat: 20 },
+        specialFeature: {
+          name: "Chá Protetor Gástrico",
+          description: "Mistura calmante e cicatrizante exclusiva do Módulo Gastrite.",
+          recipe: "Camomila + Erva-doce + Alcaçuz + Hortelã (1 colher de chá de cada para 200 ml de água).",
+          usage: "Tomar 1 xícara morna 20 minutos antes das principais refeições (café, almoço e jantar).",
+          benefits: "Calma a mucosa, reduz a sensação de queimação e auxilia a cicatrização do epitélio gástrico.",
+          notes: "Evitar adoçar. Não tomar gelado. Suspender alcaçuz se houver hipertensão.",
+        },
+        teaSchedule: [
+          {
+            time: "07:00",
+            name: "Chá Protetor Gástrico",
+            quantity: "1 xícara (200 ml)",
+            ingredients: [
+              "200 ml de água filtrada",
+              "1 colher de chá de camomila",
+              "1 colher de chá de erva-doce",
+              "1 colher de chá de alcaçuz",
+              "1 colher de chá de hortelã",
+            ],
+            preparation: "Ferver a água, desligar o fogo, adicionar as ervas e abafar por 5 minutos. Coar e tomar morno.",
+            timesPerDay: "3x ao dia (20 min antes das refeições principais)",
+            benefits: "Calmante e cicatrizante da mucosa gástrica",
+            notes: "Suspender alcaçuz em caso de hipertensão.",
+          },
+        ],
+        meals: [
+          {
+            id: "cafe_manha",
+            name: "Café da Manhã",
+            time: "07:00",
+            totalKcal: 320,
+            items: [
+              {
+                foodKey: "aveia",
+                name: "Mingau de Aveia",
+                quantityG: 40,
+                householdMeasure: "4 colheres de sopa",
+                kcal: 150,
+                substitutions: [
+                  { foodKey: "creme-de-arroz", name: "Creme de arroz", quantityG: 40, householdMeasure: "4 colheres de sopa", kcal: 150 },
+                  { foodKey: "mingau-maizena", name: "Mingau de maisena", quantityG: 30, householdMeasure: "3 colheres de sopa", kcal: 140 },
+                  { foodKey: "tapioca", name: "Tapioca fina", quantityG: 50, householdMeasure: "1 disco médio", kcal: 130 },
+                ],
+              },
+              {
+                foodKey: "maca",
+                name: "Maçã cozida",
+                quantityG: 150,
+                householdMeasure: "1 unidade",
+                kcal: 80,
+                substitutions: [
+                  { foodKey: "pera-cozida", name: "Pera cozida", quantityG: 150, householdMeasure: "1 unidade", kcal: 85 },
+                  { foodKey: "banana", name: "Banana madura", quantityG: 100, householdMeasure: "1 unidade", kcal: 89 },
+                  { foodKey: "mamao", name: "Mamão papaia", quantityG: 200, householdMeasure: "1 fatia grande", kcal: 80 },
+                ],
+              },
+              {
+                foodKey: "banana",
+                name: "Banana madura",
+                quantityG: 100,
+                householdMeasure: "1 unidade",
+                kcal: 90,
+                substitutions: [
+                  { foodKey: "maca-cozida", name: "Maçã cozida", quantityG: 150, householdMeasure: "1 unidade", kcal: 80 },
+                  { foodKey: "pera", name: "Pera madura", quantityG: 150, householdMeasure: "1 unidade", kcal: 85 },
+                  { foodKey: "mamao", name: "Mamão papaia", quantityG: 150, householdMeasure: "1 fatia média", kcal: 60 },
+                ],
+              },
+            ],
+          },
+        ],
+        recommendations: {
+          waterMl: 2500,
+          sleepHours: 8,
+          teaRoutine: ["Chá Protetor Gástrico — 20 min antes do café, almoço e jantar"],
+          strategies: [
+            "Refeições pequenas a cada 3 horas",
+            "Evitar alimentos ácidos, picantes, fritos e cafeína",
+            "Priorizar alimentos macios, mornos e de fácil digestão",
+            "Beber líquidos fora das refeições",
+            "Não deitar nas 2h após comer",
+          ],
+        },
+      },
+      {
+        id: 2,
+        name: "Fase 2 — Cicatrização",
+        durationWeeks: 2,
+        description: "Foco em cicatrização da mucosa com introdução gradual de nutrientes.",
+        dailyKcalTarget: 1700,
+        macros: { protein: 35, carb: 45, fat: 20 },
+        recommendations: {
+          waterMl: 2500,
+          sleepHours: 8,
+          teaRoutine: ["Chá Protetor Gástrico — 2x ao dia"],
+          strategies: [
+            "Ampliar fontes proteicas magras (frango, peixe, ovos)",
+            "Introduzir legumes cozidos sem casca",
+            "Manter exclusão de café, álcool e ultraprocessados",
+            "Reforçar mastigação e fracionamento",
+          ],
+        },
+      },
+      {
+        id: 3,
+        name: "Fase 3 — Reintrodução",
+        durationWeeks: 1,
+        description: "Reintrodução gradual de alimentos com maior variedade, observando tolerância individual.",
+        dailyKcalTarget: 1750,
+        macros: { protein: 35, carb: 40, fat: 25 },
+        recommendations: {
+          waterMl: 2500,
+          sleepHours: 8,
+          teaRoutine: ["Chá Protetor Gástrico — 1x ao dia (jejum)"],
+          strategies: [
+            "Reintroduzir frutas cítricas em pequenas porções",
+            "Testar tolerância a temperos suaves",
+            "Manter refeições mornas e bem mastigadas",
+            "Registrar sintomas após cada novo alimento",
+          ],
+        },
+      },
+      {
+        id: 4,
+        name: "Fase 4 — Manutenção",
+        durationWeeks: 1,
+        description: "Manutenção dos resultados e prevenção de recidivas com cardápio variado e equilibrado.",
+        dailyKcalTarget: 1800,
+        macros: { protein: 35, carb: 40, fat: 25 },
+        recommendations: {
+          waterMl: 2500,
+          sleepHours: 8,
+          teaRoutine: ["Chá Protetor Gástrico — manter como rotina semanal"],
+          strategies: [
+            "Cardápio variado mantendo fracionamento",
+            "Evitar gatilhos individuais identificados",
+            "Manter chá protetor como hábito de longo prazo",
+            "Reforço de hábitos anti-recidiva (sono, estresse, postura)",
+          ],
+        },
+      },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
