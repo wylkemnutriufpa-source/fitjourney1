@@ -261,6 +261,17 @@ function MyPlanPage() {
 
         <PlanMeals planId={data.id} meals={meals} foods={foods} />
 
+        {protocols.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+              Protocolos ativos
+            </h2>
+            {protocols.map((p) => (
+              <ActiveProtocolCard key={p.id} row={p} personalWaterMl={personalWaterMl} />
+            ))}
+          </section>
+        )}
+
         <ShoppingListCard meals={meals} foods={foods ?? []} />
 
         <WaterCalculatorCard />
