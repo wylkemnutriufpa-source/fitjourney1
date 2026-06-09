@@ -902,6 +902,7 @@ function ApplyPhaseDialog({
   const [patient, setPatient] = useState<PatientLite | null>(null);
   const [done, setDone] = useState<string | null>(null);
   const apply = useServerFn(applyProtocolPhase);
+  const qc = useQueryClient();
   const open = !!phase;
 
   const mutation = useMutation({
@@ -916,9 +917,15 @@ function ApplyPhaseDialog({
         },
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success(`${phase!.name} atribuída a ${patient!.fullName}.`);
       setDone(patient!.fullName);
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["patients-index"] }),
+        qc.invalidateQueries({ queryKey: ["patient-detail", patient!.id] }),
+        qc.invalidateQueries({ queryKey: ["my-patients-for-plan"] }),
+        qc.invalidateQueries({ queryKey: ["protocol-enrollments"] }),
+      ]);
     },
     onError: (err) => {
       toast.error(`Falha ao aplicar fase: ${(err as Error).message}`);
