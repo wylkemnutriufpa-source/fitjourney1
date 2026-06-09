@@ -107,12 +107,16 @@ function Patients() {
     setOpeningDraftFor(patientId);
     try {
       const draft = await ensureDraft({ data: { patientId } });
-      window.location.assign(`/templates?draftPlanId=${encodeURIComponent(draft.planId)}`);
+      navigate({ to: "/templates", search: { draftPlanId: draft.planId } as any });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao gerar pré-plano.");
     } finally {
       setOpeningDraftFor(null);
     }
+  };
+
+  const openExistingDraft = (draftPlanId: string) => {
+    navigate({ to: "/templates", search: { draftPlanId } as any });
   };
 
   const filtered = useMemo(() => {
