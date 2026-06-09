@@ -7,10 +7,21 @@ import {
   upsertProfessionalSubscription,
   adminUpdateNutritionist,
   setNutritionistPlanTier,
+  adminDeleteNutritionist,
   type AdminNutritionistRow,
   type NutriPlanTier,
 } from "@/lib/admin/admin.functions";
-import { Pencil, Crown, ArrowDownCircle } from "lucide-react";
+import { Pencil, Crown, ArrowDownCircle, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
