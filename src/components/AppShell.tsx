@@ -366,7 +366,9 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 : 0;
             const showDot =
               badgeKey === "feedback-pending" && !!fbStatus?.isPending && !!fbStatus.hasNutritionist;
-            const isProtocolos = item.to === "/protocolos";
+            const isProtocolos =
+              item.to === "/protocolos" || item.to === "/my-plan/protocolos";
+
             return (
               <Link
                 key={item.to}
