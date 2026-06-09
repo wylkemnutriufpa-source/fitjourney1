@@ -117,7 +117,8 @@ function MyDashboardPage() {
   const snapshot = (plan?.snapshot ?? null) as
     | { name?: string; kcal?: number; meals?: unknown[] }
     | null;
-  const hasPlan = Boolean(plan && snapshot);
+  void snapshot;
+
 
   const showLegacyWelcome = Boolean(
     profile?.sourceLegacyId && profile?.hasAnamnesis === false,
