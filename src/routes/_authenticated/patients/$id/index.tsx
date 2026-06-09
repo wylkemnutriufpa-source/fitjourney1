@@ -526,31 +526,6 @@ function PatientProfile() {
 
 
 
-        {/* Plano alimentar — entidade única, sem listar versões. */}
-        {publishedPlans && publishedPlans.length > 0 && (
-          <section className="bg-surface border border-emerald-500/30 rounded-lg p-6 flex items-center justify-between gap-4 flex-wrap">
-            <div className="space-y-1">
-              <p className="text-[10px] font-mono uppercase tracking-widest text-emerald-400">
-                Plano alimentar
-              </p>
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <CheckCircle2 className="size-5 text-emerald-400" />
-                Plano ativo · atualizado em {formatDate(publishedPlans[0].publishedAt)}
-              </h3>
-              <p className="text-[11px] text-muted-foreground">
-                O paciente já visualiza este plano no app.
-              </p>
-            </div>
-            <Link
-              to="/patients/$id/diet"
-              params={{ id: p.id }}
-              className="text-xs font-semibold py-2 px-3 flex items-center gap-2 rounded-md border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
-            >
-              <Pencil className="size-3.5" />
-              Abrir e editar
-            </Link>
-          </section>
-        )}
 
         {/* Elaboração do plano */}
         <section className="bg-surface border border-border rounded-lg p-6 space-y-4">
