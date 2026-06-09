@@ -998,6 +998,7 @@ function TemplateEditor({
             patientId,
             snapshot: JSON.parse(JSON.stringify(currentForShare)),
             sourceTemplateKey: original.id,
+            protocolMeta: (currentForShare as any).protocolMeta,
             sourceTemplateId: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(original.id)
               ? original.id
               : undefined,
