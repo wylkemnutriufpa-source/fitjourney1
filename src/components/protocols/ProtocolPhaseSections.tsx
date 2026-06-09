@@ -179,7 +179,8 @@ function TeaRowCard({ tea, index }: { tea: TeaRow; index: number }) {
         disabled={!hasDetail}
         className={cn(
           "w-full flex items-center gap-2.5 px-2.5 py-2 text-left",
-          hasDetail && "hover:bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] transition-colors",
+          hasDetail &&
+            "hover:bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] transition-colors",
         )}
       >
         <span className="inline-flex size-6 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] text-[var(--gold)] font-mono text-[10px] shrink-0">
