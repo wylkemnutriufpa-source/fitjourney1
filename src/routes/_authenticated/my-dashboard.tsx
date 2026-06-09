@@ -72,11 +72,12 @@ function MyDashboardPage() {
     queryFn: () => fetchProfile(),
     staleTime: 60_000,
   });
-  const { data: plan, isLoading: planLoading } = useQuery({
+  const { data: plan } = useQuery({
     queryKey: ["patient", "active-plan"],
     queryFn: () => fetchPlan(),
     staleTime: 30_000,
   });
+
   const { data: clinical, isLoading: clinicalLoading } = useQuery({
     queryKey: ["patient", "clinical-context"],
     queryFn: () => fetchClinical(),
