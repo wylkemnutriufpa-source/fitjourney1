@@ -29,6 +29,8 @@ import { runNutritionEngines } from "@/lib/clinical/run-nutrition-engines";
 import { validatePlan, type DailyTotals, type FoodOccurrence } from "@/lib/engine/clinical-gate";
 import { ENGINE_VERSION, GATE_VERSION } from "@/lib/engine/version";
 import { generateDraftPlanFromApproval } from "@/lib/plans/draft-auto-plan";
+import { applyActiveProtocolPhase } from "@/lib/protocols/active-write";
+import { PROTOCOL_CATALOG } from "@/lib/protocols/catalog";
 
 export type AnamnesisStatusLite =
   | "approved"
@@ -330,6 +332,11 @@ const PublishInput = z.object({
    * Permite rastrear adesão/abandono por template do sistema.
    */
   sourceTemplateKey: z.string().min(1).max(120).optional(),
+  protocolMeta: z.object({
+    protocolId: z.string().min(1).max(64),
+    moduleId: z.string().min(1).max(64),
+    phaseId: z.number().int().min(1).max(50),
+  }).optional(),
   /**
    * Quando true, permite publicar mesmo sem ClinicalContext calculável
    * (paciente sem anamnese aprovada). Motor + gate clínico são pulados;
@@ -337,6 +344,41 @@ const PublishInput = z.object({
    */
   overrideMissingClinical: z.boolean().optional(),
 });
+
+type ProtocolApplyMeta = z.infer<typeof PublishInput>["protocolMeta"];
+
+function protocolMetaFromSourceKey(sourceTemplateKey?: string): ProtocolApplyMeta {
+  if (!sourceTemplateKey?.startsWith("protocol-")) return undefined;
+  for (const protocol of PROTOCOL_CATALOG) {
+    const prefix = `protocol-${protocol.id}-`;
+    if (!sourceTemplateKey.startsWith(prefix)) continue;
+    const rest = sourceTemplateKey.slice(prefix.length);
+    for (const mod of protocol.modules ?? []) {
+      const modulePrefix = `${mod.id}-`;
+      if (!rest.startsWith(modulePrefix)) continue;
+      const phaseId = Number(rest.slice(modulePrefix.length));
+      if (Number.isInteger(phaseId) && mod.phases.some((p) => p.id === phaseId)) {
+        return { protocolId: protocol.id, moduleId: mod.id, phaseId };
+      }
+    }
+  }
+  return undefined;
+}
+
+async function syncActiveProtocolFromPlan(
+  supabase: any,
+  input: { patientId: string; nutritionistId: string; protocolMeta?: ProtocolApplyMeta; sourceTemplateKey?: string },
+) {
+  const protocolMeta = input.protocolMeta ?? protocolMetaFromSourceKey(input.sourceTemplateKey);
+  if (!protocolMeta) return;
+  await applyActiveProtocolPhase(supabase, {
+    patientId: input.patientId,
+    nutritionistId: input.nutritionistId,
+    protocolId: protocolMeta.protocolId,
+    moduleId: protocolMeta.moduleId,
+    phaseId: protocolMeta.phaseId,
+  });
+}
 
 export type PublishPlanResult = {
   id: string;
@@ -427,6 +469,12 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
         .select("id, published_at")
         .single();
       if (errOv) throw new Error(errOv.message);
+      await syncActiveProtocolFromPlan(supabase, {
+        patientId: data.patientId,
+        nutritionistId: nutri.id,
+        protocolMeta: data.protocolMeta,
+        sourceTemplateKey: data.sourceTemplateKey,
+      });
       return { id: planOv.id, publishedAt: planOv.published_at };
     }
 
@@ -524,6 +572,12 @@ export const publishPlanToPatient = createServerFn({ method: "POST" })
       .select("id, published_at")
       .single();
     if (error) throw new Error(error.message);
+    await syncActiveProtocolFromPlan(supabase, {
+      patientId: data.patientId,
+      nutritionistId: nutri.id,
+      protocolMeta: data.protocolMeta,
+      sourceTemplateKey: data.sourceTemplateKey,
+    });
 
     return { id: plan.id, publishedAt: plan.published_at };
   });
