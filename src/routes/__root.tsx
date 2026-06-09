@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "../lib/auth-context";
+import { runCacheBuster } from "../lib/cache-buster";
 import { Toaster } from "@/components/ui/sonner";
 import { IntroOverlay } from "@/components/IntroOverlay";
 import { CookieBanner } from "@/components/CookieBanner";
@@ -83,6 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      // Garante que o HTML nunca seja servido de cache estagnado em mobile.
+      { httpEquiv: "Cache-Control", content: "no-cache, no-store, must-revalidate" },
+      { httpEquiv: "Pragma", content: "no-cache" },
+      { httpEquiv: "Expires", content: "0" },
       { title: "FitJourney — Nutrição clínica e esportiva" },
       { name: "description", content: "Plataforma de nutrição clínica e esportiva. Anamnese, dieta cirúrgica e acompanhamento de pacientes." },
       { name: "author", content: "FitJourney" },
@@ -136,6 +141,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const routeContext = Route.useRouteContext();
   const queryClient = routeContext?.queryClient ?? fallbackQueryClient;
+
+  useEffect(() => {
+    void runCacheBuster();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
