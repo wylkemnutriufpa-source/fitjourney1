@@ -54,11 +54,17 @@ function cupsFromMl(ml: number): number {
   return Math.round(ml / 250);
 }
 
-export function WaterCalculatorCard() {
-  const fetchCtx = useServerFn(getMyClinicalContext);
+export function WaterCalculatorCard({ patientId }: { patientId?: string } = {}) {
+  const fetchMyCtx = useServerFn(getMyClinicalContext);
+  const fetchPatientCtx = useServerFn(getClinicalContext);
   const { data: ctx, isLoading } = useQuery({
-    queryKey: ["my-clinical-context"],
-    queryFn: () => fetchCtx(),
+    queryKey: patientId
+      ? ["clinical-context", patientId]
+      : ["my-clinical-context"],
+    queryFn: () =>
+      patientId
+        ? fetchPatientCtx({ data: { patientId } })
+        : fetchMyCtx(),
     staleTime: 60_000,
   });
 
