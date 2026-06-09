@@ -110,7 +110,7 @@ function ProtocolDetailPage() {
         ) : (
           <>
             {activeModule.methodology && <ModuleMethodologyCard methodology={activeModule.methodology} />}
-            <GoldenTipPause20 />
+            <GoldenTips protocolId={protocol.id} />
             <PhasesGrid protocol={protocol} module={activeModule} patientId={patientId} patientName={patientName} />
           </>
         )}
