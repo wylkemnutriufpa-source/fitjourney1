@@ -91,7 +91,7 @@ function saveSet(key: string, set: Set<string>) {
   }
 }
 
-export const Route = createFileRoute("/_authenticated/my-plan")({
+export const Route = createFileRoute("/_authenticated/meu-plano")({
   head: () => ({ meta: [{ title: "Meu Plano — FitJourney" }] }),
   component: MyPlanPage,
   errorComponent: ({ error }) => (

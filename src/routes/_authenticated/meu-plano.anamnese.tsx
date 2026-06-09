@@ -10,7 +10,7 @@ import { AppShell } from "@/components/AppShell";
 import { AnamnesisAnswersView } from "@/components/anamnesis/AnamnesisAnswersView";
 import { getMyApprovedAnamnesisFull } from "@/lib/anamnesis/review.functions";
 
-export const Route = createFileRoute("/_authenticated/my-plan/anamnese")({
+export const Route = createFileRoute("/_authenticated/meu-plano/anamnese")({
   head: () => ({ meta: [{ title: "Minha Anamnese — FitJourney" }] }),
   component: MyAnamnesePage,
   errorComponent: ({ error }) => (
