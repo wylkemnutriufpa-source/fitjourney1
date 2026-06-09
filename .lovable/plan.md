@@ -1,69 +1,46 @@
-## Objetivo
+## O que vamos entregar
 
-Aplicar o mesmo padrão visual/interativo da página de protocolos (que você aprovou) em todas as telas onde o paciente vê o plano:
+Duas coisas que conversam entre si:
 
-- `/my-plan` (plano publicado do paciente)
-- `/c/{slug}/{code}` e `/c/{slug}` (visualização pública/compartilhada)
-- `/my-plan-v2-preview` (preview V2)
+1. **Calculadora de Água dentro do Perfil do Paciente** — usando os dados clínicos reais daquele paciente (peso atual por recência + nível de atividade da anamnese aprovada), com modo "simular" igual à do paciente.
+2. **Jornada nova: Perfil do Paciente → Protocolos com contexto** — botão dourado "Aplicar Protocolo" no perfil leva ao catálogo já carregando o paciente em escopo. A partir daí, em todas as telas de protocolo (lista, detalhe do protocolo, fases), o sistema sabe quem é o paciente e:
+  - Mostra um banner persistente "Comparando com {Nome do Paciente}".
+  - Exibe o card de diagnóstico clínico × protocolo (já existe, é o `ProtocolDiagnosticCard`) dentro do detalhe do protocolo — ajustes sugeridos aparecem automaticamente.
+  - Quando o nutri clicar em "Aplicar Fase", o seletor de paciente já vem pré-selecionado — um clique de confirmação aplica. ( Aproveite e jogue o Botão protocolo ativo do sidebar do paciente para cima do Dashboard..em opcao de destaque e faça como fez no profissional ..destaque para chamar atenção. )
 
-Padrão alvo (idêntico ao de `protocolos.$protocolId` e `my-plan.protocolos`):
+## Arquivos / mudanças
 
-1. Tudo abre **retraído** (colapsado).
-2. Card de refeição mostra: hora · nome · qtd de alimentos · kcal.
-3. Clique na refeição → expande lista de alimentos.
-4. Clique no alimento → expande as substituições daquele alimento.
-5. Animações suaves + acessibilidade (`aria-expanded`).
-6. Funciona muito bem no mobile.
+### 1. Calculadora de Água no perfil
 
-## Escopo das mudanças
+- Novo: `src/components/patient/WaterCalculatorCard.tsx` já existe para o paciente (lê `getMyClinicalContext`). Vamos refatorar para aceitar prop opcional `patientId`:
+  - Sem prop → usa `getMyClinicalContext` (uso atual no app do paciente, sem regressão).
+  - Com `patientId` → usa `getClinicalContext({ patientId })` (uso pelo nutri).
+- Embed no `src/routes/_authenticated/patients/$id/index.tsx` logo após `PhysicalAssessmentCard`.
 
-### 1. `/my-plan` (refator principal) aproveite e troque esse My-plan Para: Meu plano.
+### 2. CTA "Aplicar Protocolo" no perfil
 
-Substituir `MealCard` + `FoodItemReadonlyRow` + `EquivalentsButton` (modal/sheet de equivalentes inteiros) pelo padrão novo:
+- No mesmo perfil, na toolbar de ações, adicionar Link dourado para `/protocolos?patientId={id}&patientName={nome}`.
 
-- `MealCard`: header colapsável simples (hora, nome, contagem, kcal). Mantém a imagem ilustrativa pequena.
-- `FoodRow`: cada item do `main.items` vira linha colapsável. Substituições do item são derivadas por `getSubstitutionsFor()` (já existe) e renderizadas inline na expansão, com `Replace` icon + medida caseira + qtd + kcal.
-- **Remover** o dialog/sheet "Ver equivalentes" — as substituições agora ficam embutidas por alimento (mesma UX dos protocolos).
-- Manter expansão persistente em localStorage por plano (chave já existente `myplan:exp:${planId}`).
-- Padrão inicial: tudo colapsado (mudar de "primeira refeição aberta" para tudo fechado, igual aos protocolos).
-- Botão "Expandir/Recolher tudo" preservado.
+### 3. Rotas de protocolo aceitam patientId
 
-### 2. `/c/{slug}/{code}` e `/c/{slug}`
+- `protocolos.tsx` (layout): `validateSearch` para `patientId?: string`, `patientName?: string`; renderiza banner persistente "Comparando com {Nome}" quando presentes.
+- `protocolos.index.tsx`: propaga `patientId/patientName` no `search` de cada `<Link>` para `/protocolos/$protocolId`.
+- `protocolos.$protocolId.tsx`:
+  - `validateSearch` aceita `patientId`, `patientName` além de `module`.
+  - Quando `patientId` presente, renderiza `<ProtocolDiagnosticCard patientId={patientId} />` no topo do detalhe (já é não-bloqueante e mostra sugestões de ajuste).
+  - Propaga `patientId/patientName` em todos os links internos (módulo, fase).
+  - Na hora de "Aplicar Fase", o `RealPatientPicker` recebe `defaultSelectedId={patientId}` (passa por prop ou um `initialPatient` simples) — se já existe paciente em escopo, o dialog confirma direto com 1 clique.
 
-Após confirmar que reusam o componente do my-plan, garantir que a mesma renderização aparece. Se forem renderers próprios, aplicar o mesmo padrão lá.
+### 4. Pré-seleção no RealPatientPicker
 
-### 3. `/my-plan-v2-preview`
+- Adicionar prop opcional `initialPatientId` e, se presente, pré-popular o estado de seleção interno na abertura. Sem regressão para outros callers.
 
-Substituir `V2MealCard` e linha de item por componentes equivalentes do novo padrão, usando o shape V2 (`day.meals[].items[].substitutions[]`).
+## Itens fora deste escopo
 
-## Itens preservados (não-regressão)
+- Não vou criar uma "Calculadora de Água" separada como rota nova; o card vai direto no perfil.
+- Não vou alterar regra de negócio do diagnóstico/comparação — ele já existe (`diagnose.ts` + `ProtocolDiagnosticCard`); só vou exibi-lo no detalhe do protocolo quando há paciente em contexto.
+- Não toco em motores clínicos, RLS, migrations.
 
-- Snapshot continua imutável (zero recálculo / normalização no renderer — invariante #2).
-- Lista de compras (`ShoppingListCard`) continua consumindo `meals` no formato atual.
-- `ClinicalAlerts`, `DailyProtocolBanner`, `WaterCalculatorCard`, orientações nutricionais — intocados.
-- Persistência de expansão por plano mantida.
-- Acessibilidade (`aria-expanded`, `aria-controls`, focus ring) mantida.
+## Confirmação que peço antes de codar
 
-## Itens removidos
-
-- Modal/Sheet "Ver equivalentes" do my-plan (substituído por expansão inline por alimento).
-- `EquivalentsButton`, `EquivalentsSheet` (se existir) e Dialog de equivalentes ficam mortos — serão deletados se sem outros usos.
-
-## Riscos
-
-- O modal de equivalentes do my-plan hoje mostra a opção alternativa **inteira** (bloco completo). O novo padrão mostra substituições **por alimento individual**. Isso é uma mudança de semântica — é exatamente o que você aprovou na tela de protocolos.
-- Se algum plano antigo só tiver `meal.equivalents` (blocos) e nenhum `item.substitutions`, a expansão do item virá vazia. Mitigação: derivar substituições do alimento via `getSubstitutionsFor()` (já é usado hoje no renderer) ou, na ausência, esconder o chevron do item.
-
-## Validação pós-implementação
-
-- Abrir `/my-plan` com um plano publicado real, verificar visualmente: tudo colapsado, expandir refeição, expandir alimento, ver substituições.
-- Verificar console/network sem erros.
-- Verificar mobile (384px).
-- Verificar `/c/{slug}/{code}` com link real.
-- Não declarar concluído sem validação visual (regra de accountability).
-
-## Arquivos a alterar
-
-- `src/routes/_authenticated/my-plan.tsx` (refator dos componentes de refeição)
-- `src/routes/_authenticated/my-plan-v2-preview.tsx` (mesmo padrão sobre shape V2)
-- `src/routes/c.$slug.$code.tsx` e `src/routes/c.$slug.tsx` (verificar e ajustar se renderer próprio)
+Só uma: ok manter o **botão "Aplicar Protocolo"** no perfil ao lado dos botões dourados de plano (mesmo padrão visual), e o **banner "Comparando com {Nome}"** fixo no topo das telas de protocolo enquanto o paciente estiver em escopo? Se sim, executo direto. (Perfeito..pode executar.)
