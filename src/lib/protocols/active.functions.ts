@@ -6,7 +6,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { findProtocolPhase } from "@/lib/protocols/catalog";
+import { applyActiveProtocolPhase } from "@/lib/protocols/active-write";
 
 const ApplyInput = z.object({
   patientId: z.string().uuid(),
@@ -82,35 +82,14 @@ export const applyProtocolPhase = createServerFn({ method: "POST" })
     if (nutriErr) throw new Error(nutriErr.message);
     if (!nutri) throw new Error("Profissional não encontrado");
 
-    const found = findProtocolPhase(data.protocolId, data.moduleId, data.phaseId);
-    if (!found) throw new Error("Fase de protocolo inválida");
-
-    const startedAt = new Date();
-    const endsAt = new Date(
-      startedAt.getTime() + found.phase.durationWeeks * 7 * 24 * 60 * 60 * 1000,
-    );
-
-    const { data: row, error } = await supabase
-      .from("patient_active_protocols")
-      .insert({
-        patient_id: data.patientId,
-        nutritionist_id: nutri.id,
-        protocol_id: data.protocolId,
-        protocol_name: found.protocol.name,
-        module_id: data.moduleId,
-        module_name: found.module.name,
-        phase_id: data.phaseId,
-        // Deep-clone seguro do snapshot — JSONB no banco fica congelado.
-        phase_snapshot: JSON.parse(JSON.stringify(found.phase)),
-        started_at: startedAt.toISOString(),
-        ends_at: endsAt.toISOString(),
-        status: "active",
-      })
-      .select("id")
-      .single();
-
-    if (error) throw new Error(error.message);
-    return { id: row.id as string };
+    const row = await applyActiveProtocolPhase(supabase, {
+      patientId: data.patientId,
+      nutritionistId: nutri.id,
+      protocolId: data.protocolId,
+      moduleId: data.moduleId,
+      phaseId: data.phaseId,
+    });
+    return { id: row.id };
   });
 
 export const listMyActiveProtocols = createServerFn({ method: "GET" })
