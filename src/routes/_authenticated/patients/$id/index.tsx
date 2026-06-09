@@ -32,6 +32,8 @@ import {
   Power,
   MessageSquareHeart,
   ChevronRight,
+  Activity,
+  CalendarDays,
 } from "lucide-react";
 import { toast } from "sonner";
 import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBoundaries";
