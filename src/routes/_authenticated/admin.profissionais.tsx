@@ -80,16 +80,29 @@ function planBadgeClass(t: NutriPlanTier | undefined): string {
 function ProfessionalsPage() {
   const fetchAll = useServerFn(listProfessionals);
   const setTierFn = useServerFn(setNutritionistPlanTier);
+  const deleteFn = useServerFn(adminDeleteNutritionist);
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin", "professionals"],
     queryFn: () => fetchAll(),
   });
   const [editing, setEditing] = useState<AdminNutritionistRow | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<AdminNutritionistRow | null>(null);
+  const [deleteInput, setDeleteInput] = useState("");
   const tierMut = useMutation({
     mutationFn: (vars: { nutritionist_id: string; plan_tier: NutriPlanTier }) =>
       setTierFn({ data: vars }),
     onSuccess: (_r, vars) => {
       toast.success(vars.plan_tier === "pro" ? "Upgrade para PRO aplicado" : "Plano alterado para BASIC");
+      refetch();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const deleteMut = useMutation({
+    mutationFn: (nutritionist_id: string) => deleteFn({ data: { nutritionist_id } }),
+    onSuccess: () => {
+      toast.success("Profissional excluído permanentemente.");
+      setConfirmDelete(null);
+      setDeleteInput("");
       refetch();
     },
     onError: (e: Error) => toast.error(e.message),
