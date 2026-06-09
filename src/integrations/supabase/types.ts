@@ -1138,6 +1138,14 @@ export type Database = {
       }
     }
     Functions: {
+      admin_delete_nutritionist: {
+        Args: { _nutritionist_id: string }
+        Returns: undefined
+      }
+      admin_delete_patient: {
+        Args: { _patient_id: string }
+        Returns: undefined
+      }
       cleanup_orphan_auth_user: {
         Args: { _auth_user_id: string }
         Returns: boolean
