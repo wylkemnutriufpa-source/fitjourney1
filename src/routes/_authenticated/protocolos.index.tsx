@@ -149,7 +149,13 @@ function ProtocolosIndexPage() {
             }
 
             return (
-              <Link key={p.id} to="/protocolos/$protocolId" params={{ protocolId: p.id }} className={cardClasses}>
+              <Link
+                key={p.id}
+                to="/protocolos/$protocolId"
+                params={{ protocolId: p.id }}
+                search={{ patientId, patientName }}
+                className={cardClasses}
+              >
                 {inner}
               </Link>
             );
