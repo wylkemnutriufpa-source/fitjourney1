@@ -8,7 +8,7 @@ import { PhysicalAssessmentCard } from "@/components/patient/PhysicalAssessmentC
 import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
 import { WaterCalculatorCard } from "@/components/patient/WaterCalculatorCard";
 import { getPatientForNutritionist, setPatientActiveStatus } from "@/lib/patients/patient-detail.functions";
-import { listPublishedPlansForPatient } from "@/lib/plans/plans.functions";
+import { listPublishedPlansForPatient, getLatestPlanForPatient } from "@/lib/plans/plans.functions";
 import { getAnamnesisForReview } from "@/lib/anamnesis/review.functions";
 import { listPatientFeedbacks } from "@/lib/feedback/feedback.functions";
 import { listPatientActiveProtocols } from "@/lib/protocols/active.functions";
@@ -113,6 +113,13 @@ function PatientProfile() {
   const { data: publishedPlans } = useQuery({
     queryKey: ["patient-published-plans", id],
     queryFn: () => fetchPlans({ data: { patientId: id } }),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const fetchLatestPlan = useServerFn(getLatestPlanForPatient);
+  const { data: latestPlan } = useQuery({
+    queryKey: ["patient-latest-plan", id],
+    queryFn: () => fetchLatestPlan({ data: { patientId: id } }),
     staleTime: 0,
     refetchOnMount: "always",
   });
@@ -301,34 +308,55 @@ function PatientProfile() {
         {/* Status clínico — Plano alimentar + Protocolo ativo (visão rápida) */}
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Plano alimentar */}
-          <div className={"rounded-lg border p-5 space-y-2 " + (hasPublishedPlan ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-surface")}>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Plano alimentar
-            </p>
-            <h3 className="text-base font-semibold flex items-center gap-2">
-              <FileText className={"size-4 " + (hasPublishedPlan ? "text-emerald-400" : "text-muted-foreground")} />
-              {hasPublishedPlan ? "Plano ativo publicado" : "Sem plano publicado"}
-            </h3>
-            {hasPublishedPlan && publishedPlans && (
-              <p className="text-[11px] text-muted-foreground">
-                Atualizado em {formatDate(publishedPlans[0].publishedAt)} · paciente já visualiza no app.
-              </p>
-            )}
-            {!hasPublishedPlan && (
-              <p className="text-[11px] text-muted-foreground">
-                Elabore um plano via template ou IA FitJourney.
-              </p>
-            )}
-            {hasPublishedPlan && (
-              <Link
-                to="/patients/$id/diet"
-                params={{ id: p.id }}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:underline pt-1"
-              >
-                <Pencil className="size-3" /> Abrir e editar
-              </Link>
-            )}
-          </div>
+          {(() => {
+            const hasDraft = !!latestPlan && latestPlan.status === "draft";
+            const showCard = hasPublishedPlan || hasDraft;
+            const tone = hasPublishedPlan
+              ? "border-emerald-500/40 bg-emerald-500/5"
+              : hasDraft
+                ? "border-amber-500/40 bg-amber-500/5"
+                : "border-border bg-surface";
+            return (
+              <div className={"rounded-lg border p-5 space-y-2 " + tone}>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Plano alimentar
+                </p>
+                <h3 className="text-base font-semibold flex items-center gap-2">
+                  <FileText className={"size-4 " + (hasPublishedPlan ? "text-emerald-400" : hasDraft ? "text-amber-400" : "text-muted-foreground")} />
+                  {hasPublishedPlan
+                    ? (latestPlan?.title ?? "Plano ativo publicado")
+                    : hasDraft
+                      ? (latestPlan?.title ?? "Rascunho em andamento")
+                      : "Sem plano publicado"}
+                </h3>
+                {hasPublishedPlan && publishedPlans && (
+                  <p className="text-[11px] text-muted-foreground">
+                    Publicado em {formatDate(publishedPlans[0].publishedAt)} · paciente já visualiza no app.
+                  </p>
+                )}
+                {!hasPublishedPlan && hasDraft && (
+                  <p className="text-[11px] text-muted-foreground">
+                    Editado em {formatDate(latestPlan!.updatedAt)} · ainda não publicado para o paciente.
+                  </p>
+                )}
+                {!showCard && (
+                  <p className="text-[11px] text-muted-foreground">
+                    Elabore um plano via template ou IA FitJourney.
+                  </p>
+                )}
+                {showCard && (
+                  <Link
+                    to="/patients/$id/diet"
+                    params={{ id: p.id }}
+                    className={"inline-flex items-center gap-1.5 text-xs font-semibold pt-1 hover:underline " + (hasPublishedPlan ? "text-emerald-400" : "text-amber-400")}
+                  >
+                    <Pencil className="size-3" />
+                    {hasPublishedPlan ? "Abrir e editar" : "Continuar editando"}
+                  </Link>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Protocolo ativo */}
           <div className={"rounded-lg border p-5 space-y-2 " + (activeProtocols.length > 0 ? "border-[var(--gold)]/50 bg-[color-mix(in_oklab,var(--gold)_6%,transparent)]" : "border-border bg-surface")}>
