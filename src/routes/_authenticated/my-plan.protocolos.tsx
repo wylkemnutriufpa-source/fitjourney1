@@ -46,6 +46,21 @@ function personalizedWaterMl(
   return Math.round(weightKg * WATER_ML_PER_KG[activity]);
 }
 
+function abbreviateMeasure(value: string | null | undefined): string {
+  if (!value) return "";
+  return value
+    .replace(/\bunidades?\b/gi, "unid")
+    .replace(/\bm[ée]dias?\b/gi, "méd")
+    .replace(/\bgrandes?\b/gi, "gd")
+    .replace(/\bpequenas?\b/gi, "pq")
+    .replace(/\bcolheres? de sopa cheias?\b/gi, "col sopa")
+    .replace(/\bcolheres? de sopa\b/gi, "col sopa")
+    .replace(/\bcolheres? de ch[áa] cheias?\b/gi, "col chá")
+    .replace(/\bcolheres? de ch[áa]\b/gi, "col chá")
+    .replace(/\bx[ií]caras?\b/gi, "xíc")
+    .replace(/\bpor[çc][õo]es?\b/gi, "porção");
+}
+
 export const Route = createFileRoute("/_authenticated/my-plan/protocolos")({
   head: () => ({ meta: [{ title: "Protocolos Ativos — FitJourney" }] }),
   component: PatientActiveProtocolsPage,
