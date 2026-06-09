@@ -91,11 +91,31 @@ export interface ProtocolPhase {
   };
 }
 
+export interface MethodologyPillar {
+  readonly title: string;
+  readonly summary: string;
+  readonly examples?: ReadonlyArray<string>;
+}
+
+export interface MethodologyRule {
+  readonly name: string;
+  readonly description: string;
+}
+
+export interface ModuleMethodology {
+  readonly title: string;
+  readonly subtitle?: string;
+  readonly pillars: ReadonlyArray<MethodologyPillar>;
+  readonly behavioralRules: ReadonlyArray<MethodologyRule>;
+  readonly disclaimer?: string;
+}
+
 export interface ProtocolModule {
   readonly id: string;
   readonly name: string;
   readonly tagline: string;
   readonly phases: ReadonlyArray<ProtocolPhase>;
+  readonly methodology?: ModuleMethodology;
 }
 
 export type ProtocolIcon =
