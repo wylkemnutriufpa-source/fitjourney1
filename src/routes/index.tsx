@@ -518,9 +518,11 @@ function Landing() {
               </p>
             </motion.div>
 
-            <div className="fj-inline-reel mt-10 md:mt-12 mb-24 md:mb-32">
-              <video src={reel1.url} autoPlay muted loop playsInline preload="metadata" />
-              <span className="fj-inline-reel-mask" aria-hidden />
+            <div className="max-w-3xl mx-auto my-20 md:my-28">
+              <div className="fj-inline-reel">
+                <video src={reel1.url} autoPlay muted loop playsInline preload="metadata" />
+                <span className="fj-inline-reel-mask" aria-hidden />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
