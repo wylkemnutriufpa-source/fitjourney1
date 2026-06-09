@@ -141,7 +141,7 @@ export interface ProtocolDescriptor {
 const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
   {
     id: "fit-glp",
-    name: "Fit GLP",
+    name: "Módulo Fit GLP",
     tagline: "Saciedade Natural e Controle de Apetite",
     methodology: {
       title: "Metodologia GLP-1 Natural",
