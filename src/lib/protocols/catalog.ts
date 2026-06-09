@@ -897,8 +897,8 @@ const IFJ_MODULES: ReadonlyArray<ProtocolModule> = [
                 kcal: 234,
                 substitutions: [
                   { foodKey: "omelete-queijo", name: "Omelete com queijo branco", quantityG: 150, householdMeasure: "1 omelete", kcal: 240 },
-                  { foodKey: "iogurte-granola", name: "Iogurte natural + granola", quantityG: 250, householdMeasure: "1 pote", kcal: 240 },
-                  { foodKey: "queijo-cottage", name: "Queijo Cottage + aveia", quantityG: 200, householdMeasure: "1 porção", kcal: 250 },
+                  { foodKey: "queijo-cottage", name: "Queijo Cottage", quantityG: 200, householdMeasure: "6 colheres de sopa", kcal: 180 },
+                  { foodKey: "iogurte-grego", name: "Iogurte Grego Natural", quantityG: 250, householdMeasure: "1 pote grande", kcal: 155 },
                 ],
               },
               {
