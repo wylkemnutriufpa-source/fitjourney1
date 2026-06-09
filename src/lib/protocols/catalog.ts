@@ -50,6 +50,9 @@ export interface PhaseMealItem {
   readonly householdMeasure: string;
   readonly kcal: number;
   readonly imageSlug?: string;
+  readonly ingredients?: ReadonlyArray<string>;
+  readonly preparation?: string;
+  readonly usage?: string;
   readonly substitutions?: ReadonlyArray<PhaseMealItemSubstitution>;
 }
 
