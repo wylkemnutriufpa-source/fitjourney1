@@ -113,7 +113,7 @@ export function mergeModule(
   // Mescla cada fase
   const phases = mod.phases.map((p) => mergePhase(p, mod.id, idx));
 
-  return { ...mod, methodology, phases };
+  return { ...mod, name: modPayload.name ?? mod.name, methodology, phases };
 }
 
 /** Mescla fase de um snapshot ativo (paciente). Aceita phase "shape lite". */
