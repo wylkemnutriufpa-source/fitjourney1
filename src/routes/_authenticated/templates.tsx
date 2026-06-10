@@ -1650,7 +1650,10 @@ function MealEditor({
               </button>
             </div>
             {meal.main.items.map((item) => (
-              <div key={item.id} className="space-y-1.5">
+              <div
+                key={item.id}
+                className="space-y-1.5 md:space-y-0 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-2"
+              >
                 <FoodItemRow
                   item={item}
                   primary
@@ -1663,6 +1666,7 @@ function MealEditor({
                   onChange={(next) =>
                     changeMainItem(item.id, (i) => ({ ...i, materializedEquivalents: next }))
                   }
+                  variant="inline"
                 />
               </div>
             ))}
