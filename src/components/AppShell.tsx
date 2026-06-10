@@ -489,8 +489,8 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
       <div className={sidebarOpen ? "min-w-0 pl-0 md:pl-64" : "min-w-0 pl-0 md:pl-0"}>
         <ExpirationBanner />
-        <header className="h-16 border-b border-border flex items-center justify-between gap-2 px-3 sm:gap-3 sm:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <header className="min-h-16 border-b border-border grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 py-2 sm:gap-3 sm:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-40">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 overflow-hidden">
             <button
               onClick={() => setSidebarOpen((v) => !v)}
               title={sidebarOpen ? "Recolher menu" : "Expandir menu"}
@@ -502,10 +502,12 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
               <LogoOrbital slot="mobile-header" />
             </span>
             <BackButton />
-            <Crumbs />
+            <div className="hidden min-[390px]:block min-w-0">
+              <Crumbs />
+            </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-4">
             {!isPatient && (
               <button
                 type="button"
@@ -517,8 +519,12 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
                 <Search className="size-4" />
               </button>
             )}
-            <ThemeToggle />
-            {header}
+            <div className="hidden min-[390px]:block">
+              <ThemeToggle />
+            </div>
+            <div className="min-w-0 max-w-[9.5rem] sm:max-w-none">
+              {header}
+            </div>
             <div className="text-right hidden sm:block">
               <p className="text-xs font-medium flex items-center gap-1.5 justify-end">
                 {displayName}
@@ -558,7 +564,7 @@ export function AppShell({ children, header }: { children: ReactNode; header?: R
 
           </div>
         </header>
-        <main className="mx-auto max-w-7xl overflow-x-hidden p-3 sm:p-8">{children ?? <Outlet />}</main>
+        <main className="mx-auto max-w-7xl overflow-x-hidden px-2 py-3 sm:p-8">{children ?? <Outlet />}</main>
       </div>
       <TrialPaywall />
       <ExpirationPaywall />

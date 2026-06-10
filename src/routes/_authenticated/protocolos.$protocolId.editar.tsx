@@ -189,7 +189,7 @@ function ProtocolEditorPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl p-6 space-y-6">
+      <div className="mx-auto w-full max-w-5xl px-1 py-3 sm:p-6 space-y-5 sm:space-y-6">
         <header className="space-y-3">
           <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             <Link
@@ -200,7 +200,7 @@ function ProtocolEditorPage() {
               <ArrowLeft className="size-3" /> Voltar ao protocolo
             </Link>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap min-w-0">
             <Sparkles className="size-4 text-[var(--gold)]" />
             <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] border border-[var(--gold)]/50 rounded px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--gold)_8%,transparent)]">
               Editor Admin
@@ -215,7 +215,7 @@ function ProtocolEditorPage() {
             </Button>
           </div>
           <h1
-            className="text-2xl font-bold uppercase text-[var(--gold)] tracking-tight"
+            className="text-xl sm:text-2xl font-bold uppercase text-[var(--gold)] tracking-tight break-words"
             style={{ textShadow: "0 0 14px color-mix(in oklab, var(--gold) 30%, transparent)" }}
           >
             {protocol.name}
@@ -550,7 +550,7 @@ function GoldenTipListEditor({
     <div className="space-y-3">
       {tips.map((t, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-start">
+          <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] gap-1.5 items-start">
             <ReorderButtons i={i} total={tips.length} onMove={(f, to) => onChange(reorder(tips, f, to))} />
             <EmojiPicker value={t.emoji} onChange={(v) => update(i, { emoji: v })} />
             <Input
@@ -635,7 +635,7 @@ function TeaListEditor({
     <div className="space-y-3">
       {teas.map((t, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-start">
+          <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] gap-1.5 items-start">
             <ReorderButtons i={i} total={teas.length} onMove={(f, to) => onChange(reorder(teas, f, to))} />
             <EmojiPicker value={t.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input
@@ -655,7 +655,7 @@ function TeaListEditor({
 
           <SizeButtons value={t.size} onChange={(s) => update(i, { size: s })} />
 
-          <div className="grid grid-cols-2 gap-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
             <Input
               value={t.quantity ?? ""}
               placeholder="Quantidade (ex: 300 ml)"
@@ -703,7 +703,7 @@ function PillarListEditor({
     <div className="space-y-3">
       {pillars.map((p, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-start">
+          <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] gap-1.5 items-start">
             <ReorderButtons i={i} total={pillars.length} onMove={(f, to) => onChange(reorder(pillars, f, to))} />
             <EmojiPicker value={p.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input
@@ -767,7 +767,7 @@ function RuleListEditor({
     <div className="space-y-3">
       {rules.map((r, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-start">
+          <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] gap-1.5 items-start">
             <ReorderButtons i={i} total={rules.length} onMove={(f, to) => onChange(reorder(rules, f, to))} />
             <EmojiPicker value={r.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input

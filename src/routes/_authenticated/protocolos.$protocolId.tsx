@@ -3,7 +3,7 @@
 // e grava em patient_active_protocols (snapshot imutável da fase).
 
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, notFound, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -77,6 +77,7 @@ export const Route = createFileRoute("/_authenticated/protocolos/$protocolId")({
 
 function ProtocolDetailPage() {
   const { protocol } = Route.useLoaderData();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { roles } = useAuth();
   const isAdmin = roles.includes("admin");
 
@@ -113,9 +114,13 @@ function ProtocolDetailPage() {
     [baseGoldenTips, overridesIdx],
   );
 
+  if (pathname.endsWith("/editar")) {
+    return <Outlet />;
+  }
+
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl p-6 space-y-6">
+      <div className="mx-auto w-full max-w-5xl px-1 py-3 sm:p-6 space-y-5 sm:space-y-6">
         <PremiumHeader
           protocol={protocol}
           hasAccess={hasAccess}
@@ -442,7 +447,7 @@ function ModulesGrid({
               </p>
               <p className="text-xs text-muted-foreground mt-1">{m.tagline}</p>
             </div>
-            <div className="relative mt-auto pt-3 border-t border-[var(--gold)]/15 flex items-center justify-between">
+            <div className="relative mt-auto pt-3 border-t border-[var(--gold)]/15 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <span className="text-[10px] font-mono uppercase text-muted-foreground">
                 {m.phases.length} {m.phases.length === 1 ? "fase" : "fases"}
               </span>
@@ -616,14 +621,14 @@ function ModuleDetailsDialog({
               key={p.id}
               className="rounded-lg border border-[var(--gold)]/25 bg-background/60 p-4 space-y-2"
             >
-              <div className="flex items-center justify-between gap-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
                 <p
-                  className="text-sm font-bold uppercase tracking-wide text-[var(--gold)]"
+                  className="min-w-0 text-sm font-bold uppercase tracking-wide text-[var(--gold)] leading-tight"
                   style={{ textShadow: "0 0 10px color-mix(in oklab, var(--gold) 30%, transparent)" }}
                 >
                   Fase {idx + 1} · {p.name}
                 </p>
-                <span className="text-[10px] font-mono uppercase text-muted-foreground inline-flex items-center gap-1">
+                <span className="shrink-0 text-[10px] font-mono uppercase text-muted-foreground inline-flex items-center gap-1">
                   <Clock className="size-3" />
                   {p.durationWeeks} sem
                 </span>
@@ -745,7 +750,7 @@ function PhaseCard({ phase, onOpen }: { phase: ProtocolPhase; onOpen: () => void
         <p className="text-xs text-muted-foreground pt-1">{phase.description}</p>
       </div>
 
-      <div className="relative grid grid-cols-3 gap-2 text-[10px] font-mono text-muted-foreground border-t border-[var(--gold)]/15 pt-3">
+      <div className="relative grid grid-cols-1 min-[360px]:grid-cols-3 gap-2 text-[10px] font-mono text-muted-foreground border-t border-[var(--gold)]/15 pt-3">
         <span className="inline-flex items-center gap-1">
           <Droplets className="size-3 text-[var(--gold)]/70" />
           {(phase.recommendations.waterMl / 1000).toFixed(1)}L
@@ -820,7 +825,7 @@ function PhaseDetailsDialog({
           {/* Macros */}
           {phase.macros && (
             <Section title="Distribuição de Macros">
-              <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="grid grid-cols-1 min-[360px]:grid-cols-3 gap-2 text-xs">
                 <MacroPill label="Proteína" pct={phase.macros.protein} />
                 <MacroPill label="Carbo" pct={phase.macros.carb} />
                 <MacroPill label="Gordura" pct={phase.macros.fat} />
