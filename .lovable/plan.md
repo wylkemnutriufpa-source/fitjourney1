@@ -1,46 +1,66 @@
-## O que vamos entregar
+## Bugs reportados no editor (paciente Lucas)
 
-Duas coisas que conversam entre si:
+### Bug 1 — Queijo minas aparecendo como substituição de proteína no almoço
 
-1. **Calculadora de Água dentro do Perfil do Paciente** — usando os dados clínicos reais daquele paciente (peso atual por recência + nível de atividade da anamnese aprovada), com modo "simular" igual à do paciente.
-2. **Jornada nova: Perfil do Paciente → Protocolos com contexto** — botão dourado "Aplicar Protocolo" no perfil leva ao catálogo já carregando o paciente em escopo. A partir daí, em todas as telas de protocolo (lista, detalhe do protocolo, fases), o sistema sabe quem é o paciente e:
-  - Mostra um banner persistente "Comparando com {Nome do Paciente}".
-  - Exibe o card de diagnóstico clínico × protocolo (já existe, é o `ProtocolDiagnosticCard`) dentro do detalhe do protocolo — ajustes sugeridos aparecem automaticamente.
-  - Quando o nutri clicar em "Aplicar Fase", o seletor de paciente já vem pré-selecionado — um clique de confirmação aplica. ( Aproveite e jogue o Botão protocolo ativo do sidebar do paciente para cima do Dashboard..em opcao de destaque e faça como fez no profissional ..destaque para chamar atenção. )
+**Causa provável:** o item base de almoço do Lucas tem `foodKey` que não existe no catálogo TACO (ou nome livre). O `findCandidateIn` faz fuzzy match e acaba grudando em `frango-desfiado`/`queijo-minas` (subGroup `protein-snack`). A partir daí o filtro `subGroup === base.subGroup` libera todo o pool de lanche.
 
-## Arquivos / mudanças
+**Fix:** Reforçar trava clínica em `src/lib/substitutions/equivalents.ts`:
 
-### 1. Calculadora de Água no perfil
+- Quando `base.scaleGroup === "protein"` E não houver `subGroup` no base, inferir `protein-meal` se a refeição for almoço/jantar, `protein-snack` se for café/lanche.
+- Encaminhar `mealKind` (ou um hint `proteinContext: "meal" | "snack"`) do `recalc.ts` até `calculateEquivalents` para que mesmo com fuzzy match o filtro respeite o contexto da refeição.
+- Em `recalc.ts`, sobrescrever `eqBase.subGroup` conforme o contexto antes de calcular.
 
-- Novo: `src/components/patient/WaterCalculatorCard.tsx` já existe para o paciente (lê `getMyClinicalContext`). Vamos refatorar para aceitar prop opcional `patientId`:
-  - Sem prop → usa `getMyClinicalContext` (uso atual no app do paciente, sem regressão).
-  - Com `patientId` → usa `getClinicalContext({ patientId })` (uso pelo nutri).
-- Embed no `src/routes/_authenticated/patients/$id/index.tsx` logo após `PhysicalAssessmentCard`.
+Observação minha: temos muita variedade de proteina..nao trm pq ficar rotacionando com poucas opcoes como estou percebendo..clico em gerar nova opcao repete 2..3x a mesma opção.. oq podemos introduzir tbm eh uma trapinho para profissionais clicar e tipo travar aquela opcao..e quando clicar em gerar so gera 2 pq tem uma travada..dai ele tava a 2a..e quando do clicar em gerar gera apenas uma até chegar na opcao perfeita sacou a jogada? Aplicar esse mecanismos em todas as opcoes de refeição a trava e rotacionamento sem travar..respeitando as gramas do item principal. 
 
-### 2. CTA "Aplicar Protocolo" no perfil
+### Bug 2 — Jantar não abre opção de edição da proteína
 
-- No mesmo perfil, na toolbar de ações, adicionar Link dourado para `/protocolos?patientId={id}&patientName={nome}`.
+**Causa provável:** a proteína do jantar caiu em um caminho onde `householdMeasures` ou `kcalPer100g` está ausente, e o `Select` de unidade fica oculto (linha 871: `if (it.unit === "ml" || ...)`). Preciso ver o item real do snapshot do Lucas antes de afirmar — a hipótese mais barata é que o item foi salvo sem `kcal`/`unit` válidos e o botão de editar é renderizado condicional a `kcalPer100g`.
 
-### 3. Rotas de protocolo aceitam patientId
+**Fix:** Investigar com o snapshot atual; tornar o botão de editar sempre visível (mesmo sem `kcalPer100g` permitir editar `qty`/`unit` em modo livre).
 
-- `protocolos.tsx` (layout): `validateSearch` para `patientId?: string`, `patientName?: string`; renderiza banner persistente "Comparando com {Nome}" quando presentes.
-- `protocolos.index.tsx`: propaga `patientId/patientName` no `search` de cada `<Link>` para `/protocolos/$protocolId`.
-- `protocolos.$protocolId.tsx`:
-  - `validateSearch` aceita `patientId`, `patientName` além de `module`.
-  - Quando `patientId` presente, renderiza `<ProtocolDiagnosticCard patientId={patientId} />` no topo do detalhe (já é não-bloqueante e mostra sugestões de ajuste).
-  - Propaga `patientId/patientName` em todos os links internos (módulo, fase).
-  - Na hora de "Aplicar Fase", o `RealPatientPicker` recebe `defaultSelectedId={patientId}` (passa por prop ou um `initialPatient` simples) — se já existe paciente em escopo, o dialog confirma direto com 1 clique.
+### Bug 3 — Edição de quantidade vai para ML em vez de gramas
 
-### 4. Pré-seleção no RealPatientPicker
+**Causa:** linha 871-872 de `diet.tsx`:
 
-- Adicionar prop opcional `initialPatientId` e, se presente, pré-popular o estado de seleção interno na abertura. Sem regressão para outros callers.
+```ts
+if (it.unit === "ml" || ...) opts.splice(1, 0, { value: "u:ml", label: "ml", kind: "u" });
+```
 
-## Itens fora deste escopo
+Quando o item nasce com `unit: "ml"` errado (vindo do catálogo do alimento), a opção `ml` aparece e fica selecionada. Para itens cujo `scaleGroup ∈ { protein, carb, fruit }`, a unidade default tem que ser `g` (ou `unid` para ovo/frutas inteiras).
 
-- Não vou criar uma "Calculadora de Água" separada como rota nova; o card vai direto no perfil.
-- Não vou alterar regra de negócio do diagnóstico/comparação — ele já existe (`diagnose.ts` + `ProtocolDiagnosticCard`); só vou exibi-lo no detalhe do protocolo quando há paciente em contexto.
-- Não toco em motores clínicos, RLS, migrations.
+**Fix:**
 
-## Confirmação que peço antes de codar
+- Em `addFoodToMeal` / no carregamento do snapshot, forçar `unit = "g"` quando o `scaleGroup` indica sólido e o catálogo não declara explicitamente `ml`.
+- No seletor de unidades, esconder `ml` para `scaleGroup ∈ { protein, carb, fruit }`.
 
-Só uma: ok manter o **botão "Aplicar Protocolo"** no perfil ao lado dos botões dourados de plano (mesmo padrão visual), e o **banner "Comparando com {Nome}"** fixo no topo das telas de protocolo enquanto o paciente estiver em escopo? Se sim, executo direto. (Perfeito..pode executar.)
+### Bug 4 — Ovo sempre em unidades
+
+**Fix:** Em `addFoodToMeal` e na materialização de substituições (`recalc.ts` → `MaterializedEquivalentOption`):
+
+- Detectar `foodKey === "ovo-galinha"` (ou alias: `omelete`, `ovos-mexidos`, `ovos-cozidos`) e força `unit = "unid"` com `qty = Math.max(1, round(grams / 50))`.
+- Aplicar a mesma normalização ao snapshot ao abrir o editor (não só na adição), para corrigir o plano atual do Lucas sem precisar de migration.
+
+## Ordem de execução
+
+1. Bug 1 (catálogo): força `subGroup` por contexto da refeição em `equivalents.ts` + `recalc.ts`.
+2. Bug 3 (ml → g): trava em `addFoodToMeal` + filtro de opções no `Select`.
+3. Bug 4 (ovo em unid): normalização única reaproveitada em add/recalc/abertura do editor.
+4. Bug 2 (jantar edição): vou abrir o snapshot do Lucas via DB antes de mexer no JSX — preciso ver o item real para não chutar.
+
+## Validação
+
+Sem afirmação de "corrigido" antes de:
+
+- Abrir o plano do Lucas no preview.
+- Editar proteína do almoço → ver opções (sem queijo minas).
+- Editar proteína do jantar → confirmar que abre.
+- Trocar quantidade de proteína do almoço → unidade fica em g (não ml).
+- Adicionar/editar ovo em qualquer refeição → fica em unid.
+
+## Risco / rollback
+
+- Mudanças isoladas em 2 arquivos (`equivalents.ts`, `recalc.ts`) + 1 arquivo de UI (`diet.tsx`).
+- Sem migration, sem mudança em snapshot publicado.
+- Reverso = git.
+
+Posso seguir nessa ordem?

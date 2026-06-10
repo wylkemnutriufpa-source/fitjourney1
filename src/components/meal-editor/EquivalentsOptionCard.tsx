@@ -3,7 +3,7 @@
 // Burro: recebe value + onChange + onRemove. Sem estado de servidor.
 
 import { useState } from "react";
-import { Search, Trash2, ArrowRightLeft } from "lucide-react";
+import { Search, Trash2, ArrowRightLeft, Lock, Unlock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,6 +91,18 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
               Buscar
             </Button>
           ) : null}
+          <Button
+            type="button"
+            variant={value.locked ? "default" : "outline"}
+            size="icon"
+            className="h-8 w-8 flex-none"
+            onClick={() => patch({ locked: !value.locked })}
+            disabled={disabled}
+            aria-label={value.locked ? "Destravar opção" : "Travar opção (não regenerar)"}
+            title={value.locked ? "Destravar opção" : "Travar opção (não regenerar)"}
+          >
+            {value.locked ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+          </Button>
           {onRemove ? (
             <Button
               type="button"

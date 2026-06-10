@@ -86,6 +86,7 @@ import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBou
 import { cleanFoodDisplayName, cleanFoodNamesDeep } from "@/lib/foods/display-name";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { toPlannerTemplate } from "@/lib/meal-planner";
+import { detectMealKind } from "@/lib/plans/substitution-rules";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Plano do paciente — FitJourney" }] }),
@@ -133,8 +134,43 @@ function uid() {
   return `id-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function normalizeEditItem(it: any): any {
+  if (!it || typeof it !== "object") return it;
+  const next = { ...it };
+  const foodKey: string = String(next.foodKey ?? "");
+  const name: string = String(next.name ?? "");
+  const isEgg = /^(ovo-galinha|omelete|ovos-mexidos|ovos-cozidos|ovos-com-bacon)$/.test(foodKey)
+    || /\b(ovo|ovos|omelete)\b/i.test(name);
+  const isSolid = ["protein", "carb", "fruit"].includes(String(next.scaleGroup ?? ""));
+  if (isEgg && next.unit !== "unid") {
+    const qtyG = next.unit === "g" ? Number(next.qty) || 50 : Number(next.qty) * 50 || 50;
+    const units = Math.max(1, Math.round(qtyG / 50));
+    next.qty = units;
+    next.unit = "unid";
+    next.kcal = Math.round((143 * 50 * units) / 100);
+    delete next.householdMeasure;
+  } else if (isSolid && next.unit === "ml") {
+    next.unit = "g";
+  }
+  return next;
+}
+
+function normalizeSnapshotForEdit(s: any): any {
+  if (!s || typeof s !== "object") return s;
+  if (!Array.isArray(s.meals)) return s;
+  return {
+    ...s,
+    meals: s.meals.map((m: any) => ({
+      ...m,
+      main: m?.main
+        ? { ...m.main, items: (m.main.items ?? []).map(normalizeEditItem) }
+        : m?.main,
+    })),
+  };
+}
+
 function cloneSnapshot(s: any): EditSnapshot {
-  return cleanFoodNamesDeep(JSON.parse(JSON.stringify(s ?? {})));
+  return normalizeSnapshotForEdit(cleanFoodNamesDeep(JSON.parse(JSON.stringify(s ?? {}))));
 }
 
 function kcalOf(item: Pick<EditItem, "kcal">) {
@@ -375,24 +411,43 @@ function PlanEditor({
 
   function addFoodToMeal(mealId: string, food: CatalogFood) {
     const newId = uid();
-    // Se o alimento tem medida caseira default, já abre o item com ela
-    // selecionada — a dor relatada (ovo em gramas, banana em gramas) some
-    // sem o nutri precisar trocar nada à mão.
     const defaultMeasure =
       food.householdMeasures?.find((m) => m.isDefault) ??
       food.householdMeasures?.[0];
+
+    // Normaliza unidade na entrada do editor:
+    // - Ovo sempre em "unid" (1 ovo = 50g), independente do que veio do catálogo.
+    // - Sólidos (proteína/carbo/fruta) NUNCA em "ml" — se vier ml, coage p/ "g".
+    const isEgg = /^(ovo-galinha|omelete|ovos-mexidos|ovos-cozidos|ovos-com-bacon)$/.test(food.foodKey ?? "")
+      || /\b(ovo|ovos|omelete)\b/i.test(food.name ?? "");
+    const isSolid = ["protein", "carb", "fruit"].includes(food.scaleGroup);
+
+    let initQty = food.qty;
+    let initUnit = food.unit;
+    let initKcal = food.kcal;
+
+    if (isEgg) {
+      initUnit = "unid";
+      initQty = Math.max(1, Math.round(initQty || 1));
+      initKcal = Math.round(143 * 50 * initQty / 100); // 1 ovo ≈ 72 kcal
+    } else if (isSolid && initUnit === "ml") {
+      initUnit = "g";
+    }
+
     const baseItem: any = {
       id: newId,
       foodKey: food.foodKey,
       name: cleanFoodDisplayName(food.name),
-      qty: food.qty,
-      unit: food.unit,
-      kcal: food.kcal,
+      qty: initQty,
+      unit: initUnit,
+      kcal: initKcal,
       scaleGroup: food.scaleGroup,
       kcalPer100g: food.kcalPer100g,
       householdMeasures: food.householdMeasures,
     };
-    if (defaultMeasure && food.kcalPer100g) {
+
+    // Só aplica medida caseira padrão se NÃO for ovo (ovo é sempre unid).
+    if (!isEgg && defaultMeasure && food.kcalPer100g) {
       baseItem.householdMeasure = {
         label: defaultMeasure.measureName,
         grams: defaultMeasure.gramsEquivalent,
@@ -411,7 +466,6 @@ function PlanEditor({
         items: [...m.main.items, baseItem],
       },
     }));
-    // Abre o modal pós-adição para decidir Replicar / Gerar equivalentes.
     setPostAdd({ mealId, itemId: newId, itemName: cleanFoodDisplayName(food.name) });
   }
 
@@ -864,11 +918,14 @@ function MealCard({
                 const currentValue = currentMeasure ? `m:${currentMeasure.label}` : `u:${it.unit}`;
 
                 type Opt = { value: string; label: string; kind: "u" | "m"; payload?: any };
+                // Para sólidos (proteína/carbo/fruta) NUNCA mostramos "ml" —
+                // arroz/frango/banana saindo em ml era um dos bugs reportados.
+                const isSolid = ["protein", "carb", "fruit"].includes(it.scaleGroup);
                 const opts: Opt[] = [
                   { value: "u:g", label: "g", kind: "u" },
                   { value: "u:unid", label: "unid", kind: "u" },
                 ];
-                if (it.unit === "ml" || (!measures?.length && false)) {
+                if (!isSolid && (it.unit === "ml" || it.scaleGroup === "beverage" || it.scaleGroup === "dairy")) {
                   opts.splice(1, 0, { value: "u:ml", label: "ml", kind: "u" });
                 }
                 if (it.unit && !["g", "ml", "unid", "medida"].includes(it.unit) && !measures?.find((m) => m.measureName === it.unit)) {
@@ -939,6 +996,7 @@ function MealCard({
               }
               variant="inline"
               autoGenerateOnMount={newItemIds.has(it.id)}
+              mealKind={detectMealKind(meal.label, meal.time)}
             />
             <div className="flex items-center justify-end gap-1 md:gap-0.5">
                 <Button
