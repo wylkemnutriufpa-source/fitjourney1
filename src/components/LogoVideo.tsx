@@ -9,19 +9,16 @@ interface LogoVideoProps {
 }
 
 export function LogoVideo({ className = "size-10 object-contain", style }: LogoVideoProps) {
-  // Em mobile (qualquer toque/coarse pointer) usamos PNG estático para evitar
-  // o quadrado branco que aparece em Android/MIUI (Xiaomi) ao renderizar webm transparente.
-  const [isMobile, setIsMobile] = useState(false);
+  // Apenas Xiaomi/MIUI (Redmi/POCO) renderiza PNG estático — o webm transparente
+  // pinta um quadrado branco nesses devices. Demais Android/iOS mantêm o vídeo.
+  const [isXiaomi, setIsXiaomi] = useState(false);
   useEffect(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
-    const mq = window.matchMedia("(pointer: coarse)");
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener?.("change", update);
-    return () => mq.removeEventListener?.("change", update);
+    if (typeof navigator === "undefined") return;
+    const ua = navigator.userAgent || "";
+    setIsXiaomi(/MIUI|XiaoMi|Xiaomi|Redmi|POCO|HMSCore.*Mi /i.test(ua));
   }, []);
 
-  if (isMobile) {
+  if (isXiaomi) {
     return (
       <img
         src={logoStaticPng.url}
