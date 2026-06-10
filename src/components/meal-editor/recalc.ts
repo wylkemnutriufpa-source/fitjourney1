@@ -13,7 +13,7 @@ import {
 } from "@/lib/substitutions/equivalents";
 import { findCandidateIn } from "@/lib/substitutions/taco-catalog";
 import type { PlannerFoodItem } from "@/lib/meal-planner";
-import { inferGramsPerUnit, unitFromGrams } from "@/lib/foods/unit-bridge";
+import { inferGramsPerUnit } from "@/lib/foods/unit-bridge";
 
 import {
   TACO_CATALOG_VERSION,
