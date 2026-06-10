@@ -2179,6 +2179,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Baixo índice glicêmico, cromo e fracionamento estratégico.",
     icon: "TrendingDown",
     triggers: { anyClinicalTag: ["insulin_resistance", "pre_diabetes", "sop"] },
+    modules: [RESISTENCIA_INSULINA_MODULE],
   },
   {
     id: "anemia",
@@ -2193,6 +2194,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Inositol, baixo carbo e anti-inflamatórios — equilíbrio hormonal.",
     icon: "CircleDot",
     triggers: { anyClinicalTag: ["sop", "insulin_resistance"] },
+    modules: [SOP_MODULE],
   },
 ];
 
