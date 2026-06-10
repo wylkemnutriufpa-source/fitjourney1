@@ -3,7 +3,7 @@
 // e grava em patient_active_protocols (snapshot imutável da fase).
 
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, notFound, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -77,6 +77,7 @@ export const Route = createFileRoute("/_authenticated/protocolos/$protocolId")({
 
 function ProtocolDetailPage() {
   const { protocol } = Route.useLoaderData();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { roles } = useAuth();
   const isAdmin = roles.includes("admin");
 
@@ -113,9 +114,13 @@ function ProtocolDetailPage() {
     [baseGoldenTips, overridesIdx],
   );
 
+  if (pathname.endsWith("/editar")) {
+    return <Outlet />;
+  }
+
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl p-6 space-y-6">
+      <div className="mx-auto w-full max-w-5xl px-1 py-3 sm:p-6 space-y-5 sm:space-y-6">
         <PremiumHeader
           protocol={protocol}
           hasAccess={hasAccess}
