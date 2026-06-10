@@ -750,7 +750,7 @@ function PhaseCard({ phase, onOpen }: { phase: ProtocolPhase; onOpen: () => void
         <p className="text-xs text-muted-foreground pt-1">{phase.description}</p>
       </div>
 
-      <div className="relative grid grid-cols-3 gap-2 text-[10px] font-mono text-muted-foreground border-t border-[var(--gold)]/15 pt-3">
+      <div className="relative grid grid-cols-1 min-[360px]:grid-cols-3 gap-2 text-[10px] font-mono text-muted-foreground border-t border-[var(--gold)]/15 pt-3">
         <span className="inline-flex items-center gap-1">
           <Droplets className="size-3 text-[var(--gold)]/70" />
           {(phase.recommendations.waterMl / 1000).toFixed(1)}L
@@ -825,7 +825,7 @@ function PhaseDetailsDialog({
           {/* Macros */}
           {phase.macros && (
             <Section title="Distribuição de Macros">
-              <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="grid grid-cols-1 min-[360px]:grid-cols-3 gap-2 text-xs">
                 <MacroPill label="Proteína" pct={phase.macros.protein} />
                 <MacroPill label="Carbo" pct={phase.macros.carb} />
                 <MacroPill label="Gordura" pct={phase.macros.fat} />
