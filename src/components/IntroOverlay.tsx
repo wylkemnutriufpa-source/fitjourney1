@@ -151,12 +151,19 @@ export function IntroOverlay() {
               Bem-vindo ao sistema FitJourney
             </h1>
             <p
-              className={`mt-6 text-sm md:text-base font-mono uppercase tracking-[0.35em] ${
-                textVisible ? "opacity-80 translate-y-0" : "opacity-0 translate-y-4"
+              className={`mt-6 text-base md:text-lg lg:text-xl font-mono uppercase tracking-[0.35em] font-semibold ${
+                textVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
               style={{
-                color: "oklch(0.78 0.13 85)",
-                textShadow: "0 0 20px oklch(0.65 0.14 85 / 0.4)",
+                background:
+                  "linear-gradient(90deg, #ffffff 0%, oklch(0.92 0.12 90) 50%, #ffffff 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                color: "transparent",
+                textShadow:
+                  "0 0 24px rgba(255,255,255,0.55), 0 0 40px oklch(0.78 0.13 85 / 0.6)",
+                filter: "drop-shadow(0 0 12px oklch(0.78 0.13 85 / 0.5))",
                 transition:
                   "opacity 1800ms ease-out 900ms, transform 1800ms ease-out 900ms",
               }}
