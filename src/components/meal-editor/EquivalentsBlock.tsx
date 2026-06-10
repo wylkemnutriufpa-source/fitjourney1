@@ -64,6 +64,7 @@ export function EquivalentsBlock({
   disabled,
   variant = "stacked",
   autoGenerateOnMount = false,
+  mealKind,
 }: Props) {
   const candidates = useTacoCandidates();
   const criterion: BlockCriterion = value?.criterion ?? "auto";
@@ -80,8 +81,6 @@ export function EquivalentsBlock({
 
   const flashPending = (apply: () => void) => {
     setPending(true);
-    // Pequeno flash de skeleton (~280ms) — recalc é síncrono, mas o feedback
-    // visual de "gerando" ajuda muito na percepção de premium.
     if (reduceMotion) {
       apply();
       setPending(false);
@@ -104,6 +103,8 @@ export function EquivalentsBlock({
         size,
         candidates,
         rotationOffset: nextRotation,
+        mealKind,
+        keepLocked: options,
       });
       if (!next) {
         toast.error(`Não foi possível recalcular equivalentes para "${base.name}".`);
@@ -127,6 +128,7 @@ export function EquivalentsBlock({
       criterion,
       size: defaultSize,
       candidates,
+      mealKind,
     });
     if (next) {
       autoGenDoneRef.current = true;
@@ -135,8 +137,7 @@ export function EquivalentsBlock({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoGenerateOnMount, canRecalc, candidates]);
 
-  // Recalc automático quando o item base muda (qty/unit/foodKey),
-  // somente se já existe um bloco materializado. Debounce 400ms.
+  // Recalc automático quando o item base muda (qty/unit/foodKey).
   const lastSigRef = useRef<string | null>(null);
   useEffect(() => {
     if (!value || value.options.length === 0) return;
@@ -149,7 +150,9 @@ export function EquivalentsBlock({
     if (lastSigRef.current === sig) return;
     const handle = setTimeout(() => {
       const size = (value.options.length || defaultSize) as EquivalentsBlockSize;
-      const next = recalcMaterializedEquivalents({ base, criterion, size, candidates });
+      const next = recalcMaterializedEquivalents({
+        base, criterion, size, candidates, mealKind, keepLocked: value.options,
+      });
       if (next) {
         lastSigRef.current = sig;
         onChange(next);
@@ -157,7 +160,7 @@ export function EquivalentsBlock({
     }, 400);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [base.foodKey, base.qty, base.unit, criterion, candidates]);
+  }, [base.foodKey, base.qty, base.unit, criterion, candidates, mealKind]);
 
   const handleCriterionChange = (c: BlockCriterion) => {
     if (!value) {
