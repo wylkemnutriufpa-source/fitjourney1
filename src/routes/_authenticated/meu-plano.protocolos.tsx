@@ -157,9 +157,15 @@ function PatientActiveProtocolsPage() {
         ) : (
           <div className="space-y-4">
             {data.protocols.map((p) => (
-              <ActiveProtocolCard key={p.id} row={p} personalWaterMl={personalWaterMl} />
+              <ActiveProtocolCard
+                key={p.id}
+                row={p}
+                personalWaterMl={personalWaterMl}
+                overrides={overridesByProtocol.get(p.protocol_id) ?? []}
+              />
             ))}
           </div>
+
         )}
       </div>
     </AppShell>
@@ -176,13 +182,20 @@ export function computeCurrentWeek(row: ActiveProtocolRow): number {
 export function ActiveProtocolCard({
   row,
   personalWaterMl,
+  overrides = [],
 }: {
   row: ActiveProtocolRow;
   personalWaterMl: number | null;
+  overrides?: ReadonlyArray<ProtocolOverrideRow>;
 }) {
-  const phase = row.phase_snapshot;
+  const idx = useMemo(() => indexOverrides(overrides), [overrides]);
+  const phase = useMemo(
+    () => mergeSnapshotPhase(row.phase_snapshot, row.module_id, idx),
+    [row.phase_snapshot, row.module_id, idx],
+  );
   const week = computeCurrentWeek(row);
   const waterMl = personalWaterMl ?? phase.recommendations.waterMl;
+
   const waterLabel = `${(waterMl / 1000).toFixed(1)}L água${personalWaterMl ? " (você)" : ""}`;
   return (
     <article className="relative overflow-hidden rounded-2xl border border-[var(--gold)]/30 bg-gradient-to-br from-surface to-background p-5 space-y-5 shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)]">
