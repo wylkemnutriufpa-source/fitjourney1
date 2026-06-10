@@ -394,14 +394,14 @@ function Landing() {
               </motion.p>
 
               {c.stats.visible && (
-                <motion.div variants={fadeUp} className="grid grid-cols-4 gap-3 max-w-md mx-auto lg:mx-0 mt-10">
+                <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-md mx-auto lg:mx-0 mt-10">
                   {c.stats.items.map((stat, i) => (
                     <motion.div
                       key={stat.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.8 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                      className="text-center glass-premium rounded-xl p-2.5 gradient-border"
+                      className="text-center glass-premium rounded-xl p-3 gradient-border min-w-0"
                     >
                       <p className="font-display text-lg md:text-2xl font-bold text-gradient-animated leading-none">
                         {/^[\d.]+[^\d]*$/.test(stat.value) ? (
@@ -410,7 +410,7 @@ function Landing() {
                           stat.value
                         )}
                       </p>
-                      <p className="text-[10px] text-muted-foreground mt-1.5 font-medium leading-tight">{stat.label}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1.5 font-medium leading-tight break-words">{stat.label}</p>
                     </motion.div>
                   ))}
                 </motion.div>
