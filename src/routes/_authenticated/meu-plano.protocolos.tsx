@@ -2,7 +2,7 @@
 // READ ONLY: lista os protocolos que o profissional aplicou para o paciente.
 // Experiência premium: refeições e alimentos expansíveis com substituições.
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
