@@ -11,6 +11,12 @@
 // Determinístico. Sem IA. Sem IO.
 
 import type { GoalKind } from "@/lib/clinical/resolve-goal";
+import {
+  LOW_CARB_MODULE,
+  CICLO_CARBO_MODULE,
+  RESISTENCIA_INSULINA_MODULE,
+  SOP_MODULE,
+} from "./modules/metabolic";
 
 export interface ProtocolTriggers {
   readonly anyClinicalTag?: ReadonlyArray<string>;
@@ -2080,6 +2086,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
       anyClinicalTag: ["insulin_resistance", "pre_diabetes", "diabetes_type2", "sop", "high_triglycerides"],
       anyGoal: ["cut"],
     },
+    modules: [LOW_CARB_MODULE],
   },
   {
     id: "agua",
@@ -2094,6 +2101,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Dias high/low/no carb — performance e composição corporal.",
     icon: "Repeat",
     triggers: { anyClinicalTag: ["high_training_volume"], anyGoal: ["performance", "bulk"] },
+    modules: [CICLO_CARBO_MODULE],
   },
   {
     id: "anti-ansiedade",
@@ -2171,6 +2179,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Baixo índice glicêmico, cromo e fracionamento estratégico.",
     icon: "TrendingDown",
     triggers: { anyClinicalTag: ["insulin_resistance", "pre_diabetes", "sop"] },
+    modules: [RESISTENCIA_INSULINA_MODULE],
   },
   {
     id: "anemia",
@@ -2185,6 +2194,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Inositol, baixo carbo e anti-inflamatórios — equilíbrio hormonal.",
     icon: "CircleDot",
     triggers: { anyClinicalTag: ["sop", "insulin_resistance"] },
+    modules: [SOP_MODULE],
   },
 ];
 
