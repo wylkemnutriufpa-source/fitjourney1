@@ -2174,6 +2174,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Fibras, hidratação e probióticos — trânsito intestinal regular.",
     icon: "Leaf",
     triggers: { anyClinicalTag: ["constipation", "ibs"] },
+    modules: [ANTICONSTIPACAO_MODULE],
   },
   {
     id: "pre-natal",
