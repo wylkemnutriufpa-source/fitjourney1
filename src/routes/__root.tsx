@@ -16,7 +16,7 @@ import { runCacheBuster } from "../lib/cache-buster";
 import { Toaster } from "@/components/ui/sonner";
 import { IntroOverlay } from "@/components/IntroOverlay";
 import { CookieBanner } from "@/components/CookieBanner";
-import logoMp4 from "@/assets/fitjourney-logo.mp4.asset.json";
+import logoWebm from "@/assets/fitjourney-logo.webm.asset.json";
 
 const fallbackQueryClient = new QueryClient();
 
@@ -107,7 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/StdQ07rPbDMv4Qh75goHxDt3m4e2/social-images/social-1780433875841-WhatsApp_Image_2026-06-02_at_17.56.54.webp" },
     ],
     links: [
-      { rel: "preload", href: logoMp4.url, as: "video", type: "video/mp4", fetchPriority: "high" },
+      { rel: "preload", href: logoWebm.url, as: "video", type: "video/webm", fetchPriority: "high" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
