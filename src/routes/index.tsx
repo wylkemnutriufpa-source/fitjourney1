@@ -245,10 +245,7 @@ function Landing() {
       <FjLandingTheme />
 
       {/* ══════════ NAV — Premium Reveal ══════════ */}
-      <motion.nav
-        initial={false}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+      <nav
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${
           navScrolled
             ? "backdrop-blur-2xl bg-background/55 shadow-[0_12px_40px_-16px_rgba(0,0,0,0.55)]"
@@ -265,19 +262,14 @@ function Landing() {
         />
 
         <div className="max-w-7xl mx-auto px-3 sm:px-6 h-[92px] flex items-center justify-between gap-2">
-          <motion.div
-            initial={{ opacity: 0, x: -16 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
-            className="flex shrink-0 items-center gap-3"
-          >
+          <div className="flex shrink-0 items-center gap-3">
             <BrandLockup
               slot="landing-header"
               wordmarkAs={<Link to="/" className="fj-wordmark leading-none tracking-wide">FitJourney</Link>}
               onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
             />
 
-          </motion.div>
+          </div>
 
           <motion.div
             initial={{ opacity: 0, y: -8 }}
@@ -347,7 +339,7 @@ function Landing() {
             </div>
           </motion.div>
         )}
-      </motion.nav>
+        </nav>
 
       {/* ══════════ HERO ══════════ */}
       <section ref={heroRef} className="relative pt-36 pb-20 md:pt-44 md:pb-28 px-4 overflow-hidden noise-overlay">
@@ -1313,7 +1305,6 @@ function FjLandingTheme() {
           .fj-landing .glass-premium {
             animation: fj-fade-up .9s cubic-bezier(.2,.7,.2,1) both;
           }
-          .fj-landing nav { animation: fj-fade-in .8s ease-out both; }
         }
       `}</style>
     </>

@@ -218,20 +218,18 @@
   justify-content: center;
   background: transparent;
   overflow: hidden;
+  contain: layout paint;
+}
+
+.fj-logo-video-media {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateZ(0);
 }
 
 .fj-logo-video-ios-fallback {
   display: none;
-}
-
-@supports (-webkit-touch-callout: none) {
-  .fj-logo-video-media {
-    display: none;
-  }
-
-  .fj-logo-video-ios-fallback {
-    display: block;
-  }
 }
 
 .fj-logo-pulse {
