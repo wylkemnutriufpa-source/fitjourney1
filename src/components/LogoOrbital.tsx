@@ -27,7 +27,11 @@ export function LogoOrbital({
   const settings = useLogoSettings(slot ?? "landing-header");
   const cfg = slot ? settings : null;
   const lockedLandingHeader = slot === "landing-header";
-  const finalEffect: LogoEffect = cfg?.variant === "static" ? ("none" as any) : cfg?.effect ?? effect;
+  const finalEffect: LogoEffect = lockedLandingHeader
+    ? "none"
+    : cfg?.variant === "static"
+    ? ("none" as any)
+    : cfg?.effect ?? effect;
   const finalSizePx = lockedLandingHeader ? 64 : cfg?.sizePx ?? sizePx;
   const customUrl = cfg?.customUrl ?? null;
   const customIsVideo = !!customUrl && (/^data:video\//i.test(customUrl) || /\.(mp4|webm)(\?|$)/i.test(customUrl));
@@ -41,15 +45,15 @@ export function LogoOrbital({
 
   const wrapperStyle: CSSProperties = {
     ...(sizeStyle ?? {}),
-    paddingLeft: cfg?.paddingX || undefined,
-    paddingRight: cfg?.paddingX || undefined,
-    paddingTop: cfg?.paddingY || undefined,
-    paddingBottom: cfg?.paddingY || undefined,
-    marginLeft: cfg?.marginX || undefined,
-    marginRight: cfg?.marginX || undefined,
-    marginTop: cfg?.marginY || undefined,
-    marginBottom: cfg?.marginY || undefined,
-    boxSizing: cfg?.paddingX || cfg?.paddingY ? "content-box" : undefined,
+    paddingLeft: lockedLandingHeader ? undefined : cfg?.paddingX || undefined,
+    paddingRight: lockedLandingHeader ? undefined : cfg?.paddingX || undefined,
+    paddingTop: lockedLandingHeader ? undefined : cfg?.paddingY || undefined,
+    paddingBottom: lockedLandingHeader ? undefined : cfg?.paddingY || undefined,
+    marginLeft: lockedLandingHeader ? undefined : cfg?.marginX || undefined,
+    marginRight: lockedLandingHeader ? undefined : cfg?.marginX || undefined,
+    marginTop: lockedLandingHeader ? undefined : cfg?.marginY || undefined,
+    marginBottom: lockedLandingHeader ? undefined : cfg?.marginY || undefined,
+    boxSizing: !lockedLandingHeader && (cfg?.paddingX || cfg?.paddingY) ? "content-box" : undefined,
   };
 
   // Logos customizadas (upload) não recebem a aura/pulse ambientes — só o efeito explícito.
