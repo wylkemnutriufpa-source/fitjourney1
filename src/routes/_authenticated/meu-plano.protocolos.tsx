@@ -26,11 +26,15 @@ import {
   listMyActiveProtocols,
   type ActiveProtocolRow,
 } from "@/lib/protocols/active.functions";
+import { listAllProtocolOverrides } from "@/lib/protocols/overrides.functions";
+import { indexOverrides, mergeSnapshotPhase } from "@/lib/protocols/apply-overrides";
+import type { ProtocolOverrideRow } from "@/lib/protocols/overrides-types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
 import { getMyClinicalContext } from "@/lib/clinical/context.functions";
 import type { ActivityLevel } from "@/lib/engine/types";
+
 
 const WATER_ML_PER_KG: Record<ActivityLevel, number> = {
   sedentary: 35,
