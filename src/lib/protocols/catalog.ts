@@ -2130,6 +2130,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Alimentos vermífugos naturais e suporte intestinal.",
     icon: "Bug",
     triggers: { anyClinicalTag: ["parasitosis_suspected"] },
+    modules: [ANTIPARASITARIO_MODULE],
   },
   {
     id: "anticelulite",
