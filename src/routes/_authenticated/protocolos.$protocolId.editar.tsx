@@ -116,6 +116,30 @@ function ReorderButtons({ i, total, onMove }: { i: number; total: number; onMove
   );
 }
 
+function SizeButtons({ value, onChange }: { value?: GoldenTipSize; onChange: (v: GoldenTipSize) => void }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        Tamanho
+      </Label>
+      <div className="flex gap-1">
+        {(["sm", "md", "lg"] as GoldenTipSize[]).map((s) => (
+          <Button
+            key={s}
+            type="button"
+            size="sm"
+            variant={(value ?? "md") === s ? "default" : "outline"}
+            className="h-6 px-2 text-[10px] uppercase"
+            onClick={() => onChange(s)}
+          >
+            {s}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 export const Route = createFileRoute("/_authenticated/protocolos/$protocolId/editar")({
   loader: ({ params }) => {
@@ -612,6 +636,7 @@ function TeaListEditor({
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
           <div className="flex gap-1.5 items-start">
             <ReorderButtons i={i} total={teas.length} onMove={(f, to) => onChange(reorder(teas, f, to))} />
+            <EmojiPicker value={t.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input
               value={t.name}
               placeholder="Nome do chá"
@@ -626,6 +651,8 @@ function TeaListEditor({
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
+
+          <SizeButtons value={t.size} onChange={(s) => update(i, { size: s })} />
 
           <div className="grid grid-cols-2 gap-1.5">
             <Input
@@ -677,6 +704,7 @@ function PillarListEditor({
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
           <div className="flex gap-1.5 items-start">
             <ReorderButtons i={i} total={pillars.length} onMove={(f, to) => onChange(reorder(pillars, f, to))} />
+            <EmojiPicker value={p.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input
               value={p.title}
               placeholder="Título"
@@ -691,6 +719,8 @@ function PillarListEditor({
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
+
+          <SizeButtons value={p.size} onChange={(s) => update(i, { size: s })} />
 
           <Textarea
             rows={2}
@@ -738,6 +768,7 @@ function RuleListEditor({
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
           <div className="flex gap-1.5 items-start">
             <ReorderButtons i={i} total={rules.length} onMove={(f, to) => onChange(reorder(rules, f, to))} />
+            <EmojiPicker value={r.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input
               value={r.name}
               placeholder="Nome da regra"
@@ -752,6 +783,8 @@ function RuleListEditor({
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
+
+          <SizeButtons value={r.size} onChange={(s) => update(i, { size: s })} />
 
           <Textarea
             rows={2}

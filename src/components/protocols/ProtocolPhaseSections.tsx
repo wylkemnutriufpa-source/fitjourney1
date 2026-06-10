@@ -23,6 +23,7 @@ export type TeaRow = {
   timesPerDay?: string;
   benefits?: string;
   note?: string;
+  emoji?: string;
 };
 
 /** Constrói a lista de chás a partir do snapshot da fase. */
@@ -36,6 +37,7 @@ export function buildTeaRows(phase: ProtocolPhase): TeaRow[] {
     timesPerDay: t.timesPerDay,
     benefits: t.benefits,
     note: t.notes,
+    emoji: t.emoji,
   }));
   if (fromSchedule.length > 0) return fromSchedule;
   // Fallback: derivar de teaRoutine (strings livres). Nome = string toda.
@@ -184,7 +186,7 @@ function TeaRowCard({ tea, index }: { tea: TeaRow; index: number }) {
         )}
       >
         <span className="inline-flex size-6 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] text-[var(--gold)] font-mono text-[10px] shrink-0">
-          {index}
+          {tea.emoji || index}
         </span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground truncate">{tea.name}</p>

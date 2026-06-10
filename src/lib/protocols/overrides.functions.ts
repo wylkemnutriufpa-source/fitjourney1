@@ -24,6 +24,7 @@ const PayloadSchema: z.ZodType<ProtocolOverridePayload> = z.object({
         objective: z.string(),
         howTo: z.array(z.string()),
         benefit: z.string().optional(),
+        size: z.enum(["sm", "md", "lg"]).optional(),
       }),
     )
     .optional(),
@@ -35,6 +36,7 @@ const PayloadSchema: z.ZodType<ProtocolOverridePayload> = z.object({
         objective: z.string(),
         howTo: z.array(z.string()),
         benefit: z.string().optional(),
+        size: z.enum(["sm", "md", "lg"]).optional(),
       }),
     )
     .optional(),
@@ -49,6 +51,8 @@ const PayloadSchema: z.ZodType<ProtocolOverridePayload> = z.object({
         timesPerDay: z.string().optional(),
         benefits: z.string().optional(),
         notes: z.string().optional(),
+        emoji: z.string().optional(),
+        size: z.enum(["sm", "md", "lg"]).optional(),
       }),
     )
     .optional(),
@@ -59,6 +63,8 @@ const PayloadSchema: z.ZodType<ProtocolOverridePayload> = z.object({
         title: z.string(),
         summary: z.string(),
         examples: z.array(z.string()).optional(),
+        emoji: z.string().optional(),
+        size: z.enum(["sm", "md", "lg"]).optional(),
       }),
     )
     .optional(),
@@ -67,6 +73,8 @@ const PayloadSchema: z.ZodType<ProtocolOverridePayload> = z.object({
       z.object({
         name: z.string(),
         description: z.string(),
+        emoji: z.string().optional(),
+        size: z.enum(["sm", "md", "lg"]).optional(),
       }),
     )
     .optional(),
