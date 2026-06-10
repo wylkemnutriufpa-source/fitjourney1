@@ -41,12 +41,6 @@ export function EquivalentsOptionCard({ value, onChange, onRemove, onSwap, disab
   };
 
   return (
-    <div className="group/card flex gap-3 rounded-lg border border-border bg-card p-3 shadow-sm transition-all hover:border-primary/40 hover:shadow-md">
-      <button
-        type="button"
-        onClick={onSwap}
-        disabled={disabled || !onSwap}
-        className="group relative h-20 w-20 flex-none overflow-hidden rounded-lg bg-muted ring-1 ring-border disabled:cursor-default"
     <div className="group/card rounded-lg border border-border bg-card p-3 shadow-sm transition-all hover:border-primary/40 hover:shadow-md">
       <div className="flex flex-col sm:flex-row gap-3">
         <button
