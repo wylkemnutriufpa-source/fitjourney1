@@ -23,6 +23,12 @@ import {
   ANTIINCHACO_MODULE,
   ANTIPARASITARIO_MODULE,
 } from "./modules/digestive";
+import {
+  PRE_NATAL_MODULE,
+  ANTICELULITE_MODULE,
+  BELEZA_MODULE,
+  ANTIQUEDA_MODULE,
+} from "./modules/hormonal";
 
 export interface ProtocolTriggers {
   readonly anyClinicalTag?: ReadonlyArray<string>;
@@ -2138,6 +2144,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Drenagem, anti-inflamatórios e suporte ao colágeno.",
     icon: "HeartPulse",
     triggers: { anyClinicalTag: ["cellulite_concern", "bloating"] },
+    modules: [ANTICELULITE_MODULE],
   },
   {
     id: "antiqueda",
@@ -2145,6 +2152,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Ferro, zinco, biotina e proteína — saúde capilar.",
     icon: "Scissors",
     triggers: { anyClinicalTag: ["hair_loss", "anemia"] },
+    modules: [ANTIQUEDA_MODULE],
   },
   {
     id: "anti-inflamatorio",
@@ -2167,6 +2175,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Unhas, cabelo e pele — colágeno, silício e antioxidantes.",
     icon: "Gem",
     triggers: { anyClinicalTag: ["beauty_concern"] },
+    modules: [BELEZA_MODULE],
   },
   {
     id: "anticonstipacao",
@@ -2182,6 +2191,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Ácido fólico, ferro, ômega-3 — nutrição materno-fetal.",
     icon: "Baby",
     triggers: { anyClinicalTag: ["pregnancy"], anyRiskFlag: ["pregnancy_care_required"] },
+    modules: [PRE_NATAL_MODULE],
   },
   {
     id: "resistencia-insulina",
