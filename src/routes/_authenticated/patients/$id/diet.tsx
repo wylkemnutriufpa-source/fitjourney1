@@ -376,24 +376,43 @@ function PlanEditor({
 
   function addFoodToMeal(mealId: string, food: CatalogFood) {
     const newId = uid();
-    // Se o alimento tem medida caseira default, já abre o item com ela
-    // selecionada — a dor relatada (ovo em gramas, banana em gramas) some
-    // sem o nutri precisar trocar nada à mão.
     const defaultMeasure =
       food.householdMeasures?.find((m) => m.isDefault) ??
       food.householdMeasures?.[0];
+
+    // Normaliza unidade na entrada do editor:
+    // - Ovo sempre em "unid" (1 ovo = 50g), independente do que veio do catálogo.
+    // - Sólidos (proteína/carbo/fruta) NUNCA em "ml" — se vier ml, coage p/ "g".
+    const isEgg = /^(ovo-galinha|omelete|ovos-mexidos|ovos-cozidos|ovos-com-bacon)$/.test(food.foodKey ?? "")
+      || /\b(ovo|ovos|omelete)\b/i.test(food.name ?? "");
+    const isSolid = ["protein", "carb", "fruit"].includes(food.scaleGroup);
+
+    let initQty = food.qty;
+    let initUnit = food.unit;
+    let initKcal = food.kcal;
+
+    if (isEgg) {
+      initUnit = "unid";
+      initQty = Math.max(1, Math.round(initQty || 1));
+      initKcal = Math.round(143 * 50 * initQty / 100); // 1 ovo ≈ 72 kcal
+    } else if (isSolid && initUnit === "ml") {
+      initUnit = "g";
+    }
+
     const baseItem: any = {
       id: newId,
       foodKey: food.foodKey,
       name: cleanFoodDisplayName(food.name),
-      qty: food.qty,
-      unit: food.unit,
-      kcal: food.kcal,
+      qty: initQty,
+      unit: initUnit,
+      kcal: initKcal,
       scaleGroup: food.scaleGroup,
       kcalPer100g: food.kcalPer100g,
       householdMeasures: food.householdMeasures,
     };
-    if (defaultMeasure && food.kcalPer100g) {
+
+    // Só aplica medida caseira padrão se NÃO for ovo (ovo é sempre unid).
+    if (!isEgg && defaultMeasure && food.kcalPer100g) {
       baseItem.householdMeasure = {
         label: defaultMeasure.measureName,
         grams: defaultMeasure.gramsEquivalent,
@@ -412,7 +431,6 @@ function PlanEditor({
         items: [...m.main.items, baseItem],
       },
     }));
-    // Abre o modal pós-adição para decidir Replicar / Gerar equivalentes.
     setPostAdd({ mealId, itemId: newId, itemName: cleanFoodDisplayName(food.name) });
   }
 
