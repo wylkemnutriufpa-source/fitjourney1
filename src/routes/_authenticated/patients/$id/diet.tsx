@@ -687,7 +687,7 @@ function PlanEditor({
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto max-w-3xl px-4 py-3 flex items-center justify-between gap-3">
           <div className="text-xs text-muted-foreground">
-            {dirty ? "Alterações não salvas" : "Tudo salvo"}
+            {saving ? "Salvando…" : dirty ? "Alterações pendentes (autosave)" : lastSavedAt ? "Salvo automaticamente" : "Tudo salvo"}
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <Button
