@@ -480,7 +480,8 @@ function StringListEditor({
   return (
     <div className="space-y-2">
       {values.map((v, i) => (
-        <div key={i} className="flex gap-1.5">
+        <div key={i} className="flex gap-1.5 items-start">
+          <ReorderButtons i={i} total={values.length} onMove={(f, t) => onChange(reorder(values, f, t))} />
           <Input
             value={v}
             placeholder={placeholder}
@@ -506,6 +507,7 @@ function StringListEditor({
     </div>
   );
 }
+
 
 function GoldenTipListEditor({
   tips,
