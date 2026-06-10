@@ -49,6 +49,8 @@ export interface PhaseMacros {
   readonly fat: number;
 }
 
+export type CardSize = "sm" | "md" | "lg";
+
 export interface PhaseTea {
   readonly time?: string;
   readonly name: string;
@@ -58,6 +60,8 @@ export interface PhaseTea {
   readonly preparation?: string;
   readonly timesPerDay?: string;
   readonly notes?: string;
+  readonly emoji?: string;
+  readonly size?: CardSize;
 }
 
 export interface PhaseMealItemSubstitution {
