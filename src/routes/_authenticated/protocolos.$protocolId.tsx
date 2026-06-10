@@ -262,6 +262,12 @@ function GoldenTips({ tips }: { tips: ReadonlyArray<GoldenTip> }) {
 
 function GoldenTipCard({ tip, defaultOpen, index }: { tip: GoldenTip; defaultOpen: boolean; index: number }) {
   const [open, setOpen] = useState(defaultOpen);
+  const size = tip.size ?? "md";
+  const sizing = size === "sm"
+    ? { pad: "px-2.5 py-2", emojiBox: "size-6 text-sm", title: "text-xs font-semibold", emojiPad: "text-base" }
+    : size === "lg"
+    ? { pad: "px-4 py-4", emojiBox: "size-10 text-2xl", title: "text-base font-semibold", emojiPad: "text-2xl" }
+    : { pad: "px-3.5 py-3", emojiBox: "size-8 text-lg", title: "text-sm font-semibold", emojiPad: "text-lg" };
   return (
     <section
       className="rounded-xl border border-[var(--gold)]/40 bg-gradient-to-br from-[color-mix(in_oklab,var(--gold)_8%,transparent)] to-background overflow-hidden shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_15%,transparent)]"
@@ -270,21 +276,22 @@ function GoldenTipCard({ tip, defaultOpen, index }: { tip: GoldenTip; defaultOpe
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="w-full flex items-center gap-2.5 px-3.5 py-3 text-left hover:bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] transition-colors"
+        className={cn("w-full flex items-center gap-2.5 text-left hover:bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] transition-colors", sizing.pad)}
       >
-        <span className="inline-flex size-8 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_18%,transparent)] text-lg shrink-0" aria-hidden>
+        <span className={cn("inline-flex items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_18%,transparent)] shrink-0", sizing.emojiBox)} aria-hidden>
           {tip.emoji}
         </span>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
             Dica de Ouro #{index} · Hack Metabólico
           </p>
-          <p className="text-sm font-semibold text-foreground">{tip.title}</p>
+          <p className={cn("text-foreground", sizing.title)}>{tip.title}</p>
         </div>
         <ChevronDown
           className={cn("size-4 text-[var(--gold)] transition-transform shrink-0", open && "rotate-180")}
         />
       </button>
+
 
       {open && (
         <div className="px-3.5 pb-4 pt-1 border-t border-[var(--gold)]/20 space-y-3 animate-fade-in text-sm leading-relaxed">

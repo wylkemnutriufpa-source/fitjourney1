@@ -20,6 +20,9 @@ import {
   ListChecks,
   Lightbulb,
   ShieldCheck,
+  ArrowUp,
+  ArrowDown,
+  Smile,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -44,10 +47,75 @@ import {
 } from "@/lib/protocols/overrides.functions";
 import { indexOverrides, mergeModule, mergeGoldenTips } from "@/lib/protocols/apply-overrides";
 import type { ProtocolOverridePayload } from "@/lib/protocols/overrides-types";
-import type { GoldenTip } from "@/lib/protocols/golden-tips";
+import type { GoldenTip, GoldenTipSize } from "@/lib/protocols/golden-tips";
 import { getGoldenTipsFor } from "@/lib/protocols/golden-tips";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/lib/auth-context";
+
+// Helper: move item in array (immutable)
+function reorder<T>(arr: ReadonlyArray<T>, from: number, to: number): T[] {
+  if (to < 0 || to >= arr.length) return [...arr];
+  const next = [...arr];
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
+
+const EMOJI_GRID = [
+  "✨","🔥","⏱️","💧","🥩","🥬","🥗","🍵","🌿","🍋","🍎","🥑","🥚",
+  "🌾","🐟","🍯","🧂","🧘","🧠","💪","❤️","🛡️","⚡","🌙","☀️","🍽️",
+  "📏","🩺","🩸","🧪","🧬","🌱","🥦","🥕","🍠","🍞","☕","🥤","🧉",
+] as const;
+
+function EmojiPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="w-16 h-9 px-0 text-lg" aria-label="Escolher emoji">
+          {value || <Smile className="size-4 text-muted-foreground" />}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-2" align="start">
+        <div className="grid grid-cols-8 gap-1 mb-2">
+          {EMOJI_GRID.map((e) => (
+            <button
+              key={e}
+              type="button"
+              onClick={() => onChange(e)}
+              className={cn(
+                "h-7 w-7 inline-flex items-center justify-center rounded text-lg hover:bg-accent",
+                value === e && "ring-1 ring-[var(--gold)]",
+              )}
+            >
+              {e}
+            </button>
+          ))}
+        </div>
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Ou digite/cole"
+          className="h-7 text-sm"
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function ReorderButtons({ i, total, onMove }: { i: number; total: number; onMove: (from: number, to: number) => void }) {
+  return (
+    <div className="flex flex-col">
+      <Button size="icon" variant="ghost" className="h-5 w-6" disabled={i === 0} onClick={() => onMove(i, i - 1)} aria-label="Subir">
+        <ArrowUp className="size-3" />
+      </Button>
+      <Button size="icon" variant="ghost" className="h-5 w-6" disabled={i === total - 1} onClick={() => onMove(i, i + 1)} aria-label="Descer">
+        <ArrowDown className="size-3" />
+      </Button>
+    </div>
+  );
+}
+
 
 export const Route = createFileRoute("/_authenticated/protocolos/$protocolId/editar")({
   loader: ({ params }) => {
@@ -412,7 +480,8 @@ function StringListEditor({
   return (
     <div className="space-y-2">
       {values.map((v, i) => (
-        <div key={i} className="flex gap-1.5">
+        <div key={i} className="flex gap-1.5 items-start">
+          <ReorderButtons i={i} total={values.length} onMove={(f, t) => onChange(reorder(values, f, t))} />
           <Input
             value={v}
             placeholder={placeholder}
@@ -439,6 +508,7 @@ function StringListEditor({
   );
 }
 
+
 function GoldenTipListEditor({
   tips,
   onChange,
@@ -455,13 +525,9 @@ function GoldenTipListEditor({
     <div className="space-y-3">
       {tips.map((t, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-center">
-            <Input
-              className="w-16"
-              value={t.emoji}
-              placeholder="🔥"
-              onChange={(e) => update(i, { emoji: e.target.value })}
-            />
+          <div className="flex gap-1.5 items-start">
+            <ReorderButtons i={i} total={tips.length} onMove={(f, to) => onChange(reorder(tips, f, to))} />
+            <EmojiPicker value={t.emoji} onChange={(v) => update(i, { emoji: v })} />
             <Input
               className="flex-1"
               value={t.title}
@@ -476,6 +542,25 @@ function GoldenTipListEditor({
             >
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              Tamanho do card
+            </Label>
+            <div className="flex gap-1">
+              {(["sm", "md", "lg"] as GoldenTipSize[]).map((s) => (
+                <Button
+                  key={s}
+                  type="button"
+                  size="sm"
+                  variant={(t.size ?? "md") === s ? "default" : "outline"}
+                  className="h-6 px-2 text-[10px] uppercase"
+                  onClick={() => update(i, { size: s })}
+                >
+                  {s}
+                </Button>
+              ))}
+            </div>
           </div>
           <Input
             value={t.objective}
@@ -499,7 +584,7 @@ function GoldenTipListEditor({
         size="sm"
         variant="outline"
         onClick={() =>
-          onChange([...tips, { emoji: "✨", title: "", objective: "", howTo: [""] }])
+          onChange([...tips, { emoji: "✨", title: "", objective: "", howTo: [""], size: "md" }])
         }
       >
         <Plus className="size-3.5 mr-1.5" /> Adicionar dica
@@ -507,6 +592,7 @@ function GoldenTipListEditor({
     </div>
   );
 }
+
 
 function TeaListEditor({
   teas,
@@ -524,7 +610,8 @@ function TeaListEditor({
     <div className="space-y-3">
       {teas.map((t, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 items-start">
+            <ReorderButtons i={i} total={teas.length} onMove={(f, to) => onChange(reorder(teas, f, to))} />
             <Input
               value={t.name}
               placeholder="Nome do chá"
@@ -539,6 +626,7 @@ function TeaListEditor({
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
+
           <div className="grid grid-cols-2 gap-1.5">
             <Input
               value={t.quantity ?? ""}
@@ -587,7 +675,8 @@ function PillarListEditor({
     <div className="space-y-3">
       {pillars.map((p, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 items-start">
+            <ReorderButtons i={i} total={pillars.length} onMove={(f, to) => onChange(reorder(pillars, f, to))} />
             <Input
               value={p.title}
               placeholder="Título"
@@ -602,6 +691,7 @@ function PillarListEditor({
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
+
           <Textarea
             rows={2}
             value={p.summary}
@@ -646,7 +736,8 @@ function RuleListEditor({
     <div className="space-y-3">
       {rules.map((r, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 items-start">
+            <ReorderButtons i={i} total={rules.length} onMove={(f, to) => onChange(reorder(rules, f, to))} />
             <Input
               value={r.name}
               placeholder="Nome da regra"
@@ -661,6 +752,7 @@ function RuleListEditor({
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
+
           <Textarea
             rows={2}
             value={r.description}
