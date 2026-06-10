@@ -55,6 +55,11 @@ export type MaterializedEquivalentOption = {
   fatG?: number;
   /** Slug da imagem (default: foodKey). Editável pelo profissional. */
   imageSlug?: string;
+  /**
+   * Trava do profissional: quando true, "Gerar outra opção" preserva esta
+   * opção e só rotaciona as demais. Permite ir refinando até o conjunto ideal.
+   */
+  locked?: boolean;
 };
 
 export type MaterializedEquivalents = {
