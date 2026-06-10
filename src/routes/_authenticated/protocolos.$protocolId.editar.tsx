@@ -189,7 +189,7 @@ function ProtocolEditorPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl p-6 space-y-6">
+      <div className="mx-auto w-full max-w-5xl px-1 py-3 sm:p-6 space-y-5 sm:space-y-6">
         <header className="space-y-3">
           <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             <Link
@@ -200,7 +200,7 @@ function ProtocolEditorPage() {
               <ArrowLeft className="size-3" /> Voltar ao protocolo
             </Link>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap min-w-0">
             <Sparkles className="size-4 text-[var(--gold)]" />
             <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] border border-[var(--gold)]/50 rounded px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--gold)_8%,transparent)]">
               Editor Admin
@@ -215,7 +215,7 @@ function ProtocolEditorPage() {
             </Button>
           </div>
           <h1
-            className="text-2xl font-bold uppercase text-[var(--gold)] tracking-tight"
+            className="text-xl sm:text-2xl font-bold uppercase text-[var(--gold)] tracking-tight break-words"
             style={{ textShadow: "0 0 14px color-mix(in oklab, var(--gold) 30%, transparent)" }}
           >
             {protocol.name}
