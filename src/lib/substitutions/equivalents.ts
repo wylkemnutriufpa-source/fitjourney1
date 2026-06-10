@@ -171,22 +171,50 @@ export function calculateEquivalentQty(
  */
 const ALLOWED_SCALE_GROUPS = new Set(["protein", "carb", "fat", "fruit"]);
 
+export type EquivalentsOptions = {
+  /**
+   * Contexto da refeição para travar substituições de proteína:
+   * - "meal" (almoço/jantar) → só pool `protein-meal` (carnes/peixes).
+   * - "snack" (café/lanche) → só pool `protein-snack` (ovo, queijo, frango desfiado, carne moída).
+   * Aplicado APENAS quando base.scaleGroup === "protein". Para outros grupos é ignorado.
+   */
+  proteinContext?: "meal" | "snack";
+  /**
+   * foodKeys que NÃO podem aparecer na saída (opções travadas pelo profissional
+   * em outras posições do bloco). Garante variedade ao "Gerar outra opção".
+   */
+  excludeFoodKeys?: ReadonlySet<string>;
+};
+
 export function calculateEquivalents(
   base: EquivalentBase,
   candidates: readonly EquivalentCandidate[],
   count: number,
   criterion: MatchCriterion = defaultCriterionFor(base.scaleGroup),
   rotationOffset = 0,
+  opts: EquivalentsOptions = {},
 ): EquivalentOption[] {
   // Trava clínica: scaleGroup do base precisa ser conhecido E permitido.
   if (!base.scaleGroup || !ALLOWED_SCALE_GROUPS.has(base.scaleGroup)) {
     return [];
   }
   const n = Math.max(1, Math.min(4, Math.floor(count)));
+
+  // Resolve subGroup do base com base no contexto da refeição:
+  // proteínas de almoço/jantar nunca devem casar com ovo/queijo/frango desfiado
+  // (subGroup protein-snack) e vice-versa. Sobrepõe match fuzzy do anchor.
+  let effectiveBaseSubGroup = base.subGroup;
+  if (base.scaleGroup === "protein" && opts.proteinContext) {
+    effectiveBaseSubGroup =
+      opts.proteinContext === "meal" ? "protein-meal" : "protein-snack";
+  }
+
+  const exclude = opts.excludeFoodKeys;
   const pool = candidates.filter((c) => {
     if (c.foodKey === base.foodKey) return false;
+    if (exclude && exclude.has(c.foodKey)) return false;
     if (c.scaleGroup !== base.scaleGroup) return false;
-    if (base.subGroup) return c.subGroup === base.subGroup;
+    if (effectiveBaseSubGroup) return c.subGroup === effectiveBaseSubGroup;
     return true;
   });
   const computed = pool
@@ -198,11 +226,14 @@ export function calculateEquivalents(
     (a, b) => Math.abs(a.qty - base.qty) - Math.abs(b.qty - base.qty),
   );
 
-  // Rotação: ao clicar "Gerar outra opção", o cursor avança e devolvemos uma
-  // janela diferente da pool ordenada. Mantém variedade sem perder a "naturalidade"
-  // (todas as opções continuam ordenadas por proximidade dentro da janela).
   if (computed.length === 0) return [];
-  const offset = ((rotationOffset % computed.length) + computed.length) % computed.length;
+
+  // Rotação: avança a janela em múltiplos de `n` para que cada clique em
+  // "Gerar outra opção" devolva itens REALMENTE novos enquanto a pool não
+  // esgota. Antes avançava 1-a-1 e produzia opções repetidas no slice(0,n).
+  const stride = Math.max(1, n);
+  const totalOffset = (rotationOffset * stride) % computed.length;
+  const offset = ((totalOffset % computed.length) + computed.length) % computed.length;
   const rotated = offset === 0 ? computed : [...computed.slice(offset), ...computed.slice(0, offset)];
   return rotated.slice(0, n);
 }
