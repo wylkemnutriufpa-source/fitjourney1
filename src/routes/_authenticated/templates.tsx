@@ -2071,7 +2071,7 @@ function FoodItemRow({
   );
 
   const baseClass =
-    "flex items-center gap-2 rounded-md p-1.5 border " +
+    "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 rounded-md p-1.5 border " +
     (primary ? "bg-primary/5 border-primary/20" : "bg-muted/40 border-border");
 
   if (!editing) {
@@ -2081,48 +2081,49 @@ function FoodItemRow({
         onDoubleClick={() => setEditing(true)}
         title="Duplo clique para editar"
       >
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0">
           <p className="text-xs font-medium truncate">{item.name}</p>
-          <p className="text-[10px] text-muted-foreground font-mono">
+          <p className="text-[10px] text-muted-foreground font-mono truncate">
             {formatFoodPortion(item)} · {item.kcal} kcal
           </p>
         </div>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setEditing(true);
-          }}
-          className="shrink-0 rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 p-1.5"
-          title="Editar alimento"
-          aria-label="Editar alimento"
-        >
-          <Pencil className="size-3.5" />
-        </button>
-        <Popover open={infoOpen} onOpenChange={setFoodInfoOpen}>
-          <PopoverTrigger asChild>
-            <button
-              className="shrink-0 text-muted-foreground hover:text-primary p-1.5"
-              title="Ver medidas caseiras"
-              onClick={(e) => e.stopPropagation()}
-              aria-label="Ver medidas caseiras"
-            >
-              <ChevronDown className="size-3.5" />
-            </button>
-          </PopoverTrigger>
-          <FoodInfoPopover item={item} match={catalogMatch} onApplyMeasure={applyMeasure} />
-        </Popover>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-          className="shrink-0 text-muted-foreground hover:text-destructive p-1.5"
-          title="Remover"
-          aria-label="Remover alimento"
-        >
-          <X className="size-3.5" />
-        </button>
-
+        <div className="flex items-center gap-0.5 shrink-0">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditing(true);
+            }}
+            className="shrink-0 rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 p-1"
+            title="Editar alimento"
+            aria-label="Editar alimento"
+          >
+            <Pencil className="size-3.5" />
+          </button>
+          <Popover open={infoOpen} onOpenChange={setFoodInfoOpen}>
+            <PopoverTrigger asChild>
+              <button
+                className="shrink-0 text-muted-foreground hover:text-primary p-1"
+                title="Ver medidas caseiras"
+                onClick={(e) => e.stopPropagation()}
+                aria-label="Ver medidas caseiras"
+              >
+                <ChevronDown className="size-3.5" />
+              </button>
+            </PopoverTrigger>
+            <FoodInfoPopover item={item} match={catalogMatch} onApplyMeasure={applyMeasure} />
+          </Popover>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="shrink-0 text-muted-foreground hover:text-destructive p-1"
+            title="Remover"
+            aria-label="Remover alimento"
+          >
+            <X className="size-3.5" />
+          </button>
+        </div>
       </div>
     );
   }
