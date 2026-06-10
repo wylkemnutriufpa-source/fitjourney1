@@ -2082,6 +2082,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
       anyClinicalTag: ["insulin_resistance", "pre_diabetes", "high_appetite"],
       anyGoal: ["cut"],
     },
+    modules: [JEJUM_INTERMITENTE_MODULE],
   },
   {
     id: "low-carb",
