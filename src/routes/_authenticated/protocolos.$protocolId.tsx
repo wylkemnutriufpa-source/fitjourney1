@@ -447,7 +447,7 @@ function ModulesGrid({
               </p>
               <p className="text-xs text-muted-foreground mt-1">{m.tagline}</p>
             </div>
-            <div className="relative mt-auto pt-3 border-t border-[var(--gold)]/15 flex items-center justify-between">
+            <div className="relative mt-auto pt-3 border-t border-[var(--gold)]/15 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <span className="text-[10px] font-mono uppercase text-muted-foreground">
                 {m.phases.length} {m.phases.length === 1 ? "fase" : "fases"}
               </span>
@@ -621,14 +621,14 @@ function ModuleDetailsDialog({
               key={p.id}
               className="rounded-lg border border-[var(--gold)]/25 bg-background/60 p-4 space-y-2"
             >
-              <div className="flex items-center justify-between gap-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
                 <p
-                  className="text-sm font-bold uppercase tracking-wide text-[var(--gold)]"
+                  className="min-w-0 text-sm font-bold uppercase tracking-wide text-[var(--gold)] leading-tight"
                   style={{ textShadow: "0 0 10px color-mix(in oklab, var(--gold) 30%, transparent)" }}
                 >
                   Fase {idx + 1} · {p.name}
                 </p>
-                <span className="text-[10px] font-mono uppercase text-muted-foreground inline-flex items-center gap-1">
+                <span className="shrink-0 text-[10px] font-mono uppercase text-muted-foreground inline-flex items-center gap-1">
                   <Clock className="size-3" />
                   {p.durationWeeks} sem
                 </span>
