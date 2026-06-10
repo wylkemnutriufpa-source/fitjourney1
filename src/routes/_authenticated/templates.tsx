@@ -1078,29 +1078,9 @@ function TemplateEditor({
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto p-0 gap-0">
-        <DialogHeader className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border sticky top-0 bg-background z-10">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="secondary">{draft.category}</Badge>
-                <DialogTitle className="text-base sm:text-xl leading-tight">
-                  {isMine ? "Editando · " : "Editor · "}
-                  {original.name}
-                </DialogTitle>
-              </div>
-              <DialogDescription className="text-xs mt-1 hidden sm:block">
-                Cada alimento é editável de forma independente. Alterar a gramatura do principal
-                escala todas as substituições proporcionalmente.
-              </DialogDescription>
-              {!isMine && (
-                <p className="mt-2 text-[11px] text-primary bg-primary/5 border border-primary/20 rounded px-2 py-1.5 inline-flex items-center gap-1.5">
-                  <FolderHeart className="size-3" />
-                  Suas edições são salvas em <strong>Meus Templates</strong> — o template
-                  original do sistema não é alterado.
-                </p>
-              )}
-
-            </div>
+        <DialogHeader className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border sticky top-0 bg-background z-10 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <Badge variant="secondary" className="shrink-0">{draft.category}</Badge>
             <div className="flex gap-2 shrink-0">
               <Button
                 size="sm"
@@ -1123,8 +1103,27 @@ function TemplateEditor({
               </Button>
             </div>
           </div>
+          <div className="min-w-0">
+            <DialogTitle className="text-base sm:text-xl leading-tight break-words">
+              {isMine ? "Editando · " : "Editor · "}
+              {original.name}
+            </DialogTitle>
+            <DialogDescription className="text-xs mt-1 hidden sm:block">
+              Cada alimento é editável de forma independente. Alterar a gramatura do principal
+              escala todas as substituições proporcionalmente.
+            </DialogDescription>
+            {!isMine && (
+              <p className="mt-2 text-[11px] text-primary bg-primary/5 border border-primary/20 rounded px-2 py-1.5 flex items-start gap-1.5 leading-snug">
+                <FolderHeart className="size-3 mt-0.5 shrink-0" />
+                <span>
+                  Suas edições são salvas em <strong>Meus Templates</strong> — o template
+                  original do sistema não é alterado.
+                </span>
+              </p>
+            )}
+          </div>
 
-          <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-fit mt-3">
+          <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-fit">
             <TabBtn
               active={editorTab === "refeicoes"}
               onClick={() => setEditorTab("refeicoes")}
@@ -1166,18 +1165,6 @@ function TemplateEditor({
                   />
                 ))}
 
-                {/* FAB mobile: atalho flutuante para "+ Refeição" quando a lista é longa.
-                    Posicionado acima do DialogFooter sticky (~5rem). Não duplica o botão
-                    inline do topo — é apenas atalho de scroll. */}
-                <Button
-                  size="lg"
-                  onClick={addMeal}
-                  className="sm:hidden fixed bottom-24 right-4 z-20 h-12 rounded-full shadow-lg gap-1.5 pl-4 pr-5"
-                  aria-label="Adicionar refeição"
-                >
-                  <Plus className="size-5" />
-                  <span className="text-sm font-medium">Refeição</span>
-                </Button>
               </>
             )}
 

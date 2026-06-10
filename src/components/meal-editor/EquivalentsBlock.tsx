@@ -205,18 +205,19 @@ export function EquivalentsBlock({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={isInline
-          ? "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-input bg-background px-2 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+          ? "inline-flex h-9 items-center justify-center gap-1 rounded-md border border-input bg-background px-2 text-xs font-medium text-foreground transition-colors hover:bg-accent"
           : "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"}
+        aria-expanded={open}
       >
-        <div className="flex items-center gap-2 min-w-0">
-          {open ? (
+        <div className="flex items-center gap-1.5 min-w-0">
+          {!isInline && (open ? (
             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
           ) : (
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-          )}
+          ))}
           <Shuffle className="h-3.5 w-3.5 text-primary shrink-0" />
           <span className="text-xs font-medium text-foreground truncate">
-            Substituições
+            {isInline ? "Subst." : "Substituições"}
           </span>
           <span className={isInline ? "hidden" : "text-[11px] text-muted-foreground truncate"}>
             · {summaryLabel}
