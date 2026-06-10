@@ -34,7 +34,7 @@ export function LogoOrbital({
     : cfg?.effect ?? effect;
   // landing-header: tamanho FIXO para evitar flash de "logo cresce" na recarga
   // (servidor SSR não conhece localStorage do usuário).
-  const finalSizePx = lockedLandingHeader ? 72 : (cfg?.sizePx ?? sizePx);
+  const finalSizePx = lockedLandingHeader ? 80 : (cfg?.sizePx ?? sizePx);
   const customUrl = cfg?.customUrl ?? null;
   const customIsVideo = !!customUrl && (/^data:video\//i.test(customUrl) || /\.(mp4|webm)(\?|$)/i.test(customUrl));
   const useVideo = cfg?.variant === "video" && !customUrl;
