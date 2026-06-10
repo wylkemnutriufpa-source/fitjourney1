@@ -168,10 +168,13 @@ export function getLogoSettings(slot: LogoSlot): SlotConfig {
 const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function useLogoSettings(slot: LogoSlot): SlotConfig {
-  // SSR/primeiro render: defaults idênticos client+server (sem hydration mismatch).
-  // Imediatamente após hidratar, useLayoutEffect aplica o cache do localStorage
-  // ANTES do browser pintar — sem flash de tamanho/variant no header.
-  const [cfg, setCfg] = useState<SlotConfig>(() => mergeConfig(slot));
+  // No client, lê localStorage no initializer para evitar flash de tamanho
+  // (default → tamanho real). Servidor renderiza defaults; client hidrata já
+  // com o tamanho final cacheado, então não há "logo pequena → cresce".
+  const [cfg, setCfg] = useState<SlotConfig>(() => {
+    if (typeof window === "undefined") return mergeConfig(slot);
+    return getLogoSettings(slot);
+  });
   useIsoLayoutEffect(() => {
     setCfg(getLogoSettings(slot));
   }, [slot]);
