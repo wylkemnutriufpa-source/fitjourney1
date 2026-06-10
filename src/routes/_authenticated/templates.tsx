@@ -1915,7 +1915,14 @@ function FoodInfoPopover({
   const currentNutrition = match ? nutritionForCurrentPortion(item, match) : null;
 
   return (
-    <PopoverContent side="right" align="start" sideOffset={8} className="w-72 p-3">
+    <PopoverContent
+      side="bottom"
+      align="start"
+      sideOffset={8}
+      collisionPadding={12}
+      className="w-[min(20rem,calc(100vw-1.5rem))] max-w-[calc(100vw-1.5rem)] p-3"
+    >
+
       <div className="space-y-2">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
