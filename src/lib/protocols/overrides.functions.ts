@@ -156,7 +156,8 @@ export const saveProtocolOverride = createServerFn({ method: "POST" })
     if (selErr) throw new Error(selErr.message);
 
     // JSONB no Supabase tipa como Json; nosso payload é JSON-serializable.
-    const payloadJson = data.payload as unknown as Record<string, unknown>;
+    const payloadJson = JSON.parse(JSON.stringify(data.payload)) as never;
+
 
     if (existing?.id) {
       const { error } = await supabase
