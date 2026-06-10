@@ -704,6 +704,7 @@ function PillarListEditor({
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
           <div className="flex gap-1.5 items-start">
             <ReorderButtons i={i} total={pillars.length} onMove={(f, to) => onChange(reorder(pillars, f, to))} />
+            <EmojiPicker value={p.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input
               value={p.title}
               placeholder="Título"
@@ -718,6 +719,8 @@ function PillarListEditor({
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
+
+          <SizeButtons value={p.size} onChange={(s) => update(i, { size: s })} />
 
           <Textarea
             rows={2}
