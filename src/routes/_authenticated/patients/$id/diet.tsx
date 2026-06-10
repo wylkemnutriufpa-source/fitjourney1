@@ -8,7 +8,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState, type ComponentProps } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { toast } from "sonner";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
@@ -517,6 +517,8 @@ function PlanEditor({
     );
   }, [draft]);
 
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+
   async function handleSave() {
     setSaving(true);
     try {
@@ -526,6 +528,7 @@ function PlanEditor({
       };
       await onSave(snapshotToPersist);
       setDirty(false);
+      setLastSavedAt(Date.now());
       if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
         try { navigator.vibrate([8, 30, 12]); } catch { /* ignore */ }
       }
@@ -537,6 +540,27 @@ function PlanEditor({
       setSaving(false);
     }
   }
+
+  // Autosave: debounce 1.2s após qualquer alteração + flush ao trocar de aba/sair.
+  const saveRef = useRef(handleSave);
+  saveRef.current = handleSave;
+  useEffect(() => {
+    if (!dirty || saving) return;
+    const t = setTimeout(() => { void saveRef.current(); }, 1200);
+    return () => clearTimeout(t);
+  }, [draft, dirty, saving]);
+  useEffect(() => {
+    const flush = () => { if (dirty && !saving) void saveRef.current(); };
+    const onVis = () => { if (document.visibilityState === "hidden") flush(); };
+    window.addEventListener("blur", flush);
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("beforeunload", flush);
+    return () => {
+      window.removeEventListener("blur", flush);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("beforeunload", flush);
+    };
+  }, [dirty, saving]);
 
   // Regenera substituições passando o snapshot atual pelo motor vigente
   // (planos antigos publicados antes da nova rotação ficam com equivalents=[]).
@@ -663,7 +687,7 @@ function PlanEditor({
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto max-w-3xl px-4 py-3 flex items-center justify-between gap-3">
           <div className="text-xs text-muted-foreground">
-            {dirty ? "Alterações não salvas" : "Tudo salvo"}
+            {saving ? "Salvando…" : dirty ? "Alterações pendentes (autosave)" : lastSavedAt ? "Salvo automaticamente" : "Tudo salvo"}
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <Button
