@@ -11,6 +11,12 @@
 // Determinístico. Sem IA. Sem IO.
 
 import type { GoalKind } from "@/lib/clinical/resolve-goal";
+import {
+  LOW_CARB_MODULE,
+  CICLO_CARBO_MODULE,
+  RESISTENCIA_INSULINA_MODULE,
+  SOP_MODULE,
+} from "./modules/metabolic";
 
 export interface ProtocolTriggers {
   readonly anyClinicalTag?: ReadonlyArray<string>;
