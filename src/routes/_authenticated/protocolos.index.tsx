@@ -72,7 +72,7 @@ function ProtocolosIndexPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl p-6 space-y-6">
+      <div className="mx-auto w-full max-w-5xl px-1 py-3 sm:p-6 space-y-5 sm:space-y-6">
         <header className="space-y-2">
           <div className="flex items-center gap-2">
             <Sparkles className="size-4 text-[var(--gold)] animate-pulse" />
@@ -100,9 +100,9 @@ function ProtocolosIndexPage() {
                   className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[color-mix(in_oklab,var(--gold)_6%,transparent)] via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity"
                   aria-hidden
                 />
-                <div className="relative flex items-start justify-between gap-2">
+                <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="grid size-9 place-items-center rounded-md border border-[var(--gold)]/40 bg-background">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-md border border-[var(--gold)]/40 bg-background">
                       <Icon className="size-4 text-[var(--gold)]" />
                     </div>
                     <div className="min-w-0">
@@ -137,7 +137,7 @@ function ProtocolosIndexPage() {
                   )}
                 </div>
                 <p className="relative text-xs text-muted-foreground">{p.tagline}</p>
-                <div className="relative pt-2 mt-auto border-t border-[var(--gold)]/15 flex items-center justify-between gap-2">
+                <div className="relative pt-2 mt-auto border-t border-[var(--gold)]/15 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
                   <span className="text-[10px] font-mono uppercase text-muted-foreground">
                     {locked ? "requer pro" : "4 fases"}
                   </span>
