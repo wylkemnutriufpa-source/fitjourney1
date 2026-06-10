@@ -871,7 +871,7 @@ function PhotoSlot({
           ref={inputRef}
           type="file"
           accept="image/*"
-          capture="environment"
+          
           onChange={(e) => onSelect(e.target.files?.[0] ?? null)}
           className="hidden"
         />
