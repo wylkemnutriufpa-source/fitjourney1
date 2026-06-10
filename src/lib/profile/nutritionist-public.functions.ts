@@ -5,7 +5,6 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 
 const SlugSchema = z
@@ -42,6 +41,7 @@ export const getNutritionistPublicProfile = createServerFn({ method: "GET" })
     z.object({ slug: SlugSchema }).parse(input),
   )
   .handler(async ({ data }): Promise<PublicNutritionistProfile | null> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("nutritionists")
       .select(
@@ -82,6 +82,7 @@ export const resolveInviteBySlug = createServerFn({ method: "GET" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<ResolvedInvite | null> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: nutri, error: nutriErr } = await supabaseAdmin
       .from("nutritionists")
       .select("id, slug, full_name, display_name")

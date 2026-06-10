@@ -24,8 +24,16 @@ export type LandingLead = {
 export const createLead = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => leadSchema.parse(data))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("landing_leads").insert({
+    // A-06: usa cliente anon (não service_role). A policy "anyone can insert leads"
+    // controla via WITH CHECK (validação de tamanho de campos). RLS aplica.
+    const { createClient } = await import("@supabase/supabase-js");
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !key) throw new Error("Supabase env not configured");
+    const anon = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { error } = await anon.from("landing_leads").insert({
       full_name: data.fullName,
       email: data.email,
       whatsapp: data.whatsapp,

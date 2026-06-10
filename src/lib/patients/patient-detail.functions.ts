@@ -4,7 +4,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 
 export interface PatientDetail {
@@ -102,7 +101,8 @@ export const setPatientActiveStatus = createServerFn({ method: "POST" })
     if (pErr) throw new Error(pErr.message);
     if (!patient) throw new Error("Paciente não pertence a você.");
 
-    const { data: updated, error: upErr } = await supabaseAdmin
+    // C-04: usa context.supabase (RLS as user) — não bypassa RLS.
+    const { data: updated, error: upErr } = await supabase
       .from("patients")
       .update({ is_active: data.isActive, updated_at: new Date().toISOString() })
       .eq("id", data.patientId)

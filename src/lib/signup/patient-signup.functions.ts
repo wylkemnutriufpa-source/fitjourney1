@@ -5,7 +5,6 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createAvatarSignedUrl } from "@/lib/profile/avatar-storage";
 
 // ---------- validateReferralCode ----------
@@ -30,6 +29,7 @@ export interface ValidatedReferral {
 export const validateReferralCode = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => ValidateInput.parse(input))
   .handler(async ({ data }): Promise<ValidatedReferral> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("referral_codes")
       .select("nutritionist_id, status, expires_at")
@@ -92,6 +92,7 @@ export const consumeReferralCodeAndCreatePatient = createServerFn({
 })
   .inputValidator((input: unknown) => ConsumeInput.parse(input))
   .handler(async ({ data }): Promise<PatientSignupResult> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // 1) revalida código
     const { data: codeRow, error: codeErr } = await supabaseAdmin
       .from("referral_codes")
