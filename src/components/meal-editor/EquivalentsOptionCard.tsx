@@ -3,7 +3,7 @@
 // Burro: recebe value + onChange + onRemove. Sem estado de servidor.
 
 import { useState } from "react";
-import { Search, Trash2, ArrowRightLeft } from "lucide-react";
+import { Search, Trash2, ArrowRightLeft, Lock, Unlock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
