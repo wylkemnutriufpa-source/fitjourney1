@@ -24,6 +24,7 @@ const PayloadSchema: z.ZodType<ProtocolOverridePayload> = z.object({
         objective: z.string(),
         howTo: z.array(z.string()),
         benefit: z.string().optional(),
+        size: z.enum(["sm", "md", "lg"]).optional(),
       }),
     )
     .optional(),
@@ -35,6 +36,7 @@ const PayloadSchema: z.ZodType<ProtocolOverridePayload> = z.object({
         objective: z.string(),
         howTo: z.array(z.string()),
         benefit: z.string().optional(),
+        size: z.enum(["sm", "md", "lg"]).optional(),
       }),
     )
     .optional(),
