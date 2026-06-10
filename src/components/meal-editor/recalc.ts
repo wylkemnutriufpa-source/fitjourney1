@@ -165,6 +165,3 @@ export function recalcMaterializedEquivalents(args: {
     options: merged,
   };
 }
-
-// Reexport p/ uso externo
-export { unitFromGrams };
