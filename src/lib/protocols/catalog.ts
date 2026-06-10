@@ -124,11 +124,15 @@ export interface MethodologyPillar {
   readonly title: string;
   readonly summary: string;
   readonly examples?: ReadonlyArray<string>;
+  readonly emoji?: string;
+  readonly size?: CardSize;
 }
 
 export interface MethodologyRule {
   readonly name: string;
   readonly description: string;
+  readonly emoji?: string;
+  readonly size?: CardSize;
 }
 
 export interface ModuleMethodology {
