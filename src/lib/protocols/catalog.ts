@@ -17,6 +17,12 @@ import {
   RESISTENCIA_INSULINA_MODULE,
   SOP_MODULE,
 } from "./modules/metabolic";
+import {
+  JEJUM_INTERMITENTE_MODULE,
+  ANTICONSTIPACAO_MODULE,
+  ANTIINCHACO_MODULE,
+  ANTIPARASITARIO_MODULE,
+} from "./modules/digestive";
 
 export interface ProtocolTriggers {
   readonly anyClinicalTag?: ReadonlyArray<string>;
@@ -2076,6 +2082,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
       anyClinicalTag: ["insulin_resistance", "pre_diabetes", "high_appetite"],
       anyGoal: ["cut"],
     },
+    modules: [JEJUM_INTERMITENTE_MODULE],
   },
   {
     id: "low-carb",
@@ -2123,6 +2130,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Alimentos vermífugos naturais e suporte intestinal.",
     icon: "Bug",
     triggers: { anyClinicalTag: ["parasitosis_suspected"] },
+    modules: [ANTIPARASITARIO_MODULE],
   },
   {
     id: "anticelulite",
@@ -2151,6 +2159,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Sódio controlado, potássio e diuréticos naturais.",
     icon: "Wind",
     triggers: { anyClinicalTag: ["bloating", "hypertension"] },
+    modules: [ANTIINCHACO_MODULE],
   },
   {
     id: "beleza",
@@ -2165,6 +2174,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Fibras, hidratação e probióticos — trânsito intestinal regular.",
     icon: "Leaf",
     triggers: { anyClinicalTag: ["constipation", "ibs"] },
+    modules: [ANTICONSTIPACAO_MODULE],
   },
   {
     id: "pre-natal",
