@@ -17,6 +17,12 @@ import {
   RESISTENCIA_INSULINA_MODULE,
   SOP_MODULE,
 } from "./modules/metabolic";
+import {
+  JEJUM_INTERMITENTE_MODULE,
+  ANTICONSTIPACAO_MODULE,
+  ANTIINCHACO_MODULE,
+  ANTIPARASITARIO_MODULE,
+} from "./modules/digestive";
 
 export interface ProtocolTriggers {
   readonly anyClinicalTag?: ReadonlyArray<string>;
