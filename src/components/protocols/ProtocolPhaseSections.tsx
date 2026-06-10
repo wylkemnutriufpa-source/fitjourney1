@@ -186,7 +186,7 @@ function TeaRowCard({ tea, index }: { tea: TeaRow; index: number }) {
         )}
       >
         <span className="inline-flex size-6 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--gold)_12%,transparent)] text-[var(--gold)] font-mono text-[10px] shrink-0">
-          {index}
+          {tea.emoji || index}
         </span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground truncate">{tea.name}</p>
