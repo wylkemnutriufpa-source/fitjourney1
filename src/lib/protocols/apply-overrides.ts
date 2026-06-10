@@ -82,6 +82,7 @@ export function mergePhase(
 
   return {
     ...phase,
+    name: pl?.name ?? phase.name,
     teaSchedule,
     recommendations: {
       ...phase.recommendations,
