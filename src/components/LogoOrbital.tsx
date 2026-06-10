@@ -32,7 +32,7 @@ export function LogoOrbital({
     : cfg?.variant === "static"
     ? ("none" as any)
     : cfg?.effect ?? effect;
-  const finalSizePx = lockedLandingHeader ? 64 : cfg?.sizePx ?? sizePx;
+  const finalSizePx = cfg?.sizePx ?? sizePx;
   const customUrl = cfg?.customUrl ?? null;
   const customIsVideo = !!customUrl && (/^data:video\//i.test(customUrl) || /\.(mp4|webm)(\?|$)/i.test(customUrl));
   const useVideo = cfg?.variant === "video" && !customUrl;
