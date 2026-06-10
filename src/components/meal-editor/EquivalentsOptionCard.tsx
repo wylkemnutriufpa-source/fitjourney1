@@ -4,6 +4,13 @@
 
 import { useState } from "react";
 import { Search, Trash2, ArrowRightLeft, Lock, Unlock } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
