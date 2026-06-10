@@ -736,7 +736,8 @@ function RuleListEditor({
     <div className="space-y-3">
       {rules.map((r, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 items-start">
+            <ReorderButtons i={i} total={rules.length} onMove={(f, to) => onChange(reorder(rules, f, to))} />
             <Input
               value={r.name}
               placeholder="Nome da regra"
@@ -751,6 +752,7 @@ function RuleListEditor({
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
+
           <Textarea
             rows={2}
             value={r.description}
