@@ -41,6 +41,11 @@ type Props = {
   variant?: "stacked" | "inline";
   /** Gera substituições automaticamente uma única vez ao montar, se ainda não houver. */
   autoGenerateOnMount?: boolean;
+  /**
+   * Contexto da refeição (almoço/jantar vs café/lanche). Usado para travar
+   * o pool de proteínas — almoço/jantar nunca recebe ovo/queijo/frango desfiado.
+   */
+  mealKind?: "breakfast" | "lunch" | "snack" | "dinner" | "other";
 };
 
 const CRITERION_LABEL: Record<BlockCriterion, string> = {
