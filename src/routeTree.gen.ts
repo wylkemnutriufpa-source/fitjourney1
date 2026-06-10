@@ -64,6 +64,7 @@ import { Route as AuthenticatedAdminLogosRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminLandingRouteImport } from './routes/_authenticated/admin.landing'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
+import { Route as AuthenticatedProtocolosProtocolIdEditarRouteImport } from './routes/_authenticated/protocolos.$protocolId.editar'
 import { Route as AuthenticatedPatientsIdFeedbacksRouteImport } from './routes/_authenticated/patients/$id/feedbacks'
 import { Route as AuthenticatedPatientsIdDietRouteImport } from './routes/_authenticated/patients/$id/diet'
 
@@ -369,6 +370,12 @@ const AuthenticatedPatientsIdIndexRoute =
     path: '/patients/$id/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedProtocolosProtocolIdEditarRoute =
+  AuthenticatedProtocolosProtocolIdEditarRouteImport.update({
+    id: '/editar',
+    path: '/editar',
+    getParentRoute: () => AuthenticatedProtocolosProtocolIdRoute,
+  } as any)
 const AuthenticatedPatientsIdFeedbacksRoute =
   AuthenticatedPatientsIdFeedbacksRouteImport.update({
     id: '/patients/$id/feedbacks',
@@ -431,13 +438,14 @@ export interface FileRoutesByFullPath {
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
-  '/protocolos/$protocolId': typeof AuthenticatedProtocolosProtocolIdRoute
+  '/protocolos/$protocolId': typeof AuthenticatedProtocolosProtocolIdRouteWithChildren
   '/c/$slug/$code': typeof CSlugCodeRoute
   '/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
   '/protocolos/': typeof AuthenticatedProtocolosIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
   '/patients/$id/feedbacks': typeof AuthenticatedPatientsIdFeedbacksRoute
+  '/protocolos/$protocolId/editar': typeof AuthenticatedProtocolosProtocolIdEditarRoute
   '/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -488,13 +496,14 @@ export interface FileRoutesByTo {
   '/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
-  '/protocolos/$protocolId': typeof AuthenticatedProtocolosProtocolIdRoute
+  '/protocolos/$protocolId': typeof AuthenticatedProtocolosProtocolIdRouteWithChildren
   '/c/$slug/$code': typeof CSlugCodeRoute
   '/anamneses': typeof AuthenticatedAnamnesesIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
   '/protocolos': typeof AuthenticatedProtocolosIndexRoute
   '/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
   '/patients/$id/feedbacks': typeof AuthenticatedPatientsIdFeedbacksRoute
+  '/protocolos/$protocolId/editar': typeof AuthenticatedProtocolosProtocolIdEditarRoute
   '/patients/$id': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRoutesById {
@@ -548,13 +557,14 @@ export interface FileRoutesById {
   '/_authenticated/onboarding/nutritionist': typeof AuthenticatedOnboardingNutritionistRoute
   '/_authenticated/onboarding/patient': typeof AuthenticatedOnboardingPatientRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
-  '/_authenticated/protocolos/$protocolId': typeof AuthenticatedProtocolosProtocolIdRoute
+  '/_authenticated/protocolos/$protocolId': typeof AuthenticatedProtocolosProtocolIdRouteWithChildren
   '/c/$slug/$code': typeof CSlugCodeRoute
   '/_authenticated/anamneses/': typeof AuthenticatedAnamnesesIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
   '/_authenticated/protocolos/': typeof AuthenticatedProtocolosIndexRoute
   '/_authenticated/patients/$id/diet': typeof AuthenticatedPatientsIdDietRoute
   '/_authenticated/patients/$id/feedbacks': typeof AuthenticatedPatientsIdFeedbacksRoute
+  '/_authenticated/protocolos/$protocolId/editar': typeof AuthenticatedProtocolosProtocolIdEditarRoute
   '/_authenticated/patients/$id/': typeof AuthenticatedPatientsIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -615,6 +625,7 @@ export interface FileRouteTypes {
     | '/protocolos/'
     | '/patients/$id/diet'
     | '/patients/$id/feedbacks'
+    | '/protocolos/$protocolId/editar'
     | '/patients/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -672,6 +683,7 @@ export interface FileRouteTypes {
     | '/protocolos'
     | '/patients/$id/diet'
     | '/patients/$id/feedbacks'
+    | '/protocolos/$protocolId/editar'
     | '/patients/$id'
   id:
     | '__root__'
@@ -731,6 +743,7 @@ export interface FileRouteTypes {
     | '/_authenticated/protocolos/'
     | '/_authenticated/patients/$id/diet'
     | '/_authenticated/patients/$id/feedbacks'
+    | '/_authenticated/protocolos/$protocolId/editar'
     | '/_authenticated/patients/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -1138,6 +1151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPatientsIdIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/protocolos/$protocolId/editar': {
+      id: '/_authenticated/protocolos/$protocolId/editar'
+      path: '/editar'
+      fullPath: '/protocolos/$protocolId/editar'
+      preLoaderRoute: typeof AuthenticatedProtocolosProtocolIdEditarRouteImport
+      parentRoute: typeof AuthenticatedProtocolosProtocolIdRoute
+    }
     '/_authenticated/patients/$id/feedbacks': {
       id: '/_authenticated/patients/$id/feedbacks'
       path: '/patients/$id/feedbacks'
@@ -1224,15 +1244,30 @@ const AuthenticatedMyPlanRouteChildren: AuthenticatedMyPlanRouteChildren = {
 const AuthenticatedMyPlanRouteWithChildren =
   AuthenticatedMyPlanRoute._addFileChildren(AuthenticatedMyPlanRouteChildren)
 
+interface AuthenticatedProtocolosProtocolIdRouteChildren {
+  AuthenticatedProtocolosProtocolIdEditarRoute: typeof AuthenticatedProtocolosProtocolIdEditarRoute
+}
+
+const AuthenticatedProtocolosProtocolIdRouteChildren: AuthenticatedProtocolosProtocolIdRouteChildren =
+  {
+    AuthenticatedProtocolosProtocolIdEditarRoute:
+      AuthenticatedProtocolosProtocolIdEditarRoute,
+  }
+
+const AuthenticatedProtocolosProtocolIdRouteWithChildren =
+  AuthenticatedProtocolosProtocolIdRoute._addFileChildren(
+    AuthenticatedProtocolosProtocolIdRouteChildren,
+  )
+
 interface AuthenticatedProtocolosRouteChildren {
-  AuthenticatedProtocolosProtocolIdRoute: typeof AuthenticatedProtocolosProtocolIdRoute
+  AuthenticatedProtocolosProtocolIdRoute: typeof AuthenticatedProtocolosProtocolIdRouteWithChildren
   AuthenticatedProtocolosIndexRoute: typeof AuthenticatedProtocolosIndexRoute
 }
 
 const AuthenticatedProtocolosRouteChildren: AuthenticatedProtocolosRouteChildren =
   {
     AuthenticatedProtocolosProtocolIdRoute:
-      AuthenticatedProtocolosProtocolIdRoute,
+      AuthenticatedProtocolosProtocolIdRouteWithChildren,
     AuthenticatedProtocolosIndexRoute: AuthenticatedProtocolosIndexRoute,
   }
 
