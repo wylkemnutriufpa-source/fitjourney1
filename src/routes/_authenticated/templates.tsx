@@ -1652,7 +1652,7 @@ function MealEditor({
             {meal.main.items.map((item) => (
               <div
                 key={item.id}
-                className="space-y-1.5 md:space-y-0 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-2"
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 md:gap-2"
               >
                 <FoodItemRow
                   item={item}
@@ -1915,7 +1915,14 @@ function FoodInfoPopover({
   const currentNutrition = match ? nutritionForCurrentPortion(item, match) : null;
 
   return (
-    <PopoverContent side="right" align="start" sideOffset={8} className="w-72 p-3">
+    <PopoverContent
+      side="bottom"
+      align="start"
+      sideOffset={8}
+      collisionPadding={12}
+      className="w-[min(20rem,calc(100vw-1.5rem))] max-w-[calc(100vw-1.5rem)] p-3"
+    >
+
       <div className="space-y-2">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -2081,16 +2088,29 @@ function FoodItemRow({
   if (!editing) {
     return (
       <div
-        className={baseClass + " group cursor-default select-none"}
-        onDoubleClick={() => setEditing(true)}
-        title="Duplo clique para editar"
+        className={baseClass + " group select-none"}
       >
-        <div className="min-w-0">
-          <p className="text-xs font-medium truncate">{item.name}</p>
-          <p className="text-[10px] text-muted-foreground font-mono truncate">
-            {formatFoodPortion(item)} · {item.kcal} kcal
-          </p>
-        </div>
+        <Popover open={infoOpen} onOpenChange={setFoodInfoOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                setInfoOpen(false);
+                setEditing(true);
+              }}
+              className="min-w-0 text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+              title="Toque para ver medidas · duplo toque para editar"
+              aria-label="Ver medidas caseiras"
+            >
+              <p className="text-xs font-medium truncate">{item.name}</p>
+              <p className="text-[10px] text-muted-foreground font-mono truncate">
+                {formatFoodPortion(item)} · {item.kcal} kcal
+              </p>
+            </button>
+          </PopoverTrigger>
+          <FoodInfoPopover item={item} match={catalogMatch} onApplyMeasure={applyMeasure} />
+        </Popover>
         <div className="flex items-center gap-0.5 shrink-0">
           <button
             onClick={(e) => {
@@ -2103,19 +2123,6 @@ function FoodItemRow({
           >
             <Pencil className="size-3.5" />
           </button>
-          <Popover open={infoOpen} onOpenChange={setFoodInfoOpen}>
-            <PopoverTrigger asChild>
-              <button
-                className="shrink-0 text-muted-foreground hover:text-primary p-1"
-                title="Ver medidas caseiras"
-                onClick={(e) => e.stopPropagation()}
-                aria-label="Ver medidas caseiras"
-              >
-                <ChevronDown className="size-3.5" />
-              </button>
-            </PopoverTrigger>
-            <FoodInfoPopover item={item} match={catalogMatch} onApplyMeasure={applyMeasure} />
-          </Popover>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -2131,6 +2138,7 @@ function FoodItemRow({
       </div>
     );
   }
+
 
   const editFields = (
     <>
