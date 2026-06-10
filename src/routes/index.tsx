@@ -265,7 +265,15 @@ function Landing() {
           <div className="flex shrink-0 items-center gap-3">
             <BrandLockup
               slot="landing-header"
-              wordmarkAs={<Link to="/" className="fj-wordmark leading-none tracking-wide">FitJourney</Link>}
+              wordmarkAs={
+                <button
+                  type="button"
+                  onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+                  className="fj-wordmark leading-none tracking-wide bg-transparent border-0 p-0 cursor-pointer"
+                >
+                  FitJourney
+                </button>
+              }
               onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
             />
 
@@ -441,7 +449,14 @@ function Landing() {
                       <div className="fj-logo-orbit fj-logo-orbit-2"><span className="fj-logo-particle fj-logo-particle-gold" /></div>
                       <div className="fj-logo-orbit fj-logo-orbit-3"><span className="fj-logo-particle" /></div>
                       <div className="fj-logo-orbit fj-logo-orbit-4"><span className="fj-logo-particle fj-logo-particle-gold" /></div>
-                      <LogoMark className="relative z-10 w-full h-full object-contain drop-shadow-[0_0_30px_oklch(0.62_0.16_155/0.55)]" />
+                      <button
+                        type="button"
+                        aria-label="Tocar intro FitJourney"
+                        onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+                        className="relative z-10 w-full h-full bg-transparent border-0 p-0 cursor-pointer"
+                      >
+                        <LogoMark className="w-full h-full object-contain drop-shadow-[0_0_30px_oklch(0.62_0.16_155/0.55)]" />
+                      </button>
                     </div>
                   </div>
                   {[
@@ -892,7 +907,15 @@ function Landing() {
               <div className="mb-4">
                 <BrandLockup
                   slot="landing-footer"
-                  wordmarkAs={<Link to="/" className="font-display font-bold">FitJourney</Link>}
+                  wordmarkAs={
+                    <button
+                      type="button"
+                      onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+                      className="font-display font-bold bg-transparent border-0 p-0 cursor-pointer"
+                    >
+                      FitJourney
+                    </button>
+                  }
                   onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
                 />
               </div>
