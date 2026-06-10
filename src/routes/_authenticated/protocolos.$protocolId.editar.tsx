@@ -47,10 +47,75 @@ import {
 } from "@/lib/protocols/overrides.functions";
 import { indexOverrides, mergeModule, mergeGoldenTips } from "@/lib/protocols/apply-overrides";
 import type { ProtocolOverridePayload } from "@/lib/protocols/overrides-types";
-import type { GoldenTip } from "@/lib/protocols/golden-tips";
+import type { GoldenTip, GoldenTipSize } from "@/lib/protocols/golden-tips";
 import { getGoldenTipsFor } from "@/lib/protocols/golden-tips";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/lib/auth-context";
+
+// Helper: move item in array (immutable)
+function reorder<T>(arr: ReadonlyArray<T>, from: number, to: number): T[] {
+  if (to < 0 || to >= arr.length) return [...arr];
+  const next = [...arr];
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
+
+const EMOJI_GRID = [
+  "✨","🔥","⏱️","💧","🥩","🥬","🥗","🍵","🌿","🍋","🍎","🥑","🥚",
+  "🌾","🐟","🍯","🧂","🧘","🧠","💪","❤️","🛡️","⚡","🌙","☀️","🍽️",
+  "📏","🩺","🩸","🧪","🧬","🌱","🥦","🥕","🍠","🍞","☕","🥤","🧉",
+] as const;
+
+function EmojiPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="w-16 h-9 px-0 text-lg" aria-label="Escolher emoji">
+          {value || <Smile className="size-4 text-muted-foreground" />}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-2" align="start">
+        <div className="grid grid-cols-8 gap-1 mb-2">
+          {EMOJI_GRID.map((e) => (
+            <button
+              key={e}
+              type="button"
+              onClick={() => onChange(e)}
+              className={cn(
+                "h-7 w-7 inline-flex items-center justify-center rounded text-lg hover:bg-accent",
+                value === e && "ring-1 ring-[var(--gold)]",
+              )}
+            >
+              {e}
+            </button>
+          ))}
+        </div>
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Ou digite/cole"
+          className="h-7 text-sm"
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function ReorderButtons({ i, total, onMove }: { i: number; total: number; onMove: (from: number, to: number) => void }) {
+  return (
+    <div className="flex flex-col">
+      <Button size="icon" variant="ghost" className="h-5 w-6" disabled={i === 0} onClick={() => onMove(i, i - 1)} aria-label="Subir">
+        <ArrowUp className="size-3" />
+      </Button>
+      <Button size="icon" variant="ghost" className="h-5 w-6" disabled={i === total - 1} onClick={() => onMove(i, i + 1)} aria-label="Descer">
+        <ArrowDown className="size-3" />
+      </Button>
+    </div>
+  );
+}
+
 
 export const Route = createFileRoute("/_authenticated/protocolos/$protocolId/editar")({
   loader: ({ params }) => {
