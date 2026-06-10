@@ -943,6 +943,7 @@ function MealCard({
               }
               variant="inline"
               autoGenerateOnMount={newItemIds.has(it.id)}
+              mealKind={detectMealKind(meal.label, meal.time)}
             />
             <div className="flex items-center justify-end gap-1 md:gap-0.5">
                 <Button
