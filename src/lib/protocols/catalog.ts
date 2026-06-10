@@ -29,6 +29,13 @@ import {
   BELEZA_MODULE,
   ANTIQUEDA_MODULE,
 } from "./modules/hormonal";
+import {
+  ANTI_ANSIEDADE_MODULE,
+  ANTI_ENXAQUECA_MODULE,
+  ANTI_INFLAMATORIO_MODULE,
+  ANEMIA_MODULE,
+} from "./modules/brain";
+import { AGUA_MODULE } from "./modules/water";
 
 export interface ProtocolTriggers {
   readonly anyClinicalTag?: ReadonlyArray<string>;
@@ -2103,10 +2110,11 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
   },
   {
     id: "agua",
-    name: "Protocolo IFJ — Módulo Água",
-    tagline: "Hidratação calculada por peso/atividade com lembretes diários.",
+    name: "Protocolo IFJ — Módulo Água (Hiperhidratação 10 dias)",
+    tagline: "Peak-week clínica: carrega → pico → corte controlado.",
     icon: "Droplets",
     triggers: { anyClinicalTag: ["low_hydration", "constipation", "high_training_volume"] },
+    modules: [AGUA_MODULE],
   },
   {
     id: "ciclo-carbo",
@@ -2122,6 +2130,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Triptofano, magnésio, ômega-3 — eixo intestino-cérebro.",
     icon: "Brain",
     triggers: { anyClinicalTag: ["anxiety"] },
+    modules: [ANTI_ANSIEDADE_MODULE],
   },
   {
     id: "anti-enxaqueca",
@@ -2129,6 +2138,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Exclusão de gatilhos + magnésio, riboflavina e CoQ10.",
     icon: "Activity",
     triggers: { anyClinicalTag: ["migraine"] },
+    modules: [ANTI_ENXAQUECA_MODULE],
   },
   {
     id: "antiparasitario",
@@ -2160,6 +2170,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Ômega-3, polifenóis e exclusão de pró-inflamatórios.",
     icon: "Flame",
     triggers: { anyClinicalTag: ["chronic_inflammation", "high_cholesterol", "high_triglycerides"] },
+    modules: [ANTI_INFLAMATORIO_MODULE],
   },
   {
     id: "antiinchaco",
@@ -2207,6 +2218,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Ferro heme, vitamina C e B12 — recuperação hematológica.",
     icon: "Droplet",
     triggers: { anyClinicalTag: ["anemia"] },
+    modules: [ANEMIA_MODULE],
   },
   {
     id: "sop",
