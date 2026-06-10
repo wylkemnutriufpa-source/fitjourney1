@@ -134,8 +134,43 @@ function uid() {
   return `id-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function normalizeEditItem(it: any): any {
+  if (!it || typeof it !== "object") return it;
+  const next = { ...it };
+  const foodKey: string = String(next.foodKey ?? "");
+  const name: string = String(next.name ?? "");
+  const isEgg = /^(ovo-galinha|omelete|ovos-mexidos|ovos-cozidos|ovos-com-bacon)$/.test(foodKey)
+    || /\b(ovo|ovos|omelete)\b/i.test(name);
+  const isSolid = ["protein", "carb", "fruit"].includes(String(next.scaleGroup ?? ""));
+  if (isEgg && next.unit !== "unid") {
+    const qtyG = next.unit === "g" ? Number(next.qty) || 50 : Number(next.qty) * 50 || 50;
+    const units = Math.max(1, Math.round(qtyG / 50));
+    next.qty = units;
+    next.unit = "unid";
+    next.kcal = Math.round((143 * 50 * units) / 100);
+    delete next.householdMeasure;
+  } else if (isSolid && next.unit === "ml") {
+    next.unit = "g";
+  }
+  return next;
+}
+
+function normalizeSnapshotForEdit(s: any): any {
+  if (!s || typeof s !== "object") return s;
+  if (!Array.isArray(s.meals)) return s;
+  return {
+    ...s,
+    meals: s.meals.map((m: any) => ({
+      ...m,
+      main: m?.main
+        ? { ...m.main, items: (m.main.items ?? []).map(normalizeEditItem) }
+        : m?.main,
+    })),
+  };
+}
+
 function cloneSnapshot(s: any): EditSnapshot {
-  return cleanFoodNamesDeep(JSON.parse(JSON.stringify(s ?? {})));
+  return normalizeSnapshotForEdit(cleanFoodNamesDeep(JSON.parse(JSON.stringify(s ?? {}))));
 }
 
 function kcalOf(item: Pick<EditItem, "kcal">) {
