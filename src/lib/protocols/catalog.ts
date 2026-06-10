@@ -2101,6 +2101,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Dias high/low/no carb — performance e composição corporal.",
     icon: "Repeat",
     triggers: { anyClinicalTag: ["high_training_volume"], anyGoal: ["performance", "bulk"] },
+    modules: [CICLO_CARBO_MODULE],
   },
   {
     id: "anti-ansiedade",
