@@ -139,14 +139,14 @@ function SectionCollapsible({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-[color-mix(in_oklab,var(--gold)_5%,transparent)] transition-colors"
+        className="w-full grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2 px-3 py-2.5 text-left hover:bg-[color-mix(in_oklab,var(--gold)_5%,transparent)] transition-colors"
       >
         <span className="text-[var(--gold)]">{icon}</span>
-        <span className="flex-1 text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+        <span className="min-w-0 text-[10px] font-mono uppercase tracking-widest text-[var(--gold)] truncate">
           {title}
         </span>
         {countLabel && (
-          <span className="text-[10px] font-mono text-muted-foreground">{countLabel}</span>
+          <span className="text-[10px] font-mono text-muted-foreground shrink-0">{countLabel}</span>
         )}
         <ChevronDown
           className={cn("size-3.5 text-[var(--gold)] transition-transform", open && "rotate-180")}
@@ -212,8 +212,8 @@ function TeaRowCard({ tea, index }: { tea: TeaRow; index: number }) {
         <dl className="px-2.5 pb-2.5 pt-1.5 border-t border-border/40 space-y-1.5 animate-fade-in text-xs">
           {tea.quantity && <DetailRow label="Quantidade" value={tea.quantity} />}
           {tea.ingredients && tea.ingredients.length > 0 && (
-            <div className="flex gap-2">
-              <dt className="font-mono uppercase tracking-wider text-[10px] text-muted-foreground shrink-0 min-w-[5.5rem]">
+    <div className="grid gap-1 sm:grid-cols-[5.5rem_minmax(0,1fr)] sm:gap-2">
+      <dt className="font-mono uppercase tracking-wider text-[10px] text-muted-foreground">
                 Ingredientes
               </dt>
               <dd className="text-foreground/90 flex-1">
@@ -241,7 +241,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
       <dt className="font-mono uppercase tracking-wider text-[10px] text-muted-foreground shrink-0 min-w-[5.5rem]">
         {label}
       </dt>
-      <dd className="text-foreground/90 flex-1">{value}</dd>
+      <dd className="text-foreground/90 min-w-0 break-words">{value}</dd>
     </div>
   );
 }
