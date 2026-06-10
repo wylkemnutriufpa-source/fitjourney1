@@ -29,7 +29,9 @@ export function BrandLockup({
   onLogoClick,
 }: BrandLockupProps) {
   const cfg = useLogoSettings(slot);
-  const wm = cfg.wordmark;
+  const wm = slot === "landing-header"
+    ? { ...cfg.wordmark, show: true, position: "right" as const, gap: 12, sizePx: 20, offsetX: 0, offsetY: 0 }
+    : cfg.wordmark;
 
   const logoNode = <LogoOrbital slot={slot} />;
   const wrappedLogo = logoWrapper
