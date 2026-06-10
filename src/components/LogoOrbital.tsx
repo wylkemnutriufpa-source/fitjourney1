@@ -26,8 +26,9 @@ export function LogoOrbital({
 }: LogoOrbitalProps) {
   const settings = useLogoSettings(slot ?? "landing-header");
   const cfg = slot ? settings : null;
+  const lockedLandingHeader = slot === "landing-header";
   const finalEffect: LogoEffect = cfg?.variant === "static" ? ("none" as any) : cfg?.effect ?? effect;
-  const finalSizePx = cfg?.sizePx ?? sizePx;
+  const finalSizePx = lockedLandingHeader ? 64 : cfg?.sizePx ?? sizePx;
   const customUrl = cfg?.customUrl ?? null;
   const customIsVideo = !!customUrl && (/^data:video\//i.test(customUrl) || /\.(mp4|webm)(\?|$)/i.test(customUrl));
   const useVideo = cfg?.variant === "video" && !customUrl;
@@ -54,7 +55,7 @@ export function LogoOrbital({
   // Logos customizadas (upload) não recebem a aura/pulse ambientes — só o efeito explícito.
   // Admin também pode forçar o desligamento da aura por slot via `showAura: false`.
   const auraDisabledBySlot = cfg ? cfg.showAura === false : false;
-  const hideAmbient = !!customUrl || auraDisabledBySlot;
+  const hideAmbient = lockedLandingHeader || !!customUrl || auraDisabledBySlot;
 
   return (
     <span
@@ -147,7 +148,9 @@ export function LogoOrbital({
         </span>
       )}
 
-      {customIsVideo ? (
+      {lockedLandingHeader ? (
+        <LogoVideo className="relative z-10 object-contain" style={sizeStyle} />
+      ) : customIsVideo ? (
         <span className={`fj-logo-video-shell relative z-10 object-contain ${sizeClass}`} style={sizeStyle} aria-label="Logo">
           <video
             autoPlay
