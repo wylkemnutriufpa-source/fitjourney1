@@ -2087,12 +2087,24 @@ function FoodItemRow({
             {formatFoodPortion(item)} · {item.kcal} kcal
           </p>
         </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditing(true);
+          }}
+          className="shrink-0 rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 p-1.5"
+          title="Editar alimento"
+          aria-label="Editar alimento"
+        >
+          <Pencil className="size-3.5" />
+        </button>
         <Popover open={infoOpen} onOpenChange={setFoodInfoOpen}>
           <PopoverTrigger asChild>
             <button
-              className="text-muted-foreground hover:text-primary p-1 opacity-60 group-hover:opacity-100 transition-opacity"
+              className="shrink-0 text-muted-foreground hover:text-primary p-1.5"
               title="Ver medidas caseiras"
               onClick={(e) => e.stopPropagation()}
+              aria-label="Ver medidas caseiras"
             >
               <ChevronDown className="size-3.5" />
             </button>
@@ -2102,23 +2114,15 @@ function FoodItemRow({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            setEditing(true);
-          }}
-          className="text-muted-foreground hover:text-primary p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-          title="Editar"
-        >
-          <Pencil className="size-3.5" />
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
             onRemove();
           }}
-          className="text-muted-foreground hover:text-destructive p-1 opacity-60 group-hover:opacity-100 transition-opacity"
+          className="shrink-0 text-muted-foreground hover:text-destructive p-1.5"
           title="Remover"
+          aria-label="Remover alimento"
         >
           <X className="size-3.5" />
         </button>
+
       </div>
     );
   }
