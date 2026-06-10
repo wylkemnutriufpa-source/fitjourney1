@@ -161,7 +161,12 @@ function ProtocolEditorPage() {
     queryKey: ["protocol-overrides", protocol.id],
     queryFn: () => fetchOverrides({ data: { protocolId: protocol.id } }),
     staleTime: 30_000,
+    enabled: isAdmin,
   });
+
+  const overrides = data?.overrides ?? [];
+  const idx = useMemo(() => indexOverrides(overrides), [overrides]);
+  const modules = useMemo(() => getProtocolModules(protocol), [protocol]);
 
   if (!isAdmin) {
     return (
@@ -181,10 +186,6 @@ function ProtocolEditorPage() {
       </AppShell>
     );
   }
-
-  const overrides = data?.overrides ?? [];
-  const idx = useMemo(() => indexOverrides(overrides), [overrides]);
-  const modules = useMemo(() => getProtocolModules(protocol), [protocol]);
 
   return (
     <AppShell>
