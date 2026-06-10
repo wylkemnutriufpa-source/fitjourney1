@@ -87,6 +87,7 @@ export const Route = createFileRoute("/_authenticated/meu-plano/protocolos")({
 function PatientActiveProtocolsPage() {
   const fetchActive = useServerFn(listMyActiveProtocols);
   const fetchCtx = useServerFn(getMyClinicalContext);
+  const fetchAllOverrides = useServerFn(listAllProtocolOverrides);
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient", "active-protocols"],
     queryFn: () => fetchActive(),
@@ -97,10 +98,25 @@ function PatientActiveProtocolsPage() {
     queryFn: () => fetchCtx(),
     staleTime: 60_000,
   });
+  const { data: overridesData } = useQuery({
+    queryKey: ["protocol-overrides-all"],
+    queryFn: () => fetchAllOverrides(),
+    staleTime: 30_000,
+  });
+  const overridesByProtocol = useMemo(() => {
+    const m = new Map<string, ProtocolOverrideRow[]>();
+    for (const r of overridesData?.overrides ?? []) {
+      const arr = m.get(r.protocolId) ?? [];
+      arr.push(r);
+      m.set(r.protocolId, arr);
+    }
+    return m;
+  }, [overridesData]);
   const personalWaterMl = personalizedWaterMl(
     ctx?.currentWeight?.weightKg ?? null,
     ctx?.demographics.activity ?? null,
   );
+
 
   return (
     <AppShell>
