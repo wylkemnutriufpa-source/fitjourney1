@@ -248,17 +248,17 @@ function ModuleMethodologyCard({ methodology }: { methodology: NonNullable<Proto
   );
 }
 
-function GoldenTips({ protocolId }: { protocolId: string }) {
-  const tips = getGoldenTipsFor(protocolId);
+function GoldenTips({ tips }: { tips: ReadonlyArray<GoldenTip> }) {
   if (tips.length === 0) return null;
   return (
     <div className="space-y-2.5">
       {tips.map((tip, i) => (
-        <GoldenTipCard key={`${protocolId}-${i}`} tip={tip} defaultOpen={i === 0} index={i + 1} />
+        <GoldenTipCard key={`gt-${i}-${tip.title}`} tip={tip} defaultOpen={i === 0} index={i + 1} />
       ))}
     </div>
   );
 }
+
 
 function GoldenTipCard({ tip, defaultOpen, index }: { tip: GoldenTip; defaultOpen: boolean; index: number }) {
   const [open, setOpen] = useState(defaultOpen);
