@@ -550,7 +550,7 @@ function GoldenTipListEditor({
     <div className="space-y-3">
       {tips.map((t, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-start">
+          <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] gap-1.5 items-start">
             <ReorderButtons i={i} total={tips.length} onMove={(f, to) => onChange(reorder(tips, f, to))} />
             <EmojiPicker value={t.emoji} onChange={(v) => update(i, { emoji: v })} />
             <Input
@@ -635,7 +635,7 @@ function TeaListEditor({
     <div className="space-y-3">
       {teas.map((t, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-start">
+          <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] gap-1.5 items-start">
             <ReorderButtons i={i} total={teas.length} onMove={(f, to) => onChange(reorder(teas, f, to))} />
             <EmojiPicker value={t.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input
@@ -655,7 +655,7 @@ function TeaListEditor({
 
           <SizeButtons value={t.size} onChange={(s) => update(i, { size: s })} />
 
-          <div className="grid grid-cols-2 gap-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
             <Input
               value={t.quantity ?? ""}
               placeholder="Quantidade (ex: 300 ml)"
@@ -703,7 +703,7 @@ function PillarListEditor({
     <div className="space-y-3">
       {pillars.map((p, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-start">
+          <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] gap-1.5 items-start">
             <ReorderButtons i={i} total={pillars.length} onMove={(f, to) => onChange(reorder(pillars, f, to))} />
             <EmojiPicker value={p.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input
@@ -767,7 +767,7 @@ function RuleListEditor({
     <div className="space-y-3">
       {rules.map((r, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-start">
+          <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] gap-1.5 items-start">
             <ReorderButtons i={i} total={rules.length} onMove={(f, to) => onChange(reorder(rules, f, to))} />
             <EmojiPicker value={r.emoji ?? ""} onChange={(v) => update(i, { emoji: v })} />
             <Input
