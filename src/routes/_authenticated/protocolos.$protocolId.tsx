@@ -51,6 +51,9 @@ import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSecti
 import { ProtocolDiagnosticCard } from "@/components/patient/ProtocolDiagnosticCard";
 import { getGoldenTipsFor, type GoldenTip } from "@/lib/protocols/golden-tips";
 import { getMethodologyFor } from "@/lib/protocols/methodologies";
+import { listProtocolOverrides } from "@/lib/protocols/overrides.functions";
+import { indexOverrides, mergeModule, mergeGoldenTips } from "@/lib/protocols/apply-overrides";
+
 
 type PageSearch = {
   readonly module?: string;
@@ -81,11 +84,33 @@ function ProtocolDetailPage() {
   const requiresPremium = !!protocol.exclusive;
   const hasAccess = !requiresPremium || isAdmin;
 
-  const modules = useMemo(() => getProtocolModules(protocol), [protocol]);
+  const baseModules = useMemo(() => getProtocolModules(protocol), [protocol]);
   const { module: moduleId, patientId, patientName } = Route.useSearch();
+
+  // Carrega overrides do admin e aplica em cima do catálogo hardcoded.
+  // Aparece para TODOS, inclusive pacientes com protocolo ativo.
+  const fetchOverrides = useServerFn(listProtocolOverrides);
+  const { data: overridesData } = useQuery({
+    queryKey: ["protocol-overrides", protocol.id],
+    queryFn: () => fetchOverrides({ data: { protocolId: protocol.id } }),
+    staleTime: 30_000,
+  });
+  const overridesIdx = useMemo(
+    () => indexOverrides(overridesData?.overrides ?? []),
+    [overridesData],
+  );
+  const modules = useMemo(
+    () => baseModules.map((m) => mergeModule(m, overridesIdx)),
+    [baseModules, overridesIdx],
+  );
   const activeModule = useMemo(
     () => (moduleId ? modules.find((m) => m.id === moduleId) ?? null : null),
     [modules, moduleId],
+  );
+  const baseGoldenTips = useMemo(() => getGoldenTipsFor(protocol.id), [protocol.id]);
+  const goldenTips = useMemo(
+    () => mergeGoldenTips(baseGoldenTips, overridesIdx),
+    [baseGoldenTips, overridesIdx],
   );
 
   return (
@@ -97,6 +122,18 @@ function ProtocolDetailPage() {
           requiresPremium={requiresPremium}
           activeModule={activeModule}
         />
+
+        {hasAccess && isAdmin && (
+          <div className="flex justify-end">
+            <Link
+              to="/protocolos/$protocolId/editar"
+              params={{ protocolId: protocol.id }}
+              className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-[var(--gold)] border border-[var(--gold)]/40 rounded px-2.5 py-1.5 hover:bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] transition-colors"
+            >
+              <Pencil className="size-3" /> Editar protocolo
+            </Link>
+          </div>
+        )}
 
         {hasAccess && <EnrollmentsButton protocol={protocol} />}
 
@@ -111,7 +148,7 @@ function ProtocolDetailPage() {
             {getMethodologyFor(protocol.id) && (
               <ModuleMethodologyCard methodology={getMethodologyFor(protocol.id)!} />
             )}
-            <GoldenTips protocolId={protocol.id} />
+            <GoldenTips tips={goldenTips} />
             <ModulesGrid protocol={protocol} modules={modules} patientId={patientId} patientName={patientName} />
           </>
         ) : (
@@ -119,7 +156,7 @@ function ProtocolDetailPage() {
             {(activeModule.methodology ?? getMethodologyFor(protocol.id)) && (
               <ModuleMethodologyCard methodology={(activeModule.methodology ?? getMethodologyFor(protocol.id))!} />
             )}
-            <GoldenTips protocolId={protocol.id} />
+            <GoldenTips tips={goldenTips} />
             <PhasesGrid protocol={protocol} module={activeModule} patientId={patientId} patientName={patientName} />
           </>
         )}
@@ -127,6 +164,7 @@ function ProtocolDetailPage() {
     </AppShell>
   );
 }
+
 
 function ModuleMethodologyCard({ methodology }: { methodology: NonNullable<ProtocolModule["methodology"]> }) {
   const [open, setOpen] = useState(true);
@@ -210,17 +248,17 @@ function ModuleMethodologyCard({ methodology }: { methodology: NonNullable<Proto
   );
 }
 
-function GoldenTips({ protocolId }: { protocolId: string }) {
-  const tips = getGoldenTipsFor(protocolId);
+function GoldenTips({ tips }: { tips: ReadonlyArray<GoldenTip> }) {
   if (tips.length === 0) return null;
   return (
     <div className="space-y-2.5">
       {tips.map((tip, i) => (
-        <GoldenTipCard key={`${protocolId}-${i}`} tip={tip} defaultOpen={i === 0} index={i + 1} />
+        <GoldenTipCard key={`gt-${i}-${tip.title}`} tip={tip} defaultOpen={i === 0} index={i + 1} />
       ))}
     </div>
   );
 }
+
 
 function GoldenTipCard({ tip, defaultOpen, index }: { tip: GoldenTip; defaultOpen: boolean; index: number }) {
   const [open, setOpen] = useState(defaultOpen);

@@ -2,7 +2,7 @@
 // READ ONLY: lista os protocolos que o profissional aplicou para o paciente.
 // Experiência premium: refeições e alimentos expansíveis com substituições.
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -26,11 +26,15 @@ import {
   listMyActiveProtocols,
   type ActiveProtocolRow,
 } from "@/lib/protocols/active.functions";
+import { listAllProtocolOverrides } from "@/lib/protocols/overrides.functions";
+import { indexOverrides, mergeSnapshotPhase } from "@/lib/protocols/apply-overrides";
+import type { ProtocolOverrideRow } from "@/lib/protocols/overrides-types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
 import { getMyClinicalContext } from "@/lib/clinical/context.functions";
 import type { ActivityLevel } from "@/lib/engine/types";
+
 
 const WATER_ML_PER_KG: Record<ActivityLevel, number> = {
   sedentary: 35,
@@ -83,6 +87,7 @@ export const Route = createFileRoute("/_authenticated/meu-plano/protocolos")({
 function PatientActiveProtocolsPage() {
   const fetchActive = useServerFn(listMyActiveProtocols);
   const fetchCtx = useServerFn(getMyClinicalContext);
+  const fetchAllOverrides = useServerFn(listAllProtocolOverrides);
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient", "active-protocols"],
     queryFn: () => fetchActive(),
@@ -93,10 +98,25 @@ function PatientActiveProtocolsPage() {
     queryFn: () => fetchCtx(),
     staleTime: 60_000,
   });
+  const { data: overridesData } = useQuery({
+    queryKey: ["protocol-overrides-all"],
+    queryFn: () => fetchAllOverrides(),
+    staleTime: 30_000,
+  });
+  const overridesByProtocol = useMemo(() => {
+    const m = new Map<string, ProtocolOverrideRow[]>();
+    for (const r of overridesData?.overrides ?? []) {
+      const arr = m.get(r.protocolId) ?? [];
+      arr.push(r);
+      m.set(r.protocolId, arr);
+    }
+    return m;
+  }, [overridesData]);
   const personalWaterMl = personalizedWaterMl(
     ctx?.currentWeight?.weightKg ?? null,
     ctx?.demographics.activity ?? null,
   );
+
 
   return (
     <AppShell>
@@ -137,9 +157,15 @@ function PatientActiveProtocolsPage() {
         ) : (
           <div className="space-y-4">
             {data.protocols.map((p) => (
-              <ActiveProtocolCard key={p.id} row={p} personalWaterMl={personalWaterMl} />
+              <ActiveProtocolCard
+                key={p.id}
+                row={p}
+                personalWaterMl={personalWaterMl}
+                overrides={overridesByProtocol.get(p.protocol_id) ?? []}
+              />
             ))}
           </div>
+
         )}
       </div>
     </AppShell>
@@ -156,13 +182,20 @@ export function computeCurrentWeek(row: ActiveProtocolRow): number {
 export function ActiveProtocolCard({
   row,
   personalWaterMl,
+  overrides = [],
 }: {
   row: ActiveProtocolRow;
   personalWaterMl: number | null;
+  overrides?: ReadonlyArray<ProtocolOverrideRow>;
 }) {
-  const phase = row.phase_snapshot;
+  const idx = useMemo(() => indexOverrides(overrides), [overrides]);
+  const phase = useMemo(
+    () => mergeSnapshotPhase(row.phase_snapshot, row.module_id, idx),
+    [row.phase_snapshot, row.module_id, idx],
+  );
   const week = computeCurrentWeek(row);
   const waterMl = personalWaterMl ?? phase.recommendations.waterMl;
+
   const waterLabel = `${(waterMl / 1000).toFixed(1)}L água${personalWaterMl ? " (você)" : ""}`;
   return (
     <article className="relative overflow-hidden rounded-2xl border border-[var(--gold)]/30 bg-gradient-to-br from-surface to-background p-5 space-y-5 shadow-[0_0_0_1px_color-mix(in_oklab,var(--gold)_8%,transparent)]">
