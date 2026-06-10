@@ -9,16 +9,20 @@ interface LogoVideoProps {
 }
 
 export function LogoVideo({ className = "size-10 object-contain", style }: LogoVideoProps) {
-  // Apenas Xiaomi/MIUI (Redmi/POCO) renderiza PNG estático — o webm transparente
-  // pinta um quadrado branco nesses devices. Demais Android/iOS mantêm o vídeo.
-  const [isXiaomi, setIsXiaomi] = useState(false);
+  // Xiaomi/MIUI (Redmi/POCO/HyperOS) pinta um quadrado branco no webm transparente.
+  // Como o UA do Chrome no MIUI frequentemente omite "Xiaomi/MIUI" e expõe só
+  // códigos de modelo (ex.: M2101K6G, 2201116SG), fazemos detecção por UA + model
+  // code e também caímos para PNG estático se o vídeo falhar/estagnar.
+  const [useStatic, setUseStatic] = useState(false);
   useEffect(() => {
     if (typeof navigator === "undefined") return;
     const ua = navigator.userAgent || "";
-    setIsXiaomi(/MIUI|XiaoMi|Xiaomi|Redmi|POCO|HMSCore.*Mi /i.test(ua));
+    if (/MIUI|XiaoMi|Xiaomi|Redmi|POCO|HyperOS|HMSCore.*Mi |Mi \d|M2\d{3}|2\d{9,}[A-Z]{1,2}/i.test(ua)) {
+      setUseStatic(true);
+    }
   }, []);
 
-  if (isXiaomi) {
+  if (useStatic) {
     return (
       <img
         src={logoStaticPng.url}
@@ -41,6 +45,8 @@ export function LogoVideo({ className = "size-10 object-contain", style }: LogoV
       className={`fj-logo-video-media bg-transparent ${className}`}
       style={{ background: "transparent", ...style }}
       aria-label="FitJourney"
+      onError={() => setUseStatic(true)}
+      onStalled={() => setUseStatic(true)}
     >
       <source src={logoWebm.url} type="video/webm" />
       <source src={logoMp4.url} type="video/mp4" />
