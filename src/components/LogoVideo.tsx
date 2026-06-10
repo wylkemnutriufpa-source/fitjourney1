@@ -20,8 +20,8 @@ export function LogoVideo({ className = "size-10 object-contain", style }: LogoV
         className="fj-logo-video-media size-full object-contain"
         style={{ background: "transparent" }}
       >
-        <source src={logoMp4.url} type="video/mp4" />
         <source src={logoWebm.url} type="video/webm" />
+        <source src={logoMp4.url} type="video/mp4" />
       </video>
       <LogoMark className="fj-logo-video-ios-fallback size-full object-contain" />
     </span>
