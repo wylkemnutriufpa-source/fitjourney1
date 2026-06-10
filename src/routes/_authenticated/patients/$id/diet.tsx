@@ -86,6 +86,7 @@ import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteBou
 import { cleanFoodDisplayName, cleanFoodNamesDeep } from "@/lib/foods/display-name";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { toPlannerTemplate } from "@/lib/meal-planner";
+import { detectMealKind } from "@/lib/plans/substitution-rules";
 
 export const Route = createFileRoute("/_authenticated/patients/$id/diet")({
   head: () => ({ meta: [{ title: "Plano do paciente — FitJourney" }] }),
