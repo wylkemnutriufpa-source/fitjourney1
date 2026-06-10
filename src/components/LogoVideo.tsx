@@ -10,20 +10,21 @@ interface LogoVideoProps {
 
 export function LogoVideo({ className = "size-10 object-contain", style }: LogoVideoProps) {
   return (
-    <span className={`fj-logo-video-shell ${className}`} style={style} aria-label="FitJourney">
+    <span className={`fj-logo-video-shell relative ${className}`} style={style} aria-label="FitJourney">
+      {/* Poster estático: aparece imediatamente; o vídeo entra por cima quando estiver pronto */}
+      <LogoMark className="absolute inset-0 size-full object-contain" />
       <video
         autoPlay
         muted
         loop
         playsInline
         preload="auto"
-        className="fj-logo-video-media size-full object-contain"
+        className="fj-logo-video-media relative size-full object-contain"
         style={{ background: "transparent" }}
       >
         <source src={logoWebm.url} type="video/webm" />
         <source src={logoMp4.url} type="video/mp4" />
       </video>
-      <LogoMark className="fj-logo-video-ios-fallback size-full object-contain" />
     </span>
   );
 }
