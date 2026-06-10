@@ -2,12 +2,16 @@
 // PURO. Sem IO. Renderizada pelo componente GoldenTips na página de detalhe.
 // Cada protocolo tem 3 dicas exclusivas com ação simples e benefício fisiológico.
 
+export type GoldenTipSize = "sm" | "md" | "lg";
+
 export interface GoldenTip {
   readonly emoji: string;
   readonly title: string;
   readonly objective: string;
   readonly howTo: ReadonlyArray<string>;
   readonly benefit?: string;
+  /** Tamanho do card no render. Default "md". */
+  readonly size?: GoldenTipSize;
 }
 
 const GLP1_TIPS: GoldenTip[] = [
