@@ -801,3 +801,41 @@
     .reveal { opacity: 1; transform: none; transition: none; }
   }
 }
+
+/* ============================================================
+   Polish global — cards e botões interativos
+   ============================================================ */
+@utility card-interactive {
+  transition: transform 280ms cubic-bezier(.16,.84,.24,1),
+              box-shadow 280ms cubic-bezier(.16,.84,.24,1),
+              border-color 280ms ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px -12px oklch(0 0 0 / 0.45),
+                0 0 0 1px oklch(0.62 0.16 155 / 0.18);
+  }
+}
+
+@utility btn-interactive {
+  transition: transform 180ms cubic-bezier(.16,.84,.24,1),
+              box-shadow 180ms ease,
+              background-color 180ms ease,
+              color 180ms ease,
+              border-color 180ms ease;
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -10px oklch(0.62 0.16 155 / 0.55);
+  }
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-interactive, .btn-interactive {
+    transition: none !important;
+  }
+  .card-interactive:hover, .btn-interactive:hover {
+    transform: none !important;
+  }
+}
