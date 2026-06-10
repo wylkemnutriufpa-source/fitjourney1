@@ -8,7 +8,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { loadCatalog } from "@/lib/anamnesis/v2/catalog/loader";
 import { toCanonical } from "@/lib/anamnesis/v2/to-canonical";
 import type { Answers } from "@/lib/anamnesis/v2/catalog/types";
@@ -92,6 +91,8 @@ export const submitPatientAnamnesisUpdate = createServerFn({ method: "POST" })
       answers: data.answers as Answers,
       origin: "online",
     });
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: prev } = await supabaseAdmin
       .from("anamneses")

@@ -4,7 +4,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { loadCatalog } from "@/lib/anamnesis/v2/catalog/loader";
 import { toCanonical } from "@/lib/anamnesis/v2/to-canonical";
 import type { Answers } from "@/lib/anamnesis/v2/catalog/types";
@@ -84,6 +83,9 @@ export const submitInitialAnamnesis = createServerFn({ method: "POST" })
       answers: data.answers as Answers,
       origin: "online",
     });
+
+    // A-05: lazy import de client.server (evita leak no client bundle).
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // 3a) limpa quaisquer rascunhos pendentes deste paciente (autosave)
     await supabaseAdmin

@@ -5,7 +5,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createAvatarSignedUrl, getAvatarStoragePath, isAvatarStorageReference } from "@/lib/profile/avatar-storage";
 
 export interface MyNutritionistProfile {
@@ -26,6 +25,7 @@ export const getMyNutritionistProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<MyNutritionistProfile | null> => {
     const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
       .from("nutritionists")
       .select(
@@ -111,6 +111,7 @@ export const updateMyNutritionistProfile = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => UpdateInput.parse(input))
   .handler(async ({ data, context }): Promise<MyNutritionistProfile> => {
     const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: upserted, error } = await supabaseAdmin
       .from("nutritionists")
@@ -179,6 +180,7 @@ export const getOrCreateMyReferralCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<MyReferralCode | null> => {
     const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Garante que existe um nutritionist row para este auth user.
     const { data: nutri, error: nutriErr } = await supabaseAdmin
