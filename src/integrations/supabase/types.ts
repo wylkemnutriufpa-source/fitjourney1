@@ -158,6 +158,92 @@ export type Database = {
         }
         Relationships: []
       }
+      diagnostic_responses: {
+        Row: {
+          answers: Json
+          created_at: string
+          diagnosis: Json | null
+          diferenca_kg: number | null
+          email: string
+          full_name: string
+          id: string
+          imc: number | null
+          lead_id: string | null
+          peso_ideal: number | null
+          triggers_acionados: string[]
+          whatsapp: string
+        }
+        Insert: {
+          answers: Json
+          created_at?: string
+          diagnosis?: Json | null
+          diferenca_kg?: number | null
+          email: string
+          full_name: string
+          id?: string
+          imc?: number | null
+          lead_id?: string | null
+          peso_ideal?: number | null
+          triggers_acionados?: string[]
+          whatsapp: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          diagnosis?: Json | null
+          diferenca_kg?: number | null
+          email?: string
+          full_name?: string
+          id?: string
+          imc?: number | null
+          lead_id?: string | null
+          peso_ideal?: number | null
+          triggers_acionados?: string[]
+          whatsapp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostic_responses_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "landing_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnostic_triggers: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          frases: Json
+          id: string
+          nome: string
+          prioridade: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          frases?: Json
+          id?: string
+          nome: string
+          prioridade?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          frases?: Json
+          id?: string
+          nome?: string
+          prioridade?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       food_household_measures: {
         Row: {
           created_at: string

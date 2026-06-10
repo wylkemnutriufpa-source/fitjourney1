@@ -64,6 +64,7 @@ import { Route as AuthenticatedAdminPacientesRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminLogosRouteImport } from './routes/_authenticated/admin.logos'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminLandingRouteImport } from './routes/_authenticated/admin.landing'
+import { Route as AuthenticatedAdminDiagnosticoRouteImport } from './routes/_authenticated/admin.diagnostico'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
 import { Route as AuthenticatedProtocolosProtocolIdEditarRouteImport } from './routes/_authenticated/protocolos.$protocolId.editar'
 import { Route as AuthenticatedPatientsIdFeedbacksRouteImport } from './routes/_authenticated/patients/$id/feedbacks'
@@ -370,6 +371,12 @@ const AuthenticatedAdminLandingRoute =
     path: '/landing',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminDiagnosticoRoute =
+  AuthenticatedAdminDiagnosticoRouteImport.update({
+    id: '/diagnostico',
+    path: '/diagnostico',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedPatientsIdIndexRoute =
   AuthenticatedPatientsIdIndexRouteImport.update({
     id: '/patients/$id/',
@@ -423,6 +430,7 @@ export interface FileRoutesByFullPath {
   '/n/$slug': typeof NSlugRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/admin/diagnostico': typeof AuthenticatedAdminDiagnosticoRoute
   '/admin/landing': typeof AuthenticatedAdminLandingRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logos': typeof AuthenticatedAdminLogosRoute
@@ -482,6 +490,7 @@ export interface FileRoutesByTo {
   '/n/$slug': typeof NSlugRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/admin/diagnostico': typeof AuthenticatedAdminDiagnosticoRoute
   '/admin/landing': typeof AuthenticatedAdminLandingRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logos': typeof AuthenticatedAdminLogosRoute
@@ -544,6 +553,7 @@ export interface FileRoutesById {
   '/n/$slug': typeof NSlugRoute
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
+  '/_authenticated/admin/diagnostico': typeof AuthenticatedAdminDiagnosticoRoute
   '/_authenticated/admin/landing': typeof AuthenticatedAdminLandingRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/_authenticated/admin/logos': typeof AuthenticatedAdminLogosRoute
@@ -606,6 +616,7 @@ export interface FileRouteTypes {
     | '/n/$slug'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/admin/diagnostico'
     | '/admin/landing'
     | '/admin/leads'
     | '/admin/logos'
@@ -665,6 +676,7 @@ export interface FileRouteTypes {
     | '/n/$slug'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/admin/diagnostico'
     | '/admin/landing'
     | '/admin/leads'
     | '/admin/logos'
@@ -726,6 +738,7 @@ export interface FileRouteTypes {
     | '/n/$slug'
     | '/signup/nutritionist'
     | '/signup/patient'
+    | '/_authenticated/admin/diagnostico'
     | '/_authenticated/admin/landing'
     | '/_authenticated/admin/leads'
     | '/_authenticated/admin/logos'
@@ -1164,6 +1177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLandingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/diagnostico': {
+      id: '/_authenticated/admin/diagnostico'
+      path: '/diagnostico'
+      fullPath: '/admin/diagnostico'
+      preLoaderRoute: typeof AuthenticatedAdminDiagnosticoRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/patients/$id/': {
       id: '/_authenticated/patients/$id/'
       path: '/patients/$id'
@@ -1196,6 +1216,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminDiagnosticoRoute: typeof AuthenticatedAdminDiagnosticoRoute
   AuthenticatedAdminLandingRoute: typeof AuthenticatedAdminLandingRoute
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
   AuthenticatedAdminLogosRoute: typeof AuthenticatedAdminLogosRoute
@@ -1205,6 +1226,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminDiagnosticoRoute: AuthenticatedAdminDiagnosticoRoute,
   AuthenticatedAdminLandingRoute: AuthenticatedAdminLandingRoute,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
   AuthenticatedAdminLogosRoute: AuthenticatedAdminLogosRoute,
@@ -1381,13 +1403,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

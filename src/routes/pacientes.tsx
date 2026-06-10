@@ -22,6 +22,7 @@ import { CheckoutModal } from "@/components/CheckoutModal";
 import { createLead } from "@/lib/landing/leads.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DiagnosticFunnel } from "@/components/diagnostic/DiagnosticFunnel";
 
 export const Route = createFileRoute("/pacientes")({
   head: () => ({
@@ -151,7 +152,7 @@ function HeroSection({ onCheckout }: { onCheckout: () => void }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
         >
-          <LeadCaptureCard />
+          <DiagnosticFunnel onCheckout={onCheckout} />
         </motion.div>
       </div>
     </section>
