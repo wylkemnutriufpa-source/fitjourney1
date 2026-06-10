@@ -2159,6 +2159,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
     tagline: "Sódio controlado, potássio e diuréticos naturais.",
     icon: "Wind",
     triggers: { anyClinicalTag: ["bloating", "hypertension"] },
+    modules: [ANTIINCHACO_MODULE],
   },
   {
     id: "beleza",
