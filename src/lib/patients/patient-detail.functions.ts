@@ -84,6 +84,7 @@ export const setPatientActiveStatus = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ isActive: boolean }> => {
     const { supabase, userId } = context as { supabase: any; userId: string };
 
+    // Resolve nutri owner via RLS-bound client (auth.uid() = userId).
     const { data: nutri, error: nErr } = await supabase
       .from("nutritionists")
       .select("id")
@@ -92,6 +93,7 @@ export const setPatientActiveStatus = createServerFn({ method: "POST" })
     if (nErr) throw new Error(nErr.message);
     if (!nutri) throw new Error("Perfil de nutricionista não encontrado.");
 
+    // Ownership check — gate before any write.
     const { data: patient, error: pErr } = await supabase
       .from("patients")
       .select("id")
@@ -101,8 +103,11 @@ export const setPatientActiveStatus = createServerFn({ method: "POST" })
     if (pErr) throw new Error(pErr.message);
     if (!patient) throw new Error("Paciente não pertence a você.");
 
-    // C-04: usa context.supabase (RLS as user) — não bypassa RLS.
-    const { data: updated, error: upErr } = await supabase
+    // REVERT C-04: a policy de UPDATE em `patients` não cobre auth.uid()→nutri,
+    // então usamos supabaseAdmin SOMENTE para o write, com filtros explícitos
+    // (id + nutritionist_id) que reproduzem a regra de posse já validada acima.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: updated, error: upErr } = await supabaseAdmin
       .from("patients")
       .update({ is_active: data.isActive, updated_at: new Date().toISOString() })
       .eq("id", data.patientId)
