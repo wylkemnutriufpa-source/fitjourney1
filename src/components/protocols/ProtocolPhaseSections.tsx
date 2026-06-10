@@ -23,6 +23,7 @@ export type TeaRow = {
   timesPerDay?: string;
   benefits?: string;
   note?: string;
+  emoji?: string;
 };
 
 /** Constrói a lista de chás a partir do snapshot da fase. */
@@ -36,6 +37,7 @@ export function buildTeaRows(phase: ProtocolPhase): TeaRow[] {
     timesPerDay: t.timesPerDay,
     benefits: t.benefits,
     note: t.notes,
+    emoji: t.emoji,
   }));
   if (fromSchedule.length > 0) return fromSchedule;
   // Fallback: derivar de teaRoutine (strings livres). Nome = string toda.
