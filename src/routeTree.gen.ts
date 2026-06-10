@@ -13,6 +13,7 @@ import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SuporteRouteImport } from './routes/suporte'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as PacientesRouteImport } from './routes/pacientes'
 import { Route as LogoTestRouteImport } from './routes/logo-test'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AppRouteImport } from './routes/app'
@@ -86,6 +87,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PacientesRoute = PacientesRouteImport.update({
+  id: '/pacientes',
+  path: '/pacientes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogoTestRoute = LogoTestRouteImport.update({
@@ -394,6 +400,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/logo-test': typeof LogoTestRoute
+  '/pacientes': typeof PacientesRoute
   '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/suporte': typeof SuporteRoute
@@ -453,6 +460,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/logo-test': typeof LogoTestRoute
+  '/pacientes': typeof PacientesRoute
   '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/suporte': typeof SuporteRoute
@@ -513,6 +521,7 @@ export interface FileRoutesById {
   '/app': typeof AppRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/logo-test': typeof LogoTestRoute
+  '/pacientes': typeof PacientesRoute
   '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/suporte': typeof SuporteRoute
@@ -574,6 +583,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/forgot-password'
     | '/logo-test'
+    | '/pacientes'
     | '/privacidade'
     | '/reset-password'
     | '/suporte'
@@ -633,6 +643,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/forgot-password'
     | '/logo-test'
+    | '/pacientes'
     | '/privacidade'
     | '/reset-password'
     | '/suporte'
@@ -692,6 +703,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/forgot-password'
     | '/logo-test'
+    | '/pacientes'
     | '/privacidade'
     | '/reset-password'
     | '/suporte'
@@ -753,6 +765,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LogoTestRoute: typeof LogoTestRoute
+  PacientesRoute: typeof PacientesRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SuporteRoute: typeof SuporteRoute
@@ -792,6 +805,13 @@ declare module '@tanstack/react-router' {
       path: '/privacidade'
       fullPath: '/privacidade'
       preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pacientes': {
+      id: '/pacientes'
+      path: '/pacientes'
+      fullPath: '/pacientes'
+      preLoaderRoute: typeof PacientesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/logo-test': {
@@ -1347,6 +1367,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LogoTestRoute: LogoTestRoute,
+  PacientesRoute: PacientesRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SuporteRoute: SuporteRoute,
