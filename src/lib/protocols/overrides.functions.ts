@@ -16,6 +16,7 @@ const ListInput = z.object({
 });
 
 const PayloadSchema: z.ZodType<ProtocolOverridePayload> = z.object({
+  name: z.string().max(120).optional(),
   goldenTips: z
     .array(
       z.object({

@@ -362,6 +362,64 @@ function ProtocolScopeEditor({
   );
 }
 
+function EditableTitle({
+  value,
+  onSave,
+  pending,
+  className,
+}: {
+  value: string;
+  onSave: (next: string) => void;
+  pending?: boolean;
+  className?: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  useEffect(() => setDraft(value), [value]);
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+        <Input
+          value={draft}
+          autoFocus
+          onChange={(e) => setDraft(e.target.value)}
+          className="h-8 text-sm"
+        />
+        <Button
+          size="sm"
+          variant="default"
+          disabled={pending}
+          onClick={() => {
+            onSave(draft.trim() || value);
+            setEditing(false);
+          }}
+        >
+          <Save className="size-3.5" />
+        </Button>
+        <Button size="sm" variant="ghost" onClick={() => { setDraft(value); setEditing(false); }}>
+          Cancelar
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 min-w-0">
+      <span className={className}>{value}</span>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="h-6 w-6 shrink-0"
+        aria-label="Editar título"
+        onClick={() => setEditing(true)}
+      >
+        <Pencil className="size-3.5 text-[var(--gold)]" />
+      </Button>
+    </div>
+  );
+}
+
 function ModuleScopeEditor({
   protocol,
   module: mod,
@@ -371,13 +429,27 @@ function ModuleScopeEditor({
   module: ProtocolModule;
   idx: ReturnType<typeof indexOverrides>;
 }) {
+  const modPayload = idx.modules.get(mod.id) ?? {};
+  const displayName = modPayload.name ?? mod.name;
+  const save = useSaveOverride();
+  const handleSaveName = (name: string) =>
+    save({
+      protocolId: protocol.id,
+      moduleId: mod.id,
+      phaseId: null,
+      payload: { ...modPayload, name },
+    });
+
   return (
     <section className="rounded-xl border border-border bg-surface/50 p-4 space-y-4">
-      <header className="flex items-center gap-2">
-        <Sparkles className="size-4 text-[var(--gold)]" />
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">
-          {mod.name}
-        </h2>
+      <header className="flex items-center gap-2 flex-wrap">
+        <Sparkles className="size-4 text-[var(--gold)] shrink-0" />
+        <EditableTitle
+          value={displayName}
+          pending={save.pending}
+          onSave={handleSaveName}
+          className="text-sm font-semibold uppercase tracking-wide text-foreground break-words"
+        />
       </header>
       {mod.phases.map((phase) => (
         <PhaseEditor
@@ -403,6 +475,7 @@ function PhaseEditor({
   phase: ProtocolPhase;
   initial: ProtocolOverridePayload;
 }) {
+  const [name, setName] = useState<string>(() => initial.name ?? phase.name);
   const [tips, setTips] = useState<GoldenTip[]>(() => [...(initial.tips ?? [])]);
   const [teas, setTeas] = useState<PhaseTea[]>(() => [...(initial.teas ?? [])]);
   const [strategies, setStrategies] = useState<string[]>(() => [...(initial.strategies ?? [])]);
@@ -410,28 +483,45 @@ function PhaseEditor({
   const [rules, setRules] = useState<MethodologyRule[]>(() => [...(initial.rules ?? [])]);
 
   useEffect(() => {
+    setName(initial.name ?? phase.name);
     setTips([...(initial.tips ?? [])]);
     setTeas([...(initial.teas ?? [])]);
     setStrategies([...(initial.strategies ?? [])]);
     setPillars([...(initial.pillars ?? [])]);
     setRules([...(initial.rules ?? [])]);
-  }, [initial]);
+  }, [initial, phase.name]);
 
   const save = useSaveOverride();
+  const buildPayload = (overrideName?: string): ProtocolOverridePayload => ({
+    name: (overrideName ?? name) !== phase.name ? (overrideName ?? name) : undefined,
+    tips, teas, strategies, pillars, rules,
+  });
   const handleSave = () =>
     save({
       protocolId: protocol.id,
       moduleId: mod.id,
       phaseId: phase.id,
-      payload: { tips, teas, strategies, pillars, rules },
+      payload: buildPayload(),
     });
+  const handleSaveName = (next: string) => {
+    setName(next);
+    save({
+      protocolId: protocol.id,
+      moduleId: mod.id,
+      phaseId: phase.id,
+      payload: buildPayload(next),
+    });
+  };
 
   return (
     <div className="rounded-lg border border-border/60 bg-background/60 p-3 space-y-4">
       <header className="flex items-center justify-between flex-wrap gap-2">
-        <p className="text-xs font-mono uppercase tracking-widest text-[var(--gold)]">
-          {phase.name}
-        </p>
+        <EditableTitle
+          value={name}
+          pending={save.pending}
+          onSave={handleSaveName}
+          className="text-xs font-mono uppercase tracking-widest text-[var(--gold)] break-words"
+        />
         <Button size="sm" variant="outline" onClick={handleSave} disabled={save.pending}>
           <Save className="size-3.5 mr-1.5" /> Salvar fase
         </Button>

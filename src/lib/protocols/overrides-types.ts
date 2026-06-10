@@ -20,6 +20,7 @@ import type {
  * conteúdo hardcoded — nunca sobrescrevem. (Remoção fica para Fase 2.)
  */
 export interface ProtocolOverridePayload {
+  readonly name?: string;
   readonly goldenTips?: ReadonlyArray<GoldenTip>;
   readonly tips?: ReadonlyArray<GoldenTip>;
   readonly teas?: ReadonlyArray<PhaseTea>;
