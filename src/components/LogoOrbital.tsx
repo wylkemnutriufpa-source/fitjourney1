@@ -25,7 +25,6 @@ export function LogoOrbital({
   slot,
 }: LogoOrbitalProps) {
   const settings = useLogoSettings(slot ?? "landing-header");
-  const ready = useLogoSettingsReady();
   const cfg = slot ? settings : null;
   const lockedLandingHeader = slot === "landing-header";
   const finalEffect: LogoEffect = lockedLandingHeader
@@ -33,7 +32,9 @@ export function LogoOrbital({
     : cfg?.variant === "static"
     ? ("none" as any)
     : cfg?.effect ?? effect;
-  const finalSizePx = cfg?.sizePx ?? sizePx;
+  // landing-header: tamanho FIXO para evitar flash de "logo cresce" na recarga
+  // (servidor SSR não conhece localStorage do usuário).
+  const finalSizePx = lockedLandingHeader ? 72 : (cfg?.sizePx ?? sizePx);
   const customUrl = cfg?.customUrl ?? null;
   const customIsVideo = !!customUrl && (/^data:video\//i.test(customUrl) || /\.(mp4|webm)(\?|$)/i.test(customUrl));
   const useVideo = cfg?.variant === "video" && !customUrl;
@@ -65,11 +66,7 @@ export function LogoOrbital({
   return (
     <span
       className={`${hideAmbient ? "" : "fj-logo-aura"} relative inline-flex items-center justify-center shrink-0 ${sizeClass} ${className}`}
-      style={{
-        ...wrapperStyle,
-        opacity: ready ? 1 : 0,
-        transition: "opacity 220ms ease-out",
-      }}
+      style={wrapperStyle}
     >
       {!hideAmbient && <span className="fj-logo-pulse" aria-hidden />}
 
