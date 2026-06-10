@@ -865,11 +865,14 @@ function MealCard({
                 const currentValue = currentMeasure ? `m:${currentMeasure.label}` : `u:${it.unit}`;
 
                 type Opt = { value: string; label: string; kind: "u" | "m"; payload?: any };
+                // Para sólidos (proteína/carbo/fruta) NUNCA mostramos "ml" —
+                // arroz/frango/banana saindo em ml era um dos bugs reportados.
+                const isSolid = ["protein", "carb", "fruit"].includes(it.scaleGroup);
                 const opts: Opt[] = [
                   { value: "u:g", label: "g", kind: "u" },
                   { value: "u:unid", label: "unid", kind: "u" },
                 ];
-                if (it.unit === "ml" || (!measures?.length && false)) {
+                if (!isSolid && (it.unit === "ml" || it.scaleGroup === "beverage" || it.scaleGroup === "dairy")) {
                   opts.splice(1, 0, { value: "u:ml", label: "ml", kind: "u" });
                 }
                 if (it.unit && !["g", "ml", "unid", "medida"].includes(it.unit) && !measures?.find((m) => m.measureName === it.unit)) {
