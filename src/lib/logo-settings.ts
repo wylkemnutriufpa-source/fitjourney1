@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useState, useCallback } from "react";
 import type { LogoEffect } from "@/components/LogoOrbital";
 import { supabase } from "@/integrations/supabase/client";
 
