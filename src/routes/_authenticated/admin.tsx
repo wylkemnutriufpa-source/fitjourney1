@@ -37,7 +37,7 @@ function AdminLayout() {
           </div>
           <h1 className="text-2xl font-bold tracking-tight mt-1">Administração</h1>
         </div>
-        <div className="flex gap-2 border-b border-border">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-2">
           {tabs.map((t) => {
             const active = path === t.to || path.startsWith(t.to + "/");
             return (
@@ -45,10 +45,10 @@ function AdminLayout() {
                 key={t.to}
                 to={t.to}
                 className={
-                  "px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors " +
+                  "px-3 py-2.5 text-sm font-medium rounded-lg border text-center transition-colors " +
                   (active
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground")
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40")
                 }
               >
                 {t.label}
