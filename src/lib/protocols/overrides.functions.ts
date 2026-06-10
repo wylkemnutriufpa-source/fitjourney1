@@ -145,31 +145,23 @@ export const saveProtocolOverride = createServerFn({ method: "POST" })
     if (roleErr) throw new Error(roleErr.message);
     if (!isAdmin) throw new Error("Forbidden: admin required");
 
-    // Upsert manual via select-then-insert/update (não temos constraint composta
-    // exportada via .upsert sem listar onConflict; mais simples e seguro assim).
-    const { data: existing, error: selErr } = await supabase
+    // Upsert manual pelo escopo (protocol_id, module_id, phase_id).
+    const sel = supabase
       .from("protocol_overrides")
       .select("id")
-      .eq("protocol_id", data.protocolId)
-      .is("module_id", data.moduleId === null ? null : (undefined as never))
-      .maybeSingle()
-      .then(async (r) => {
-        // fallback explícito por causa de .is(...) só aceitar null literal —
-        // refazemos a query com filtros corretos:
-        const q = supabase
-          .from("protocol_overrides")
-          .select("id")
-          .eq("protocol_id", data.protocolId);
-        const q2 = data.moduleId === null ? q.is("module_id", null) : q.eq("module_id", data.moduleId);
-        const q3 = data.phaseId === null ? q2.is("phase_id", null) : q2.eq("phase_id", data.phaseId);
-        return q3.maybeSingle();
-      });
+      .eq("protocol_id", data.protocolId);
+    const sel2 = data.moduleId === null ? sel.is("module_id", null) : sel.eq("module_id", data.moduleId);
+    const sel3 = data.phaseId === null ? sel2.is("phase_id", null) : sel2.eq("phase_id", data.phaseId);
+    const { data: existing, error: selErr } = await sel3.maybeSingle();
     if (selErr) throw new Error(selErr.message);
+
+    // JSONB no Supabase tipa como Json; nosso payload é JSON-serializable.
+    const payloadJson = data.payload as unknown as Record<string, unknown>;
 
     if (existing?.id) {
       const { error } = await supabase
         .from("protocol_overrides")
-        .update({ payload: data.payload, updated_by: userId })
+        .update({ payload: payloadJson, updated_by: userId })
         .eq("id", existing.id);
       if (error) throw new Error(error.message);
       return { ok: true, id: existing.id };
@@ -181,7 +173,7 @@ export const saveProtocolOverride = createServerFn({ method: "POST" })
         protocol_id: data.protocolId,
         module_id: data.moduleId,
         phase_id: data.phaseId,
-        payload: data.payload,
+        payload: payloadJson,
         updated_by: userId,
       })
       .select("id")
@@ -189,6 +181,7 @@ export const saveProtocolOverride = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true, id: ins.id };
   });
+
 
 export const deleteProtocolOverride = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
