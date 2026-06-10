@@ -517,6 +517,8 @@ function PlanEditor({
     );
   }, [draft]);
 
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+
   async function handleSave() {
     setSaving(true);
     try {
@@ -526,6 +528,7 @@ function PlanEditor({
       };
       await onSave(snapshotToPersist);
       setDirty(false);
+      setLastSavedAt(Date.now());
       if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
         try { navigator.vibrate([8, 30, 12]); } catch { /* ignore */ }
       }
@@ -537,6 +540,27 @@ function PlanEditor({
       setSaving(false);
     }
   }
+
+  // Autosave: debounce 1.2s após qualquer alteração + flush ao trocar de aba/sair.
+  const saveRef = useRef(handleSave);
+  saveRef.current = handleSave;
+  useEffect(() => {
+    if (!dirty || saving) return;
+    const t = setTimeout(() => { void saveRef.current(); }, 1200);
+    return () => clearTimeout(t);
+  }, [draft, dirty, saving]);
+  useEffect(() => {
+    const flush = () => { if (dirty && !saving) void saveRef.current(); };
+    const onVis = () => { if (document.visibilityState === "hidden") flush(); };
+    window.addEventListener("blur", flush);
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("beforeunload", flush);
+    return () => {
+      window.removeEventListener("blur", flush);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("beforeunload", flush);
+    };
+  }, [dirty, saving]);
 
   // Regenera substituições passando o snapshot atual pelo motor vigente
   // (planos antigos publicados antes da nova rotação ficam com equivalents=[]).
