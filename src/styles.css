@@ -212,24 +212,12 @@
   filter: drop-shadow(0 0 6px oklch(0.62 0.16 155 / 0.35));
 }
 
-.fj-logo-video-shell {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  overflow: hidden;
-  contain: layout paint;
-}
-
 .fj-logo-video-media {
   display: block;
   opacity: 1;
   visibility: visible;
   transform: translateZ(0);
-}
-
-.fj-logo-video-ios-fallback {
-  display: none;
+  background: transparent;
 }
 
 .fj-logo-pulse {
