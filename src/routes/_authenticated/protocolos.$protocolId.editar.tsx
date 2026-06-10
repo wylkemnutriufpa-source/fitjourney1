@@ -610,7 +610,8 @@ function TeaListEditor({
     <div className="space-y-3">
       {teas.map((t, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 items-start">
+            <ReorderButtons i={i} total={teas.length} onMove={(f, to) => onChange(reorder(teas, f, to))} />
             <Input
               value={t.name}
               placeholder="Nome do chá"
@@ -625,6 +626,7 @@ function TeaListEditor({
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
+
           <div className="grid grid-cols-2 gap-1.5">
             <Input
               value={t.quantity ?? ""}
