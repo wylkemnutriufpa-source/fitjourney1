@@ -2086,6 +2086,7 @@ export const PROTOCOL_CATALOG: ReadonlyArray<ProtocolDescriptor> = [
       anyClinicalTag: ["insulin_resistance", "pre_diabetes", "diabetes_type2", "sop", "high_triglycerides"],
       anyGoal: ["cut"],
     },
+    modules: [LOW_CARB_MODULE],
   },
   {
     id: "agua",
