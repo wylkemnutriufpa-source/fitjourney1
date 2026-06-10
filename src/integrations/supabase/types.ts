@@ -930,6 +930,47 @@ export type Database = {
           },
         ]
       }
+      protocol_overrides: {
+        Row: {
+          created_at: string
+          id: string
+          module_id: string | null
+          payload: Json
+          phase_id: number | null
+          protocol_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          module_id?: string | null
+          payload?: Json
+          phase_id?: number | null
+          protocol_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          module_id?: string | null
+          payload?: Json
+          phase_id?: number | null
+          protocol_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "protocol_overrides_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "orphan_auth_users"
+            referencedColumns: ["auth_user_id"]
+          },
+        ]
+      }
       referral_codes: {
         Row: {
           code: string
