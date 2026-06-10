@@ -525,13 +525,9 @@ function GoldenTipListEditor({
     <div className="space-y-3">
       {tips.map((t, i) => (
         <div key={i} className="rounded-md border border-border/60 bg-background/60 p-2.5 space-y-2">
-          <div className="flex gap-1.5 items-center">
-            <Input
-              className="w-16"
-              value={t.emoji}
-              placeholder="🔥"
-              onChange={(e) => update(i, { emoji: e.target.value })}
-            />
+          <div className="flex gap-1.5 items-start">
+            <ReorderButtons i={i} total={tips.length} onMove={(f, to) => onChange(reorder(tips, f, to))} />
+            <EmojiPicker value={t.emoji} onChange={(v) => update(i, { emoji: v })} />
             <Input
               className="flex-1"
               value={t.title}
@@ -546,6 +542,25 @@ function GoldenTipListEditor({
             >
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              Tamanho do card
+            </Label>
+            <div className="flex gap-1">
+              {(["sm", "md", "lg"] as GoldenTipSize[]).map((s) => (
+                <Button
+                  key={s}
+                  type="button"
+                  size="sm"
+                  variant={(t.size ?? "md") === s ? "default" : "outline"}
+                  className="h-6 px-2 text-[10px] uppercase"
+                  onClick={() => update(i, { size: s })}
+                >
+                  {s}
+                </Button>
+              ))}
+            </div>
           </div>
           <Input
             value={t.objective}
@@ -569,7 +584,7 @@ function GoldenTipListEditor({
         size="sm"
         variant="outline"
         onClick={() =>
-          onChange([...tips, { emoji: "✨", title: "", objective: "", howTo: [""] }])
+          onChange([...tips, { emoji: "✨", title: "", objective: "", howTo: [""], size: "md" }])
         }
       >
         <Plus className="size-3.5 mr-1.5" /> Adicionar dica
@@ -577,6 +592,7 @@ function GoldenTipListEditor({
     </div>
   );
 }
+
 
 function TeaListEditor({
   teas,
