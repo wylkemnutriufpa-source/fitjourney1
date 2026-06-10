@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useState, useCallback } from "react";
 import type { LogoEffect } from "@/components/LogoOrbital";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -164,14 +164,19 @@ export function getLogoSettings(slot: LogoSlot): SlotConfig {
   return mergeConfig(slot, all[slot]);
 }
 
+// useLayoutEffect no client, useEffect no SSR (evita warning).
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 export function useLogoSettings(slot: LogoSlot): SlotConfig {
-  // O primeiro render precisa ser idêntico no SSR e no client. Ler localStorage
-  // antes da hidratação troca img/video/tamanho da logo e causa tela preta por
-  // hydration mismatch; configurações persistidas entram logo após o mount.
+  // SSR/primeiro render: defaults idênticos client+server (sem hydration mismatch).
+  // Imediatamente após hidratar, useLayoutEffect aplica o cache do localStorage
+  // ANTES do browser pintar — sem flash de tamanho/variant no header.
   const [cfg, setCfg] = useState<SlotConfig>(() => mergeConfig(slot));
+  useIsoLayoutEffect(() => {
+    setCfg(getLogoSettings(slot));
+  }, [slot]);
   useEffect(() => {
     const refresh = () => setCfg(getLogoSettings(slot));
-    refresh();
     syncFromDb().then(refresh);
     window.addEventListener(EVENT_NAME, refresh);
     window.addEventListener("storage", refresh);
