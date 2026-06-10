@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { LogoMark } from "@/components/LogoMark";
 import { LogoVideo } from "@/components/LogoVideo";
-import { useLogoSettings, type LogoSlot } from "@/lib/logo-settings";
+import { useLogoSettings, useLogoSettingsReady, type LogoSlot } from "@/lib/logo-settings";
 
 export type LogoEffect = "none" | "orbit" | "dust" | "comet" | "ripple" | "energy" | "aura" | "sparkle" | "lines" | "halo";
 
@@ -25,6 +25,7 @@ export function LogoOrbital({
   slot,
 }: LogoOrbitalProps) {
   const settings = useLogoSettings(slot ?? "landing-header");
+  const ready = useLogoSettingsReady();
   const cfg = slot ? settings : null;
   const lockedLandingHeader = slot === "landing-header";
   const finalEffect: LogoEffect = lockedLandingHeader
@@ -64,7 +65,11 @@ export function LogoOrbital({
   return (
     <span
       className={`${hideAmbient ? "" : "fj-logo-aura"} relative inline-flex items-center justify-center shrink-0 ${sizeClass} ${className}`}
-      style={wrapperStyle}
+      style={{
+        ...wrapperStyle,
+        opacity: ready ? 1 : 0,
+        transition: "opacity 220ms ease-out",
+      }}
     >
       {!hideAmbient && <span className="fj-logo-pulse" aria-hidden />}
 
