@@ -22,6 +22,7 @@ import { CheckoutModal } from "@/components/CheckoutModal";
 import { createLead } from "@/lib/landing/leads.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DiagnosticFunnel } from "@/components/diagnostic/DiagnosticFunnel";
 
 export const Route = createFileRoute("/pacientes")({
   head: () => ({
