@@ -549,7 +549,7 @@ function FinalCTASection({ onCheckout }: { onCheckout: () => void }) {
           onClick={onCheckout}
           className="mt-8 inline-flex items-center gap-2 gradient-primary text-primary-foreground rounded-full px-8 py-4 text-lg font-semibold shadow-[0_20px_60px_-15px_oklch(0.62_0.16_155/0.8)] hover:scale-[1.04] active:scale-[0.97] transition-all"
         >
-          Quero meu plano com a IFJ <ArrowRight className="w-5 h-5" />
+          Quero meu plano com a Inteligência FitJourney <ArrowRight className="w-5 h-5" />
         </button>
         <p className="mt-4 text-xs text-muted-foreground">
           Já tem convite do seu nutricionista?{" "}
