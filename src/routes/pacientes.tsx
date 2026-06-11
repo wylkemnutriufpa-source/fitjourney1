@@ -169,7 +169,7 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
         >
-          <DiagnosticFunnel onCheckout={onCheckout} />
+          <DiagnosticFunnel onCheckout={onCheckout} onComplete={onQuizDone} />
         </motion.div>
       </div>
     </section>
