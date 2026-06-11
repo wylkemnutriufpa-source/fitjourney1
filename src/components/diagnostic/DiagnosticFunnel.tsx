@@ -134,8 +134,8 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
               Descubra em 3 minutos como está sua saúde nutricional
             </h3>
             <p className="text-sm text-muted-foreground mt-1.5">
-              Responda nosso questionário inteligente e receba um diagnóstico
-              personalizado elaborado pela Inteligência FitJourney (IFJ).
+              Responda nosso questionário rápido e receba uma análise clínica
+              personalizada feita pelo método FitJourney.
             </p>
 
             <form onSubmit={handleLead} className="mt-5 space-y-3">
@@ -249,10 +249,10 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
               </div>
             </div>
             <p className="mt-6 font-semibold">
-              Analisando seu perfil com a Inteligência FitJourney…
+              Cruzando suas respostas com nossa base clínica…
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Cruzando seus dados com nossa base clínica.
+              Montando sua análise personalizada.
             </p>
           </motion.div>
         )}
@@ -419,6 +419,7 @@ function Step4({ answers, setAnswers }: StepProps) {
     { id: "tireoide", label: "Problemas de tireoide", icon: Sparkles },
     { id: "sop", label: "SOP / resistência à insulina", icon: Target },
     { id: "intestino", label: "Intestino preso / inchaço", icon: Wind },
+    { id: "gastrite_refluxo", label: "Gastrite ou refluxo", icon: Flame },
     { id: "compulsao", label: "Compulsão / ansiedade", icon: Frown },
   ];
   return (
