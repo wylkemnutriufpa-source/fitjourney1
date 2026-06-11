@@ -23,6 +23,13 @@ import { createLead } from "@/lib/landing/leads.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DiagnosticFunnel } from "@/components/diagnostic/DiagnosticFunnel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/pacientes")({
   head: () => ({
@@ -67,9 +74,9 @@ function PacientesPage() {
           <button
             type="button"
             onClick={() => setCheckoutOpen(true)}
-            className="hidden sm:inline-flex items-center gap-1.5 gradient-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-semibold shadow-[0_8px_24px_-8px_oklch(0.62_0.16_155/0.7)] hover:scale-[1.03] transition-all"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all hover:scale-[1.03] bg-[var(--gold,oklch(0.78_0.13_85))] text-background shadow-[0_8px_24px_-8px_oklch(0.78_0.13_85/0.7)]"
           >
-            Quero meu plano <ArrowRight className="w-3.5 h-3.5" />
+            Iniciar meu acompanhamento <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </nav>
@@ -147,19 +154,7 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <button
-              type="button"
-              onClick={onCheckout}
-              className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground rounded-full px-6 py-3.5 text-base font-semibold shadow-[0_12px_32px_-8px_oklch(0.62_0.16_155/0.7)] hover:scale-[1.03] active:scale-[0.98] transition-all"
-            >
-              Quero meu plano personalizado agora <ArrowRight className="w-4 h-4" />
-            </button>
-            <a
-              href="#como"
-              className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-medium border border-border hover:bg-muted/40 transition-colors"
-            >
-              Conheça como funciona →
-            </a>
+            <DiagnosisExplainerButton />
           </div>
         </motion.div>
 
@@ -586,5 +581,78 @@ function PageTheme() {
         background-image: linear-gradient(135deg, oklch(0.62 0.16 155), oklch(0.55 0.18 150));
       }
     `}</style>
+  );
+}
+
+/* ════════════════════════════════════════════════════
+   DIAGNOSIS EXPLAINER (glass dialog)
+   ════════════════════════════════════════════════════ */
+function DiagnosisExplainerButton() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-medium backdrop-blur-xl bg-white/5 border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_8px_32px_-12px_rgba(0,0,0,0.4)] hover:bg-white/10 hover:border-white/25 transition-all text-foreground"
+      >
+        <Sparkles className="w-4 h-4 text-[var(--gold,oklch(0.78_0.13_85))]" />
+        Conheça como funciona
+      </button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto backdrop-blur-2xl bg-background/70 border-white/15 shadow-[0_24px_64px_-16px_rgba(0,0,0,0.5)]">
+          <DialogHeader>
+            <div className="mx-auto grid size-12 place-items-center rounded-full border border-[var(--gold,oklch(0.78_0.13_85))]/40 bg-[var(--gold,oklch(0.78_0.13_85))]/10 mb-2">
+              <HeartPulse className="size-5 text-[var(--gold,oklch(0.78_0.13_85))]" />
+            </div>
+            <DialogTitle className="text-center text-xl">
+              O que é o seu Diagnóstico Nutricional?
+            </DialogTitle>
+            <DialogDescription className="text-center pt-1">
+              Um retrato claro de como sua alimentação e rotina estão impactando sua saúde — e o que dá pra melhorar já.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 text-sm text-muted-foreground leading-relaxed pt-2">
+            <p>
+              A maioria dos problemas de saúde hoje — cansaço constante, ganho de peso,
+              gordura abdominal, ansiedade, intestino preso, picos de glicose, colesterol
+              alto, dores e baixa imunidade — está diretamente ligada à{" "}
+              <span className="text-foreground font-medium">má alimentação</span>.
+            </p>
+            <p>
+              A vida corrida da maioria das pessoas favorece o{" "}
+              <span className="text-foreground font-medium">sedentarismo</span>, refeições
+              ultraprocessadas, pular refeições, excesso de açúcar e álcool, sono ruim e
+              estresse — tudo isso, junto, acelera o aparecimento de doenças crônicas.
+            </p>
+            <p>
+              Pensando nisso, o{" "}
+              <span className="text-foreground font-medium">nosso sistema inteligente</span>{" "}
+              analisa suas respostas e gera um diagnóstico personalizado, com orientações
+              práticas pra você começar a mudar o jogo já no próximo prato.
+            </p>
+            <div className="rounded-xl border border-[var(--gold,oklch(0.78_0.13_85))]/30 bg-[var(--gold,oklch(0.78_0.13_85))]/5 p-4 mt-2">
+              <p className="text-foreground text-sm">
+                👉 Preencha o formulário ao lado e receba seu{" "}
+                <span className="font-semibold text-[var(--gold,oklch(0.78_0.13_85))]">
+                  Diagnóstico Nutricional personalizado
+                </span>{" "}
+                — gratuito e na hora.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold bg-[var(--gold,oklch(0.78_0.13_85))] text-background hover:brightness-110 transition-all"
+          >
+            Quero meu diagnóstico <ArrowRight className="w-4 h-4" />
+          </button>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
