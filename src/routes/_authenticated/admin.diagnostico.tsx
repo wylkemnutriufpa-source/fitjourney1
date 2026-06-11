@@ -139,6 +139,7 @@ function AdminDiagnosticoPage() {
                 prioridade: 5,
                 ativo: true,
                 frases: [""],
+                dicas: [""],
               })
             }
             className="gradient-primary text-primary-foreground rounded-full"
