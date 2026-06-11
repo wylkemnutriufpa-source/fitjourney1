@@ -53,7 +53,7 @@ const initialAnswers: QuizAnswers = {
   queixas: [],
 };
 
-export function DiagnosticFunnel({ onCheckout }: { onCheckout: () => void }) {
+export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () => void; onComplete?: () => void }) {
   const [phase, setPhase] = useState<"capture" | "quiz" | "loading" | "result">("capture");
   const [lead, setLead] = useState<LeadForm>({ fullName: "", email: "", whatsapp: "" });
   const [answers, setAnswers] = useState<QuizAnswers>(initialAnswers);
