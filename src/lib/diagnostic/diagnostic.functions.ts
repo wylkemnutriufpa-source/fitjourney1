@@ -52,11 +52,13 @@ export const listActiveTriggers = createServerFn({ method: "GET" })
 export const submitDiagnosticResponse = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => anonSchema.parse(d))
   .handler(async ({ data }) => {
-    const anon = await anonClient();
+    // Usa service role: bypass RLS para ler lead existente (SELECT bloqueado p/ anon)
+    // e gravar diagnóstico mesmo com .select().single() no RETURNING.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // 1. Cria lead se ainda não existir (mesmo email)
     let leadId: string | null = null;
-    const { data: existing } = await anon
+    const { data: existing } = await supabaseAdmin
       .from("landing_leads")
       .select("id")
       .eq("email", data.email)
@@ -64,7 +66,7 @@ export const submitDiagnosticResponse = createServerFn({ method: "POST" })
     if (existing?.id) {
       leadId = existing.id;
     } else {
-      const { data: inserted, error: leadErr } = await anon
+      const { data: inserted, error: leadErr } = await supabaseAdmin
         .from("landing_leads")
         .insert({
           full_name: data.fullName,
@@ -79,7 +81,7 @@ export const submitDiagnosticResponse = createServerFn({ method: "POST" })
     }
 
     // 2. Salva resposta do diagnóstico
-    const { error } = await anon.from("diagnostic_responses").insert({
+    const { error } = await supabaseAdmin.from("diagnostic_responses").insert({
       lead_id: leadId,
       full_name: data.fullName,
       email: data.email,
