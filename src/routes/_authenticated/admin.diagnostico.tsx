@@ -318,6 +318,60 @@ function AdminDiagnosticoPage() {
                 </Button>
               </div>
 
+              <div className="border-t border-border pt-4">
+                <p className="text-xs font-medium mb-1">
+                  Dicas personalizadas ({(editing.dicas ?? []).length})
+                </p>
+                <p className="text-[11px] text-muted-foreground mb-2 leading-relaxed">
+                  Aparecem no card colapsável "Ver dica personalizada". O motor sorteia uma. Use 3+ para evitar repetição.
+                </p>
+                <div className="space-y-2">
+                  {(editing.dicas ?? []).map((d, i) => (
+                    <div key={i} className="flex gap-2">
+                      <Textarea
+                        value={d}
+                        onChange={(e) => {
+                          const next = [...(editing.dicas ?? [])];
+                          next[i] = e.target.value;
+                          setEditing({ ...editing, dicas: next });
+                        }}
+                        rows={3}
+                        className="flex-1 text-sm"
+                        placeholder="Ex.: Tente incluir fibras em todas as refeições..."
+                      />
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() =>
+                          setEditing({
+                            ...editing,
+                            dicas: (editing.dicas ?? []).filter(
+                              (_, idx) => idx !== i,
+                            ),
+                          })
+                        }
+                      >
+                        <Trash2 className="size-3.5 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    setEditing({
+                      ...editing,
+                      dicas: [...(editing.dicas ?? []), ""],
+                    })
+                  }
+                  className="mt-2"
+                >
+                  <Plus className="size-3.5 mr-1" /> Adicionar dica
+                </Button>
+              </div>
+
+
               <div className="flex justify-end gap-2 pt-2">
                 <Button variant="ghost" onClick={() => setEditing(null)}>
                   Cancelar
