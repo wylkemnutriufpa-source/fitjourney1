@@ -907,15 +907,14 @@ function Landing() {
                 <BrandLockup
                   slot="landing-footer"
                   wordmarkAs={
-                    <button
-                      type="button"
-                      onClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+                    <Link
+                      to="/pacientes"
                       className="font-display font-bold bg-transparent border-0 p-0 cursor-pointer"
                     >
                       FitJourney
-                    </button>
+                    </Link>
                   }
-                  onLogoClick={() => import("@/components/IntroOverlay").then((m) => m.playIntro())}
+                  onLogoClick={() => { window.location.href = "/pacientes"; }}
                 />
               </div>
 
