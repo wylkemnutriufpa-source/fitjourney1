@@ -104,7 +104,10 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
         },
       });
       // pequeno delay para o efeito "wow"
-      setTimeout(() => setPhase("result"), 1200);
+      setTimeout(() => {
+        setPhase("result");
+        onComplete?.();
+      }, 1200);
     } catch (e: any) {
       setErr(e?.message ?? "Não conseguimos gerar seu diagnóstico agora.");
       setPhase("quiz");
