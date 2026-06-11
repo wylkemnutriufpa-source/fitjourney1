@@ -143,7 +143,7 @@ export function gerarDiagnostico(
   const primeiroNome = answers.nome.trim().split(" ")[0] || "tudo bem";
 
   return {
-    saudacao: `Olá ${primeiroNome}! Analisamos seu perfil com a Inteligência FitJourney.`,
+    saudacao: `Olá ${primeiroNome}! Analisamos seu perfil com o método clínico FitJourney.`,
     analisePeso,
     imc: Number(imc.toFixed(2)),
     pesoIdeal: Number(pesoIdeal.toFixed(1)),
