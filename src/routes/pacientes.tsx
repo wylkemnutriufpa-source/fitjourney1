@@ -31,7 +31,7 @@ export const Route = createFileRoute("/pacientes")({
       {
         name: "description",
         content:
-          "Planos alimentares clínicos personalizados feitos por IA + revisão humana do seu nutricionista. Prático, eficaz e feito para a sua vida real.",
+          "Planos alimentares clínicos personalizados feitos pelo nosso sistema inteligente + revisão humana do seu nutricionista. Prático, eficaz e feito para a sua vida real.",
       },
       { property: "og:title", content: "FitJourney — Transformação com Inteligência Nutricional" },
       {
