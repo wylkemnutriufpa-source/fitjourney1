@@ -140,9 +140,16 @@ export function gerarDiagnostico(
     nome: answers.nome.split(" ")[0],
   };
 
-  const dicas = ordenados
-    .filter((t) => t.slug !== imcSlug)
-    .map((t) => applyVars(pick(t.frases, rng), vars));
+  const semImc = ordenados.filter((t) => t.slug !== imcSlug);
+
+  const dicasDetalhadas: DicaDetalhada[] = semImc.map((t) => {
+    const frase = applyVars(pick(t.frases, rng), vars);
+    const dica =
+      t.dicas && t.dicas.length > 0 ? applyVars(pick(t.dicas, rng), vars) : null;
+    return { slug: t.slug, nome: t.nome, frase, dica };
+  });
+
+  const dicas = dicasDetalhadas.map((d) => d.frase);
 
   const imcTrigger = byslug(imcSlug);
   const analisePeso = imcTrigger
@@ -159,6 +166,7 @@ export function gerarDiagnostico(
     diferencaKg,
     classificacaoImc: classificacao,
     dicas,
+    dicasDetalhadas,
     triggersAcionados: ordenados.map((t) => t.slug),
     cta: "Pronto para destravar de verdade? Tenha um plano clínico completo, revisado por um nutricionista e acompanhamento no app FitJourney.",
   };
