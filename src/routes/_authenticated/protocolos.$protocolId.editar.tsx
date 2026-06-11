@@ -215,18 +215,7 @@ function ProtocolEditorPage() {
               {preview ? <Pencil className="size-3.5 mr-1.5" /> : <Eye className="size-3.5 mr-1.5" />}
               {preview ? "Voltar para edição" : "Visualizar"}
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() =>
-                printHTML({
-                  title: `${protocol.name} · Protocolo`,
-                  html: buildProtocolPrintHtml(protocol, modules, idx),
-                })
-              }
-            >
-              <Printer className="size-3.5 mr-1.5" /> PDF
-            </Button>
+            {/* PDF agora vive dentro do Plano Alimentar (em cada Fase, no viewer). */}
           </div>
           <h1
             className="text-xl sm:text-2xl font-bold uppercase text-[var(--gold)] tracking-tight break-words"
