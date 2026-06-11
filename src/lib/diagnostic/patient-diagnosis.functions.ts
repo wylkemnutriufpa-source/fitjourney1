@@ -143,7 +143,7 @@ export const getMyDiagnosis = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!patient) return null;
 
-    const { data: row } = await supabase
+    const { data: row } = await (supabase as any)
       .from("patient_diagnoses")
       .select("id, anamnesis_id, diagnosis, generated_at")
       .eq("patient_id", patient.id)
@@ -156,6 +156,6 @@ export const getMyDiagnosis = createServerFn({ method: "GET" })
       id: row.id as string,
       anamnesisId: row.anamnesis_id as string,
       generatedAt: row.generated_at as string,
-      diagnosis: row.diagnosis as Diagnosis,
+      diagnosis: row.diagnosis as unknown as Diagnosis,
     };
   });
