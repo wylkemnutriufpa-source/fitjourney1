@@ -85,7 +85,40 @@ function LeadsPage() {
             Contatos capturados pelo modal premium após a intro.{" "}
             <span className="font-medium text-foreground">{leads.length}</span> no total.
           </p>
+      </div>
+
+      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-mono uppercase tracking-widest text-primary mb-1">
+            Funil de diagnóstico
+          </p>
+          <p className="text-sm font-medium truncate">{getFunnelUrl()}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Compartilhe este link — cada conclusão gera um lead automaticamente.
+          </p>
         </div>
+        <div className="flex gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard.writeText(getFunnelUrl());
+              toast.success("Link copiado!");
+            }}
+            className="inline-flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-md border border-border bg-background hover:bg-muted transition"
+          >
+            <Copy className="size-3.5" /> Copiar
+          </button>
+          <a
+            href="/pacientes"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition"
+          >
+            <ExternalLink className="size-3.5" /> Abrir
+          </a>
+        </div>
+      </div>
+
         <button
           type="button"
           onClick={exportCsv}
