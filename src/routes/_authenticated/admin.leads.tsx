@@ -78,13 +78,22 @@ function LeadsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h2 className="text-lg font-semibold">Leads da landing page</h2>
           <p className="text-sm text-muted-foreground">
-            Contatos capturados pelo modal premium após a intro.{" "}
+            Contatos capturados pelo funil de diagnóstico.{" "}
             <span className="font-medium text-foreground">{leads.length}</span> no total.
           </p>
+        </div>
+        <button
+          type="button"
+          onClick={exportCsv}
+          disabled={leads.length === 0}
+          className="inline-flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-md border border-border hover:bg-muted transition disabled:opacity-50"
+        >
+          <Download className="size-3.5" /> Exportar CSV
+        </button>
       </div>
 
       <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -119,15 +128,6 @@ function LeadsPage() {
         </div>
       </div>
 
-        <button
-          type="button"
-          onClick={exportCsv}
-          disabled={leads.length === 0}
-          className="inline-flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-md border border-border hover:bg-muted transition disabled:opacity-50"
-        >
-          <Download className="size-3.5" /> Exportar CSV
-        </button>
-      </div>
 
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Carregando…</p>
