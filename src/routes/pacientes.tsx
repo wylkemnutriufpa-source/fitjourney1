@@ -265,7 +265,7 @@ function HowItWorks({ onCheckout }: { onCheckout: () => void }) {
     {
       icon: ClipboardCheck,
       title: "Anamnese Inteligente",
-      desc: "Responda um questionário rápido. A IFJ analisa cansaço, inchaço, compulsão, intestino, objetivos, rotina e restrições.",
+      desc: "Responda um questionário rápido. O nosso sistema inteligente analisa cansaço, inchaço, compulsão, intestino, objetivos, rotina e restrições.",
     },
     {
       icon: Brain,
