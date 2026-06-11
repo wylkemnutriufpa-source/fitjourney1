@@ -37,6 +37,8 @@ import {
 type LeadForm = { fullName: string; email: string; whatsapp: string };
 
 const TOTAL_STEPS = 5;
+const WHATSAPP_GROUP_INVITE_URL =
+  "https://chat.whatsapp.com/EeWyBhE9LDXCigseMT6ff1?s=cl&p=i&mlu=0&ilr=0&amv=1";
 
 const initialAnswers: QuizAnswers = {
   nome: "",
@@ -284,9 +286,7 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
               que seu número é real.
             </p>
             <a
-              href="https://chat.whatsapp.com/EeWyBhE9LDXCigseMT6ff1?s=cl&p=i&mlu=0&ilr=0&amv=1"
-              target="_blank"
-              rel="noopener noreferrer"
+              href={WHATSAPP_GROUP_INVITE_URL}
               className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold px-6 h-12 transition-colors shadow-lg shadow-[#25D366]/30"
             >
               <svg viewBox="0 0 32 32" className="size-5 fill-white" aria-hidden>
