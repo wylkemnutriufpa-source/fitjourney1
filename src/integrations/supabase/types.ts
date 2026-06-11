@@ -656,6 +656,61 @@ export type Database = {
           },
         ]
       }
+      patient_diagnoses: {
+        Row: {
+          anamnesis_id: string
+          created_at: string
+          diagnosis: Json
+          generated_at: string
+          id: string
+          nutritionist_id: string
+          patient_id: string
+          triggers_version: string | null
+        }
+        Insert: {
+          anamnesis_id: string
+          created_at?: string
+          diagnosis: Json
+          generated_at?: string
+          id?: string
+          nutritionist_id: string
+          patient_id: string
+          triggers_version?: string | null
+        }
+        Update: {
+          anamnesis_id?: string
+          created_at?: string
+          diagnosis?: Json
+          generated_at?: string
+          id?: string
+          nutritionist_id?: string
+          patient_id?: string
+          triggers_version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_diagnoses_anamnesis_id_fkey"
+            columns: ["anamnesis_id"]
+            isOneToOne: true
+            referencedRelation: "anamneses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_diagnoses_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_diagnoses_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_feedbacks: {
         Row: {
           abdomen_cm: number | null

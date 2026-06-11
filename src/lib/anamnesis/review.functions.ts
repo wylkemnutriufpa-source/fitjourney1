@@ -12,6 +12,7 @@ import { loadCatalog } from "@/lib/anamnesis/v2/catalog/loader";
 import { toCanonical } from "@/lib/anamnesis/v2/to-canonical";
 import type { Answers } from "@/lib/anamnesis/v2/catalog/types";
 import { generateDraftPlanFromApproval } from "@/lib/plans/draft-auto-plan";
+import { generatePatientDiagnosisFromAnamnesisId } from "@/lib/diagnostic/patient-diagnosis.functions";
 
 // ---------------- getMyLatestAnamnesisSummary ----------------
 // Paciente. SEMPRE retorna a última versão APROVADA. Nunca submitted/draft.
@@ -386,6 +387,19 @@ export const reviewAnamnesis = createServerFn({ method: "POST" })
         }
       } catch (e) {
         console.error("[reviewAnamnesis] draft auto-plan threw:", e);
+      }
+
+      // Geração do Diagnóstico Clínico Personalizado (snapshot imutável).
+      // Best-effort: NUNCA bloqueia a aprovação.
+      try {
+        const diagOutcome = await generatePatientDiagnosisFromAnamnesisId(data.anamnesisId);
+        if (!diagOutcome.ok) {
+          console.warn("[reviewAnamnesis] patient diagnosis skipped:", diagOutcome.reason);
+        } else {
+          console.info("[reviewAnamnesis] patient diagnosis generated:", diagOutcome.id);
+        }
+      } catch (e) {
+        console.error("[reviewAnamnesis] patient diagnosis threw:", e);
       }
     }
 
