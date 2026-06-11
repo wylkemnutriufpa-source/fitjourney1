@@ -194,7 +194,7 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
         <div className="absolute bottom-[-20%] right-[-10%] w-[55%] h-[55%] rounded-full bg-[var(--gold,oklch(0.78_0.13_85))]/15 blur-[120px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24 grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
         <motion.div
           className="min-w-0 w-full"
           initial={{ opacity: 0, y: 24 }}
