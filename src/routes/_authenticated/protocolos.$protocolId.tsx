@@ -903,6 +903,49 @@ function EditPhaseButton({
   );
 }
 
+function PhaseShareButtons({
+  protocol,
+  module: m,
+  phase,
+}: {
+  protocol: ProtocolDescriptor;
+  module: ProtocolModule;
+  phase: ProtocolPhase;
+}) {
+  const [shareOpen, setShareOpen] = useState(false);
+  const template = useMemo(
+    () => protocolPhaseToPlannerTemplate(protocol, m, phase),
+    [protocol, m, phase],
+  );
+  const printHtml = useMemo(() => templateToPrintHtml(template), [template]);
+  const whatsText = useMemo(() => templateToWhatsText(template), [template]);
+  return (
+    <>
+      <Button
+        variant="outline"
+        onClick={() => printHTML({ title: template.name, html: printHtml })}
+      >
+        <Printer className="size-4" />
+        PDF
+      </Button>
+      <Button
+        onClick={() => setShareOpen(true)}
+        className="bg-[#25D366] hover:bg-[#1ebe57] text-white"
+      >
+        <MessageCircle className="size-4" />
+        WhatsApp
+      </Button>
+      <SendShareDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title={`Enviar "${phase.name}" via WhatsApp`}
+        defaultMessage={whatsText}
+        printHtml={printHtml}
+      />
+    </>
+  );
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
