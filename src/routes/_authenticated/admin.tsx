@@ -25,6 +25,7 @@ function AdminLayout() {
     { to: "/admin/pacientes", label: "Pacientes" },
     { to: "/admin/leads", label: "Leads" },
     { to: "/admin/diagnostico", label: "Diagnóstico" },
+    { to: "/admin/diagnostico-preview", label: "Preview Diagnóstico" },
     { to: "/admin/landing", label: "Landing Page" },
     { to: "/admin/logos", label: "Logos" },
     { to: "/admin/settings", label: "Checkout" },
