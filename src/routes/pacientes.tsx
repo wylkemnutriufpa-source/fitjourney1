@@ -194,8 +194,9 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
         <div className="absolute bottom-[-20%] right-[-10%] w-[55%] h-[55%] rounded-full bg-[var(--gold,oklch(0.78_0.13_85))]/15 blur-[120px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 grid lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-10 lg:gap-12 items-center">
         <motion.div
+          className="min-w-0 w-full"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -203,9 +204,9 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-xs font-medium text-primary mb-5">
             <Sparkles className="w-3.5 h-3.5" /> Inteligência FitJourney (IFJ)
           </span>
-          <h1 className="text-[clamp(1.75rem,8vw,3.75rem)] sm:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight break-words">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight [overflow-wrap:anywhere] hyphens-auto">
             Transforme sua saúde de verdade com a{" "}
-            <span className="bg-gradient-to-r from-primary to-[var(--gold,oklch(0.78_0.13_85))] bg-clip-text text-transparent break-words">
+            <span className="bg-gradient-to-r from-primary to-[var(--gold,oklch(0.78_0.13_85))] bg-clip-text text-transparent">
               Inteligência FitJourney
             </span>
           </h1>
@@ -227,7 +228,7 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
         {/* Mini formulário de captura */}
         <motion.div
           id="funil"
-          className="scroll-mt-24"
+          className="scroll-mt-24 min-w-0 w-full"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
