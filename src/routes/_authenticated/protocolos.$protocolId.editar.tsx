@@ -253,6 +253,48 @@ function ProtocolEditorPage() {
   );
 }
 
+function buildProtocolPrintHtml(
+  protocol: ProtocolDescriptor,
+  modules: ReadonlyArray<ProtocolModule>,
+  idx: ReturnType<typeof indexOverrides>,
+) {
+  const tips = mergeGoldenTips(getGoldenTipsFor(protocol.id), idx);
+  const tipItems = tips
+    .map((t) => `<li><strong>${escapeHtml(t.emoji ? `${t.emoji} ${t.title}` : t.title)}</strong>${t.objective ? ` — ${escapeHtml(t.objective)}` : ""}</li>`)
+    .join("");
+
+  const moduleBlocks = modules
+    .map((mod) => {
+      const merged = mergeModule(mod, idx);
+      const phases = merged.phases
+        .map((phase) => {
+          const strategies = phase.recommendations.strategies ?? [];
+          const teas = phase.teaSchedule?.length
+            ? phase.teaSchedule.map((tea) => [tea.emoji, tea.name, tea.time, tea.quantity, tea.timesPerDay].filter(Boolean).join(" · "))
+            : phase.recommendations.teaRoutine ?? [];
+          const meals = phase.meals ?? [];
+
+          return `<section class="meal">
+            <h3>${escapeHtml(phase.name)}</h3>
+            <p>${escapeHtml(phase.description)}</p>
+            <p class="meta">${phase.durationWeeks} semanas${phase.dailyKcalTarget ? ` · ${phase.dailyKcalTarget} kcal/dia` : ""} · ${(phase.recommendations.waterMl / 1000).toFixed(1)}L água · ${phase.recommendations.sleepHours}h sono</p>
+            ${phase.macros ? `<p><strong>Macros:</strong> Proteína ${phase.macros.protein}% · Carbo ${phase.macros.carb}% · Gordura ${phase.macros.fat}%</p>` : ""}
+            ${strategies.length ? `<h3>Estratégias-chave</h3><ul>${strategies.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>` : ""}
+            ${teas.length ? `<h3>Rotina de chás</h3><ul>${teas.map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>` : ""}
+            ${meals.length ? `<h3>Cardápio</h3>${meals.map((meal) => `<div class="meal"><div class="meal-h"><span>${escapeHtml(meal.name)}</span><span class="meal-time">${escapeHtml(meal.time)}</span></div><ul>${meal.items.map((item) => `<li>${escapeHtml(item.name)} — ${escapeHtml(item.householdMeasure)} · ${item.quantityG}g · ${item.kcal} kcal</li>`).join("")}</ul></div>`).join("")}` : ""}
+          </section>`;
+        })
+        .join("");
+      return `<h2>${escapeHtml(merged.name)}</h2>${merged.tagline ? `<p>${escapeHtml(merged.tagline)}</p>` : ""}${phases}`;
+    })
+    .join("");
+
+  return `<h1>${escapeHtml(protocol.name)}</h1>
+    <p class="meta">${escapeHtml(protocol.tagline)}</p>
+    ${tipItems ? `<h2>Dicas de Ouro</h2><ul>${tipItems}</ul>` : ""}
+    ${moduleBlocks}`;
+}
+
 // =============================================================================
 // PREVIEW
 // =============================================================================
