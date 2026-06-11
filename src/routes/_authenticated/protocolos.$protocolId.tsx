@@ -846,9 +846,12 @@ function PhaseDetailsDialog({
           {/* Cardápio */}
           {phase.meals && phase.meals.length > 0 && (
             <Section title="Cardápio do Dia">
-              <p className="text-[11px] text-muted-foreground mb-2">
-                Clique em uma refeição para ver os alimentos, e em um alimento para ver as substituições.
-              </p>
+              <div className="flex items-start justify-between gap-2 -mt-1 mb-2">
+                <p className="text-[11px] text-muted-foreground">
+                  Clique em uma refeição para ver os alimentos, e em um alimento para ver as substituições.
+                </p>
+                <PhasePdfButton protocol={protocol} module={m} phase={phase} />
+              </div>
               <div className="space-y-2">
                 {phase.meals.map((meal) => (
                   <PreviewMealCard key={meal.id} meal={meal} />
