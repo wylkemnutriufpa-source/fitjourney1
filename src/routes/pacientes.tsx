@@ -159,6 +159,8 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
 
         {/* Mini formulário de captura */}
         <motion.div
+          id="funil"
+          className="scroll-mt-24"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
