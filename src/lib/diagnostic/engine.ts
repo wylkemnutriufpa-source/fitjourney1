@@ -97,6 +97,7 @@ export function gerarDiagnostico(
     ["diabetes", answers.condicoes.includes("diabetes")],
     ["tireoide", answers.condicoes.includes("tireoide")],
     ["sop_insulina", answers.condicoes.includes("sop")],
+    ["gastrite_refluxo", answers.condicoes.includes("gastrite_refluxo")],
     [
       "intestino_inchaco",
       answers.condicoes.includes("intestino") || answers.queixas.includes("inchaco"),
@@ -109,6 +110,9 @@ export function gerarDiagnostico(
     ["sedentarismo", answers.atividadeFisica === "sedentario"],
     ["sono_ruim", answers.sono === "menos_6h" || answers.sono === "6a7h"],
     ["refeicoes_poucas", answers.refeicoesPorDia === "menos_3"],
+    ["objetivo_emagrecer", answers.objetivo === "emagrecer"],
+    ["objetivo_ganhar_massa", answers.objetivo === "ganhar_massa"],
+    ["objetivo_energia", answers.objetivo === "energia"],
   ];
 
   for (const [slug, ativou] of matriz) {
