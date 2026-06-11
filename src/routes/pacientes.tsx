@@ -76,6 +76,10 @@ function PacientesPage() {
           )}
           <a
             href={WHATSAPP_GROUP_INVITE_URL}
+            onClick={(event) => {
+              event.preventDefault();
+              window.location.assign(WHATSAPP_GROUP_INVITE_URL);
+            }}
             className="inline-flex items-center justify-center gap-1.5 rounded-full px-3 sm:px-4 py-2 text-[11px] sm:text-sm font-semibold transition-all hover:scale-[1.03] bg-[var(--gold,oklch(0.78_0.13_85))] text-background shadow-[0_8px_24px_-8px_oklch(0.78_0.13_85/0.7)] whitespace-nowrap"
           >
             <span className="hidden sm:inline">Iniciar meu acompanhamento</span>
