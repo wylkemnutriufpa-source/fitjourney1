@@ -174,7 +174,7 @@ function AdminDiagnosticoPage() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {t.frases.length} frase{t.frases.length !== 1 ? "s" : ""}
+                      {t.frases.length} frase{t.frases.length !== 1 ? "s" : ""} · {t.dicas?.length ?? 0} dica{(t.dicas?.length ?? 0) !== 1 ? "s" : ""}
                     </p>
                   </div>
                   <div className="flex gap-1">
