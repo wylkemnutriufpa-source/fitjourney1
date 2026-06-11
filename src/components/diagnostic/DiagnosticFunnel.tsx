@@ -257,6 +257,58 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
           </motion.div>
         )}
 
+        {phase === "whatsapp_gate" && (
+          <motion.div
+            key="whatsapp_gate"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.35 }}
+            className="py-6 text-center"
+          >
+            <div className="mx-auto size-16 rounded-full bg-[#25D366]/15 flex items-center justify-center mb-4">
+              <svg viewBox="0 0 32 32" className="size-8 fill-[#25D366]" aria-hidden>
+                <path d="M19.11 17.21c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.59-1.5-1.86-.16-.27-.02-.42.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.02-.22-.53-.45-.46-.61-.47l-.52-.01c-.18 0-.48.07-.73.34s-.96.94-.96 2.29.98 2.66 1.12 2.84c.14.18 1.94 2.96 4.7 4.15.66.28 1.17.45 1.57.58.66.21 1.26.18 1.74.11.53-.08 1.6-.65 1.83-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32zM16.03 5.33c-5.9 0-10.7 4.8-10.7 10.7 0 1.88.49 3.72 1.43 5.34l-1.51 5.52 5.65-1.48a10.7 10.7 0 0 0 5.13 1.31h.01c5.9 0 10.7-4.8 10.7-10.7s-4.8-10.69-10.71-10.69zm0 19.59h-.01c-1.59 0-3.15-.43-4.5-1.24l-.32-.19-3.35.88.89-3.27-.21-.34a8.9 8.9 0 1 1 16.45-4.73c0 4.91-3.99 8.89-8.95 8.89z"/>
+              </svg>
+            </div>
+            <p className="text-xs font-mono uppercase tracking-widest text-primary mb-2">
+              Falta 1 passo
+            </p>
+            <h3 className="text-2xl font-bold tracking-tight">
+              Você está quase lá, {lead.fullName.split(" ")[0] || "tudo certo"}!
+            </h3>
+            <p className="text-sm text-muted-foreground mt-3 max-w-md mx-auto leading-relaxed">
+              Entre no nosso grupo de <strong>Dicas Diárias no WhatsApp</strong> para
+              receber seu diagnóstico completo e validar seu cadastro. É lá que
+              enviamos as orientações personalizadas todos os dias.
+            </p>
+            <a
+              href="https://chat.whatsapp.com/EeWyBhE9LDXCigseMT6ff1?s=cl&p=i&mlu=0&ilr=0&amv=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold px-6 h-12 transition-colors shadow-lg shadow-[#25D366]/30"
+            >
+              <svg viewBox="0 0 32 32" className="size-5 fill-white" aria-hidden>
+                <path d="M19.11 17.21c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.59-1.5-1.86-.16-.27-.02-.42.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.02-.22-.53-.45-.46-.61-.47l-.52-.01c-.18 0-.48.07-.73.34s-.96.94-.96 2.29.98 2.66 1.12 2.84c.14.18 1.94 2.96 4.7 4.15.66.28 1.17.45 1.57.58.66.21 1.26.18 1.74.11.53-.08 1.6-.65 1.83-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32zM16.03 5.33c-5.9 0-10.7 4.8-10.7 10.7 0 1.88.49 3.72 1.43 5.34l-1.51 5.52 5.65-1.48a10.7 10.7 0 0 0 5.13 1.31h.01c5.9 0 10.7-4.8 10.7-10.7s-4.8-10.69-10.71-10.69z"/>
+              </svg>
+              Entrar no grupo agora
+            </a>
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => setPhase("result")}
+                className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
+              >
+                Já entrei no grupo, ver meu diagnóstico
+              </button>
+            </div>
+            <p className="text-[11px] text-muted-foreground/70 mt-6 max-w-sm mx-auto">
+              Confirmamos seu WhatsApp para garantir que você receba o
+              acompanhamento nutricional especializado no canal certo.
+            </p>
+          </motion.div>
+        )}
+
         {phase === "result" && diagnosis && (
           <DiagnosisResult diagnosis={diagnosis} onCheckout={onCheckout} />
         )}
