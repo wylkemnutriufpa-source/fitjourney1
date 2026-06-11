@@ -105,7 +105,7 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
       });
       // pequeno delay para o efeito "wow"
       setTimeout(() => {
-        setPhase("result");
+        setPhase("whatsapp_gate");
         onComplete?.();
       }, 1200);
     } catch (e: any) {
