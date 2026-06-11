@@ -24,6 +24,14 @@ export interface TriggerRow {
   prioridade: number;
   ativo: boolean;
   frases: string[];
+  dicas?: string[];
+}
+
+export interface DicaDetalhada {
+  slug: string;
+  nome: string;
+  frase: string;
+  dica: string | null;
 }
 
 export interface Diagnosis {
