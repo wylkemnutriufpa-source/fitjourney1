@@ -14,6 +14,7 @@ import {
   Save,
   Eye,
   Pencil,
+  Printer,
   Plus,
   Trash2,
   Leaf,
@@ -52,6 +53,7 @@ import { getGoldenTipsFor } from "@/lib/protocols/golden-tips";
 import { ProtocolPhaseSections } from "@/components/protocols/ProtocolPhaseSections";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/lib/auth-context";
+import { escapeHtml, printHTML } from "@/lib/share-utils";
 
 // Helper: move item in array (immutable)
 function reorder<T>(arr: ReadonlyArray<T>, from: number, to: number): T[] {
@@ -212,6 +214,18 @@ function ProtocolEditorPage() {
             >
               {preview ? <Pencil className="size-3.5 mr-1.5" /> : <Eye className="size-3.5 mr-1.5" />}
               {preview ? "Voltar para edição" : "Visualizar"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                printHTML({
+                  title: `${protocol.name} · Protocolo`,
+                  html: buildProtocolPrintHtml(protocol, modules, idx),
+                })
+              }
+            >
+              <Printer className="size-3.5 mr-1.5" /> PDF
             </Button>
           </div>
           <h1
