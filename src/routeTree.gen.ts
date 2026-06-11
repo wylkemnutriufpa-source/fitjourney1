@@ -64,6 +64,7 @@ import { Route as AuthenticatedAdminPacientesRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminLogosRouteImport } from './routes/_authenticated/admin.logos'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminLandingRouteImport } from './routes/_authenticated/admin.landing'
+import { Route as AuthenticatedAdminDiagnosticoPreviewRouteImport } from './routes/_authenticated/admin.diagnostico-preview'
 import { Route as AuthenticatedAdminDiagnosticoRouteImport } from './routes/_authenticated/admin.diagnostico'
 import { Route as AuthenticatedPatientsIdIndexRouteImport } from './routes/_authenticated/patients/$id/index'
 import { Route as AuthenticatedProtocolosProtocolIdEditarRouteImport } from './routes/_authenticated/protocolos.$protocolId.editar'
@@ -371,6 +372,12 @@ const AuthenticatedAdminLandingRoute =
     path: '/landing',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminDiagnosticoPreviewRoute =
+  AuthenticatedAdminDiagnosticoPreviewRouteImport.update({
+    id: '/diagnostico-preview',
+    path: '/diagnostico-preview',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminDiagnosticoRoute =
   AuthenticatedAdminDiagnosticoRouteImport.update({
     id: '/diagnostico',
@@ -431,6 +438,7 @@ export interface FileRoutesByFullPath {
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/admin/diagnostico': typeof AuthenticatedAdminDiagnosticoRoute
+  '/admin/diagnostico-preview': typeof AuthenticatedAdminDiagnosticoPreviewRoute
   '/admin/landing': typeof AuthenticatedAdminLandingRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logos': typeof AuthenticatedAdminLogosRoute
@@ -491,6 +499,7 @@ export interface FileRoutesByTo {
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/admin/diagnostico': typeof AuthenticatedAdminDiagnosticoRoute
+  '/admin/diagnostico-preview': typeof AuthenticatedAdminDiagnosticoPreviewRoute
   '/admin/landing': typeof AuthenticatedAdminLandingRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/logos': typeof AuthenticatedAdminLogosRoute
@@ -554,6 +563,7 @@ export interface FileRoutesById {
   '/signup/nutritionist': typeof SignupNutritionistRoute
   '/signup/patient': typeof SignupPatientRoute
   '/_authenticated/admin/diagnostico': typeof AuthenticatedAdminDiagnosticoRoute
+  '/_authenticated/admin/diagnostico-preview': typeof AuthenticatedAdminDiagnosticoPreviewRoute
   '/_authenticated/admin/landing': typeof AuthenticatedAdminLandingRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/_authenticated/admin/logos': typeof AuthenticatedAdminLogosRoute
@@ -617,6 +627,7 @@ export interface FileRouteTypes {
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/admin/diagnostico'
+    | '/admin/diagnostico-preview'
     | '/admin/landing'
     | '/admin/leads'
     | '/admin/logos'
@@ -677,6 +688,7 @@ export interface FileRouteTypes {
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/admin/diagnostico'
+    | '/admin/diagnostico-preview'
     | '/admin/landing'
     | '/admin/leads'
     | '/admin/logos'
@@ -739,6 +751,7 @@ export interface FileRouteTypes {
     | '/signup/nutritionist'
     | '/signup/patient'
     | '/_authenticated/admin/diagnostico'
+    | '/_authenticated/admin/diagnostico-preview'
     | '/_authenticated/admin/landing'
     | '/_authenticated/admin/leads'
     | '/_authenticated/admin/logos'
@@ -1177,6 +1190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLandingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/diagnostico-preview': {
+      id: '/_authenticated/admin/diagnostico-preview'
+      path: '/diagnostico-preview'
+      fullPath: '/admin/diagnostico-preview'
+      preLoaderRoute: typeof AuthenticatedAdminDiagnosticoPreviewRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/diagnostico': {
       id: '/_authenticated/admin/diagnostico'
       path: '/diagnostico'
@@ -1217,6 +1237,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDiagnosticoRoute: typeof AuthenticatedAdminDiagnosticoRoute
+  AuthenticatedAdminDiagnosticoPreviewRoute: typeof AuthenticatedAdminDiagnosticoPreviewRoute
   AuthenticatedAdminLandingRoute: typeof AuthenticatedAdminLandingRoute
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
   AuthenticatedAdminLogosRoute: typeof AuthenticatedAdminLogosRoute
@@ -1227,6 +1248,8 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDiagnosticoRoute: AuthenticatedAdminDiagnosticoRoute,
+  AuthenticatedAdminDiagnosticoPreviewRoute:
+    AuthenticatedAdminDiagnosticoPreviewRoute,
   AuthenticatedAdminLandingRoute: AuthenticatedAdminLandingRoute,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
   AuthenticatedAdminLogosRoute: AuthenticatedAdminLogosRoute,
