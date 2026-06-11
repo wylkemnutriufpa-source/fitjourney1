@@ -111,9 +111,10 @@ function PacientesPage() {
 /* ════════════════════════════════════════════════════
    HERO
    ════════════════════════════════════════════════════ */
-function HeroSection({ onCheckout }: { onCheckout: () => void }) {
+function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQuizDone: () => void }) {
   return (
     <section className="relative overflow-hidden">
+
       {/* glow background */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-primary/15 blur-[120px]" />
