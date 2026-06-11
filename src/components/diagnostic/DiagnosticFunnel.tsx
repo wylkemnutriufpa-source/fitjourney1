@@ -287,8 +287,6 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
             </p>
             <a
               href={WHATSAPP_GROUP_INVITE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold px-6 h-12 transition-colors shadow-lg shadow-[#25D366]/30"
             >
               <svg viewBox="0 0 32 32" className="size-5 fill-white" aria-hidden>
