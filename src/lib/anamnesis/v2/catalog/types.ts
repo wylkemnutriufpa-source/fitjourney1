@@ -27,10 +27,11 @@ export interface Option {
 
 export interface Trigger {
   // Renderiza pergunta se TODAS as condições baterem.
-  // Cada condição: { questionId, equals } (ou includes p/ multi_choice)
+  // Cada condição: { questionId, equals } (ou includes p/ multi_choice, in p/ qualquer um da lista)
   all?: Array<
     | { questionId: string; equals: AnswerValue }
     | { questionId: string; includes: string }
+    | { questionId: string; in: string[] }
     | { questionId: string; truthy: true }
   >;
 }
