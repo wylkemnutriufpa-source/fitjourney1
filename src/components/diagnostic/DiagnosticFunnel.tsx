@@ -419,8 +419,8 @@ function Step4({ answers, setAnswers }: StepProps) {
     { id: "tireoide", label: "Problemas de tireoide", icon: Sparkles },
     { id: "sop", label: "SOP / resistência à insulina", icon: Target },
     { id: "intestino", label: "Intestino preso / inchaço", icon: Wind },
+    { id: "gastrite_refluxo", label: "Gastrite ou refluxo", icon: Flame },
     { id: "compulsao", label: "Compulsão / ansiedade", icon: Frown },
-  ];
   return (
     <div className="space-y-4">
       <Header
