@@ -145,6 +145,7 @@ const upsertSchema = z.object({
   prioridade: z.number().int().min(0).max(100),
   ativo: z.boolean(),
   frases: z.array(z.string().trim().min(3).max(500)).min(1).max(10),
+  dicas: z.array(z.string().trim().min(3).max(800)).max(10).default([]),
 });
 
 export const adminUpsertTrigger = createServerFn({ method: "POST" })
@@ -152,28 +153,24 @@ export const adminUpsertTrigger = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => upsertSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    const payload = {
+      slug: data.slug,
+      nome: data.nome,
+      prioridade: data.prioridade,
+      ativo: data.ativo,
+      frases: data.frases,
+      dicas: data.dicas ?? [],
+    };
     if (data.id) {
       const { error } = await context.supabase
         .from("diagnostic_triggers")
-        .update({
-          slug: data.slug,
-          nome: data.nome,
-          prioridade: data.prioridade,
-          ativo: data.ativo,
-          frases: data.frases,
-        })
+        .update(payload)
         .eq("id", data.id);
       if (error) throw new Error(error.message);
     } else {
       const { error } = await context.supabase
         .from("diagnostic_triggers")
-        .insert({
-          slug: data.slug,
-          nome: data.nome,
-          prioridade: data.prioridade,
-          ativo: data.ativo,
-          frases: data.frases,
-        });
+        .insert(payload);
       if (error) throw new Error(error.message);
     }
     return { ok: true as const };
