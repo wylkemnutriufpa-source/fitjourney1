@@ -338,14 +338,14 @@ function IFJSection() {
         <div>
           <p className="text-sm font-semibold text-primary uppercase tracking-wider">Inteligência FitJourney</p>
           <h2 className="text-3xl sm:text-4xl font-bold mt-2 leading-tight">
-            A IA mais avançada em{" "}
+            O sistema inteligente mais avançado em{" "}
             <span className="bg-gradient-to-r from-primary to-[var(--gold,oklch(0.78_0.13_85))] bg-clip-text text-transparent">
               nutrição clínica
             </span>{" "}
             do Brasil
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Combinamos inteligência artificial treinada em milhares de casos
+            Combinamos um sistema inteligente treinado em milhares de casos
             clínicos com a sensibilidade humana do seu nutricionista.
           </p>
         </div>
