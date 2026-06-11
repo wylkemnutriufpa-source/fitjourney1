@@ -23,6 +23,13 @@ import { createLead } from "@/lib/landing/leads.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DiagnosticFunnel } from "@/components/diagnostic/DiagnosticFunnel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/pacientes")({
   head: () => ({
