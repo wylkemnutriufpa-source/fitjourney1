@@ -74,9 +74,9 @@ function PacientesPage() {
           <button
             type="button"
             onClick={() => setCheckoutOpen(true)}
-            className="hidden sm:inline-flex items-center gap-1.5 gradient-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-semibold shadow-[0_8px_24px_-8px_oklch(0.62_0.16_155/0.7)] hover:scale-[1.03] transition-all"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all hover:scale-[1.03] bg-[var(--gold,oklch(0.78_0.13_85))] text-background shadow-[0_8px_24px_-8px_oklch(0.78_0.13_85/0.7)]"
           >
-            Quero meu plano <ArrowRight className="w-3.5 h-3.5" />
+            Iniciar meu acompanhamento <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </nav>
