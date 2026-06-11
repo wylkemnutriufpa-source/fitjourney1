@@ -75,7 +75,9 @@ export async function generatePatientDiagnosisFromAnamnesisId(
     .sort()
     .join(",");
 
-  const { data: inserted, error: iErr } = await supabaseAdmin
+  if (!ana.nutritionist_id) return { ok: false, reason: "PATIENT_HAS_NO_NUTRITIONIST" };
+
+  const { data: inserted, error: iErr } = await (supabaseAdmin as any)
     .from("patient_diagnoses")
     .insert({
       patient_id: ana.patient_id,
