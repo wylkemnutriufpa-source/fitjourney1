@@ -272,15 +272,16 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
               </svg>
             </div>
             <p className="text-xs font-mono uppercase tracking-widest text-primary mb-2">
-              Falta 1 passo
+              Falta 1 passo antes do diagnóstico
             </p>
             <h3 className="text-2xl font-bold tracking-tight">
-              Você está quase lá, {lead.fullName.split(" ")[0] || "tudo certo"}!
+              Confirme seu WhatsApp, {lead.fullName.split(" ")[0] || "tudo certo"}!
             </h3>
             <p className="text-sm text-muted-foreground mt-3 max-w-md mx-auto leading-relaxed">
-              Entre no nosso grupo de <strong>Dicas Diárias no WhatsApp</strong> para
-              receber seu diagnóstico completo e validar seu cadastro. É lá que
-              enviamos as orientações personalizadas todos os dias.
+              Para liberar o questionário e seu diagnóstico, entre no nosso grupo
+              de <strong>Dicas Diárias no WhatsApp</strong>. É lá que enviamos
+              orientações nutricionais todos os dias — e é assim que confirmamos
+              que seu número é real.
             </p>
             <a
               href="https://chat.whatsapp.com/EeWyBhE9LDXCigseMT6ff1?s=cl&p=i&mlu=0&ilr=0&amv=1"
@@ -296,15 +297,15 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
             <div className="mt-4">
               <button
                 type="button"
-                onClick={() => setPhase("result")}
+                onClick={() => setPhase("quiz")}
                 className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
               >
-                Já entrei no grupo, ver meu diagnóstico
+                Já entrei no grupo, liberar questionário
               </button>
             </div>
             <p className="text-[11px] text-muted-foreground/70 mt-6 max-w-sm mx-auto">
-              Confirmamos seu WhatsApp para garantir que você receba o
-              acompanhamento nutricional especializado no canal certo.
+              Sem confirmação do WhatsApp, não conseguimos enviar seu plano nem
+              o acompanhamento nutricional especializado.
             </p>
           </motion.div>
         )}
