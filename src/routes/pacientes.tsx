@@ -31,8 +31,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const WHATSAPP_GROUP_INVITE_URL =
-  "https://chat.whatsapp.com/EeWyBhE9LDXCigseMT6ff1?s=cl&p=i&mlu=0&ilr=0&amv=1";
+const PROFESSIONAL_INVITE_SLUG = "dr-wylkem-kleyton";
+const PROFESSIONAL_WHATSAPP_URL =
+  "https://wa.me/5591980124814?text=Ol%C3%A1%2C%20quero%20iniciar%20meu%20acompanhamento%20nutricional.";
 
 export const Route = createFileRoute("/pacientes")({
   head: () => ({
@@ -56,6 +57,7 @@ export const Route = createFileRoute("/pacientes")({
 
 function PacientesPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [startOptionsOpen, setStartOptionsOpen] = useState(false);
   const [quizDone, setQuizDone] = useState(false);
 
   return (
@@ -74,14 +76,15 @@ function PacientesPage() {
               <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
             </div>
           )}
-          <a
-            href="/pacientes#funil"
+          <button
+            type="button"
+            onClick={() => setStartOptionsOpen(true)}
             className="inline-flex items-center justify-center gap-1.5 rounded-full px-3 sm:px-4 py-2 text-[11px] sm:text-sm font-semibold transition-all hover:scale-[1.03] bg-[var(--gold,oklch(0.78_0.13_85))] text-background shadow-[0_8px_24px_-8px_oklch(0.78_0.13_85/0.7)] whitespace-nowrap"
           >
             <span className="hidden sm:inline">Iniciar meu acompanhamento</span>
             <span className="sm:hidden">Iniciar</span>
             <ArrowRight className="w-3.5 h-3.5" />
-          </a>
+          </button>
         </div>
       </nav>
 
@@ -115,7 +118,66 @@ function PacientesPage() {
         onOpenChange={setCheckoutOpen}
         audience="patient"
       />
+
+      <StartOptionsDialog
+        open={startOptionsOpen}
+        onOpenChange={setStartOptionsOpen}
+      />
     </div>
+  );
+}
+
+function StartOptionsDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md backdrop-blur-2xl bg-background/80 border-white/15 shadow-[0_24px_64px_-16px_rgba(0,0,0,0.5)]">
+        <DialogHeader>
+          <DialogTitle className="text-center text-xl">
+            Como você quer começar?
+          </DialogTitle>
+          <DialogDescription className="text-center pt-1">
+            Escolha falar no WhatsApp ou preencher a anamnese pelo convite direto do profissional.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-3 pt-2">
+          <a
+            href={PROFESSIONAL_WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-2xl border border-primary/25 bg-primary/10 p-4 text-left transition hover:bg-primary/15"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+              <MessageCircle className="size-5" />
+            </span>
+            <span>
+              <span className="block font-semibold text-foreground">Falar no WhatsApp</span>
+              <span className="block text-sm text-muted-foreground">Tire dúvidas e combine o início do acompanhamento.</span>
+            </span>
+          </a>
+
+          <Link
+            to="/c/$slug"
+            params={{ slug: PROFESSIONAL_INVITE_SLUG }}
+            className="flex items-center gap-3 rounded-2xl border border-[var(--gold,oklch(0.78_0.13_85))]/35 bg-[var(--gold,oklch(0.78_0.13_85))]/10 p-4 text-left transition hover:bg-[var(--gold,oklch(0.78_0.13_85))]/15"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--gold,oklch(0.78_0.13_85))] text-background">
+              <ClipboardCheck className="size-5" />
+            </span>
+            <span>
+              <span className="block font-semibold text-foreground">Iniciar minha anamnese</span>
+              <span className="block text-sm text-muted-foreground">Abra o cadastro direto pelo link de convite profissional.</span>
+            </span>
+          </Link>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
