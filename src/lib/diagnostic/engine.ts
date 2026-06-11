@@ -42,6 +42,7 @@ export interface Diagnosis {
   diferencaKg: number;
   classificacaoImc: "baixo" | "ideal" | "sobrepeso" | "obesidade";
   dicas: string[];
+  dicasDetalhadas: DicaDetalhada[];
   triggersAcionados: string[];
   cta: string;
 }
