@@ -939,6 +939,7 @@ function PhaseShareButtons({
         open={shareOpen}
         onOpenChange={setShareOpen}
         title={`Enviar "${phase.name}" via WhatsApp`}
+        printTitle={template.name}
         defaultMessage={whatsText}
         printHtml={printHtml}
       />
