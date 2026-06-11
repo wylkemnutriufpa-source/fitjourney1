@@ -134,8 +134,8 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
               Descubra em 3 minutos como está sua saúde nutricional
             </h3>
             <p className="text-sm text-muted-foreground mt-1.5">
-              Responda nosso questionário inteligente e receba um diagnóstico
-              personalizado elaborado pela Inteligência FitJourney (IFJ).
+              Responda nosso questionário rápido e receba uma análise clínica
+              personalizada feita pelo método FitJourney.
             </p>
 
             <form onSubmit={handleLead} className="mt-5 space-y-3">
