@@ -154,19 +154,7 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <button
-              type="button"
-              onClick={onCheckout}
-              className="inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground rounded-full px-6 py-3.5 text-base font-semibold shadow-[0_12px_32px_-8px_oklch(0.62_0.16_155/0.7)] hover:scale-[1.03] active:scale-[0.98] transition-all"
-            >
-              Quero meu plano personalizado agora <ArrowRight className="w-4 h-4" />
-            </button>
-            <a
-              href="#como"
-              className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-medium border border-border hover:bg-muted/40 transition-colors"
-            >
-              Conheça como funciona →
-            </a>
+            <DiagnosisExplainerButton />
           </div>
         </motion.div>
 
