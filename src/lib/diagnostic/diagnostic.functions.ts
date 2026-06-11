@@ -9,6 +9,7 @@ export type TriggerDTO = {
   prioridade: number;
   ativo: boolean;
   frases: string[];
+  dicas: string[];
 };
 
 const anonSchema = z.object({
@@ -39,13 +40,13 @@ export const listActiveTriggers = createServerFn({ method: "GET" })
     const anon = await anonClient();
     const { data, error } = await anon
       .from("diagnostic_triggers")
-      .select("id, slug, nome, prioridade, ativo, frases")
+      .select("id, slug, nome, prioridade, ativo, frases, dicas")
       .eq("ativo", true)
       .order("prioridade", { ascending: false });
     if (error) throw new Error(error.message);
     return (data ?? []).map((r: any) => ({
       ...r,
-      frases: Array.isArray(r.frases) ? r.frases : [],
+      frases: Array.isArray(r.frases) ? r.frases : [], dicas: Array.isArray(r.dicas) ? r.dicas : [],
     }));
   });
 
@@ -123,12 +124,12 @@ export const adminListTriggers = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
       .from("diagnostic_triggers")
-      .select("id, slug, nome, prioridade, ativo, frases")
+      .select("id, slug, nome, prioridade, ativo, frases, dicas")
       .order("prioridade", { ascending: false });
     if (error) throw new Error(error.message);
     return (data ?? []).map((r: any) => ({
       ...r,
-      frases: Array.isArray(r.frases) ? r.frases : [],
+      frases: Array.isArray(r.frases) ? r.frases : [], dicas: Array.isArray(r.dicas) ? r.dicas : [],
     }));
   });
 
@@ -144,6 +145,7 @@ const upsertSchema = z.object({
   prioridade: z.number().int().min(0).max(100),
   ativo: z.boolean(),
   frases: z.array(z.string().trim().min(3).max(500)).min(1).max(10),
+  dicas: z.array(z.string().trim().min(3).max(800)).max(10).default([]),
 });
 
 export const adminUpsertTrigger = createServerFn({ method: "POST" })
@@ -151,28 +153,24 @@ export const adminUpsertTrigger = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => upsertSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    const payload = {
+      slug: data.slug,
+      nome: data.nome,
+      prioridade: data.prioridade,
+      ativo: data.ativo,
+      frases: data.frases,
+      dicas: data.dicas ?? [],
+    };
     if (data.id) {
       const { error } = await context.supabase
         .from("diagnostic_triggers")
-        .update({
-          slug: data.slug,
-          nome: data.nome,
-          prioridade: data.prioridade,
-          ativo: data.ativo,
-          frases: data.frases,
-        })
+        .update(payload)
         .eq("id", data.id);
       if (error) throw new Error(error.message);
     } else {
       const { error } = await context.supabase
         .from("diagnostic_triggers")
-        .insert({
-          slug: data.slug,
-          nome: data.nome,
-          prioridade: data.prioridade,
-          ativo: data.ativo,
-          frases: data.frases,
-        });
+        .insert(payload);
       if (error) throw new Error(error.message);
     }
     return { ok: true as const };
