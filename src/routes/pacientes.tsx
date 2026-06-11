@@ -494,7 +494,7 @@ function BeforeAfterSection() {
    ════════════════════════════════════════════════════ */
 function FAQSection() {
   const faqs = [
-    { q: "É só IA ou tem nutricionista de verdade?", a: "É a combinação das duas: a IA gera o plano com alta precisão e o nutricionista revisa e acompanha cada etapa." },
+    { q: "É só um sistema automatizado ou tem nutricionista de verdade?", a: "É a combinação das duas: o nosso sistema inteligente gera o plano com alta precisão e o nutricionista revisa e acompanha cada etapa." },
     { q: "Quanto tempo leva para ver resultados?", a: "A maioria dos pacientes nota mais energia e bem-estar já na primeira semana. Resultados visíveis costumam aparecer entre 3 e 6 semanas." },
     { q: "Preciso ir ao consultório?", a: "Não necessariamente. Tudo pode ser feito 100% online, pelo app." },
     { q: "Posso cancelar quando quiser?", a: "Sim, sem fidelidade. Você decide quanto tempo quer manter o acompanhamento." },
