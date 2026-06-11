@@ -46,6 +46,7 @@ export const Route = createFileRoute("/pacientes")({
 
 function PacientesPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [quizDone, setQuizDone] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -55,12 +56,14 @@ function PacientesPage() {
       <nav className="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/70 border-b border-border/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[80px] flex items-center justify-between gap-3">
           <BrandLockup slot="landing-header" />
-          <div className="hidden md:flex items-center gap-7 text-sm font-medium text-muted-foreground">
-            <a href="#como" className="hover:text-foreground transition-colors">Como funciona</a>
-            <a href="#ifj" className="hover:text-foreground transition-colors">A IFJ</a>
-            <a href="#vantagens" className="hover:text-foreground transition-colors">Vantagens</a>
-            <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
-          </div>
+          {quizDone && (
+            <div className="hidden md:flex items-center gap-7 text-sm font-medium text-muted-foreground">
+              <a href="#como" className="hover:text-foreground transition-colors">Como funciona</a>
+              <a href="#ifj" className="hover:text-foreground transition-colors">A IFJ</a>
+              <a href="#vantagens" className="hover:text-foreground transition-colors">Vantagens</a>
+              <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => setCheckoutOpen(true)}
@@ -72,14 +75,27 @@ function PacientesPage() {
       </nav>
 
       <main className="pt-[80px]">
-        <HeroSection onCheckout={() => setCheckoutOpen(true)} />
-        <HowItWorks onCheckout={() => setCheckoutOpen(true)} />
-        <IFJSection />
-        <BenefitsSection onCheckout={() => setCheckoutOpen(true)} />
-        <TestimonialsSection />
-        <BeforeAfterSection />
-        <FAQSection />
-        <FinalCTASection onCheckout={() => setCheckoutOpen(true)} />
+        <HeroSection
+          onCheckout={() => setCheckoutOpen(true)}
+          onQuizDone={() => setQuizDone(true)}
+        />
+
+        {quizDone && (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <HowItWorks onCheckout={() => setCheckoutOpen(true)} />
+            <IFJSection />
+            <BenefitsSection onCheckout={() => setCheckoutOpen(true)} />
+            <TestimonialsSection />
+            <BeforeAfterSection />
+            <FAQSection />
+            <FinalCTASection onCheckout={() => setCheckoutOpen(true)} />
+          </motion.div>
+        )}
+
         <Footer />
       </main>
 
