@@ -31,7 +31,7 @@ export const Route = createFileRoute("/pacientes")({
       {
         name: "description",
         content:
-          "Planos alimentares clínicos personalizados feitos por IA + revisão humana do seu nutricionista. Prático, eficaz e feito para a sua vida real.",
+          "Planos alimentares clínicos personalizados feitos pelo nosso sistema inteligente + revisão humana do seu nutricionista. Prático, eficaz e feito para a sua vida real.",
       },
       { property: "og:title", content: "FitJourney — Transformação com Inteligência Nutricional" },
       {
@@ -59,7 +59,7 @@ function PacientesPage() {
           {quizDone && (
             <div className="hidden md:flex items-center gap-7 text-sm font-medium text-muted-foreground">
               <a href="#como" className="hover:text-foreground transition-colors">Como funciona</a>
-              <a href="#ifj" className="hover:text-foreground transition-colors">A IFJ</a>
+              <a href="#ifj" className="hover:text-foreground transition-colors">A Inteligência</a>
               <a href="#vantagens" className="hover:text-foreground transition-colors">Vantagens</a>
               <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
             </div>
@@ -130,19 +130,19 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-xs font-medium text-primary mb-5">
             <Sparkles className="w-3.5 h-3.5" /> Inteligência FitJourney (IFJ)
           </span>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
+          <h1 className="text-[clamp(1.75rem,8vw,3.75rem)] sm:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight break-words">
             Transforme sua saúde de verdade com a{" "}
-            <span className="bg-gradient-to-r from-primary to-[var(--gold,oklch(0.78_0.13_85))] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-[var(--gold,oklch(0.78_0.13_85))] bg-clip-text text-transparent break-words">
               Inteligência FitJourney
             </span>
           </h1>
-          <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
-            Planos alimentares clínicos personalizados feitos por IA + revisão
+          <p className="mt-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
+            Planos alimentares clínicos personalizados feitos pelo nosso sistema inteligente + revisão
             humana do seu nutricionista. Prático, eficaz e feito para caber na
             sua vida real.
           </p>
           <p className="mt-3 text-sm text-muted-foreground/80">
-            Chega de dietas genéricas. A IFJ entende suas queixas, seu corpo e
+            Chega de dietas genéricas. A Inteligência FitJourney entende suas queixas, seu corpo e
             seu dia a dia para criar um protocolo que realmente funciona.
           </p>
 
@@ -265,7 +265,7 @@ function HowItWorks({ onCheckout }: { onCheckout: () => void }) {
     {
       icon: ClipboardCheck,
       title: "Anamnese Inteligente",
-      desc: "Responda um questionário rápido. A IFJ analisa cansaço, inchaço, compulsão, intestino, objetivos, rotina e restrições.",
+      desc: "Responda um questionário rápido. O nosso sistema inteligente analisa cansaço, inchaço, compulsão, intestino, objetivos, rotina e restrições.",
     },
     {
       icon: Brain,
@@ -338,14 +338,14 @@ function IFJSection() {
         <div>
           <p className="text-sm font-semibold text-primary uppercase tracking-wider">Inteligência FitJourney</p>
           <h2 className="text-3xl sm:text-4xl font-bold mt-2 leading-tight">
-            A IA mais avançada em{" "}
+            O sistema inteligente mais avançado em{" "}
             <span className="bg-gradient-to-r from-primary to-[var(--gold,oklch(0.78_0.13_85))] bg-clip-text text-transparent">
               nutrição clínica
             </span>{" "}
             do Brasil
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Combinamos inteligência artificial treinada em milhares de casos
+            Combinamos um sistema inteligente treinado em milhares de casos
             clínicos com a sensibilidade humana do seu nutricionista.
           </p>
         </div>
@@ -371,10 +371,10 @@ function IFJSection() {
 function BenefitsSection({ onCheckout }: { onCheckout: () => void }) {
   const items = [
     { icon: Smartphone, title: "App próprio com plano, feedback e fotos", desc: "Acompanhe seu plano, envie feedback semanal e fotos de evolução." },
-    { icon: Brain, title: "IA Clínica + Acompanhamento Humano", desc: "Plano gerado pela IFJ e sempre revisado pelo nutricionista." },
+    { icon: Brain, title: "Sistema Inteligente + Acompanhamento Humano", desc: "Plano gerado pelo nosso sistema inteligente e sempre revisado pelo nutricionista." },
     { icon: Trophy, title: "Gamificação, metas e streaks", desc: "Conquistas e evolução visual para manter o foco." },
     { icon: ShoppingCart, title: "Lista de compras, água e substituições", desc: "Ferramentas práticas do dia a dia, todas dentro do app." },
-    { icon: MessageCircle, title: "Chat com a IFJ 24h", desc: "Tire dúvidas sobre trocas, receitas, sintomas e ajustes rápidos." },
+    { icon: MessageCircle, title: "Chat com a Inteligência FitJourney 24h", desc: "Tire dúvidas sobre trocas, receitas, sintomas e ajustes rápidos." },
     { icon: LineChart, title: "Relatórios de evolução", desc: "Gráficos claros e profissionais para você e seu médico." },
   ];
   return (
@@ -494,7 +494,7 @@ function BeforeAfterSection() {
    ════════════════════════════════════════════════════ */
 function FAQSection() {
   const faqs = [
-    { q: "É só IA ou tem nutricionista de verdade?", a: "É a combinação das duas: a IA gera o plano com alta precisão e o nutricionista revisa e acompanha cada etapa." },
+    { q: "É só um sistema automatizado ou tem nutricionista de verdade?", a: "É a combinação das duas: o nosso sistema inteligente gera o plano com alta precisão e o nutricionista revisa e acompanha cada etapa." },
     { q: "Quanto tempo leva para ver resultados?", a: "A maioria dos pacientes nota mais energia e bem-estar já na primeira semana. Resultados visíveis costumam aparecer entre 3 e 6 semanas." },
     { q: "Preciso ir ao consultório?", a: "Não necessariamente. Tudo pode ser feito 100% online, pelo app." },
     { q: "Posso cancelar quando quiser?", a: "Sim, sem fidelidade. Você decide quanto tempo quer manter o acompanhamento." },
@@ -549,7 +549,7 @@ function FinalCTASection({ onCheckout }: { onCheckout: () => void }) {
           onClick={onCheckout}
           className="mt-8 inline-flex items-center gap-2 gradient-primary text-primary-foreground rounded-full px-8 py-4 text-lg font-semibold shadow-[0_20px_60px_-15px_oklch(0.62_0.16_155/0.8)] hover:scale-[1.04] active:scale-[0.97] transition-all"
         >
-          Quero meu plano com a IFJ <ArrowRight className="w-5 h-5" />
+          Quero meu plano com a Inteligência FitJourney <ArrowRight className="w-5 h-5" />
         </button>
         <p className="mt-4 text-xs text-muted-foreground">
           Já tem convite do seu nutricionista?{" "}
