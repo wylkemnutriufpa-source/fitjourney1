@@ -374,7 +374,7 @@ function BenefitsSection({ onCheckout }: { onCheckout: () => void }) {
     { icon: Brain, title: "Sistema Inteligente + Acompanhamento Humano", desc: "Plano gerado pelo nosso sistema inteligente e sempre revisado pelo nutricionista." },
     { icon: Trophy, title: "Gamificação, metas e streaks", desc: "Conquistas e evolução visual para manter o foco." },
     { icon: ShoppingCart, title: "Lista de compras, água e substituições", desc: "Ferramentas práticas do dia a dia, todas dentro do app." },
-    { icon: MessageCircle, title: "Chat com a IFJ 24h", desc: "Tire dúvidas sobre trocas, receitas, sintomas e ajustes rápidos." },
+    { icon: MessageCircle, title: "Chat com a Inteligência FitJourney 24h", desc: "Tire dúvidas sobre trocas, receitas, sintomas e ajustes rápidos." },
     { icon: LineChart, title: "Relatórios de evolução", desc: "Gráficos claros e profissionais para você e seu médico." },
   ];
   return (
