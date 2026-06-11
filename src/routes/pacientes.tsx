@@ -59,7 +59,7 @@ function PacientesPage() {
           {quizDone && (
             <div className="hidden md:flex items-center gap-7 text-sm font-medium text-muted-foreground">
               <a href="#como" className="hover:text-foreground transition-colors">Como funciona</a>
-              <a href="#ifj" className="hover:text-foreground transition-colors">A IFJ</a>
+              <a href="#ifj" className="hover:text-foreground transition-colors">A Inteligência</a>
               <a href="#vantagens" className="hover:text-foreground transition-colors">Vantagens</a>
               <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
             </div>
