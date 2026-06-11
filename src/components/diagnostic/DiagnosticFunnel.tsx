@@ -249,10 +249,10 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
               </div>
             </div>
             <p className="mt-6 font-semibold">
-              Analisando seu perfil com a Inteligência FitJourney…
+              Cruzando suas respostas com nossa base clínica…
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Cruzando seus dados com nossa base clínica.
+              Montando sua análise personalizada.
             </p>
           </motion.div>
         )}
