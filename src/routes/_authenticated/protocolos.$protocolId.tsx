@@ -858,11 +858,12 @@ function PhaseDetailsDialog({
           )}
         </div>
 
-        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between">
+        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2">
           <Button variant="outline" onClick={onClose}>
             Fechar
           </Button>
           <div className="flex flex-col sm:flex-row gap-2">
+            <PhaseShareButtons protocol={protocol} module={m} phase={phase} />
             <EditPhaseButton protocolId={protocol.id} moduleId={m.id} phaseId={phase.id} />
             <Button onClick={() => onApply(phase)}>
               <Send className="size-4" />
