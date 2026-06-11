@@ -151,11 +151,37 @@ export const CATALOG: CatalogManifest = {
           clinicalTags: ["reflux"],
         },
         {
+          id: "digestive.reflux.onPPI",
+          domain: "digestive",
+          type: "boolean",
+          title: "Usa inibidor de bomba de prótons (omeprazol, pantoprazol)?",
+          trigger: { all: [{ questionId: "digestive.reflux", truthy: true }] },
+        },
+        {
+          id: "digestive.reflux.nocturnal",
+          domain: "digestive",
+          type: "boolean",
+          title: "Refluxo piora à noite ou ao deitar?",
+          trigger: { all: [{ questionId: "digestive.reflux", truthy: true }] },
+        },
+        {
           id: "digestive.ibs",
           domain: "digestive",
           type: "boolean",
           title: "Síndrome do intestino irritável?",
           clinicalTags: ["ibs"],
+        },
+        {
+          id: "digestive.ibs.subtype",
+          domain: "digestive",
+          type: "single_choice",
+          title: "Padrão predominante",
+          trigger: { all: [{ questionId: "digestive.ibs", truthy: true }] },
+          options: [
+            { value: "diarrhea", label: "Diarreia (SII-D)" },
+            { value: "constipation", label: "Constipação (SII-C)" },
+            { value: "mixed", label: "Misto (SII-M)" },
+          ],
         },
         {
           id: "digestive.constipation",
