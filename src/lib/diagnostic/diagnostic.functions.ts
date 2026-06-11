@@ -9,6 +9,7 @@ export type TriggerDTO = {
   prioridade: number;
   ativo: boolean;
   frases: string[];
+  dicas: string[];
 };
 
 const anonSchema = z.object({
