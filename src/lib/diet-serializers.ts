@@ -14,10 +14,18 @@ function itemsToText(opt: PlannerMealOption) {
 
 function renderMealHtml(m: PlannerMeal) {
   const mainItems = m.main.items
-    .map(
-      (i) =>
-        `<li><strong>${escapeHtml(i.name)}</strong> — ${i.qty} ${escapeHtml(i.unit)} <span style="color:#666;font-family:ui-monospace,monospace;font-size:10.5px">(${i.kcal} kcal)</span></li>`,
-    )
+    .map((i) => {
+      const subs = i.materializedEquivalents?.options ?? [];
+      const subsHtml = subs.length
+        ? `<ul style="margin:4px 0 6px 18px;padding:0;list-style:'↳ '">${subs
+            .map(
+              (s) =>
+                `<li style="font-size:11px;color:#444"><strong>${escapeHtml(s.name)}</strong> — ${s.qty} ${escapeHtml(s.unit)}${s.householdMeasure ? ` (${escapeHtml(s.householdMeasure)})` : ""} <span style="color:#888;font-family:ui-monospace,monospace;font-size:10px">(${s.kcal} kcal)</span></li>`,
+            )
+            .join("")}</ul>`
+        : "";
+      return `<li><strong>${escapeHtml(i.name)}</strong> — ${i.qty} ${escapeHtml(i.unit)} <span style="color:#666;font-family:ui-monospace,monospace;font-size:10.5px">(${i.kcal} kcal)</span>${subs.length ? `<div style="font-size:10.5px;color:#2563eb;margin-top:2px">Substituições equivalentes:</div>${subsHtml}` : ""}</li>`;
+    })
     .join("");
   const recipe = m.main.recipe
     ? `<p style="font-size:11px;color:#444;margin:6px 0 0;white-space:pre-wrap">📝 <em>Modo de preparo:</em>\n${escapeHtml(m.main.recipe)}</p>`

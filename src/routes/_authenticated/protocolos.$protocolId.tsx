@@ -846,9 +846,12 @@ function PhaseDetailsDialog({
           {/* Cardápio */}
           {phase.meals && phase.meals.length > 0 && (
             <Section title="Cardápio do Dia">
-              <p className="text-[11px] text-muted-foreground mb-2">
-                Clique em uma refeição para ver os alimentos, e em um alimento para ver as substituições.
-              </p>
+              <div className="flex items-start justify-between gap-2 -mt-1 mb-2">
+                <p className="text-[11px] text-muted-foreground">
+                  Clique em uma refeição para ver os alimentos, e em um alimento para ver as substituições.
+                </p>
+                <PhasePdfButton protocol={protocol} module={m} phase={phase} />
+              </div>
               <div className="space-y-2">
                 {phase.meals.map((meal) => (
                   <PreviewMealCard key={meal.id} meal={meal} />
@@ -903,6 +906,34 @@ function EditPhaseButton({
   );
 }
 
+function PhasePdfButton({
+  protocol,
+  module: m,
+  phase,
+}: {
+  protocol: ProtocolDescriptor;
+  module: ProtocolModule;
+  phase: ProtocolPhase;
+}) {
+  const template = useMemo(
+    () => protocolPhaseToPlannerTemplate(protocol, m, phase),
+    [protocol, m, phase],
+  );
+  return (
+    <Button
+      size="sm"
+      variant="outline"
+      onClick={() =>
+        printHTML({ title: template.name, html: templateToPrintHtml(template) })
+      }
+      className="shrink-0"
+    >
+      <Printer className="size-3.5 mr-1.5" />
+      PDF
+    </Button>
+  );
+}
+
 function PhaseShareButtons({
   protocol,
   module: m,
@@ -922,13 +953,6 @@ function PhaseShareButtons({
   return (
     <>
       <Button
-        variant="outline"
-        onClick={() => printHTML({ title: template.name, html: printHtml })}
-      >
-        <Printer className="size-4" />
-        PDF
-      </Button>
-      <Button
         onClick={() => setShareOpen(true)}
         className="bg-[#25D366] hover:bg-[#1ebe57] text-white"
       >
@@ -943,6 +967,7 @@ function PhaseShareButtons({
         defaultMessage={whatsText}
         printHtml={printHtml}
       />
+
     </>
   );
 }
