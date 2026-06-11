@@ -484,6 +484,13 @@ export const CATALOG: CatalogManifest = {
           clinicalTags: ["anxiety"],
         },
         {
+          id: "screening.anxiety.inTreatment",
+          domain: "screening",
+          type: "boolean",
+          title: "Está em tratamento (terapia ou medicação)?",
+          trigger: { all: [{ questionId: "screening.anxiety", truthy: true }] },
+        },
+        {
           id: "screening.migraine",
           domain: "screening",
           type: "boolean",
