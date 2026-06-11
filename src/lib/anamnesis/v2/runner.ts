@@ -19,6 +19,7 @@ function evalTrigger(trigger: Trigger, answers: Answers): boolean {
     const v = answers[cond.questionId];
     if ("equals" in cond) return v === cond.equals;
     if ("includes" in cond) return Array.isArray(v) && v.includes(cond.includes);
+    if ("in" in cond) return typeof v === "string" && cond.in.includes(v);
     if ("truthy" in cond) return v === true || (typeof v === "string" && v.length > 0);
     return false;
   });
