@@ -163,9 +163,9 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
               {err && <p className="text-sm text-destructive">{err}</p>}
               <Button
                 type="submit"
-                className="w-full gradient-primary text-primary-foreground rounded-full h-12 text-base font-semibold"
+                className="w-full gradient-primary text-primary-foreground rounded-full h-12 px-4 text-sm sm:text-base font-semibold whitespace-nowrap"
               >
-                Quero meu diagnóstico gratuito agora <ArrowRight className="w-4 h-4 ml-1.5" />
+                Quero meu diagnóstico gratuito <ArrowRight className="w-4 h-4 ml-1.5 shrink-0" />
               </Button>
               <p className="text-[11px] text-center text-muted-foreground">
                 Seu diagnóstico aparece na tela e enviaremos detalhes pelo WhatsApp.
