@@ -65,6 +65,7 @@ function AdminDiagnosticoPage() {
           prioridade: Number(editing.prioridade ?? 5),
           ativo: editing.ativo ?? true,
           frases: (editing.frases ?? []).map((f) => f.trim()).filter(Boolean),
+          dicas: (editing.dicas ?? []).map((d) => d.trim()).filter(Boolean),
         },
       });
       setEditing(null);
