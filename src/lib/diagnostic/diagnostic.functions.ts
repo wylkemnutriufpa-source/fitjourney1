@@ -40,7 +40,7 @@ export const listActiveTriggers = createServerFn({ method: "GET" })
     const anon = await anonClient();
     const { data, error } = await anon
       .from("diagnostic_triggers")
-      .select("id, slug, nome, prioridade, ativo, frases")
+      .select("id, slug, nome, prioridade, ativo, frases, dicas")
       .eq("ativo", true)
       .order("prioridade", { ascending: false });
     if (error) throw new Error(error.message);
@@ -124,7 +124,7 @@ export const adminListTriggers = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     const { data, error } = await context.supabase
       .from("diagnostic_triggers")
-      .select("id, slug, nome, prioridade, ativo, frases")
+      .select("id, slug, nome, prioridade, ativo, frases, dicas")
       .order("prioridade", { ascending: false });
     if (error) throw new Error(error.message);
     return (data ?? []).map((r: any) => ({
