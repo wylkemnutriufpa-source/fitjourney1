@@ -53,7 +53,7 @@ const initialAnswers: QuizAnswers = {
   queixas: [],
 };
 
-export function DiagnosticFunnel({ onCheckout }: { onCheckout: () => void }) {
+export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () => void; onComplete?: () => void }) {
   const [phase, setPhase] = useState<"capture" | "quiz" | "loading" | "result">("capture");
   const [lead, setLead] = useState<LeadForm>({ fullName: "", email: "", whatsapp: "" });
   const [answers, setAnswers] = useState<QuizAnswers>(initialAnswers);
@@ -104,7 +104,10 @@ export function DiagnosticFunnel({ onCheckout }: { onCheckout: () => void }) {
         },
       });
       // pequeno delay para o efeito "wow"
-      setTimeout(() => setPhase("result"), 1200);
+      setTimeout(() => {
+        setPhase("result");
+        onComplete?.();
+      }, 1200);
     } catch (e: any) {
       setErr(e?.message ?? "Não conseguimos gerar seu diagnóstico agora.");
       setPhase("quiz");
