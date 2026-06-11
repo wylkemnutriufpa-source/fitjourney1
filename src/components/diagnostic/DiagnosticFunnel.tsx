@@ -586,20 +586,14 @@ function DiagnosisResult({
         </div>
       </div>
 
-      {diagnosis.dicas.length > 0 && (
+      {diagnosis.dicasDetalhadas.length > 0 && (
         <div>
           <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2">
             Pontos de atenção
           </p>
           <ul className="space-y-2">
-            {diagnosis.dicas.map((d, i) => (
-              <li
-                key={i}
-                className="flex gap-2 text-sm leading-relaxed p-3 rounded-xl bg-muted/40 border border-border/40"
-              >
-                <Sparkles className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
-                <span>{d}</span>
-              </li>
+            {diagnosis.dicasDetalhadas.map((d, i) => (
+              <DicaCard key={i} frase={d.frase} dica={d.dica} />
             ))}
           </ul>
         </div>
