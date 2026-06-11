@@ -204,10 +204,13 @@ function HeroSection({ onCheckout, onQuizDone }: { onCheckout: () => void; onQui
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-xs font-medium text-primary mb-5">
             <Sparkles className="w-3.5 h-3.5" /> Inteligência FitJourney (IFJ)
           </span>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight [overflow-wrap:anywhere] hyphens-auto">
+          <h1 className="text-[1.75rem] sm:text-5xl lg:text-6xl font-bold leading-[1.15] tracking-tight break-words hyphens-none">
             Transforme sua saúde de verdade com a{" "}
+            <span className="bg-gradient-to-r from-primary to-[var(--gold,oklch(0.78_0.13_85))] bg-clip-text text-transparent whitespace-nowrap sm:whitespace-normal">
+              Inteligência
+            </span>{" "}
             <span className="bg-gradient-to-r from-primary to-[var(--gold,oklch(0.78_0.13_85))] bg-clip-text text-transparent">
-              Inteligência FitJourney
+              FitJourney
             </span>
           </h1>
           <p className="mt-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
