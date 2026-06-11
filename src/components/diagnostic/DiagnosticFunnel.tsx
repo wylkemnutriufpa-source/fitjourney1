@@ -818,3 +818,47 @@ function Stat({
     </div>
   );
 }
+
+function DicaCard({ frase, dica }: { frase: string; dica: string | null }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <li className="rounded-xl bg-muted/40 border border-border/40 overflow-hidden">
+      <div className="flex gap-2 text-sm leading-relaxed p-3">
+        <Sparkles className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
+        <span>{frase}</span>
+      </div>
+      {dica && (
+        <>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-semibold text-primary border-t border-border/40 bg-primary/5 hover:bg-primary/10 transition-colors"
+          >
+            <span className="flex items-center gap-1.5">
+              <Lightbulb className="w-3.5 h-3.5" />
+              {open ? "Fechar dica" : "Ver dica personalizada"}
+            </span>
+            <ChevronDown
+              className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`}
+            />
+          </button>
+          <AnimatePresence initial={false}>
+            {open && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="px-3 py-3 text-sm leading-relaxed bg-primary/5 border-t border-primary/10 text-foreground/90">
+                  {dica}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
+    </li>
+  );
+}
