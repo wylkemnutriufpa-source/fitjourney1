@@ -22,7 +22,13 @@ import {
   Replace,
   Users,
   Timer,
+  Printer,
+  MessageCircle,
 } from "lucide-react";
+import { printHTML } from "@/lib/share-utils";
+import { templateToPrintHtml, templateToWhatsText } from "@/lib/diet-serializers";
+import { protocolPhaseToPlannerTemplate } from "@/lib/protocols/phase-to-template";
+import { SendShareDialog } from "@/components/SendShareDialog";
 import { cn } from "@/lib/utils";
 import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
 import { AppShell } from "@/components/AppShell";
