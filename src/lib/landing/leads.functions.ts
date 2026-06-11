@@ -39,7 +39,8 @@ export const createLead = createServerFn({ method: "POST" })
       whatsapp: data.whatsapp,
       source: data.source ?? "landing_intro",
     });
-    if (error) throw new Error(error.message);
+    // Lead duplicado / RLS quirk não pode bloquear o fluxo do paciente.
+    if (error) console.warn("[createLead] insert ignored:", error.message);
     return { ok: true as const };
   });
 

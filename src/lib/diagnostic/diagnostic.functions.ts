@@ -52,48 +52,55 @@ export const listActiveTriggers = createServerFn({ method: "GET" })
 export const submitDiagnosticResponse = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => anonSchema.parse(d))
   .handler(async ({ data }) => {
-    // Usa service role: bypass RLS para ler lead existente (SELECT bloqueado p/ anon)
-    // e gravar diagnóstico mesmo com .select().single() no RETURNING.
+    // Persistência é best-effort: lead duplicado ou erro de RLS NUNCA bloqueia
+    // a exibição do diagnóstico para o usuário. Falhas são logadas e seguimos.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // 1. Cria lead se ainda não existir (mesmo email)
     let leadId: string | null = null;
-    const { data: existing } = await supabaseAdmin
-      .from("landing_leads")
-      .select("id")
-      .eq("email", data.email)
-      .maybeSingle();
-    if (existing?.id) {
-      leadId = existing.id;
-    } else {
-      const { data: inserted, error: leadErr } = await supabaseAdmin
+    try {
+      // 1. Procura lead existente (por email). limit(1) evita erro com duplicatas.
+      const { data: existing } = await supabaseAdmin
         .from("landing_leads")
-        .insert({
-          full_name: data.fullName,
-          email: data.email,
-          whatsapp: data.whatsapp,
-          source: "diagnostico_pacientes",
-        })
         .select("id")
-        .single();
-      if (leadErr) throw new Error(leadErr.message);
-      leadId = inserted?.id ?? null;
+        .eq("email", data.email)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (existing && existing[0]?.id) {
+        leadId = existing[0].id;
+      } else {
+        const { data: inserted } = await supabaseAdmin
+          .from("landing_leads")
+          .insert({
+            full_name: data.fullName,
+            email: data.email,
+            whatsapp: data.whatsapp,
+            source: "diagnostico_pacientes",
+          })
+          .select("id")
+          .single();
+        leadId = inserted?.id ?? null;
+      }
+    } catch (e) {
+      console.warn("[diagnostic] lead upsert silently ignored:", e);
     }
 
-    // 2. Salva resposta do diagnóstico
-    const { error } = await supabaseAdmin.from("diagnostic_responses").insert({
-      lead_id: leadId,
-      full_name: data.fullName,
-      email: data.email,
-      whatsapp: data.whatsapp,
-      answers: data.answers,
-      diagnosis: data.diagnosis,
-      imc: data.imc ?? null,
-      peso_ideal: data.pesoIdeal ?? null,
-      diferenca_kg: data.diferencaKg ?? null,
-      triggers_acionados: data.triggersAcionados,
-    });
-    if (error) throw new Error(error.message);
+    // 2. Salva resposta do diagnóstico (best-effort também)
+    try {
+      await supabaseAdmin.from("diagnostic_responses").insert({
+        lead_id: leadId,
+        full_name: data.fullName,
+        email: data.email,
+        whatsapp: data.whatsapp,
+        answers: data.answers,
+        diagnosis: data.diagnosis,
+        imc: data.imc ?? null,
+        peso_ideal: data.pesoIdeal ?? null,
+        diferenca_kg: data.diferencaKg ?? null,
+        triggers_acionados: data.triggersAcionados,
+      });
+    } catch (e) {
+      console.warn("[diagnostic] response insert silently ignored:", e);
+    }
 
     return { ok: true as const, leadId };
   });
