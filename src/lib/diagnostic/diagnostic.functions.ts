@@ -46,7 +46,7 @@ export const listActiveTriggers = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return (data ?? []).map((r: any) => ({
       ...r,
-      frases: Array.isArray(r.frases) ? r.frases : [],
+      frases: Array.isArray(r.frases) ? r.frases : [], dicas: Array.isArray(r.dicas) ? r.dicas : [],
     }));
   });
 
@@ -129,7 +129,7 @@ export const adminListTriggers = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return (data ?? []).map((r: any) => ({
       ...r,
-      frases: Array.isArray(r.frases) ? r.frases : [],
+      frases: Array.isArray(r.frases) ? r.frases : [], dicas: Array.isArray(r.dicas) ? r.dicas : [],
     }));
   });
 
