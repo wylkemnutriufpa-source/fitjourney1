@@ -405,6 +405,13 @@ export const CATALOG: CatalogManifest = {
           title: "Possui apneia diagnosticada?",
           clinicalTags: ["sleep_apnea"],
         },
+        {
+          id: "sleep.apnea.usesCPAP",
+          domain: "sleep",
+          type: "boolean",
+          title: "Usa CPAP regularmente?",
+          trigger: { all: [{ questionId: "sleep.apnea", truthy: true }] },
+        },
       ],
     },
 
