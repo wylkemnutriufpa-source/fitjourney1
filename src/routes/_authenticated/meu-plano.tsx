@@ -13,6 +13,7 @@ import { getMyClinicalContext } from "@/lib/clinical/context.functions";
 import { ActiveProtocolCard, personalizedWaterMl } from "./meu-plano.protocolos";
 import { AppShell } from "@/components/AppShell";
 import { ClinicalAlerts } from "@/components/patient/ClinicalAlerts";
+import { DiagnosticInsightsCard } from "@/components/patient/DiagnosticInsightsCard";
 import { DailyProtocolBanner } from "@/components/patient/DailyProtocolBanner";
 import { WaterCalculatorCard } from "@/components/patient/WaterCalculatorCard";
 import { ShoppingListCard } from "@/components/patient/ShoppingListCard";
@@ -227,6 +228,7 @@ function MyPlanPage() {
       <div className="space-y-8 max-w-3xl">
         <DailyProtocolBanner />
         <ClinicalAlerts />
+        <DiagnosticInsightsCard />
         <header className="border-b border-border pb-5 space-y-2">
           <p className="text-2xl sm:text-3xl font-bold tracking-tight">
             {greeting.label}
