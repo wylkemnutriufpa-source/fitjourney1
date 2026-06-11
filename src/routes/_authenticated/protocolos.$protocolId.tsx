@@ -22,7 +22,13 @@ import {
   Replace,
   Users,
   Timer,
+  Printer,
+  MessageCircle,
 } from "lucide-react";
+import { printHTML } from "@/lib/share-utils";
+import { templateToPrintHtml, templateToWhatsText } from "@/lib/diet-serializers";
+import { protocolPhaseToPlannerTemplate } from "@/lib/protocols/phase-to-template";
+import { SendShareDialog } from "@/components/SendShareDialog";
 import { cn } from "@/lib/utils";
 import type { PhaseMeal, PhaseMealItem } from "@/lib/protocols/catalog";
 import { AppShell } from "@/components/AppShell";
@@ -852,11 +858,12 @@ function PhaseDetailsDialog({
           )}
         </div>
 
-        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between">
+        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2">
           <Button variant="outline" onClick={onClose}>
             Fechar
           </Button>
           <div className="flex flex-col sm:flex-row gap-2">
+            <PhaseShareButtons protocol={protocol} module={m} phase={phase} />
             <EditPhaseButton protocolId={protocol.id} moduleId={m.id} phaseId={phase.id} />
             <Button onClick={() => onApply(phase)}>
               <Send className="size-4" />
@@ -893,6 +900,50 @@ function EditPhaseButton({
       <Pencil className="size-4" />
       Editar esta Fase
     </Button>
+  );
+}
+
+function PhaseShareButtons({
+  protocol,
+  module: m,
+  phase,
+}: {
+  protocol: ProtocolDescriptor;
+  module: ProtocolModule;
+  phase: ProtocolPhase;
+}) {
+  const [shareOpen, setShareOpen] = useState(false);
+  const template = useMemo(
+    () => protocolPhaseToPlannerTemplate(protocol, m, phase),
+    [protocol, m, phase],
+  );
+  const printHtml = useMemo(() => templateToPrintHtml(template), [template]);
+  const whatsText = useMemo(() => templateToWhatsText(template), [template]);
+  return (
+    <>
+      <Button
+        variant="outline"
+        onClick={() => printHTML({ title: template.name, html: printHtml })}
+      >
+        <Printer className="size-4" />
+        PDF
+      </Button>
+      <Button
+        onClick={() => setShareOpen(true)}
+        className="bg-[#25D366] hover:bg-[#1ebe57] text-white"
+      >
+        <MessageCircle className="size-4" />
+        WhatsApp
+      </Button>
+      <SendShareDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title={`Enviar "${phase.name}" via WhatsApp`}
+        printTitle={template.name}
+        defaultMessage={whatsText}
+        printHtml={printHtml}
+      />
+    </>
   );
 }
 
