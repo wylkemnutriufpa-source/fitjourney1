@@ -2,8 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listLeads, deleteLead, type LandingLead } from "@/lib/landing/leads.functions";
-import { Trash2, Mail, MessageCircle, Download } from "lucide-react";
+import { Trash2, Mail, MessageCircle, Download, Copy, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+
+function getFunnelUrl() {
+  if (typeof window !== "undefined") return `${window.location.origin}/pacientes`;
+  return "/pacientes";
+}
 
 export const Route = createFileRoute("/_authenticated/admin/leads")({
   component: LeadsPage,
