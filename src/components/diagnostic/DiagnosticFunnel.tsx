@@ -80,7 +80,7 @@ export function DiagnosticFunnel({ onCheckout, onComplete }: { onCheckout: () =>
       return;
     }
     setAnswers((a) => ({ ...a, nome: lead.fullName }));
-    setPhase("quiz");
+    setPhase("whatsapp_gate");
   }
 
   async function finishQuiz() {
