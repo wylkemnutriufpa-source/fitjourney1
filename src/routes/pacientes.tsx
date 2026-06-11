@@ -80,8 +80,8 @@ function PacientesPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-1.5 rounded-full px-3 sm:px-4 py-2 text-[11px] sm:text-sm font-semibold transition-all hover:scale-[1.03] bg-[var(--gold,oklch(0.78_0.13_85))] text-background shadow-[0_8px_24px_-8px_oklch(0.78_0.13_85/0.7)] whitespace-nowrap"
           >
-            <span className="hidden xs:inline">Iniciar meu acompanhamento</span>
-            <span className="xs:hidden">Iniciar</span>
+            <span className="hidden sm:inline">Iniciar meu acompanhamento</span>
+            <span className="sm:hidden">Iniciar</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </a>
         </div>
